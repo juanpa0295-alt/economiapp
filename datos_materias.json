@@ -1,0 +1,83 @@
+{
+  "macroeconomia_1": {
+    "pib_gasto": {
+      "nombre": "PIB - Enfoque del Gasto (Modelo Keynesiano)",
+      "formula_general": "Y = \\frac{1}{1 - c_1} \\cdot [C_0 - c_1 T + I + G]",
+      "variables": {
+        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 500.0, "ayuda_real": "🔍 DATO REAL: Consumo de supervivencia financiado con desahorro."},
+        "c1": {"nombre": "Propensión a Consumir", "valor_defecto": 0.8, "ayuda_real": "🔍 DATO REAL: Un valor típico oscila entre 0.6 y 0.9."},
+        "T": {"nombre": "Impuestos", "valor_defecto": 200.0, "ayuda_real": "🔍 DATO REAL: Son los impuestos netos (Recaudo - Transferencias)."},
+        "I": {"nombre": "Inversión", "valor_defecto": 300.0, "ayuda_real": "🔍 DATO REAL: 'Formación Bruta de Capital Fijo' (FBCF)."},
+        "G": {"nombre": "Gasto Público", "valor_defecto": 400.0, "ayuda_real": "🔍 DATO REAL: 'Gasto de Consumo Final del Gobierno General'."}
+      }
+    },
+    "teoria_consumo": {
+      "nombre": "Teoría del Consumo (Función Keynesiana)",
+      "formula_general": "C = C_0 + c_1(Y - T)",
+      "variables": {
+        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 300.0, "ayuda_real": "🔍 DATO REAL: Nivel de consumo fijo que no depende de la renta."},
+        "c1": {"nombre": "Propensión Marginal a Consumir", "valor_defecto": 0.75, "ayuda_real": "🔍 DATO REAL: Cuánto aumenta el consumo si el ingreso aumenta en 1."},
+        "Y": {"nombre": "Ingreso Total (Renta)", "valor_defecto": 2000.0, "ayuda_real": "🔍 DATO REAL: Ingreso agregado de la economía."},
+        "T": {"nombre": "Impuestos Netos", "valor_defecto": 250.0, "ayuda_real": "🔍 DATO REAL: Dinero que el Estado recauda de los hogares."}
+      }
+    },
+    "consumo_intertemporal": {
+      "nombre": "Consumo Intertemporal (Fisher y Optimización)",
+      "formula_general": "C_1 + \\frac{C_2}{1+r} = Y_1 + \\frac{Y_2}{1+r}",
+      "variables": {
+        "Y1": {"nombre": "Ingreso Presente (Y1)", "valor_defecto": 1000.0, "ayuda_real": "🔍 DATO REAL: Ingreso en el periodo actual."},
+        "Y2": {"nombre": "Ingreso Futuro (Y2)", "valor_defecto": 1100.0, "ayuda_real": "🔍 DATO REAL: Ingreso esperado para el próximo periodo."},
+        "r": {"nombre": "Tasa de Interés Real (r)", "valor_defecto": 0.05, "ayuda_real": "🔍 DATO REAL: Tasa ajustada por inflación. Ingresa 0.05 para un 5%."},
+        "alpha": {"nombre": "Preferencia Presente (α)", "valor_defecto": 0.5, "ayuda_real": "🔍 DATO REAL: Qué tanta utilidad genera consumir hoy."},
+        "beta": {"nombre": "Preferencia Futura (β)", "valor_defecto": 0.5, "ayuda_real": "🔍 DATO REAL: Qué tanta utilidad genera guardar el consumo para mañana."}
+      }
+    },
+    "inversion": {
+      "nombre": "Teoría de la Inversión (Enfoque De Gregorio)",
+      "formula_general": "K^* = \\alpha \\frac{Y}{r + \\delta} \\quad \\text{y} \\quad I_t = K^* - (1-\\delta)K_{t-1}",
+      "variables": {
+        "Y": {"nombre": "Producción Esperada (Y)", "valor_defecto": 5000.0, "ayuda_real": "🔍 DATO REAL: Nivel de producción o demanda que la empresa proyecta tener."},
+        "alpha": {"nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "🔍 DATO REAL: Elasticidad del producto respecto al capital. Suele rondar 0.33 en funciones Cobb-Douglas."},
+        "r": {"nombre": "Tasa de Interés Real (r)", "valor_defecto": 0.05, "ayuda_real": "🔍 DATO REAL: Costo financiero de adquirir el capital."},
+        "delta": {"nombre": "Tasa de Depreciación (δ)", "valor_defecto": 0.10, "ayuda_real": "🔍 DATO REAL: Porcentaje del capital que se desgasta u obsolesce cada año."},
+        "K_prev": {"nombre": "Capital Inicial (K_t-1)", "valor_defecto": 8000.0, "ayuda_real": "🔍 DATO REAL: Stock de maquinaria e infraestructura que la empresa ya posee hoy."},
+        "VM": {"nombre": "Valor de Mercado (VM)", "valor_defecto": 1200.0, "ayuda_real": "🔍 DATO REAL: Capitalización bursátil para la q de Tobin."},
+        "CR": {"nombre": "Costo de Reposición (CR)", "valor_defecto": 1000.0, "ayuda_real": "🔍 DATO REAL: Costo actual de reemplazar el capital existente."}
+      }
+    },"mercado_dinero": {
+      "nombre": "Mercado de Dinero (Equilibrio L-M)",
+      "formula_general": "\\frac{M}{P} = kY - hr",
+      "variables": {
+        "M": {"nombre": "Oferta Monetaria Nominal (M)", "valor_defecto": 2000.0, "ayuda_real": "🔍 DATO REAL: Cantidad de dinero circulante (M1 o M2) controlada por el Banco de la República."},
+        "P": {"nombre": "Nivel de Precios (P)", "valor_defecto": 1.0, "ayuda_real": "🔍 DATO REAL: Índice de Precios al Consumidor (IPC). Se usa para deflactar saldos nominales."},
+        "Y": {"nombre": "Ingreso Real (Y)", "valor_defecto": 4000.0, "ayuda_real": "🔍 DATO REAL: Nivel de actividad económica o PIB real actual."},
+        "k": {"nombre": "Sensibilidad al Ingreso (k)", "valor_defecto": 0.25, "ayuda_real": "🔍 DATO REAL: Qué tanto aumenta la demanda de efectivo cuando sube el ingreso (motivo transacción)."},
+        "h": {"nombre": "Sensibilidad al Interés (h)", "valor_defecto": 800.0, "ayuda_real": "🔍 DATO REAL: Qué tanto cae la demanda de dinero cuando sube la tasa de interés (motivo especulación)."}
+      }
+    },"is_lm": {
+      "nombre": "Modelo IS-LM (Equilibrio General)",
+      "formula_general": "IS: Y = C + I + G \\quad LM: \\frac{M}{P} = L(Y, r)",
+      "variables": {
+        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 500.0, "ayuda_real": "Consumo de supervivencia de los hogares."},
+        "c1": {"nombre": "Propensión a Consumir (c1)", "valor_defecto": 0.8, "ayuda_real": "Sensibilidad del consumo al ingreso."},
+        "T": {"nombre": "Impuestos", "valor_defecto": 200.0, "ayuda_real": "Recaudación fiscal neta."},
+        "I0": {"nombre": "Inversión Autónoma", "valor_defecto": 800.0, "ayuda_real": "Inversión base empresarial."},
+        "b": {"nombre": "Sensibilidad Inversión (b)", "valor_defecto": 2000.0, "ayuda_real": "Respuesta de la inversión a la tasa de interés."},
+        "G": {"nombre": "Gasto Público", "valor_defecto": 400.0, "ayuda_real": "Gasto de consumo e inversión del gobierno."},
+        "M": {"nombre": "Oferta Monetaria Nominal (M)", "valor_defecto": 2000.0, "ayuda_real": "Dinero en circulación controlado por el BanRep."},
+        "P": {"nombre": "Nivel de Precios (P)", "valor_defecto": 1.0, "ayuda_real": "Índice de precios (IPC)."},
+        "k": {"nombre": "Sensibilidad Demanda Dinero (k)", "valor_defecto": 0.25, "ayuda_real": "Demanda por motivo transacción."},
+        "h": {"nombre": "Sensibilidad Demanda Dinero (h)", "valor_defecto": 800.0, "ayuda_real": "Demanda por motivo especulación."}
+      }
+    },"gobierno": {
+      "nombre": "Gobierno y Política Fiscal",
+      "formula_general": "BS = T - G \\quad \\text{donde} \\quad T = T_0 + tY",
+      "variables": {
+        "G": {"nombre": "Gasto Público (G)", "valor_defecto": 600.0, "ayuda_real": "🔍 DATO REAL: Compras de bienes y servicios del Estado. Mira el Presupuesto General de la Nación (PGN)."},
+        "T0": {"nombre": "Impuestos Suma Fija (T0)", "valor_defecto": 200.0, "ayuda_real": "🔍 DATO REAL: Impuestos que no dependen del nivel de actividad, como algunos prediales o tasas fijas."},
+        "t": {"nombre": "Tasa Impositiva (t)", "valor_defecto": 0.15, "ayuda_real": "🔍 DATO REAL: Presión tributaria promedio sobre el PIB. Para Colombia, suele estar entre el 14% y 19%."},
+        "Y": {"nombre": "Ingreso/PIB (Y)", "valor_defecto": 5000.0, "ayuda_real": "🔍 DATO REAL: El nivel de producción actual que genera la base gravable."}
+      }
+    }
+  }
+}
