@@ -1,20 +1,124 @@
-import streamlit as st
 import json
+import streamlit as st
 import pandas as pd
-import sympy as sp
 import numpy as np
+import sympy as sp
 import google.generativeai as genai
-import math
-import streamlit.components.v1 as components
 
-st.set_page_config(page_title="App Econ", layout="wide")
+# ==========================================
+# 1. CONFIGURACIÓN DE PÁGINA
+# ==========================================
+st.set_page_config(page_title="Cifras Claras | Educación", page_icon="🧭", layout="wide")
 
-# # ====== MENÚ LATERAL (ARQUITECTURA CURRICULAR EXACTA) ======
-with st.sidebar:
-    st.markdown("<h1><i class='fas fa-graduation-cap' style='color:#00FFAA;'></i> Navegación</h1>", unsafe_allow_html=True)
+# ==========================================
+# 2. CARGA DE DATOS BASE
+# ==========================================
+try:
+    with open('datos_materias.json', 'r', encoding='utf-8') as f:
+        datos = json.load(f)
+except FileNotFoundError:
+    st.error("🚨 No se encontró el archivo 'datos_materias.json'. Verifica que esté en la misma carpeta.")
+    st.stop()
+
+# ==========================================
+# 3. CSS PERSONALIZADO (DISEÑO INSTITUCIONAL PREMIUM)
+# ==========================================
+st.markdown("""
+<style>
+    /* 1. Fuentes e Iconos */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
     
+    html, body, [class*="css"], .stMarkdown, .stText { 
+        font-family: 'Montserrat', sans-serif !important; 
+    }
+
+    /* 2. Fondo Base Claro (Gris Perla) */
+    .stApp, [data-testid="stAppViewContainer"] {
+        background-color: #F8FAFC !important; 
+    }
+
+    /* 3. Títulos Corporativos (Azul Marino Cifras Claras) */
+    h1, h2 {
+        color: #1E3A8A !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
+    }
+    h3, h4 {
+        color: #2563EB !important;
+        font-weight: 600 !important;
+    }
+
+    /* 4. Tarjetas Suaves (Glassmorphism Light) */
+    div[data-testid="stVerticalBlock"] div[style*="border"] {
+        border-radius: 12px !important;
+        border: 1px solid #E2E8F0 !important; 
+        background-color: #FFFFFF !important; 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        transition: all 0.3s ease;
+    }
+    
+    /* Efecto Hover en las tarjetas */
+    div[data-testid="stVerticalBlock"] div[style*="border"]:hover {
+        border-color: #93C5FD !important;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1) !important;
+        transform: translateY(-2px);
+    }
+
+    /* 5. Botones Estilo SaaS (Degradado Azul/Verde) */
+    .stButton > button {
+        background: linear-gradient(90deg, #2563EB 0%, #059669 100%) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        transform: scale(1.02) !important;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3) !important;
+    }
+
+    /* 6. Expanders y Alertas */
+    .streamlit-expanderHeader {
+        background-color: #EFF6FF !important;
+        color: #1E3A8A !important;
+        font-weight: 600;
+        border-radius: 8px !important;
+    }
+    
+    div[data-testid="stAlert"] {
+        border-radius: 10px;
+        border: none !important;
+    }
+
+    /* Ocultar elementos pero rescatar la flecha del menú */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {background-color: transparent !important;}
+    [data-testid="stHeader"]::before {content: none;}
+    .stDeployButton {display: none !important;}
+</style>
+""", unsafe_allow_html=True)
+
+# ==========================================
+# 4. MENÚ LATERAL (IDENTIDAD CORPORATIVA)
+# ==========================================
+with st.sidebar:
+    # 4.1 Cargar el logo de Cifras Claras
+    try:
+        # ¡AQUÍ ESTÁ EL CAMBIO! Ponemos el nombre sencillo
+        st.image("logo.jpg", use_container_width=True)
+    except:
+        st.warning("⚠️ Logo no encontrado. Verifica que se llame 'Logo.jpg'.")
+    
+    st.markdown("<hr style='margin-top: 0; margin-bottom: 15px;'>", unsafe_allow_html=True)
+    
+    # 4.2 Navegación Principal
     materia_seleccionada = st.selectbox(
-        "Selecciona la Materia:", 
+        "📚 Selecciona la Materia:", 
         [
             "Principios de Macroeconomía", 
             "Macroeconomía 1", 
@@ -26,20 +130,28 @@ with st.sidebar:
         ]
     )
     
+    # 4.3 Submenús por Materia
     if materia_seleccionada == "Principios de Macroeconomía":
         st.markdown("<h3><i class='fas fa-chart-line' style='color:#00FFAA;'></i> Temas Activos</h3>", unsafe_allow_html=True)
         tema_seleccionado = st.radio("Selecciona el Tema:", ["PIB (Enfoque Gasto)", "Mercado de Dinero", "Modelo IS-LM"])
         
     elif materia_seleccionada == "Macroeconomía 1":
-        st.markdown("<h3><i class='fas fa-exchange-alt' style='color:#00FFAA;'></i> Temas Activos</h3>", unsafe_allow_html=True)
-        tema_seleccionado = st.radio("Selecciona el Tema:", ["Teoría del Consumo", "Consumo Intertemporal", "Inversión", "Gobierno y Política Fiscal"])
+        st.markdown("<h3><i class='fas fa-exchange-alt' style='color:#1E3A8A;'></i> Temas Activos</h3>", unsafe_allow_html=True)
+        tema_seleccionado = st.radio("Selecciona el Tema:", [
+            "Teoría del Consumo", 
+            "Consumo Intertemporal", 
+            "Inversión", 
+            "Gobierno y Política Fiscal",
+            "Microfundamentos: El Problema de la Firma" # <--- Nombre exacto
+        ])
         
     elif materia_seleccionada == "Teoría de Juegos":
-        st.markdown("<h3><i class='fas fa-chess-knight' style='color:#00FFAA;'></i> Preparación Parcial</h3>", unsafe_allow_html=True)
+        st.markdown("<h3><i class='fas fa-chess-knight' style='color:#1E3A8A;'></i> Preparación Parcial</h3>", unsafe_allow_html=True)
         tema_seleccionado = st.radio("Selecciona el Tema:", [
-            "Módulo 11: Equilibrios de Nash (Puras)",
-            "Módulo 12: Estrategias Mixtas (Cálculo p y q)",
-            "Módulo 13: Forma Extensiva y Dominancia"
+            "Equilibrios de Nash (Puras)",
+            "Estrategias Mixtas (Cálculo p y q)",
+            "Forma Extensiva y Dominancia",
+            "Arbitraje de Oferta Final" 
         ])
         
     elif materia_seleccionada == "Matemáticas 1":
@@ -54,100 +166,28 @@ with st.sidebar:
         st.markdown("<h3><i class='fas fa-chart-area' style='color:#00FFAA;'></i> Cálculo Integral</h3>", unsafe_allow_html=True)
         tema_seleccionado = st.radio("Selecciona el Tema:", ["Módulo 16: Áreas e Integrales"])
         
-    else: # Estadística 2 (Siempre al final)
+    else: # Estadística 2
         st.markdown("<h3><i class='fas fa-chart-pie' style='color:#00FFAA;'></i> Temas Activos</h3>", unsafe_allow_html=True)
         tema_seleccionado = st.radio("Selecciona el Tema:", ["Estimadores Estadísticos", "Intervalos y Tamaño de Muestra", "Pruebas de Hipótesis"])
     
     st.divider()
-    tipo_cuenta = st.radio("Suscripción (Monetización):", ["Básica (Gratis)", "Premium (Pago)"], index=0)
-
-# ====== CARGA DE DATOS ======
-with open('datos_materias.json', 'r', encoding='utf-8') as f:
-    datos = json.load(f)
-
-# ====== LÓGICA DE FONDOS DINÁMICOS POR MATERIA ======
-fondos_materias = {
-    "Principios de Macroeconomía": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop", 
-    "Macroeconomía 1": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop", 
-    "Estadística 2": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" 
-}
-
-fondo_actual = fondos_materias.get(materia_seleccionada, fondos_materias["Principios de Macroeconomía"])
-
-# ====== DISEÑO PREMIUM EVOLUCIONADO (CSS LIMPIO Y UNIFICADO) ======
-st.markdown(f"""
-<style>
-    /* 1. Fuentes e Iconos */
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
     
-    html, body, [class*="css"], .stMarkdown, .stText {{ font-family: 'Montserrat', sans-serif !important; }}
+    # 4.4 Monetización (Duplicado corregido)
+    st.markdown("### 👑 Suscripción")
+    tipo_cuenta = st.radio("Nivel de Acceso:", ["Básica (Gratis)", "Premium (Pago)"], index=0)
 
-    /* 2. Softer Dark Mode + Fondo Dinámico */
-    .stApp, [data-testid="stAppViewContainer"] {{
-        background-color: #0a192f !important; 
-        background-image: 
-            linear-gradient(rgba(10, 25, 47, 0.90), rgba(10, 25, 47, 0.95)), 
-            url("{fondo_actual}") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-attachment: fixed !important;
-    }}
+    st.divider()
 
-    /* 3. Títulos Neón */
-    h1, h2 {{
-        color: #00FFAA !important;
-        text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
-        font-weight: 800 !important;
-    }}
+    # 4.5 Mensaje de Valor (Tip Económico del Día)
+    st.markdown("""
+    <div style="background-color: #E6FFFA; border-left: 4px solid #319795; padding: 12px; border-radius: 4px;">
+        <p style="color: #285E61; margin: 0; font-size: 0.9em;">
+        <strong>💡 Tip de Estudio:</strong><br>
+        En Teoría de Juegos, recuerda que el equilibrio de Nash no siempre es el resultado óptimo de Pareto (ej. Dilema del Prisionero). ¡Analiza los incentivos!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    /* 4. Glassmorphism (Cartas Suaves) */
-    div[data-testid="stVerticalBlock"] div[style*="border"] {{
-        border-radius: 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-        background-color: rgba(17, 34, 64, 0.7) !important; 
-        backdrop-filter: blur(4px) !important; 
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.3s ease;
-    }}
-    
-    div[data-testid="stVerticalBlock"] div[style*="border"]:hover {{
-        border-color: #00FFAA !important;
-        box-shadow: 0 0 15px rgba(0, 255, 170, 0.15) !important;
-        transform: translateY(-2px);
-    }}
-
-    /* 5. Botones Estilo Quant */
-    .stButton > button {{
-        background: linear-gradient(90deg, #00FFAA 0%, #00b377 100%) !important;
-        color: #000000 !important;
-        border: none !important;
-        border-radius: 25px !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease !important;
-    }}
-    
-    .stButton > button:hover {{
-        transform: scale(1.05) !important;
-        box-shadow: 0 0 20px rgba(0, 255, 170, 0.4) !important;
-    }}
-
-    /* 6. Expanders y Alertas */
-    .streamlit-expanderHeader {{
-        background-color: rgba(17, 34, 64, 0.9) !important;
-        color: #00FFAA !important;
-        font-weight: 600;
-        border-radius: 8px !important;
-    }}
-    
-    div[data-testid="stAlert"] {{
-        border-radius: 10px;
-        background-color: rgba(17, 34, 64, 0.9) !important;
-        color: #E6F1FF !important;
-    }}
-</style>
-""", unsafe_allow_html=True)
 
 # ==========================================
 # MÓDULO 1: PIB (ENFOQUE GASTO)
@@ -274,10 +314,19 @@ elif tema_seleccionado == "Teoría del Consumo":
     col_input1, col_input2 = st.columns(2)
     valores_ingresados = {}
 
+    # Aquí generamos los inputs con el 'step' dinámico
     for i, (simbolo, info) in enumerate(tema["variables"].items()):
         with col_input1 if i % 2 == 0 else col_input2:
             with st.container(border=True):
-                valores_ingresados[simbolo] = st.number_input(f"{info['nombre']} ({simbolo})", value=float(info['valor_defecto']))
+                
+                # --- LÓGICA DE SALTOS INTELIGENTES ---
+                if simbolo == "c1": # Propensión marginal a consumir
+                    salto = 0.05
+                else:               # Ingreso, Impuestos, Consumo Autónomo
+                    salto = 100.0
+                    
+                valores_ingresados[simbolo] = st.number_input(f"{info['nombre']} ({simbolo})", value=float(info['valor_defecto']), step=salto)
+                
                 with st.expander("📖 ¿Qué es y dónde se consulta?"):
                     st.markdown(info['ayuda_real'])
 
@@ -302,7 +351,6 @@ elif tema_seleccionado == "Teoría del Consumo":
     col_pasos, col_grafico = st.columns(2)
 
     with col_pasos:
-        # Aquí aplicamos la "carpintería" pedagógica
         st.subheader("📝 Resolución Paso a Paso")
         
         st.markdown("**1. Calculamos el Ingreso Disponible ($Y_d$):**")
@@ -321,12 +369,9 @@ elif tema_seleccionado == "Teoría del Consumo":
         st.latex(f"C = {float(C_total):,.2f}")
 
     with col_grafico:
-        # Mejora: Gráfica de Función de Consumo vs Recta de 45°
         st.subheader("📈 Función de Consumo")
         st.markdown("Visualización del consumo frente a diferentes niveles de ingreso.")
         
-        # Generamos un rango de ingresos para la gráfica (desde 0 hasta el doble del ingreso actual)
-        # Asegúrate de importar numpy como np al inicio de tu código
         import numpy as np 
         rango_Y = np.linspace(0, Y_val * 2 if Y_val > 0 else 1000, 20)
         rango_C = [C0 + c1 * (y - T_val) for y in rango_Y]
@@ -337,8 +382,7 @@ elif tema_seleccionado == "Teoría del Consumo":
             "Recta 45° (Y=C)": rango_Y
         }).set_index("Ingreso (Y)")
         
-        # Usamos st.line_chart para una gráfica macroeconómica estándar
-        st.line_chart(datos_grafico, color=["#FF9800", "#555555"])
+        st.line_chart(datos_grafico, color=["#2563EB", "#9CA3AF"]) # Ajusté los colores al tema azul de Cifras Claras
 
     # ====== ANÁLISIS MARGINAL (CONSUMO) ======
     st.divider()
@@ -366,7 +410,6 @@ elif tema_seleccionado == "Teoría del Consumo":
         st.markdown("**Resultado numérico actual:**")
         st.latex(f"\\frac{{\\partial C}}{{\\partial {simbolo_derivar}}} = {float(valor_derivada):.2f}")
         
-    # Integración del concepto Freemium/Premium
     with st.expander(f"⭐ [Premium] Ver la carpintería algebraica de la derivada respecto a {simbolo_derivar}"):
         st.info("💡 En la versión gratuita el estudiante ve el resultado. En la Premium, ve este paso a paso detallado para estudiar para sus parciales.")
         if simbolo_derivar == Y_sym:
@@ -383,7 +426,6 @@ elif tema_seleccionado == "Teoría del Consumo":
             st.markdown("2. La derivada de $-c_1 T$ respecto a $T$ es **$-c_1$**.")
             st.latex(f"= 0 + 0 - c_1 = -c_1")
             st.caption("Nota económica: Por eso un aumento en los impuestos reduce el consumo en una proporción igual a la propensión marginal a consumir.")
-
 # ==========================================
 # MÓDULO 3: CONSUMO INTERTEMPORAL 
 # ==========================================
@@ -1536,151 +1578,84 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
         else:
             st.warning("⚠️ La dualidad exacta y simétrica con los intervalos de confianza estándar se visualiza mejor en pruebas de Dos Colas. Estás usando una prueba de una sola cola.")
 # ==========================================
-# MÓDULO 11: TEORÍA DE JUEGOS - EQUILIBRIOS PURAS (MATRIZ N x M)
+# MODULO 11: TEORÍA DE JUEGOS - EQUILIBRIOS PURAS
 # ==========================================
 elif tema_seleccionado == "Equilibrios de Nash (Puras)":
-    st.markdown("<h2><i class='fas fa-bullseye' style='color:#00FFAA;'></i> Módulo 11: Nash en Estrategias Puras</h2>", unsafe_allow_html=True)
-    st.markdown("Selecciona el tamaño de la matriz e ingresa los pagos. El sistema construirá el diagrama del juego y calculará las Mejores Respuestas.")
+    st.markdown("<h2><i class='fas fa-bullseye' style='color:#00FFAA;'></i> Nash en Estrategias Puras</h2>", unsafe_allow_html=True)
+    st.markdown("Selecciona el tamaño de la matriz. Ingresa los pagos directamente en las tablas estilo Excel para calcular las Mejores Respuestas.")
     
     # 1. Selectores de dimensión
     c_dim1, c_dim2 = st.columns(2)
-    filas = c_dim1.number_input("Estrategias Jugador 1 (Filas)", min_value=2, max_value=5, value=2, key="dim_f")
-    columnas = c_dim2.number_input("Estrategias Jugador 2 (Columnas)", min_value=2, max_value=5, value=2, key="dim_c")
+    filas = c_dim1.number_input("Número de Estrategias Jugador 1 (Filas)", min_value=2, max_value=5, value=2)
+    columnas = c_dim2.number_input("Número de Estrategias Jugador 2 (Columnas)", min_value=2, max_value=5, value=2)
 
     st.divider()
     
     # 2. Creación de DataFrames editables
-    st.markdown("### 📥 Ingreso de Pagos")
     c_m1, c_m2 = st.columns(2)
     with c_m1:
-        st.markdown("<h5 style='color:#2196F3;'>Pagos Jugador 1 (Azul)</h5>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:#00FFAA;'>Pagos Jugador 1</h4>", unsafe_allow_html=True)
         df_j1 = pd.DataFrame(0.0, index=[f"F{i+1}" for i in range(filas)], columns=[f"C{j+1}" for j in range(columnas)])
         pagos_j1 = st.data_editor(df_j1, key="editor_j1", use_container_width=True)
         
     with c_m2:
-        st.markdown("<h5 style='color:#FF9800;'>Pagos Jugador 2 (Naranja)</h5>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:#00FFAA;'>Pagos Jugador 2</h4>", unsafe_allow_html=True)
         df_j2 = pd.DataFrame(0.0, index=[f"F{i+1}" for i in range(filas)], columns=[f"C{j+1}" for j in range(columnas)])
         pagos_j2 = st.data_editor(df_j2, key="editor_j2", use_container_width=True)
 
-    # 3. Motor de Cálculo de Equilibrio y Mejores Respuestas
+    # 3. Motor de Cálculo de Equilibrio de Nash (N x M)
     equilibrios = []
-    mejores_respuestas_j1 = [] # Coordenadas (i,j)
-    mejores_respuestas_j2 = [] # Coordenadas (i,j)
     
-    for j in range(columnas):
-        max_j1_columna = pagos_j1.iloc[:, j].max()
-        for i in range(filas):
-            if pagos_j1.iloc[i, j] == max_j1_columna:
-                mejores_respuestas_j1.append((i, j))
-
     for i in range(filas):
-        max_j2_fila = pagos_j2.iloc[i, :].max()
         for j in range(columnas):
-            if pagos_j2.iloc[i, j] == max_j2_fila:
-                mejores_respuestas_j2.append((i, j))
-                
-    # Intersección de mejores respuestas = Equilibrio de Nash
-    nash_coords = set(mejores_respuestas_j1).intersection(set(mejores_respuestas_j2))
-    for (i, j) in nash_coords:
-        equilibrios.append(f"{pagos_j1.index[i]}, {pagos_j1.columns[j]}")
+            pago_actual_j1 = pagos_j1.iloc[i, j]
+            pago_actual_j2 = pagos_j2.iloc[i, j]
+            
+            # ¿Es Mejor Respuesta para J1?
+            max_j1_columna = pagos_j1.iloc[:, j].max()
+            es_br1 = (pago_actual_j1 == max_j1_columna)
+            
+            # ¿Es Mejor Respuesta para J2?
+            max_j2_fila = pagos_j2.iloc[i, :].max()
+            es_br2 = (pago_actual_j2 == max_j2_fila)
+            
+            if es_br1 and es_br2:
+                nombre_fila = pagos_j1.index[i]
+                nombre_col = pagos_j1.columns[j]
+                equilibrios.append(f"{nombre_fila}, {nombre_col}")
 
     st.divider()
-
-    # 4. DIAGRAMA VISUAL DE LA MATRIZ (MEJORA CLAVE)
-    st.subheader("📊 Diagrama de la Matriz de Pagos (Bi-matriz)")
-    st.markdown("Así se representa formalmente el juego. Los pagos subrayados indican que son una **Mejor Respuesta**.")
     
-    html_matriz = "<table style='width:100%; text-align:center; border-collapse: collapse; margin-bottom: 20px; font-size: 18px;'>"
-    # Fila de encabezados de columna
-    html_matriz += "<tr><th style='border: none;'></th>"
-    for j in range(columnas):
-        html_matriz += f"<th style='border: 1px solid white; padding: 10px; background-color: #333;'>{pagos_j1.columns[j]}</th>"
-    html_matriz += "</tr>"
-    
-    # Filas de la matriz
-    for i in range(filas):
-        html_matriz += f"<tr><th style='border: 1px solid white; padding: 10px; background-color: #333;'>{pagos_j1.index[i]}</th>"
-        for j in range(columnas):
-            p1 = pagos_j1.iloc[i, j]
-            p2 = pagos_j2.iloc[i, j]
-            
-            # Subrayar si es mejor respuesta
-            p1_str = f"<u><b>{p1:g}</b></u>" if (i, j) in mejores_respuestas_j1 else f"{p1:g}"
-            p2_str = f"<u><b>{p2:g}</b></u>" if (i, j) in mejores_respuestas_j2 else f"{p2:g}"
-            
-            # Resaltar la celda completa si es Nash
-            bg_color = "#1E3A8A" if (i, j) in nash_coords else "transparent"
-            
-            html_matriz += f"<td style='border: 1px solid white; padding: 15px; background-color: {bg_color};'>"
-            html_matriz += f"(<span style='color:#2196F3;'>{p1_str}</span>, <span style='color:#FF9800;'>{p2_str}</span>)"
-            html_matriz += "</td>"
-        html_matriz += "</tr>"
-    html_matriz += "</table>"
-    
-    st.markdown(html_matriz, unsafe_allow_html=True)
-
-    # 5. Resultados y Explicación
+    # 4. Resultados
     st.subheader("🎯 Veredicto del Análisis")
     if len(equilibrios) > 0:
-        st.success(f"✅ Se encontraron **{len(equilibrios)}** Equilibrio(s) de Nash en Estrategias Puras:")
+        st.success(f"Se encontraron **{len(equilibrios)}** Equilibrio(s) de Nash en Estrategias Puras:")
         for eq in equilibrios:
             st.markdown(f"### 📍 Perfil: ({eq})")
     else:
         st.error("🚨 No se encontraron Equilibrios de Nash en Estrategias Puras. Este juego requiere un análisis de Estrategias Mixtas.")
 
-    with st.expander("⭐ [Premium] ¿Cómo calculamos esto? (Método de las Mejores Respuestas)"):
-        st.markdown("**1. Análisis del Jugador 1 (Azul - Elige Filas):**")
-        st.markdown("J1 asume qué columna jugará J2. Si J2 juega la Columna 1, J1 compara sus pagos en esa columna y subraya el mayor. Hace esto para todas las columnas.")
-        st.markdown("**2. Análisis del Jugador 2 (Naranja - Elige Columnas):**")
-        st.markdown("J2 asume qué fila jugará J1. Si J1 juega la Fila 1, J2 compara sus pagos en esa fila y subraya el mayor. Hace esto para todas las filas.")
-        st.markdown("**3. Equilibrio de Nash:**")
-        st.info("Cualquier celda (perfil de estrategias) donde **ambos** pagos estén subrayados es un Equilibrio de Nash. Significa que ninguno de los dos jugadores tiene incentivos para desviarse unilateralmente.")
-
 # ==========================================
 # MÓDULO 12: TEORÍA DE JUEGOS - ESTRATEGIAS MIXTAS (2x2)
 # ==========================================
 elif tema_seleccionado == "Estrategias Mixtas (Cálculo p y q)":
-    st.markdown("<h2><i class='fas fa-dice' style='color:#00FFAA;'></i> Módulo 12: Estrategias Mixtas (2x2)</h2>", unsafe_allow_html=True)
-    st.info("💡 **El Principio de Indiferencia:** En mixtas, un jugador mezcla sus probabilidades de tal forma que hace que su oponente sea *indiferente* entre elegir cualquiera de sus estrategias.")
+    st.markdown("<h2><i class='fas fa-dice' style='color:#00FFAA;'></i> Estrategias Mixtas (2x2)</h2>", unsafe_allow_html=True)
+    st.info("💡 **Nota:** El cálculo algebraico de probabilidades exactas ($p$ y $q$) se aplica a juegos 2x2. Si tienes una matriz mayor, primero debes aplicar Eliminación Iterada de Estrategias Dominadas.")
     
     col_in1, col_in2 = st.columns(2)
     val = {}
     with col_in1:
-        st.markdown("<h4 style='color:#2196F3;'>Jugador 1 (Filas)</h4>", unsafe_allow_html=True)
-        val["u11"] = st.number_input("Pago J1 (Arriba, Izq)", value=3.0, step=1.0, key="m_u11")
-        val["u12"] = st.number_input("Pago J1 (Arriba, Der)", value=0.0, step=1.0, key="m_u12")
-        val["u21"] = st.number_input("Pago J1 (Abajo, Izq)", value=0.0, step=1.0, key="m_u21")
-        val["u22"] = st.number_input("Pago J1 (Abajo, Der)", value=1.0, step=1.0, key="m_u22")
+        st.markdown("### Jugador 1 (Filas)")
+        val["u11"] = st.number_input("Pago J1 (Arriba, Izq)", value=3.0, step=1.0)
+        val["u12"] = st.number_input("Pago J1 (Arriba, Der)", value=0.0, step=1.0)
+        val["u21"] = st.number_input("Pago J1 (Abajo, Izq)", value=0.0, step=1.0)
+        val["u22"] = st.number_input("Pago J1 (Abajo, Der)", value=1.0, step=1.0)
     with col_in2:
-        st.markdown("<h4 style='color:#FF9800;'>Jugador 2 (Columnas)</h4>", unsafe_allow_html=True)
-        val["v11"] = st.number_input("Pago J2 (Arriba, Izq)", value=2.0, step=1.0, key="m_v11")
-        val["v12"] = st.number_input("Pago J2 (Arriba, Der)", value=1.0, step=1.0, key="m_v12")
-        val["v21"] = st.number_input("Pago J2 (Abajo, Izq)", value=0.0, step=1.0, key="m_v21")
-        val["v22"] = st.number_input("Pago J2 (Abajo, Der)", value=3.0, step=1.0, key="m_v22")
-
-    # Diagrama de la matriz 2x2 interactiva
-    st.divider()
-    st.subheader("📊 Matriz de Pagos")
-    html_2x2 = f"""
-    <table style='width:100%; text-align:center; border-collapse: collapse; margin-bottom: 20px; font-size: 18px;'>
-        <tr>
-            <th style='border: none;'></th>
-            <th style='border: 1px solid white; padding: 10px; background-color: #333;'>Izquierda (q)</th>
-            <th style='border: 1px solid white; padding: 10px; background-color: #333;'>Derecha (1-q)</th>
-        </tr>
-        <tr>
-            <th style='border: 1px solid white; padding: 10px; background-color: #333;'>Arriba (p)</th>
-            <td style='border: 1px solid white; padding: 15px;'>(<span style='color:#2196F3;'>{val["u11"]:g}</span>, <span style='color:#FF9800;'>{val["v11"]:g}</span>)</td>
-            <td style='border: 1px solid white; padding: 15px;'>(<span style='color:#2196F3;'>{val["u12"]:g}</span>, <span style='color:#FF9800;'>{val["v12"]:g}</span>)</td>
-        </tr>
-        <tr>
-            <th style='border: 1px solid white; padding: 10px; background-color: #333;'>Abajo (1-p)</th>
-            <td style='border: 1px solid white; padding: 15px;'>(<span style='color:#2196F3;'>{val["u21"]:g}</span>, <span style='color:#FF9800;'>{val["v21"]:g}</span>)</td>
-            <td style='border: 1px solid white; padding: 15px;'>(<span style='color:#2196F3;'>{val["u22"]:g}</span>, <span style='color:#FF9800;'>{val["v22"]:g}</span>)</td>
-        </tr>
-    </table>
-    """
-    st.markdown(html_2x2, unsafe_allow_html=True)
+        st.markdown("### Jugador 2 (Columnas)")
+        val["v11"] = st.number_input("Pago J2 (Arriba, Izq)", value=2.0, step=1.0)
+        val["v12"] = st.number_input("Pago J2 (Arriba, Der)", value=1.0, step=1.0)
+        val["v21"] = st.number_input("Pago J2 (Abajo, Izq)", value=0.0, step=1.0)
+        val["v22"] = st.number_input("Pago J2 (Abajo, Der)", value=3.0, step=1.0)
 
     # Lógica de indiferencia
     den_p = (val["v11"] - val["v21"] - val["v12"] + val["v22"])
@@ -1690,38 +1665,27 @@ elif tema_seleccionado == "Estrategias Mixtas (Cálculo p y q)":
         p_star = (val["v22"] - val["v12"]) / den_p
         q_star = (val["u22"] - val["u12"]) / den_q
         
+        # Validar que las probabilidades existan lógicamente (entre 0 y 1)
         if 0 <= p_star <= 1 and 0 <= q_star <= 1:
             st.divider()
-            st.subheader("🎯 Equilibrio en Estrategias Mixtas")
             c1, c2 = st.columns(2)
             with c1:
-                st.metric("p* (Probabilidad J1 - Arriba)", f"{p_star:.4f} ({p_star*100:.1f}%)")
+                st.metric("p* (Probabilidad J1 - Arriba)", f"{p_star:.4f}")
+                st.latex(f"p = \\frac{{v_{{22}} - v_{{12}}}}{{(v_{{11}} - v_{{21}}) - (v_{{12}} - v_{{22}})}}")
             with c2:
-                st.metric("q* (Probabilidad J2 - Izquierda)", f"{q_star:.4f} ({q_star*100:.1f}%)")
+                st.metric("q* (Probabilidad J2 - Izquierda)", f"{q_star:.4f}")
+                st.latex(f"q = \\frac{{u_{{22}} - u_{{12}}}}{{(u_{{11}} - u_{{21}}) - (u_{{12}} - u_{{22}})}}")
             
-            st.success(f"**Equilibrio:** El Jugador 1 juega Arriba el {p_star*100:.1f}% del tiempo y Abajo el {(1-p_star)*100:.1f}%. El Jugador 2 juega Izquierda el {q_star*100:.1f}% del tiempo y Derecha el {(1-q_star)*100:.1f}%.")
-            
-            with st.expander("⭐ [Premium] ¿Cómo se calculan estas probabilidades?"):
-                st.markdown("**1. Encontrar $p^*$ (Lo que hace el Jugador 1):**")
-                st.markdown("J1 elige una probabilidad $p$ para 'Arriba' de modo que J2 gane lo mismo jugando 'Izquierda' o 'Derecha' (lo vuelve indiferente).")
-                st.latex(r"PagoEsperado_{J2}(Izquierda) = PagoEsperado_{J2}(Derecha)")
-                st.latex(f"p({val['v11']}) + (1-p)({val['v21']}) = p({val['v12']}) + (1-p)({val['v22']})")
-                st.markdown("Despejando algebraicamente obtenemos:")
-                st.latex(r"p = \frac{v_{22} - v_{12}}{(v_{11} - v_{21}) - (v_{12} - v_{22})}")
-                
-                st.markdown("**2. Encontrar $q^*$ (Lo que hace el Jugador 2):**")
-                st.markdown("J2 elige una probabilidad $q$ para 'Izquierda' de modo que J1 gane lo mismo jugando 'Arriba' o 'Abajo'.")
-                st.latex(r"PagoEsperado_{J1}(Arriba) = PagoEsperado_{J1}(Abajo)")
-                st.latex(f"q({val['u11']}) + (1-q)({val['u12']}) = q({val['u21']}) + (1-q)({val['u22']})")
+            st.success(f"Para el equilibrio, **J1** juega Arriba el **{p_star*100:.1f}%** de las veces, y **J2** juega Izquierda el **{q_star*100:.1f}%** de las veces.")
         else:
-            st.warning("⚠️ Las fórmulas arrojaron probabilidades fuera del rango [0, 1]. Esto significa que uno de los jugadores tiene una **Estrategia Estrictamente Dominante** y el equilibrio se encuentra en Puras.")
+            st.warning("⚠️ Las fórmulas arrojaron probabilidades fuera del rango [0, 1]. Esto significa que uno de los jugadores tiene una **Estrategia Estrictamente Dominante** y el equilibrio se encuentra en Puras, no en Mixtas.")
     else:
-        st.error("🚨 Los pagos ingresados generan una división por cero. Existe dominancia estricta o el juego es trivial.")
+        st.error("🚨 Los pagos ingresados generan una división por cero. El juego es completamente simétrico sin incentivo a desviar, o existe dominancia estricta.")
 # ==========================================
 # MÓDULO 13: TEORÍA DE JUEGOS - FORMA EXTENSIVA (ÁRBOL)
 # ==========================================
-elif tema_seleccionado == "Forma Extensiva (Árboles)":
-    st.markdown("<h2><i class='fas fa-sitemap' style='color:#00FFAA;'></i> Módulo 13: De Estratégica a Extensiva</h2>", unsafe_allow_html=True)
+elif tema_seleccionado == "Forma Extensiva y Dominancia":
+    st.markdown("<h2><i class='fas fa-sitemap' style='color:#00FFAA;'></i> Forma Extensiva y Dominancia</h2>", unsafe_allow_html=True)
     st.info("💡 **Juegos Secuenciales:** En la forma extensiva, los jugadores no deciden al mismo tiempo. El Jugador 1 mueve primero, y el Jugador 2 observa esa jugada antes de decidir.")
 
     # 1. Ingreso de datos
@@ -1801,6 +1765,110 @@ elif tema_seleccionado == "Forma Extensiva (Árboles)":
         eleccion_final_j1 = "Arriba" if pago_j1_arriba > pago_j1_abajo else "Abajo"
         
         st.success(f"**🎯 Equilibrio Perfecto en Subjuegos:** El Jugador 1 jugará **{eleccion_final_j1}**.")
+# ==========================================
+# TEORÍA DE JUEGOS - ARBITRAJE DE OFERTA FINAL
+# ==========================================
+elif tema_seleccionado == "Arbitraje de Oferta Final":
+    st.markdown("<h2><i class='fas fa-balance-scale' style='color:#1E3A8A;'></i> Arbitraje de Oferta Final (Farber, 1980)</h2>", unsafe_allow_html=True)
+    
+    tab_teoria, tab_simulador = st.tabs(["📚 Teoría e Intuición", "🧮 Laboratorio y Desglose Matemático"])
+    
+    with tab_teoria:
+        st.markdown("### El Dilema del Negociador")
+        st.info("💡 **Compensación (Trade-off):** Una oferta más agresiva (muy baja por la empresa o muy alta por los trabajadores) produce una mejor recompensa si el árbitro la elige, pero es menos probable que sea elegida.")
+        
+        c_t1, c_t2 = st.columns(2)
+        with c_t1:
+            st.markdown("**Reglas del Juego:**")
+            st.markdown("- La Empresa ($f$) y el Sindicato ($g$) proponen salarios $w_f$ y $w_g$.")
+            st.markdown("- El árbitro tiene en mente un salario justo $x$, pero es un secreto. Solo sabemos que se distribuye normal: $x \sim N(m, \sigma^2)$.")
+            st.markdown("- El árbitro elige mecánicamente la oferta que esté más cerca de $x$.")
+        with c_t2:
+            st.markdown("**El Papel de la Incertidumbre ($\\sigma$):**")
+            st.markdown("- Si $\\sigma$ es bajo (poca incertidumbre), todos saben qué quiere el árbitro. Las partes no pueden desviarse mucho de la media $m$ o perderán.")
+            st.markdown("- Si $\\sigma$ es alto, la ignorancia permite a las partes arriesgarse con ofertas agresivas.")
+
+    with tab_simulador:
+        st.subheader("Simulador de Equilibrio de Nash")
+        tema = datos["teoria_juegos"]["arbitraje_oferta"]
+        
+        with st.container(border=True):
+            col_in1, col_in2 = st.columns(2)
+            m_val = col_in1.number_input(tema["variables"]["m"]["nombre"], value=float(tema["variables"]["m"]["valor_defecto"]), step=50.0)
+            sigma_val = col_in2.number_input(tema["variables"]["sigma"]["nombre"], value=float(tema["variables"]["sigma"]["valor_defecto"]), step=10.0, min_value=1.0)
+            col_in1.caption(tema["variables"]["m"]["ayuda_real"])
+            col_in2.caption(tema["variables"]["sigma"]["ayuda_real"])
+
+        # Cálculos del Equilibrio
+        # wg* = m + sqrt((pi * sigma^2) / 2)
+        # wf* = m - sqrt((pi * sigma^2) / 2)
+        distancia = np.sqrt((np.pi * sigma_val**2) / 2)
+        w_f = m_val - distancia
+        w_g = m_val + distancia
+
+        st.divider()
+        col_res1, col_res2 = st.columns([1, 1.5])
+        
+        with col_res1:
+            st.markdown("### Ofertas Óptimas (Nash)")
+            st.success(f"**Oferta Sindicato ($w_g^*$):** ${w_g:,.2f}")
+            st.error(f"**Oferta Empresa ($w_f^*$):** ${w_f:,.2f}")
+            st.metric("Brecha Salarial", f"${(w_g - w_f):,.2f}")
+            
+        with col_res2:
+            st.markdown("**Distribución de Probabilidad del Árbitro**")
+            # Graficar la campana de Gauss
+            x_axis = np.linspace(m_val - 4*sigma_val, m_val + 4*sigma_val, 200)
+            # Función de densidad Normal manual
+            pdf = (1 / (sigma_val * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - m_val) / sigma_val)**2)
+            
+            df_plot = pd.DataFrame({"Salario Ideal del Árbitro (x)": x_axis, "Probabilidad": pdf}).set_index("Salario Ideal del Árbitro (x)")
+            st.line_chart(df_plot, color="#2563EB")
+            st.caption("Los extremos de la campana representan dónde terminan ubicándose $w_f^*$ y $w_g^*$. ¡Juega con la Incertidumbre (σ) para ver cómo se ensancha la brecha!")
+
+        # ==========================================
+        # CARPINTERÍA MATEMÁTICA (PAYWALL)
+        # ==========================================
+        st.divider()
+        st.subheader("🛠️ Carpintería Matemática (Desglose del Parcial)")
+        
+        if tipo_cuenta == "Básica (Gratis)":
+            st.markdown("""
+            <div style="background-color: #FEF2F2; border-left: 5px solid #EF4444; padding: 15px; border-radius: 5px;">
+                <h4 style="color: #B91C1C; margin-top: 0;">🔒 Contenido Premium</h4>
+                <p>El desarrollo de las Condiciones de Primer Orden (CPO), la igualación de densidades y el despeje algebraico del equilibrio de Farber están bloqueados.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color: #F0FDF4; border-left: 5px solid #10B981; padding: 15px; border-radius: 5px;">
+                <h4 style="color: #047857; margin-top: 0;">🔓 Acceso Premium: Análisis Analítico</h4>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("**1. Función Objetivo de la Empresa:**")
+            st.markdown("La empresa quiere minimizar el salario esperado. El árbitro elige la oferta de la empresa ($w_f$) si su ideal cae a la izquierda del punto medio, probabilidad que es $F(\\frac{w_f + w_g}{2})$:")
+            st.latex(r"\min_{w_f} \{ w_f F\left(\frac{w_f + w_g}{2}\right) + w_g \left[1 - F\left(\frac{w_f + w_g}{2}\right)\right] \}")
+            
+            st.markdown("**2. Condición de Primer Orden (CPO) Empresa:**")
+            st.markdown("Derivando respecto a $w_f$ y usando la regla de la cadena (donde $F'$ es la densidad $f$):")
+            st.latex(r"(w_g^* - w_f^*) \frac{1}{2} f\left(\frac{w_f^* + w_g^*}{2}\right) = F\left(\frac{w_f^* + w_g^*}{2}\right) \quad \text{--- (Ec. 1)}")
+            
+            st.markdown("**3. Condición de Primer Orden (CPO) Sindicato:**")
+            st.markdown("El sindicato maximiza su pago esperado. Siguiendo el mismo proceso de derivación:")
+            st.latex(r"(w_g^* - w_f^*) \frac{1}{2} f\left(\frac{w_f^* + w_g^*}{2}\right) = \left[1 - F\left(\frac{w_f^* + w_g^*}{2}\right)\right] \quad \text{--- (Ec. 2)}")
+            
+            st.markdown("**4. Igualación de Probabilidades:**")
+            st.markdown("Como el lado izquierdo de ambas ecuaciones es idéntico, sus lados derechos deben ser iguales:")
+            st.latex(r"F\left(\frac{w_f^* + w_g^*}{2}\right) = 1 - F\left(\frac{w_f^* + w_g^*}{2}\right) \implies F\left(\frac{w_f^* + w_g^*}{2}\right) = \frac{1}{2}")
+            st.markdown("Esto significa que el promedio de las ofertas debe caer exactamente en la mediana de la distribución. Al ser una Normal, la mediana es la media $m$:")
+            st.latex(r"\frac{w_f^* + w_g^*}{2} = m")
+            
+            st.markdown("**5. Despeje de la Brecha:**")
+            st.markdown("Sustituyendo el resultado en la Ec. 1, sabiendo que $F(m) = 1/2$:")
+            st.latex(r"(w_g^* - w_f^*) = \frac{1}{f(m)}")
+            st.markdown("En una Normal, el punto más alto de la campana es $f(m) = \\frac{1}{\\sqrt{2\\pi\\sigma^2}}$. Al sacar el recíproco y despejar, llegamos a las ofertas finales:")
+            st.latex(r"w_g^* = m + \sqrt{\frac{\pi \sigma^2}{2}} \quad ; \quad w_f^* = m - \sqrt{\frac{\pi \sigma^2}{2}}")
 # ==========================================
 # MÓDULO 14: MATEMÁTICAS 1 - ÁLGEBRA, LÍMITES Y CONTINUIDAD
 # ==========================================
@@ -2189,3 +2257,79 @@ elif tema_seleccionado == "Módulo 16: Áreas e Integrales":
 
         except Exception as e:
             st.error(f"🚨 Error en la función matemática. Recuerda usar '*' para multiplicar y '**' para potencias. Detalle: {e}")
+# ==========================================
+# MÓDULO 17: MACROECONOMÍA 1 - MICROFUNDAMENTOS
+# ==========================================
+elif tema_seleccionado == "Microfundamentos: El Problema de la Firma":
+    st.markdown("<h2><i class='fas fa-industry' style='color:#1E3A8A;'></i> Microfundamentos: El Problema de la Firma</h2>", unsafe_allow_html=True)
+    
+    tab_teoria, tab_simulador = st.tabs(["📚 Teoría e Intuición", "🧮 Laboratorio y CPOs"])
+    
+    with tab_teoria:
+        st.markdown("### Maximización Intertemporal")
+        st.info("💡 **El Residuo de Solow:** Tal como anotaste en tu cuaderno, la variable $z_t$ mide el grado de nuestra 'ignorancia' económica, representando el progreso técnico que no depende del capital o el trabajo.")
+        
+        c_t1, c_t2 = st.columns(2)
+        with c_t1:
+            st.markdown("**Función de Producción (Cobb-Douglas):**")
+            st.latex(r"Y_t = z_t K_t^\alpha N_t^{1-\alpha}")
+            st.markdown("**Acumulación de Capital:**")
+            st.latex(r"I_t = K_{t+1} - (1-s)K_t")
+        with c_t2:
+            st.markdown("**Relaciones Clave:**")
+            st.markdown("- Si sube el salario ($W_t$), baja la demanda de trabajo.")
+            st.markdown("- Si sube la productividad ($z_t$), las firmas contratan más.")
+
+    with tab_simulador:
+        st.subheader("Simulador de Demanda de Factores")
+        # Asegúrate de que en tu JSON la clave sea "microfundamentos"
+        tema = datos["macroeconomia_1"]["microfundamentos"]
+        
+        with st.container(border=True):
+            col1, col2, col3 = st.columns(3)
+            z_val = col1.number_input(tema["variables"]["z"]["nombre"], value=float(tema["variables"]["z"]["valor_defecto"]), step=0.1)
+            alpha_val = col2.number_input(tema["variables"]["alpha"]["nombre"], value=float(tema["variables"]["alpha"]["valor_defecto"]), step=0.05)
+            w_val = col3.number_input(tema["variables"]["w"]["nombre"], value=float(tema["variables"]["w"]["valor_defecto"]), step=1.0)
+            
+            col4, col5, col6 = st.columns(3)
+            k_val = col4.number_input(tema["variables"]["k"]["nombre"], value=float(tema["variables"]["k"]["valor_defecto"]), step=10.0)
+            r_val = col5.number_input(tema["variables"]["r"]["nombre"], value=float(tema["variables"]["r"]["valor_defecto"]), step=0.01)
+            s_val = col6.number_input(tema["variables"]["s"]["nombre"], value=float(tema["variables"]["s"]["valor_defecto"]), step=0.01)
+
+        # Cálculo de la Demanda de Trabajo óptima N*
+        base_n = ((1 - alpha_val) * z_val) / w_val
+        if base_n > 0:
+            n_optimo = (base_n ** (1 / alpha_val)) * k_val
+            produccion = z_val * (k_val ** alpha_val) * (n_optimo ** (1 - alpha_val))
+        else:
+            n_optimo = 0
+            produccion = 0
+
+        st.divider()
+        c_res1, c_res2 = st.columns([1, 1.5])
+        with c_res1:
+            st.markdown("### Resultados del Modelo")
+            st.metric("Demanda de Trabajo (N*)", f"{n_optimo:,.2f}")
+            st.metric("Producción (Y)", f"{produccion:,.2f}")
+            
+        with c_res2:
+            st.markdown("**Curva de Demanda de Trabajo**")
+            w_array = np.linspace(max(1, w_val - 5), w_val + 5, 50)
+            n_array = (((1 - alpha_val) * z_val) / w_array) ** (1 / alpha_val) * k_val
+            df_plot = pd.DataFrame({"Salario (W)": w_array, "N Demandado": n_array}).set_index("Salario (W)")
+            st.line_chart(df_plot, color="#2563EB")
+
+        # ==========================================
+        # CARPINTERÍA MATEMÁTICA (PAYWALL)
+        # ==========================================
+        st.divider()
+        st.subheader("🛠️ Carpintería Matemática (Paso a Paso)")
+        
+        if tipo_cuenta == "Básica (Gratis)":
+            st.error("🔒 **Contenido Premium:** El desglose analítico de las CPO y el despeje algebraico están bloqueados.")
+        else:
+            st.success("🔓 **Desbloqueado:**")
+            st.markdown("**Condición de Primer Orden para el Trabajo:**")
+            st.latex(r"\frac{\partial V}{\partial N_t} = (1-\alpha) z_t K_t^\alpha N_t^{-\alpha} - W_t = 0")
+            st.markdown("**Despeje de la Demanda Óptima:**")
+            st.latex(r"N_t^* = \left[ \frac{(1-\alpha)z_t}{W_t} \right]^{\frac{1}{\alpha}} K_t")

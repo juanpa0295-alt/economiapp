@@ -81,6 +81,19 @@
         "t": {"nombre": "Tasa Impositiva (t)", "valor_defecto": 0.15, "ayuda_real": "Presión tributaria promedio sobre el PIB."},
         "Y": {"nombre": "Ingreso/PIB (Y)", "valor_defecto": 5000.0, "ayuda_real": "Nivel de producción actual."}
       }
+    },
+    "microfundamentos": {
+      "nombre": "Microfundamentos: El Problema de la Firma",
+      "variables": {
+        "z": {"nombre": "Productividad (z)", "valor_defecto": 1.5, "ayuda_real": "Residuo de Solow (PTF)."},
+        "alpha": {"nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "Elasticidad del producto respecto al capital."},
+        "w": {"nombre": "Salario (W)", "valor_defecto": 10.0, "ayuda_real": "Costo marginal del trabajo actual."},
+        "k": {"nombre": "Capital Inicial (K)", "valor_defecto": 100.0, "ayuda_real": "Stock de maquinaria actual."},
+        "r": {"nombre": "Tasa de Interés (r)", "valor_defecto": 0.05, "ayuda_real": "Costo financiero en el tiempo."},
+        "s": {"nombre": "Tasa de Depreciación (s)", "valor_defecto": 0.10, "ayuda_real": "Desgaste del stock de capital."},
+        "z_futuro": {"nombre": "Prod. Futura (z_t+1)", "valor_defecto": 1.7, "ayuda_real": "Expectativa de productividad para el próximo periodo."},
+        "w_futuro": {"nombre": "Salario Futuro (W_t+1)", "valor_defecto": 11.0, "ayuda_real": "Salario esperado en el futuro."}
+      }
     }
   },
   "estadistica_2": {
@@ -115,7 +128,7 @@
       }
     }
   },
-  "teoria_juegos": {
+"teoria_juegos": {
     "matriz_2x2": {
       "nombre": "Análisis de la Forma Estratégica",
       "variables": {
@@ -127,6 +140,13 @@
         "v21": {"nombre": "J2: Abajo-Izq", "valor_defecto": 0.0, "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Izquierda"},
         "u22": {"nombre": "J1: Abajo-Der", "valor_defecto": 1.0, "ayuda_real": "Pago del Jugador 1 en la celda Abajo-Derecha"},
         "v22": {"nombre": "J2: Abajo-Der", "valor_defecto": 3.0, "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Derecha"}
+      }
+    },
+    "arbitraje_oferta": {
+      "nombre": "Arbitraje de Oferta Final (Farber)",
+      "variables": {
+        "m": {"nombre": "Media del Árbitro (m)", "valor_defecto": 1000.0, "ayuda_real": "El salario que el árbitro considera ideal en promedio."},
+        "sigma": {"nombre": "Incertidumbre (σ)", "valor_defecto": 150.0, "ayuda_real": "Qué tanta varianza o desconocimiento hay sobre la decisión del árbitro."}
       }
     }
   },"matematicas_1": {
