@@ -1698,7 +1698,10 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
 # ==========================================
 # MÓDULO: CLASE 15 - PRUEBAS DE HIPÓTESIS AVANZADAS
 # ==========================================
-elif tema_seleccionado == "Clase 15":
+st.write(f"🔍 DEBUG: El texto exacto del menú es: '{tema_seleccionado}'")
+
+elif tema_seleccionado == "Prueba de Hipótesis Avanzada":
+
     import math
     import scipy.stats as stats
 
