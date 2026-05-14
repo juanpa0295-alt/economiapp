@@ -1517,29 +1517,60 @@ elif tema_seleccionado == "Intervalos y Tamaño de Muestra":
 # ==========================================
 elif tema_seleccionado == "Pruebas de Hipótesis":
     import math
-    
-    # Función para calcular la probabilidad acumulada (CDF) de una Normal Estándar
-    def norm_cdf(x):
-        return (1.0 + math.erf(x / math.sqrt(2.0))) / 2.0
+    import scipy.stats as stats # Necesario para la distribución T y Z exacta
 
     st.markdown("<h2><i class='fas fa-balance-scale' style='color:#00FFAA;'></i> Pruebas de Hipótesis</h2>", unsafe_allow_html=True)
-    tema = datos["estadistica_2"]["pruebas_hipotesis"]
     
     st.markdown("La prueba de hipótesis es el método formal para decidir si los datos de nuestra muestra tienen suficiente evidencia para desmentir una creencia previa (el Status Quo).")
     
     st.subheader("Configuración del Test")
+
+    # 1. Selección del tipo de parámetro y estadístico
+    tipo_parametro = st.selectbox("Parámetro y Estadístico a evaluar:", [
+        "Media Poblacional - Varianza Conocida (Test Z)",
+        "Media Poblacional - Varianza Desconocida (Test T)",
+        "Proporción Poblacional (Test Z)"
+    ])
     
-    # Tipo de Prueba
+    # 2. Tipo de Prueba (Colas)
     tipo_prueba = st.radio("Tipo de Prueba (Cola):", [
         "Dos Colas (Diferente a: ≠)",
         "Cola Derecha (Mayor que: >)",
         "Cola Izquierda (Menor que: <)"
-    ])
+    ], horizontal=True)
     
+    # 3. Entradas dinámicas según el tipo de parámetro
+    st.markdown("**Ingresa los parámetros de la muestra y la hipótesis:**")
     col_in1, col_in2, col_in3 = st.columns(3)
     val = {}
     
-    for i, (simbolo, info) in enumerate(tema["variables"].items()):
+    # Configuramos los inputs para no depender exclusivamente de un JSON fijo y evitar errores
+    if "Proporción" in tipo_parametro:
+        inputs_config = {
+            "p_0": {"nombre": "Prop. Hipotética (p₀)", "def": 0.5, "step": 0.01},
+            "p_hat": {"nombre": "Prop. Muestral (p̂)", "def": 0.6, "step": 0.01},
+            "n": {"nombre": "Tamaño Muestral (n)", "def": 100, "step": 1},
+            "alpha": {"nombre": "Significancia (α)", "def": 0.05, "step": 0.01}
+        }
+    elif "Test T" in tipo_parametro:
+        inputs_config = {
+            "mu_0": {"nombre": "Media Hipotética (μ₀)", "def": 50.0, "step": 1.0},
+            "x_bar": {"nombre": "Media Muestral (x̄)", "def": 52.0, "step": 1.0},
+            "s": {"nombre": "Desv. Est. Muestral (s)", "def": 5.5, "step": 0.5},
+            "n": {"nombre": "Tamaño Muestral (n)", "def": 20, "step": 1},
+            "alpha": {"nombre": "Significancia (α)", "def": 0.05, "step": 0.01}
+        }
+    else:
+        inputs_config = {
+            "mu_0": {"nombre": "Media Hipotética (μ₀)", "def": 50.0, "step": 1.0},
+            "x_bar": {"nombre": "Media Muestral (x̄)", "def": 52.0, "step": 1.0},
+            "sigma": {"nombre": "Desv. Est. Poblacional (σ)", "def": 5.0, "step": 0.5},
+            "n": {"nombre": "Tamaño Muestral (n)", "def": 30, "step": 1},
+            "alpha": {"nombre": "Significancia (α)", "def": 0.05, "step": 0.01}
+        }
+
+    # Renderizado dinámico de los inputs
+    for i, (simbolo, info) in enumerate(inputs_config.items()):
         if i % 3 == 0: col = col_in1
         elif i % 3 == 1: col = col_in2
         else: col = col_in3
@@ -1547,32 +1578,61 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
         with col:
             with st.container(border=True):
                 if simbolo == "n":
-                    valor_inicial = int(float(info['valor_defecto']))
-                    val[simbolo] = st.number_input(f"{info['nombre']}", value=valor_inicial, step=1, format="%d")
+                    val[simbolo] = st.number_input(info['nombre'], value=int(info['def']), step=info['step'], format="%d")
                 elif simbolo == "alpha":
-                    val[simbolo] = st.number_input(f"{info['nombre']}", value=float(info['valor_defecto']), step=0.01, format="%.3f")
+                    val[simbolo] = st.number_input(info['nombre'], value=float(info['def']), step=info['step'], format="%.3f")
                 else:
-                    val[simbolo] = st.number_input(f"{info['nombre']}", value=float(info['valor_defecto']), step=1.0, format="%.2f")
-                
-    mu_0, x_bar, sigma, n, alpha = val["mu_0"], val["x_bar"], val["sigma"], val["n"], val["alpha"]
-
-    # ====== MOTOR MATEMÁTICO: Z-TEST ======
-    error_estandar = sigma / math.sqrt(n)
-    z_calc = (x_bar - mu_0) / error_estandar
+                    val[simbolo] = st.number_input(info['nombre'], value=float(info['def']), step=info['step'], format="%.2f")
     
-    # Cálculos dependiendo de las colas
+    alpha = val["alpha"]
+    n = val["n"]
+
+    # ====== MOTOR MATEMÁTICO UNIVERSAL ======
+    if "Proporción" in tipo_parametro:
+        p_0, p_hat = val["p_0"], val["p_hat"]
+        param_simbolo, valor_hipotetico, valor_muestral = "p", p_0, p_hat
+        
+        # Para pruebas de hipótesis de proporción se usa p_0 en el error estándar
+        error_estandar = math.sqrt((p_0 * (1 - p_0)) / n)
+        stat_calc = (p_hat - p_0) / error_estandar
+        dist = stats.norm
+        stat_name = "Z"
+        
+    elif "Test T" in tipo_parametro:
+        mu_0, x_bar, s = val["mu_0"], val["x_bar"], val["s"]
+        param_simbolo, valor_hipotetico, valor_muestral = "\\mu", mu_0, x_bar
+        
+        error_estandar = s / math.sqrt(n)
+        stat_calc = (x_bar - mu_0) / error_estandar
+        df = n - 1 # Grados de libertad
+        dist = stats.t(df)
+        stat_name = "T"
+        
+    else: # Test Z Clásico
+        mu_0, x_bar, sigma = val["mu_0"], val["x_bar"], val["sigma"]
+        param_simbolo, valor_hipotetico, valor_muestral = "\\mu", mu_0, x_bar
+        
+        error_estandar = sigma / math.sqrt(n)
+        stat_calc = (x_bar - mu_0) / error_estandar
+        dist = stats.norm
+        stat_name = "Z"
+
+    # Cálculos dependiendo de las colas utilizando scipy
     if "Dos Colas" in tipo_prueba:
-        p_valor = 2 * (1 - norm_cdf(abs(z_calc)))
-        z_critico = 1.96 if alpha == 0.05 else 1.645 if alpha == 0.10 else 2.576 # Aproximaciones estándar
-        rechazo = abs(z_calc) > z_critico
+        p_valor = 2 * (1 - dist.cdf(abs(stat_calc)))
+        stat_critico = dist.ppf(1 - alpha/2)
+        rechazo = abs(stat_calc) > stat_critico
+        operador_h0, operador_h1 = "=", "\\neq"
     elif "Cola Derecha" in tipo_prueba:
-        p_valor = 1 - norm_cdf(z_calc)
-        z_critico = 1.645 if alpha == 0.05 else 1.28 if alpha == 0.10 else 2.33
-        rechazo = z_calc > z_critico
+        p_valor = 1 - dist.cdf(stat_calc)
+        stat_critico = dist.ppf(1 - alpha)
+        rechazo = stat_calc > stat_critico
+        operador_h0, operador_h1 = "\\leq", ">"
     else: # Cola Izquierda
-        p_valor = norm_cdf(z_calc)
-        z_critico = -1.645 if alpha == 0.05 else -1.28 if alpha == 0.10 else -2.33
-        rechazo = z_calc < z_critico
+        p_valor = dist.cdf(stat_calc)
+        stat_critico = dist.ppf(alpha)
+        rechazo = stat_calc < stat_critico
+        operador_h0, operador_h1 = "\\geq", "<"
 
     st.divider()
     
@@ -1581,45 +1641,58 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
     with tab1:
         st.subheader("Planteamiento y Veredicto")
         
-        # Mostrar H0 y H1 según la cola elegida
+        # Mostrar H0 y H1
         c_h1, c_h2 = st.columns(2)
         with c_h1:
             st.markdown("**Hipótesis Nula ($H_0$):**")
-            operador_h0 = "=" if "Dos" in tipo_prueba else "≤" if "Derecha" in tipo_prueba else "≥"
-            st.latex(f"H_0: \\mu {operador_h0} {mu_0}")
+            st.latex(f"H_0: {param_simbolo} {operador_h0} {valor_hipotetico}")
         with c_h2:
             st.markdown("**Hipótesis Alternativa ($H_1$):**")
-            operador_h1 = "\\neq" if "Dos" in tipo_prueba else ">" if "Derecha" in tipo_prueba else "<"
-            st.latex(f"H_1: \\mu {operador_h1} {mu_0}")
+            st.latex(f"H_1: {param_simbolo} {operador_h1} {valor_hipotetico}")
             
-        st.markdown(f"**1. Estadístico de Prueba ($Z_{{calc}}$):** `{z_calc:.3f}`")
-        st.latex(f"Z = \\frac{{{x_bar} - {mu_0}}}{{{sigma} / \\sqrt{{{n}}}}} = {z_calc:.3f}")
+        st.markdown(f"**1. Estadístico de Prueba (${stat_name}_{{calc}}$):** `{stat_calc:.3f}`")
+        
+        # Imprimir la fórmula correcta según el tipo de prueba
+        if "Proporción" in tipo_parametro:
+            st.latex(f"Z = \\frac{{\\hat{{p}} - p_0}}{{\\sqrt{{\\frac{{p_0(1-p_0)}}{{n}}}}}} = \\frac{{{p_hat} - {p_0}}}{{\\sqrt{{\\frac{{{p_0}({1-p_0})}}{{{n}}}}}}} = {stat_calc:.3f}")
+        elif "Test T" in tipo_parametro:
+            st.latex(f"T = \\frac{{\\bar{{x}} - \\mu_0}}{{s / \\sqrt{{n}}}} = \\frac{{{x_bar} - {mu_0}}}{{{s} / \\sqrt{{{n}}}}} = {stat_calc:.3f}")
+        else:
+            st.latex(f"Z = \\frac{{\\bar{{x}} - \\mu_0}}{{\\sigma / \\sqrt{{n}}}} = \\frac{{{x_bar} - {mu_0}}}{{{sigma} / \\sqrt{{{n}}}}} = {stat_calc:.3f}")
         
         st.markdown(f"**2. P-Valor:** `{p_valor:.4f}`")
-        st.info("💡 **¿Qué es el P-Valor?** Es la probabilidad de haber obtenido una muestra tan extrema como la nuestra, asumiendo que el Status Quo ($H_0$) fuera real. Si es muy bajita (menor que $\\alpha$), el Status Quo es insostenible y lo rechazamos.")
+        st.info("💡 **¿Qué es el P-Valor?** Es la probabilidad de haber obtenido una muestra tan extrema asumiendo que el Status Quo ($H_0$) es real. Si es menor que $\\alpha$, el Status Quo es insostenible.")
         
         # Conclusión
         if p_valor < alpha:
             st.error(f"🚨 **CONCLUSIÓN:** Como P-Valor ({p_valor:.4f}) < $\\alpha$ ({alpha}), **RECHAZAMOS $H_0$**.")
-            st.markdown(f"Hay evidencia estadística suficiente para afirmar que la media poblacional es {operador_h1.replace('\\neq', 'diferente de').replace('>', 'mayor que').replace('<', 'menor que')} {mu_0}.")
+            st.markdown(f"Hay evidencia estadística suficiente para afirmar que el parámetro poblacional es {operador_h1.replace('\\neq', 'diferente de').replace('>', 'mayor que').replace('<', 'menor que')} {valor_hipotetico}.")
         else:
             st.success(f"✅ **CONCLUSIÓN:** Como P-Valor ({p_valor:.4f}) ≥ $\\alpha$ ({alpha}), **NO RECHAZAMOS $H_0$**.")
-            st.markdown(f"La diferencia entre tu muestra ({x_bar}) y la hipótesis ({mu_0}) no es estadísticamente significativa; puede deberse simplemente al azar del muestreo.")
+            st.markdown(f"La diferencia entre tu muestra ({valor_muestral}) y la hipótesis ({valor_hipotetico}) no es estadísticamente significativa; puede deberse simplemente al azar del muestreo.")
 
     with tab2:
         st.subheader("La Conexión con los Intervalos de Confianza")
         if "Dos Colas" in tipo_prueba:
-            margen = z_critico * error_estandar
-            ic_inf = x_bar - margen
-            ic_sup = x_bar + margen
+            # Nota técnica: El intervalo de confianza para la proporción usa p_hat en el error estándar
+            if "Proporción" in tipo_parametro:
+                se_ic = math.sqrt((p_hat * (1 - p_hat)) / n)
+            elif "Test T" in tipo_parametro:
+                se_ic = s / math.sqrt(n)
+            else:
+                se_ic = sigma / math.sqrt(n)
+                
+            margen = stat_critico * se_ic
+            ic_inf = valor_muestral - margen
+            ic_sup = valor_muestral + margen
             
             st.markdown(f"Toda prueba de hipótesis de dos colas con nivel de significancia $\\alpha$ es matemáticamente equivalente a construir un Intervalo de Confianza al $(1-\\alpha)$%.")
-            st.latex(f"IC_{{{(1-alpha)*100}\\%}} = [{ic_inf:.2f} \\ , \\ {ic_sup:.2f}]")
+            st.latex(f"IC_{{{(1-alpha)*100:.0f}\\%}} = [{ic_inf:.4f} \\ , \\ {ic_sup:.4f}]")
             
-            if mu_0 >= ic_inf and mu_0 <= ic_sup:
-                st.markdown(f"Como tu valor hipotético ($\\mu_0 = {mu_0}$) **ESTÁ DENTRO** del rango de este intervalo, es un valor razonable y posible. Por lo tanto, **No podemos rechazar $H_0$**.")
+            if valor_hipotetico >= ic_inf and valor_hipotetico <= ic_sup:
+                st.markdown(f"Como tu valor hipotético (${param_simbolo}_0 = {valor_hipotetico}$) **ESTÁ DENTRO** del rango de este intervalo, es un valor razonable y posible. Por lo tanto, **No podemos rechazar $H_0$**.")
             else:
-                st.markdown(f"Como tu valor hipotético ($\\mu_0 = {mu_0}$) **CAE AFUERA** de este intervalo, es altamente improbable que sea el verdadero promedio. Por lo tanto, **Rechazamos $H_0$**.")
+                st.markdown(f"Como tu valor hipotético (${param_simbolo}_0 = {valor_hipotetico}$) **CAE AFUERA** de este intervalo, es altamente improbable que sea el verdadero valor. Por lo tanto, **Rechazamos $H_0$**.")
         else:
             st.warning("⚠️ La dualidad exacta y simétrica con los intervalos de confianza estándar se visualiza mejor en pruebas de Dos Colas. Estás usando una prueba de una sola cola.")
 # ==========================================
