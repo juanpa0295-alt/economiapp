@@ -1,98 +1,323 @@
 {
   "macroeconomia_1": {
-    "pib_gasto": {
-      "nombre": "PIB - Enfoque del Gasto (Modelo Keynesiano)",
-      "formula_general": "Y = \\frac{1}{1 - c_1} \\cdot [C_0 - c_1 T + I + G]",
-      "variables": {
-        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 500.0, "ayuda_real": "Consumo de supervivencia financiado con desahorro."},
-        "c1": {"nombre": "Propensión a Consumir", "valor_defecto": 0.8, "ayuda_real": "Un valor típico oscila entre 0.6 y 0.9."},
-        "T": {"nombre": "Impuestos", "valor_defecto": 200.0, "ayuda_real": "Son los impuestos netos (Recaudo - Transferencias)."},
-        "I": {"nombre": "Inversión", "valor_defecto": 300.0, "ayuda_real": "Formación Bruta de Capital Fijo (FBCF)."},
-        "G": {"nombre": "Gasto Público", "valor_defecto": 400.0, "ayuda_real": "Gasto de Consumo Final del Gobierno."}
-      }
-    },
     "teoria_consumo": {
-      "nombre": "Teoría del Consumo (Función Keynesiana)",
+      "nombre": "Teoría del Consumo Keynesiano",
       "formula_general": "C = C_0 + c_1(Y - T)",
       "variables": {
-        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 300.0, "ayuda_real": "Nivel de consumo fijo que no depende de la renta."},
-        "c1": {"nombre": "Propensión Marginal a Consumir", "valor_defecto": 0.75, "ayuda_real": "Cuánto aumenta el consumo si el ingreso aumenta en 1."},
-        "Y": {"nombre": "Ingreso Total (Renta)", "valor_defecto": 2000.0, "ayuda_real": "Ingreso agregado de la economía."},
-        "T": {"nombre": "Impuestos Netos", "valor_defecto": 250.0, "ayuda_real": "Dinero que el Estado recauda de los hogares."}
+        "C0": {
+          "nombre": "Consumo de Supervivencia (C0)",
+          "valor_defecto": 800000.0,
+          "ayuda_real": "Lo mínimo que gasta un hogar en Medellín (arriendo, mercado) aunque no tenga empleo."
+        },
+        "c1": {
+          "nombre": "Propensión a Consumir (c1)",
+          "valor_defecto": 0.85,
+          "ayuda_real": "De cada peso extra que ganas, cuánto gastas. En Colombia suele ser muy alto (ej: 0.85)."
+        },
+        "Y": {
+          "nombre": "Ingreso Bruto (Y)",
+          "valor_defecto": 2600000.0,
+          "ayuda_real": "El salario total del hogar. Ejemplo: 2.6 millones de pesos."
+        },
+        "T": {
+          "nombre": "Impuestos y Descuentos (T)",
+          "valor_defecto": 208000.0,
+          "ayuda_real": "Aportes a salud, pensión o retenciones (ej: 8% del salario)."
+        }
       }
     },
     "consumo_intertemporal": {
-      "nombre": "Consumo Intertemporal (Fisher y Optimización)",
-      "formula_general": "C_1 + \\frac{C_2}{1+r} = Y_1 + \\frac{Y_2}{1+r}",
+      "nombre": "Consumo Intertemporal y Ecuación de Euler",
       "variables": {
-        "Y1": {"nombre": "Ingreso Presente (Y1)", "valor_defecto": 1000.0, "ayuda_real": "Ingreso en el periodo actual."},
-        "Y2": {"nombre": "Ingreso Futuro (Y2)", "valor_defecto": 1100.0, "ayuda_real": "Ingreso esperado para el próximo periodo."},
-        "r": {"nombre": "Tasa de Interés Real (r)", "valor_defecto": 0.05, "ayuda_real": "Tasa ajustada por inflación."},
-        "alpha": {"nombre": "Preferencia Presente (α)", "valor_defecto": 0.5, "ayuda_real": "Qué tanta utilidad genera consumir hoy."},
-        "beta": {"nombre": "Preferencia Futura (β)", "valor_defecto": 0.5, "ayuda_real": "Qué tanta utilidad genera guardar el consumo para mañana."}
+        "Y1": {
+          "nombre": "Sueldo Hoy (Y1)",
+          "valor_defecto": 2600000.0,
+          "ayuda_real": "Tu ingreso disponible este mes (Ej: 2.6 millones)."
+        },
+        "Y2": {
+          "nombre": "Sueldo Futuro (Y2)",
+          "valor_defecto": 3000000.0,
+          "ayuda_real": "Lo que esperas ganar el próximo mes."
+        },
+        "r": {
+          "nombre": "Tasa Interés Mensual (r)",
+          "valor_defecto": 0.02,
+          "ayuda_real": "Lo que rinde un CDT o lo que cuesta un crédito (Ej: 2% = 0.02)."
+        },
+        "rho": {
+          "nombre": "Tasa de Impaciencia (ρ)",
+          "valor_defecto": 0.03,
+          "ayuda_real": "Qué tanto prefieres consumir YA. Si ρ > r, eres impaciente y gastas hoy."
+        },
+        "theta": {
+          "nombre": "Suavización / Aversión (θ)",
+          "valor_defecto": 2.0,
+          "ayuda_real": "Qué tanto te molesta que tu consumo cambie mucho entre meses."
+        }
+      }
+    },
+    "pib_gasto": {
+      "nombre": "PIB y Multiplicador Keynesiano",
+      "formula_general": "Y = \\frac{1}{1 - c_1} [C_0 - c_1 T + I + G]",
+      "variables": {
+        "C0": {
+          "nombre": "Consumo Autónomo (C0)",
+          "valor_defecto": 800000.0,
+          "ayuda_real": "Consumo vital independiente del ingreso."
+        },
+        "c1": {
+          "nombre": "Propensión a Consumir (c1)",
+          "valor_defecto": 0.8,
+          "ayuda_real": "Porcentaje del ingreso extra que se gasta."
+        },
+        "T": {
+          "nombre": "Impuestos (T)",
+          "valor_defecto": 200000.0,
+          "ayuda_real": "Recaudos del gobierno."
+        },
+        "I": {
+          "nombre": "Inversión (I)",
+          "valor_defecto": 1000000.0,
+          "ayuda_real": "Inversión de las empresas."
+        },
+        "G": {
+          "nombre": "Gasto Público (G)",
+          "valor_defecto": 1500000.0,
+          "ayuda_real": "Gasto del gobierno."
+        }
       }
     },
     "inversion": {
-      "nombre": "Teoría de la Inversión (Enfoque De Gregorio)",
-      "formula_general": "K^* = \\alpha \\frac{Y}{r + \\delta} \\quad \\text{y} \\quad I_t = K^* - (1-\\delta)K_{t-1}",
+      "nombre": "Inversión (Neoclásico & Tobin)",
+      "formula_general": "K^* = \\alpha \\frac{Y}{r + \\delta} \\quad \\text{y} \\quad q = \\frac{VM}{CR}",
       "variables": {
-        "Y": {"nombre": "Producción Esperada (Y)", "valor_defecto": 5000.0, "ayuda_real": "Nivel de producción o demanda esperada."},
-        "alpha": {"nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "Elasticidad del producto respecto al capital."},
-        "r": {"nombre": "Tasa de Interés Real (r)", "valor_defecto": 0.05, "ayuda_real": "Costo financiero de adquirir el capital."},
-        "delta": {"nombre": "Tasa de Depreciación (δ)", "valor_defecto": 0.10, "ayuda_real": "Porcentaje del capital que se desgasta."},
-        "K_prev": {"nombre": "Capital Inicial (K_t-1)", "valor_defecto": 8000.0, "ayuda_real": "Stock de maquinaria e infraestructura inicial."},
-        "VM": {"nombre": "Valor de Mercado (VM)", "valor_defecto": 1200.0, "ayuda_real": "Capitalización bursátil."},
-        "CR": {"nombre": "Costo de Reposición (CR)", "valor_defecto": 1000.0, "ayuda_real": "Costo actual de reemplazar el capital."}
+        "Y": {
+          "nombre": "Ingreso o Ventas Esperadas (Y)",
+          "valor_defecto": 500000000.0,
+          "ayuda_real": "Ventas anuales esperadas (Ej: 500 millones)."
+        },
+        "alpha": {
+          "nombre": "Importancia de las Máquinas (α)",
+          "valor_defecto": 0.33,
+          "ayuda_real": "Peso del capital en la producción. El 33% (0.33) es el estándar."
+        },
+        "r": {
+          "nombre": "Tasa de Interés de Crédito (r)",
+          "valor_defecto": 0.12,
+          "ayuda_real": "Costo del crédito comercial en Colombia (Ej: 0.12)."
+        },
+        "delta": {
+          "nombre": "Desgaste / Depreciación (δ)",
+          "valor_defecto": 0.10,
+          "ayuda_real": "Desgaste anual de maquinaria (Ej: 10% = 0.10)."
+        },
+        "K_prev": {
+          "nombre": "Valor de tus Equipos Actuales (K previo)",
+          "valor_defecto": 1000000000.0,
+          "ayuda_real": "Valor actual de los activos fijos (Ej: 1000 millones)."
+        },
+        "VM": {
+          "nombre": "Valor de Venta del Negocio (VM)",
+          "valor_defecto": 1500000000.0,
+          "ayuda_real": "Precio de mercado de la empresa hoy."
+        },
+        "CR": {
+          "nombre": "Costo de Empezar de Cero (CR)",
+          "valor_defecto": 1200000000.0,
+          "ayuda_real": "Costo de reposición de todos los activos."
+        }
       }
     },
     "mercado_dinero": {
       "nombre": "Mercado de Dinero (Equilibrio L-M)",
       "formula_general": "\\frac{M}{P} = kY - hr",
       "variables": {
-        "M": {"nombre": "Oferta Monetaria Nominal (M)", "valor_defecto": 2000.0, "ayuda_real": "Cantidad de dinero circulante."},
-        "P": {"nombre": "Nivel de Precios (P)", "valor_defecto": 1.0, "ayuda_real": "Índice de Precios al Consumidor (IPC)."},
-        "Y": {"nombre": "Ingreso Real (Y)", "valor_defecto": 4000.0, "ayuda_real": "Nivel de actividad económica o PIB real."},
-        "k": {"nombre": "Sensibilidad al Ingreso (k)", "valor_defecto": 0.25, "ayuda_real": "Motivo transacción."},
-        "h": {"nombre": "Sensibilidad al Interés (h)", "valor_defecto": 800.0, "ayuda_real": "Motivo especulación."}
+        "M": {
+          "nombre": "Oferta Monetaria Nominal (M)",
+          "valor_defecto": 2000.0,
+          "ayuda_real": "Cantidad de dinero circulante."
+        },
+        "P": {
+          "nombre": "Nivel de Precios (P)",
+          "valor_defecto": 1.0,
+          "ayuda_real": "Índice de Precios al Consumidor (IPC)."
+        },
+        "Y": {
+          "nombre": "Ingreso Real (Y)",
+          "valor_defecto": 4000.0,
+          "ayuda_real": "Actividad económica o PIB real."
+        },
+        "k": {
+          "nombre": "Sensibilidad al Ingreso (k)",
+          "valor_defecto": 0.25,
+          "ayuda_real": "Motivo transacción."
+        },
+        "h": {
+          "nombre": "Sensibilidad al Interés (h)",
+          "valor_defecto": 800.0,
+          "ayuda_real": "Motivo especulación."
+        }
       }
     },
     "is_lm": {
       "nombre": "Modelo IS-LM (Equilibrio General)",
       "formula_general": "IS: Y = C + I + G \\quad LM: \\frac{M}{P} = L(Y, r)",
       "variables": {
-        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 500.0, "ayuda_real": "Consumo de supervivencia."},
-        "c1": {"nombre": "Propensión a Consumir (c1)", "valor_defecto": 0.8, "ayuda_real": "Sensibilidad del consumo al ingreso."},
-        "T": {"nombre": "Impuestos", "valor_defecto": 200.0, "ayuda_real": "Recaudación fiscal neta."},
-        "I0": {"nombre": "Inversión Autónoma", "valor_defecto": 800.0, "ayuda_real": "Inversión base empresarial."},
-        "b": {"nombre": "Sensibilidad Inversión (b)", "valor_defecto": 2000.0, "ayuda_real": "Respuesta de la inversión a la tasa de interés."},
-        "G": {"nombre": "Gasto Público", "valor_defecto": 400.0, "ayuda_real": "Gasto de consumo e inversión del gobierno."},
-        "M": {"nombre": "Oferta Monetaria Nominal (M)", "valor_defecto": 2000.0, "ayuda_real": "Dinero en circulación."},
-        "P": {"nombre": "Nivel de Precios (P)", "valor_defecto": 1.0, "ayuda_real": "Índice de precios (IPC)."},
-        "k": {"nombre": "Sensibilidad Demanda Dinero (k)", "valor_defecto": 0.25, "ayuda_real": "Demanda por motivo transacción."},
-        "h": {"nombre": "Sensibilidad Demanda Dinero (h)", "valor_defecto": 800.0, "ayuda_real": "Demanda por motivo especulación."}
+        "C0": {
+          "nombre": "Consumo Autónomo",
+          "valor_defecto": 500.0,
+          "ayuda_real": "Consumo de supervivencia."
+        },
+        "c1": {
+          "nombre": "Propensión a Consumir (c1)",
+          "valor_defecto": 0.8,
+          "ayuda_real": "Sensibilidad del consumo al ingreso."
+        },
+        "T": {
+          "nombre": "Impuestos",
+          "valor_defecto": 200.0,
+          "ayuda_real": "Recaudación fiscal neta."
+        },
+        "I0": {
+          "nombre": "Inversión Autónoma",
+          "valor_defecto": 800.0,
+          "ayuda_real": "Inversión base empresarial."
+        },
+        "b": {
+          "nombre": "Sensibilidad Inversión (b)",
+          "valor_defecto": 2000.0,
+          "ayuda_real": "Respuesta de la inversión a la tasa de interés."
+        },
+        "G": {
+          "nombre": "Gasto Público",
+          "valor_defecto": 400.0,
+          "ayuda_real": "Gasto de consumo e inversión del gobierno."
+        },
+        "M": {
+          "nombre": "Oferta Monetaria Nominal (M)",
+          "valor_defecto": 2000.0,
+          "ayuda_real": "Dinero en circulación."
+        },
+        "P": {
+          "nombre": "Nivel de Precios (P)",
+          "valor_defecto": 1.0,
+          "ayuda_real": "Índice de precios (IPC)."
+        },
+        "k": {
+          "nombre": "Sensibilidad Demanda Dinero (k)",
+          "valor_defecto": 0.25,
+          "ayuda_real": "Demanda por motivo transacción."
+        },
+        "h": {
+          "nombre": "Sensibilidad Demanda Dinero (h)",
+          "valor_defecto": 800.0,
+          "ayuda_real": "Demanda por motivo especulación."
+        }
       }
     },
     "gobierno": {
       "nombre": "Gobierno y Política Fiscal",
-      "formula_general": "BS = T - G \\quad \\text{donde} \\quad T = T_0 + tY",
       "variables": {
-        "G": {"nombre": "Gasto Público (G)", "valor_defecto": 600.0, "ayuda_real": "Compras de bienes y servicios del Estado."},
-        "T0": {"nombre": "Impuestos Suma Fija (T0)", "valor_defecto": 200.0, "ayuda_real": "Impuestos independientes de Y."},
-        "t": {"nombre": "Tasa Impositiva (t)", "valor_defecto": 0.15, "ayuda_real": "Presión tributaria promedio sobre el PIB."},
-        "Y": {"nombre": "Ingreso/PIB (Y)", "valor_defecto": 5000.0, "ayuda_real": "Nivel de producción actual."}
+        "G": {
+          "nombre": "Gasto Público (G)",
+          "valor_defecto": 5000000.0,
+          "ayuda_real": "Gasto en infraestructura, salud y educación."
+        },
+        "t": {
+          "nombre": "Tasa Impositiva (t)",
+          "valor_defecto": 0.15,
+          "ayuda_real": "Porcentaje de impuestos sobre ingresos (Ej: 0.15)."
+        },
+        "TR": {
+          "nombre": "Transferencias (TR)",
+          "valor_defecto": 1000000.0,
+          "ayuda_real": "Subsidios o ayudas entregadas a hogares."
+        }
       }
     },
     "microfundamentos": {
-      "nombre": "Microfundamentos: El Problema de la Firma",
+      "nombre": "Microfundamentos: Firma, Hogar y Equilibrio",
       "variables": {
-        "z": {"nombre": "Productividad (z)", "valor_defecto": 1.5, "ayuda_real": "Residuo de Solow (PTF)."},
-        "alpha": {"nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "Elasticidad del producto respecto al capital."},
-        "w": {"nombre": "Salario (W)", "valor_defecto": 10.0, "ayuda_real": "Costo marginal del trabajo actual."},
-        "k": {"nombre": "Capital Inicial (K)", "valor_defecto": 100.0, "ayuda_real": "Stock de maquinaria actual."},
-        "r": {"nombre": "Tasa de Interés (r)", "valor_defecto": 0.05, "ayuda_real": "Costo financiero en el tiempo."},
-        "s": {"nombre": "Tasa de Depreciación (s)", "valor_defecto": 0.10, "ayuda_real": "Desgaste del stock de capital."},
-        "z_futuro": {"nombre": "Prod. Futura (z_t+1)", "valor_defecto": 1.7, "ayuda_real": "Expectativa de productividad para el próximo periodo."},
-        "w_futuro": {"nombre": "Salario Futuro (W_t+1)", "valor_defecto": 11.0, "ayuda_real": "Salario esperado en el futuro."}
+        "z": {
+          "nombre": "Tecnología / Valor Agregado (z)",
+          "valor_defecto": 15000.0,
+          "ayuda_real": "Valor en pesos generado por trabajador/hora en una pyme colombiana."
+        },
+        "alpha": {
+          "nombre": "Importancia del Capital (α)",
+          "valor_defecto": 0.35,
+          "ayuda_real": "Peso de la maquinaria en la producción (Rango: 0.30 - 0.45)."
+        },
+        "K": {
+          "nombre": "Stock de Capital (K)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "Cantidad de máquinas o infraestructura fija."
+        },
+        "h": {
+          "nombre": "Tiempo Total Disponible (h)",
+          "valor_defecto": 240.0,
+          "ayuda_real": "Horas laborales al mes (Ej: 48h semanales)."
+        },
+        "gamma": {
+          "nombre": "Preferencia por el Ocio (γ)",
+          "valor_defecto": 0.5,
+          "ayuda_real": "Valoración del descanso frente al consumo."
+        },
+        "w": {
+          "nombre": "Salario por Hora (w)",
+          "valor_defecto": 5416.0,
+          "ayuda_real": "Salario mínimo por hora aprox. en 2024."
+        }
+      }
+    },
+    "equilibrio_dinamico": {
+      "nombre": "Equilibrio Dinámico y Fricciones",
+      "variables": {
+        "z1": {
+          "nombre": "Tecnología Hoy (z_1)",
+          "valor_defecto": 15000.0,
+          "ayuda_real": "Productividad actual en la ciudad."
+        },
+        "z2": {
+          "nombre": "Tecnología Mañana (z_2)",
+          "valor_defecto": 16000.0,
+          "ayuda_real": "Expectativa de productividad futura."
+        },
+        "K1": {
+          "nombre": "Capital Heredado (K_1)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "Stock de máquinas inicial."
+        },
+        "h": {
+          "nombre": "Tiempo Total (h)",
+          "valor_defecto": 240.0,
+          "ayuda_real": "Horas disponibles al mes para el hogar."
+        },
+        "delta": {
+          "nombre": "Depreciación (δ)",
+          "valor_defecto": 0.10,
+          "ayuda_real": "Tasa de desgaste del capital (Ej: 10%)."
+        },
+        "r": {
+          "nombre": "Tasa de Interés (r)",
+          "valor_defecto": 0.05,
+          "ayuda_real": "Costo de oportunidad intertemporal."
+        },
+        "beta": {
+          "nombre": "Factor de Descuento (β)",
+          "valor_defecto": 0.95,
+          "ayuda_real": "Nivel de paciencia del hogar."
+        },
+        "gamma": {
+          "nombre": "Preferencia Ocio (γ)",
+          "valor_defecto": 0.5,
+          "ayuda_real": "Valoración del tiempo libre."
+        },
+        "tau": {
+          "nombre": "Impuesto Laboral (τ)",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Impuesto del gobierno sobre el salario."
+        }
       }
     }
   },
@@ -101,60 +326,157 @@
       "nombre": "Estimadores Estadísticos y Muestreo",
       "formula_general": "\\bar{x} = \\frac{\\sum x_i}{n} \\quad ; \\quad s^2 = \\frac{\\sum (x_i - \\bar{x})^2}{n-1}",
       "variables": {
-        "mu": {"nombre": "Media Poblacional Verdadera (μ)", "valor_defecto": 100.0, "ayuda_real": "El parámetro real y oculto."},
-        "sigma": {"nombre": "Desviación Estándar (σ)", "valor_defecto": 15.0, "ayuda_real": "Qué tan dispersos están los datos reales."},
-        "n": {"nombre": "Tamaño de la Muestra (n)", "valor_defecto": 30.0, "ayuda_real": "Cuántas observaciones recogemos."}
+        "mu": {
+          "nombre": "Media Poblacional Verdadera (μ)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "El parámetro real y oculto."
+        },
+        "sigma": {
+          "nombre": "Desviación Estándar (σ)",
+          "valor_defecto": 15.0,
+          "ayuda_real": "Qué tan dispersos están los datos reales."
+        },
+        "n": {
+          "nombre": "Tamaño de la Muestra (n)",
+          "valor_defecto": 30.0,
+          "ayuda_real": "Cuántas observaciones recogemos."
+        }
       }
     },
     "intervalos_muestra": {
       "nombre": "Intervalos de Confianza y Tamaño de Muestra",
       "formula_general": "IC = \\bar{x} \\pm Z \\frac{\\sigma}{\\sqrt{n}} \\quad ; \\quad n = \\left(\\frac{Z \\cdot \\sigma}{E}\\right)^2",
       "variables": {
-        "x_bar": {"nombre": "Media Muestral (x̄)", "valor_defecto": 500.0, "ayuda_real": "El promedio que obtuviste en tu muestra inicial."},
-        "sigma": {"nombre": "Desviación Estándar (σ)", "valor_defecto": 50.0, "ayuda_real": "La dispersión de los datos."},
-        "n_actual": {"nombre": "Muestra Actual (n)", "valor_defecto": 100.0, "ayuda_real": "La cantidad de datos que tienes actualmente."},
-        "E": {"nombre": "Margen de Error Deseado (E)", "valor_defecto": 5.0, "ayuda_real": "El error máximo permitido para tu nuevo estudio."}
+        "x_bar": {
+          "nombre": "Media Muestral (x̄)",
+          "valor_defecto": 500.0,
+          "ayuda_real": "El promedio que obtuviste en tu muestra inicial."
+        },
+        "sigma": {
+          "nombre": "Desviación Estándar (σ)",
+          "valor_defecto": 50.0,
+          "ayuda_real": "La dispersión de los datos."
+        },
+        "n_actual": {
+          "nombre": "Muestra Actual (n)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "La cantidad de datos que tienes actualmente."
+        },
+        "E": {
+          "nombre": "Margen de Error Deseado (E)",
+          "valor_defecto": 5.0,
+          "ayuda_real": "El error máximo permitido para tu nuevo estudio."
+        }
       }
     },
     "pruebas_hipotesis": {
       "nombre": "Pruebas de Hipótesis (Inferencia)",
       "formula_general": "Z_{calc} = \\frac{\\bar{x} - \\mu_0}{\\sigma / \\sqrt{n}}",
       "variables": {
-        "mu_0": {"nombre": "Media Hipotética (μ0)", "valor_defecto": 100.0, "ayuda_real": "El valor hipotético del Status Quo a poner a prueba."},
-        "x_bar": {"nombre": "Media Muestral (x̄)", "valor_defecto": 105.0, "ayuda_real": "El promedio real de la muestra obtenida."},
-        "sigma": {"nombre": "Desviación Estándar (σ)", "valor_defecto": 15.0, "ayuda_real": "Dispersión poblacional de los datos."},
-        "n": {"nombre": "Tamaño de Muestra (n)", "valor_defecto": 50.0, "ayuda_real": "Cantidad de observaciones."},
-        "alpha": {"nombre": "Nivel de Significancia (α)", "valor_defecto": 0.05, "ayuda_real": "Riesgo de cometer Error Tipo I."}
+        "mu_0": {
+          "nombre": "Media Hipotética (μ0)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "El valor hipotético del Status Quo a poner a prueba."
+        },
+        "x_bar": {
+          "nombre": "Media Muestral (x̄)",
+          "valor_defecto": 105.0,
+          "ayuda_real": "El promedio real de la muestra obtenida."
+        },
+        "sigma": {
+          "nombre": "Desviación Estándar (σ)",
+          "valor_defecto": 15.0,
+          "ayuda_real": "Dispersión poblacional de los datos."
+        },
+        "n": {
+          "nombre": "Tamaño de Muestra (n)",
+          "valor_defecto": 50.0,
+          "ayuda_real": "Cantidad de observaciones."
+        },
+        "alpha": {
+          "nombre": "Nivel de Significancia (α)",
+          "valor_defecto": 0.05,
+          "ayuda_real": "Riesgo de cometer Error Tipo I."
+        }
       }
     }
   },
-"teoria_juegos": {
+  "teoria_juegos": {
     "matriz_2x2": {
       "nombre": "Análisis de la Forma Estratégica",
       "variables": {
-        "u11": {"nombre": "J1: Arriba-Izq", "valor_defecto": 3.0, "ayuda_real": "Pago del Jugador 1 en la celda Arriba-Izquierda"},
-        "v11": {"nombre": "J2: Arriba-Izq", "valor_defecto": 2.0, "ayuda_real": "Pago del Jugador 2 en la celda Arriba-Izquierda"},
-        "u12": {"nombre": "J1: Arriba-Der", "valor_defecto": 0.0, "ayuda_real": "Pago del Jugador 1 en la celda Arriba-Derecha"},
-        "v12": {"nombre": "J2: Arriba-Der", "valor_defecto": 1.0, "ayuda_real": "Pago del Jugador 2 en la celda Arriba-Derecha"},
-        "u21": {"nombre": "J1: Abajo-Izq", "valor_defecto": 0.0, "ayuda_real": "Pago del Jugador 1 en la celda Abajo-Izquierda"},
-        "v21": {"nombre": "J2: Abajo-Izq", "valor_defecto": 0.0, "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Izquierda"},
-        "u22": {"nombre": "J1: Abajo-Der", "valor_defecto": 1.0, "ayuda_real": "Pago del Jugador 1 en la celda Abajo-Derecha"},
-        "v22": {"nombre": "J2: Abajo-Der", "valor_defecto": 3.0, "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Derecha"}
+        "u11": {
+          "nombre": "J1: Arriba-Izq",
+          "valor_defecto": 3.0,
+          "ayuda_real": "Pago del Jugador 1 en la celda Arriba-Izquierda"
+        },
+        "v11": {
+          "nombre": "J2: Arriba-Izq",
+          "valor_defecto": 2.0,
+          "ayuda_real": "Pago del Jugador 2 en la celda Arriba-Izquierda"
+        },
+        "u12": {
+          "nombre": "J1: Arriba-Der",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Pago del Jugador 1 en la celda Arriba-Derecha"
+        },
+        "v12": {
+          "nombre": "J2: Arriba-Der",
+          "valor_defecto": 1.0,
+          "ayuda_real": "Pago del Jugador 2 en la celda Arriba-Derecha"
+        },
+        "u21": {
+          "nombre": "J1: Abajo-Izq",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Pago del Jugador 1 en la celda Abajo-Izquierda"
+        },
+        "v21": {
+          "nombre": "J2: Abajo-Izq",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Izquierda"
+        },
+        "u22": {
+          "nombre": "J1: Abajo-Der",
+          "valor_defecto": 1.0,
+          "ayuda_real": "Pago del Jugador 1 en la celda Abajo-Derecha"
+        },
+        "v22": {
+          "nombre": "J2: Abajo-Der",
+          "valor_defecto": 3.0,
+          "ayuda_real": "Pago del Jugador 2 en la celda Abajo-Derecha"
+        }
       }
     },
     "arbitraje_oferta": {
       "nombre": "Arbitraje de Oferta Final (Farber)",
       "variables": {
-        "m": {"nombre": "Media del Árbitro (m)", "valor_defecto": 1000.0, "ayuda_real": "El salario que el árbitro considera ideal en promedio."},
-        "sigma": {"nombre": "Incertidumbre (σ)", "valor_defecto": 150.0, "ayuda_real": "Qué tanta varianza o desconocimiento hay sobre la decisión del árbitro."}
+        "m": {
+          "nombre": "Media del Árbitro (m)",
+          "valor_defecto": 1000.0,
+          "ayuda_real": "El salario que el árbitro considera ideal en promedio."
+        },
+        "sigma": {
+          "nombre": "Incertidumbre (σ)",
+          "valor_defecto": 150.0,
+          "ayuda_real": "Qué tanta varianza o desconocimiento hay sobre la decisión del árbitro."
+        }
       }
     }
-  },"matematicas_1": {
+  },
+  "matematicas_1": {
     "limites": {
       "nombre": "Álgebra y Límites",
       "variables": {
-        "funcion": {"nombre": "Función f(x)", "valor_defecto": "(x**2 - 4)/(x - 2)", "ayuda_real": "Función a evaluar. Puedes usar fracciones e infinitos (escribiendo 'oo')."},
-        "tendencia": {"nombre": "Valor al que tiende 'x' (c)", "valor_defecto": "2", "ayuda_real": "El valor al que se acerca x. Escribe 'oo' para infinito positivo."}
+        "funcion": {
+          "nombre": "Función f(x)",
+          "valor_defecto": "(x**2 - 4)/(x - 2)",
+          "ayuda_real": "Función a evaluar. Puedes usar fracciones e infinitos (escribiendo 'oo')."
+        },
+        "tendencia": {
+          "nombre": "Valor al que tiende 'x' (c)",
+          "valor_defecto": "2",
+          "ayuda_real": "El valor al que se acerca x. Escribe 'oo' para infinito positivo."
+        }
       }
     }
   },
@@ -162,16 +484,33 @@
     "optimizacion_1v": {
       "nombre": "Optimización de 1 Variable (Cálculo Diferencial)",
       "variables": {
-        "funcion": {"nombre": "Función Objetivo f(x)", "valor_defecto": "-2*x**2 + 120*x - 400", "ayuda_real": "Escribe la función usando 'x' y '**' para potencias."}
+        "funcion": {
+          "nombre": "Función Objetivo f(x)",
+          "valor_defecto": "-2*x**2 + 120*x - 400",
+          "ayuda_real": "Escribe la función usando 'x' y '**' para potencias."
+        }
       }
     }
-  },"matematicas_3": {
+  },
+  "matematicas_3": {
     "integrales": {
       "nombre": "Cálculo Integral y Áreas",
       "variables": {
-        "funcion": {"nombre": "Función Marginal f(x)", "valor_defecto": "-x**2 + 10*x", "ayuda_real": "Ejemplo: Una curva de beneficio marginal o densidad de probabilidad."},
-        "lim_inf": {"nombre": "Límite Inferior (a)", "valor_defecto": "0.0", "ayuda_real": "Punto de inicio en el eje X para calcular el área."},
-        "lim_sup": {"nombre": "Límite Superior (b)", "valor_defecto": "5.0", "ayuda_real": "Punto final en el eje X para calcular el área."}
+        "funcion": {
+          "nombre": "Función Marginal f(x)",
+          "valor_defecto": "-x**2 + 10*x",
+          "ayuda_real": "Ejemplo: Una curva de beneficio marginal o densidad de probabilidad."
+        },
+        "lim_inf": {
+          "nombre": "Límite Inferior (a)",
+          "valor_defecto": "0.0",
+          "ayuda_real": "Punto de inicio en el eje X para calcular el área."
+        },
+        "lim_sup": {
+          "nombre": "Límite Superior (b)",
+          "valor_defecto": "5.0",
+          "ayuda_real": "Punto final en el eje X para calcular el área."
+        }
       }
     }
   }

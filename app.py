@@ -110,14 +110,14 @@ with st.sidebar:
     # 4.1 Cargar el logo de Cifras Claras
     try:
         # ¡AQUÍ ESTÁ EL CAMBIO! Ponemos el nombre sencillo
-        st.image("Logo.jpg", use_container_width=True)
+        st.image("logo.jpg", use_container_width=True)
     except:
         st.warning("⚠️ Logo no encontrado. Verifica que se llame 'Logo.jpg'.")
     
     st.markdown("<hr style='margin-top: 0; margin-bottom: 15px;'>", unsafe_allow_html=True)
     
     # 4.2 Navegación Principal
-    materia_seleccionada = st.selectbox(
+    materia_seleccionada = st.radio(
         "📚 Selecciona la Materia:", 
         [
             "Principios de Macroeconomía", 
@@ -142,7 +142,8 @@ with st.sidebar:
             "Consumo Intertemporal", 
             "Inversión", 
             "Gobierno y Política Fiscal",
-            "Microfundamentos: El Problema de la Firma" # <--- Nombre exacto
+            "Microfundamentos: El Problema de la Firma",
+            "Equilibrio General Dinámico"
         ])
         
     elif materia_seleccionada == "Teoría de Juegos":
@@ -211,15 +212,23 @@ if tema_seleccionado == "PIB (Enfoque Gasto)":
     for i, (simbolo, info) in enumerate(tema["variables"].items()):
         with col_input1 if i % 2 == 0 else col_input2:
             with st.container(border=True):
-                valores_ingresados[simbolo] = st.number_input(f"{info['nombre']} ({simbolo})", value=float(info['valor_defecto']))
-                with st.expander("📖 ¿Qué es y dónde se consulta?"):
+                # Saltos de 500,000 para el dinero, 0.05 para la propensión
+                paso_v = 0.05 if simbolo == "c1" else 500000.0
+                valores_ingresados[simbolo] = st.number_input(
+                    f"{info['nombre']} ({simbolo})", 
+                    value=float(info['valor_defecto']),
+                    step=paso_v,
+                    key=f"pib_mult_input_{simbolo}"
+                )
+                with st.expander("💡 Info"):
                     st.markdown(info['ayuda_real'])
 
-    C0 = valores_ingresados["C0"]
-    c1 = valores_ingresados["c1"]
-    T = valores_ingresados["T"]
-    I = valores_ingresados["I"]
-    G = valores_ingresados["G"]
+    # Extracción segura
+    C0 = valores_ingresados.get("C0", 800000.0)
+    c1 = valores_ingresados.get("c1", 0.8)
+    T = valores_ingresados.get("T", 200000.0)
+    I = valores_ingresados.get("I", 1000000.0)
+    G = valores_ingresados.get("G", 1500000.0)
 
     if c1 != 1:
         multiplicador = 1 / (1 - c1)
@@ -231,7 +240,7 @@ if tema_seleccionado == "PIB (Enfoque Gasto)":
 
     with col_form2:
         st.markdown("**Fórmula con tus Valores Actuales:**")
-        st.latex(f"Y = \\frac{{1}}{{1 - {c1}}} \\cdot [{C0} - {c1}({T}) + {I} + {G}]")
+        st.latex(rf"Y = \frac{{1}}{{1 - {c1}}} \cdot [{C0} - {c1}({T}) + {I} + {G}]")
         st.metric(label="PIB de Equilibrio (Y*)", value=f"${Y_resultado:,.2f}")
 
     st.divider()
@@ -261,7 +270,7 @@ if tema_seleccionado == "PIB (Enfoque Gasto)":
         "Propensión a Consumir (c1)": c_1_sym
     }
     
-    var_seleccionada = st.selectbox("¿Qué variable deseas derivar con respecto a Y?", list(opciones_pib.keys()))
+    var_seleccionada = st.radio("¿Qué variable deseas derivar con respecto a Y?", list(opciones_pib.keys()), horizontal=True, key="sel_der_pib")
     simbolo_derivar = opciones_pib[var_seleccionada]
     
     derivada_Y = sp.diff(funcion_Y, simbolo_derivar)
@@ -340,13 +349,25 @@ elif tema_seleccionado == "Teoría del Consumo":
     ecuacion_consumo = sp.Eq(C, C_0_sym + c_1_sym * (Y_sym - T_sym))
     ecuacion_sustituida = ecuacion_consumo.subs({C_0_sym: C0, c_1_sym: c1, Y_sym: Y_val, T_sym: T_val})
     C_total = sp.solve(ecuacion_sustituida, C)[0]
+    # Cálculo de la Tasa de Consumo (PMeC) para cumplir con la nota 1.4
+    pmec = float(C_total) / Y_val if Y_val > 0 else 0
     ahorro = (Y_val - T_val) - C_total
 
     with col_form2:
         st.markdown("**Fórmula con tus Valores Actuales:**")
         st.latex(sp.latex(ecuacion_sustituida))
         st.markdown(f"### ➡️ Consumo Total (C) = `{float(C_total):,.2f}`")
-
+        
+        st.divider()
+        st.markdown("**Cálculo de Propensiones (Tasas):**")
+        
+        # Mostramos explícitamente la matemática de dónde salen
+        st.latex(rf"PMeC = \frac{{C}}{{Y}} = \frac{{{float(C_total):,.0f}}}{{{Y_val:,.0f}}} = {pmec:.3f}")
+        st.latex(rf"PMgC = c_1 = {c1}")
+        
+        # Explicación de la Convergencia
+        if pmec > c1:
+            st.info(f"💡 **Convergencia:** Fíjate en el cálculo matemático superior. Tu Propensión Media ({pmec:.2f}) es mayor a la Marginal ({c1}). La teoría indica que a medida que tu ingreso ($Y$) crezca, ese denominador se hará más grande, haciendo que la PMeC caiga lentamente hasta igualar a tu PMgC ({c1}).")
     st.divider()
     col_pasos, col_grafico = st.columns(2)
 
@@ -395,7 +416,7 @@ elif tema_seleccionado == "Teoría del Consumo":
         "Impuestos (T)": T_sym
     }
     
-    var_seleccionada = st.selectbox("¿Qué variable deseas derivar con respecto a C?", list(opciones_consumo.keys()))
+    var_seleccionada = st.radio("¿Qué variable deseas derivar con respecto a C?", list(opciones_consumo.keys()), horizontal=True, key="sel_der_consumo")
     simbolo_derivar = opciones_consumo[var_seleccionada]
     
     derivada_C = sp.diff(funcion_C, simbolo_derivar)
@@ -457,8 +478,14 @@ elif tema_seleccionado == "Consumo Intertemporal":
         for i, (simbolo, info) in enumerate(tema["variables"].items()):
             with col_input1 if i % 2 == 0 else col_input2:
                 with st.container(border=True):
-                    # Agregamos un key único a los inputs básicos para evitar colisiones
-                    valores_ingresados[simbolo] = st.number_input(f"{info['nombre']} ({simbolo})", value=float(info['valor_defecto']), step=0.01, key=f"basic_input_{simbolo}")
+                    # Saltos inteligentes: decimales para tasas (r, rho, theta) y millones para sueldos (Y)
+                    paso_v = 0.01 if simbolo in ["r", "rho", "theta"] else 100000.0
+                    valores_ingresados[simbolo] = st.number_input(
+                        f"{info['nombre']}", 
+                        value=float(info['valor_defecto']), 
+                        step=paso_v, 
+                        key=f"basic_input_{simbolo}"
+                    )
 
         # Extracción segura de variables
         Y1 = float(valores_ingresados.get("Y1", 1000.0))
@@ -468,11 +495,19 @@ elif tema_seleccionado == "Consumo Intertemporal":
         beta = float(valores_ingresados.get("beta", 0.5))
 
         # ====== CÁLCULOS ======
-        W = Y1 + (Y2 / (1 + r))
-        C2_max = W * (1 + r)
+        r = valores_ingresados.get("r", 0.05)
+        rho = valores_ingresados.get("rho", 0.08)
+        theta = valores_ingresados.get("theta", 1.5)
         
-        C1_optimo = (alpha / (alpha + beta)) * W
-        C2_optimo = (beta / (alpha + beta)) * W * (1 + r)
+        # Riqueza Intertemporal: Y1 + Y2/(1+r)
+        W = Y1 + (Y2 / (1 + r))
+        
+        # Ecuación de Euler (Trade-off óptimo entre hoy y mañana)
+        factor_euler = ((1 + r) / (1 + rho))**(1 / theta)
+        
+        # Consumo Óptimo (Sustitución de Euler en la Restricción)
+        C1_optimo = W / (1 + (factor_euler / (1 + r)))
+        C2_optimo = C1_optimo * factor_euler
         Utilidad_optima = (C1_optimo**alpha) * (C2_optimo**beta)
 
         with col_form2:
@@ -486,21 +521,17 @@ elif tema_seleccionado == "Consumo Intertemporal":
         col_pasos, col_grafico = st.columns(2)
 
         with col_pasos:
-            st.subheader("📝 Resolución Paso a Paso")
+            st.subheader("📝 Resolución Macro (Euler)")
             
-            st.markdown("**1. Cálculo de la Riqueza ($W$):**")
-            st.latex(rf"W = {Y1} + \frac{{{Y2}}}{{1 + {r}}} = {W:,.2f}")
+            st.markdown("**1. Riqueza Intertemporal ($W$):**")
+            st.latex(rf"W = Y_1 + \frac{{Y_2}}{{1+r}} = {W:,.2f}")
             
-            st.markdown("**2. Proporciones de Consumo:**")
-            fraccion_c1 = alpha / (alpha + beta)
-            fraccion_c2 = beta / (alpha + beta)
-            st.latex(rf"\text{{Fracción }} C_1 = \frac{{{alpha}}}{{{alpha} + {beta}}} = {fraccion_c1:,.2f}")
+            st.markdown("**2. Condición de Euler (Consumo futuro en función del presente):**")
+            st.latex(rf"C_2 = C_1 \left( \frac{{1+r}}{{1+\rho}} \right)^{{\frac{{1}}{{\theta}}}}")
+            st.latex(rf"C_2 = C_1 \cdot {factor_euler:.4f}")
             
-            st.markdown("**3. Consumo Óptimo Presente ($C_1^*$):**")
-            st.latex(rf"C_1^* = {fraccion_c1:,.2f} \cdot {W:,.2f} = {C1_optimo:,.2f}")
-            
-            st.markdown("**4. Consumo Óptimo Futuro ($C_2^*$):**")
-            st.latex(rf"C_2^* = {fraccion_c2:,.2f} \cdot {W:,.2f} \cdot (1 + {r}) = {C2_optimo:,.2f}")
+            st.markdown("**3. Canasta Óptima:**")
+            st.latex(rf"C_1^* = {C1_optimo:,.2f} \quad | \quad C_2^* = {C2_optimo:,.2f}")
 
         with col_grafico:
             st.subheader("📈 Restricción y Curva de Indiferencia")
@@ -532,7 +563,12 @@ elif tema_seleccionado == "Consumo Intertemporal":
             "Utilidad Marginal del Consumo Futuro (C2)": ("U", C2_sym, funcion_U)
         }
         
-        var_seleccionada = st.selectbox("Selecciona qué análisis marginal deseas realizar:", list(opciones_fisher.keys()), key="select_marginal_2p")
+        var_seleccionada = st.radio(
+            "Selecciona qué efecto deseas evaluar:", 
+            list(opciones_fisher.keys()), 
+            horizontal=True, 
+            key="radio_marginal_intertemporal"
+        )
         funcion_str, simbolo_derivar, funcion_elegida = opciones_fisher[var_seleccionada]
         
         derivada_elegida = sp.diff(funcion_elegida, simbolo_derivar)
@@ -683,7 +719,7 @@ elif tema_seleccionado == "Consumo Intertemporal":
         st.markdown("Elige una variable para evaluar su impacto marginal exacto sobre tu riqueza.")
         
         opciones_derivar_n = ["Tasa de interés (r)"] + list(ingresos_N.keys())
-        var_a_derivar_n = st.selectbox("Derivar Riqueza ($W$) respecto a:", opciones_derivar_n, key="select_dyn_n")
+        var_a_derivar_n = st.radio("Derivar Riqueza ($W$) respecto a:", opciones_derivar_n, horizontal=True, key="select_dyn_n")
         
         if var_a_derivar_n == "Tasa de interés (r)":
             simbolo_obj = r_sym_n
@@ -748,40 +784,44 @@ elif tema_seleccionado == "Consumo Intertemporal":
 # MÓDULO 4: INVERSIÓN (DE GREGORIO & TOBIN)
 # ==========================================
 elif tema_seleccionado == "Inversión":
-    st.title("Laboratorio de Macroeconomía 📊")
+    st.title("Laboratorio de Macroeconomía y Negocios 📊")
     tema = datos["macroeconomia_1"]["inversion"]
-    st.markdown(f"<h2><i class='fas fa-exchange-alt' style='color:#00FFAA;'></i> <i class='fas fa-bullhorn' style='color:#00FFAA;'></i> {tema['nombre']}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2><i class='fas fa-exchange-alt' style='color:#2563EB;'></i> {tema['nombre']}</h2>", unsafe_allow_html=True)
 
-    st.subheader("Configuración de Variables")
+    st.subheader("Configuración de Variables de la Empresa")
     col_input1, col_input2 = st.columns(2)
     valores_ingresados = {}
 
     for i, (simbolo, info) in enumerate(tema["variables"].items()):
         with col_input1 if i % 2 == 0 else col_input2:
             with st.container(border=True):
-                # Validación de pasos y asignación de key único
-                paso = 0.01 if simbolo in ["r", "delta", "alpha"] else 100.0
+                # --- LÓGICA DE SALTOS PARA MILLONES DE PESOS ---
+                if simbolo in ["r", "delta", "alpha"]:
+                    paso = 0.01
+                else:
+                    paso = 5000000.0 # Salto de 5 millones de COP para el dinero
+                    
                 valores_ingresados[simbolo] = st.number_input(
-                    f"{info['nombre']} ({simbolo})", 
+                    f"{info['nombre']}", 
                     value=float(info['valor_defecto']), 
                     step=paso, 
                     key=f"inv_input_{simbolo}"
                 )
-                with st.expander("📖 Info"):
+                with st.expander("💡 ¿Qué pongo aquí?"):
                     st.markdown(info['ayuda_real'])
 
-    # Extracción segura
-    Y_val = float(valores_ingresados.get("Y", 5000.0))
-    alpha = float(valores_ingresados.get("alpha", 0.3))
-    r = float(valores_ingresados.get("r", 0.05))
+    # Extracción segura con los nuevos valores en millones
+    Y_val = float(valores_ingresados.get("Y", 500000000.0))
+    alpha = float(valores_ingresados.get("alpha", 0.33))
+    r = float(valores_ingresados.get("r", 0.12))
     delta = float(valores_ingresados.get("delta", 0.10))
-    K_prev = float(valores_ingresados.get("K_prev", 800.0))
-    VM = float(valores_ingresados.get("VM", 150000.0))
-    CR = float(valores_ingresados.get("CR", 100000.0))
+    K_prev = float(valores_ingresados.get("K_prev", 1000000000.0))
+    VM = float(valores_ingresados.get("VM", 1500000000.0))
+    CR = float(valores_ingresados.get("CR", 1200000000.0))
 
     st.divider()
     
-    tab_neoclasico, tab_tobin = st.tabs(["🏛️ Modelo Neoclásico (Optimización)", "📈 Teoría de la 'q' de Tobin"])
+    tab_neoclasico, tab_tobin = st.tabs(["🏛️ Decisión de Compra (Neoclásico)", "📈 Valoración de Empresa (Tobin)"])
 
     # ==========================================
     # PESTAÑA 1: MODELO NEOCLÁSICO
@@ -854,7 +894,12 @@ elif tema_seleccionado == "Inversión":
             "Producción Esperada (Y)": Y_sym
         }
         
-        simbolo_derivar = opciones_k[st.selectbox("¿Qué variable deseas derivar con respecto a K*?", list(opciones_k.keys()), key="sel_der_inv")]
+        simbolo_derivar = opciones_k[st.radio(
+            "¿Qué variable deseas derivar con respecto a K*?", 
+            list(opciones_k.keys()), 
+            horizontal=True, # ¡Esta es la magia que lo vuelve una barra!
+            key="sel_der_inv"
+        )]
         
         derivada_K = sp.diff(funcion_K, simbolo_derivar)
         valor_derivada_sym = derivada_K.subs({Y_sym: Y_val, alpha_sym: alpha, r_sym: r, delta_sym: delta})
@@ -1012,7 +1057,7 @@ elif tema_seleccionado == "Mercado de Dinero":
     funcion_r = (k_sym * Y_sym - (M_sym / P_sym)) / h_sym
     
     opciones_dinero = {"Ingreso (Y)": Y_sym, "Oferta Monetaria (M)": M_sym}
-    simbolo_derivar = opciones_dinero[st.selectbox("Derivar Tasa de Interés (r) respecto a:", list(opciones_dinero.keys()))]
+    simbolo_derivar = opciones_dinero[st.radio("Derivar Tasa de Interés (r) respecto a:", list(opciones_dinero.keys()), horizontal=True)]
     
     derivada_r = sp.diff(funcion_r, simbolo_derivar)
     valor_derivada = derivada_r.subs({k_sym: k, h_sym: h, M_sym: M, P_sym: P, Y_sym: Y_val})
@@ -1116,7 +1161,7 @@ elif tema_seleccionado == "Modelo IS-LM":
         "Política Tributaria (Impuestos T)": T_s
     }
     
-    simbolo_derivar = opciones_islm[st.selectbox("Evaluar impacto en el PIB (Y) ante cambios en:", list(opciones_islm.keys()))]
+    simbolo_derivar = opciones_islm[st.radio("Evaluar impacto en el PIB (Y) ante cambios en:", list(opciones_islm.keys()), horizontal=True)]
     
     derivada_islm = sp.diff(Y_formula_general, simbolo_derivar)
     valor_derivada = derivada_islm.subs({
@@ -1288,7 +1333,7 @@ elif tema_seleccionado == "Estimadores Estadísticos":
     st.divider()
     
     # ====== SELECTOR DE ENFOQUE ESTADÍSTICO ======
-    enfoque = st.selectbox("Selecciona el Área de Estudio:", [
+    enfoque = st.radio("Selecciona el Área de Estudio:", [
         "1. Propiedades: Insesgadez y Consistencia (Simulación)",
         "2. Método de Momentos (MM) - Demostración",
         "3. Máxima Verosimilitud (MLE) - Demostración"
@@ -1396,7 +1441,7 @@ elif tema_seleccionado == "Intervalos y Tamaño de Muestra":
     
     # Selector de Nivel de Confianza (Asigna automáticamente el valor Z)
     niveles_z = {"90% (Z = 1.645)": 1.645, "95% (Z = 1.960)": 1.96, "99% (Z = 2.576)": 2.576}
-    nc_seleccionado = st.selectbox("Nivel de Confianza (1 - α):", list(niveles_z.keys()), index=1)
+    nc_seleccionado = st.radio("Nivel de Confianza (1 - α):", list(niveles_z.keys()), index=1, horizontal=True)
     Z = niveles_z[nc_seleccionado]
     
     col_in1, col_in2 = st.columns(2)
@@ -1485,7 +1530,7 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
     st.subheader("Configuración del Test")
     
     # Tipo de Prueba
-    tipo_prueba = st.selectbox("Tipo de Prueba (Cola):", [
+    tipo_prueba = st.radio("Tipo de Prueba (Cola):", [
         "Dos Colas (Diferente a: ≠)",
         "Cola Derecha (Mayor que: >)",
         "Cola Izquierda (Menor que: <)"
@@ -2258,78 +2303,347 @@ elif tema_seleccionado == "Módulo 16: Áreas e Integrales":
         except Exception as e:
             st.error(f"🚨 Error en la función matemática. Recuerda usar '*' para multiplicar y '**' para potencias. Detalle: {e}")
 # ==========================================
-# MÓDULO 17: MACROECONOMÍA 1 - MICROFUNDAMENTOS
+# MÓDULO: MICROFUNDAMENTOS Y EQUILIBRIO GENERAL
 # ==========================================
 elif tema_seleccionado == "Microfundamentos: El Problema de la Firma":
-    st.markdown("<h2><i class='fas fa-industry' style='color:#1E3A8A;'></i> Microfundamentos: El Problema de la Firma</h2>", unsafe_allow_html=True)
+    st.markdown("<h2><i class='fas fa-industry' style='color:#1E3A8A;'></i> Microfundamentos: De la Firma al Mercado</h2>", unsafe_allow_html=True)
+    tema = datos["macroeconomia_1"]["microfundamentos"]
     
-    tab_teoria, tab_simulador = st.tabs(["📚 Teoría e Intuición", "🧮 Laboratorio y CPOs"])
+    st.subheader("⚙️ Panel de Control del Modelo")
+    st.info("💡 **Consejo:** Ajusta la tecnología y el salario para ver cómo cambia el equilibrio. En Colombia, una productividad ($z$) de 15,000 COP/h es un punto de partida realista para servicios.")
     
-    with tab_teoria:
-        st.markdown("### Maximización Intertemporal")
-        st.info("💡 **El Residuo de Solow:** Tal como anotaste en tu cuaderno, la variable $z_t$ mide el grado de nuestra 'ignorancia' económica, representando el progreso técnico que no depende del capital o el trabajo.")
-        
-        c_t1, c_t2 = st.columns(2)
-        with c_t1:
-            st.markdown("**Función de Producción (Cobb-Douglas):**")
-            st.latex(r"Y_t = z_t K_t^\alpha N_t^{1-\alpha}")
-            st.markdown("**Acumulación de Capital:**")
-            st.latex(r"I_t = K_{t+1} - (1-s)K_t")
-        with c_t2:
-            st.markdown("**Relaciones Clave:**")
-            st.markdown("- Si sube el salario ($W_t$), baja la demanda de trabajo.")
-            st.markdown("- Si sube la productividad ($z_t$), las firmas contratan más.")
+    # NUEVO: Formulario principal visible
+    with st.expander("📐 Fórmulas Principales del Modelo (Resumen)"):
+        st.markdown("Estas son las ecuaciones que gobiernan el simulador. Al cambiar los valores arriba, estas fórmulas se recalculan automáticamente en las pestañas de abajo.")
+        st.latex(r"\text{Firma (Demanda): } N^d = \left( \frac{(1-\alpha) z K^\alpha}{w} \right)^{\frac{1}{\alpha}}")
+        st.latex(r"\text{Hogar (Oferta): } N^s = \frac{1}{1+\gamma} h")
+        st.latex(r"\text{Equilibrio: } w^* = (1-\alpha) z K^\alpha \left( \frac{1+\gamma}{h} \right)^\alpha")
 
-    with tab_simulador:
-        st.subheader("Simulador de Demanda de Factores")
-        # Asegúrate de que en tu JSON la clave sea "microfundamentos"
-        tema = datos["macroeconomia_1"]["microfundamentos"]
-        
-        with st.container(border=True):
-            col1, col2, col3 = st.columns(3)
-            z_val = col1.number_input(tema["variables"]["z"]["nombre"], value=float(tema["variables"]["z"]["valor_defecto"]), step=0.1)
-            alpha_val = col2.number_input(tema["variables"]["alpha"]["nombre"], value=float(tema["variables"]["alpha"]["valor_defecto"]), step=0.05)
-            w_val = col3.number_input(tema["variables"]["w"]["nombre"], value=float(tema["variables"]["w"]["valor_defecto"]), step=1.0)
-            
-            col4, col5, col6 = st.columns(3)
-            k_val = col4.number_input(tema["variables"]["k"]["nombre"], value=float(tema["variables"]["k"]["valor_defecto"]), step=10.0)
-            r_val = col5.number_input(tema["variables"]["r"]["nombre"], value=float(tema["variables"]["r"]["valor_defecto"]), step=0.01)
-            s_val = col6.number_input(tema["variables"]["s"]["nombre"], value=float(tema["variables"]["s"]["valor_defecto"]), step=0.01)
+    col_input1, col_input2 = st.columns(2)
+    v = {}
 
-        # Cálculo de la Demanda de Trabajo óptima N*
-        base_n = ((1 - alpha_val) * z_val) / w_val
-        if base_n > 0:
-            n_optimo = (base_n ** (1 / alpha_val)) * k_val
-            produccion = z_val * (k_val ** alpha_val) * (n_optimo ** (1 - alpha_val))
+    for i, (simbolo, info) in enumerate(tema["variables"].items()):
+        # Lógica para identificar a quién afecta cada variable
+        if simbolo in ["z", "alpha", "K"]:
+            afecta = "🏭 La Firma (Mueve la curva de Demanda) y ⚖️ El Equilibrio."
+        elif simbolo in ["h", "gamma"]:
+            afecta = "🏠 El Hogar (Mueve la curva de Oferta) y ⚖️ El Equilibrio."
+        elif simbolo == "w":
+            afecta = "🏭 Firma y 🏠 Hogar (No cambia el equilibrio, pero define si hay Desempleo o Vacantes)."
         else:
-            n_optimo = 0
-            produccion = 0
+            afecta = "General"
 
-        st.divider()
-        c_res1, c_res2 = st.columns([1, 1.5])
-        with c_res1:
-            st.markdown("### Resultados del Modelo")
-            st.metric("Demanda de Trabajo (N*)", f"{n_optimo:,.2f}")
-            st.metric("Producción (Y)", f"{produccion:,.2f}")
-            
-        with c_res2:
-            st.markdown("**Curva de Demanda de Trabajo**")
-            w_array = np.linspace(max(1, w_val - 5), w_val + 5, 50)
-            n_array = (((1 - alpha_val) * z_val) / w_array) ** (1 / alpha_val) * k_val
-            df_plot = pd.DataFrame({"Salario (W)": w_array, "N Demandado": n_array}).set_index("Salario (W)")
-            st.line_chart(df_plot, color="#2563EB")
+        with col_input1 if i % 2 == 0 else col_input2:
+            with st.container(border=True):
+                paso_v = 0.01 if simbolo in ["alpha", "gamma"] else 500.0
+                v[simbolo] = st.number_input(
+                    f"{info['nombre']}", 
+                    value=float(info['valor_defecto']), 
+                    step=paso_v, 
+                    key=f"micro_input_{simbolo}"
+                )
+                # Tooltip mejorado con impacto
+                with st.expander("📖 Contexto Económico e Impacto"):
+                    st.markdown(info['ayuda_real'])
+                    st.caption(f"**🎯 Impacto en el Modelo:** {afecta}")
 
-        # ==========================================
-        # CARPINTERÍA MATEMÁTICA (PAYWALL)
-        # ==========================================
-        st.divider()
-        st.subheader("🛠️ Carpintería Matemática (Paso a Paso)")
+    # --- MOTOR MATEMÁTICO (Ecuaciones de Wilman Gómez) ---
+    nd_optimo = (((1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"])) / v["w"])**(1 / v["alpha"])
+    produccion = v["z"] * (v["K"]**v["alpha"]) * (nd_optimo**(1 - v["alpha"]))
+    l_optimo = (v["gamma"] / (1 + v["gamma"])) * v["h"]
+    ns_optimo = v["h"] - l_optimo
+    w_equilibrio = (1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"]) * ((1 + v["gamma"]) / v["h"])**v["alpha"]
+
+    st.divider()
+    
+    tab_firma, tab_hogar, tab_equilibrio = st.tabs([
+        "🏭 La Firma (Demanda)", 
+        "🏠 El Hogar (Oferta)", 
+        "⚖️ Equilibrio de Mercado"
+    ])
+
+    # 1. PESTAÑA DE LA FIRMA
+    with tab_firma:
+        st.subheader("La Firma: Maximizadora de Beneficios")
         
-        if tipo_cuenta == "Básica (Gratis)":
-            st.error("🔒 **Contenido Premium:** El desglose analítico de las CPO y el despeje algebraico están bloqueados.")
+        c_f1, c_f2 = st.columns([1, 1.2])
+        with c_f1:
+            st.metric("Demanda de Trabajo ($N^d$)", f"{nd_optimo:,.2f} h")
+            st.metric("Producción ($Y$)", f"{produccion:,.2f} unidades")
+        
+        with c_f2:
+            # Gráfica PMgN
+            w_plot = np.linspace(v["w"]*0.5, v["w"]*2.5, 50)
+            nd_plot = (((1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"])) / w_plot)**(1 / v["alpha"])
+            st.line_chart(pd.DataFrame({"Salario (w)": w_plot, "Demanda (Nd)": nd_plot}).set_index("Salario (w)"), color="#2563EB")
+
+        with st.expander("📝 Carpintería Paso a Paso: Demanda de Trabajo"):
+            st.markdown("**Paso 1: Plantear la Función de Beneficios ($\pi$)**")
+            st.markdown("La firma busca maximizar la diferencia entre sus ingresos (producción) y sus costos (salarios).")
+            st.latex(r"\max_{N} \pi = z K^\alpha N^{1-\alpha} - wN")
+            
+            st.markdown("**Paso 2: Condición de Primer Orden (CPO)**")
+            st.markdown("Derivamos $\pi$ respecto al trabajo ($N$) usando la regla de la potencia y lo igualamos a cero para encontrar el máximo:")
+            st.latex(r"\frac{\partial \pi}{\partial N} = (1-\alpha) z K^\alpha N^{-\alpha} - w = 0")
+            
+            st.markdown("**Paso 3: Producto Marginal = Costo Marginal**")
+            st.latex(r"(1-\alpha) z K^\alpha N^{-\alpha} = w")
+            
+            st.markdown("**Paso 4: Despeje Algebraico de $N$**")
+            st.markdown("Pasamos $w$ a dividir y el término $N^{-\alpha}$ al lado derecho como $N^\alpha$:")
+            st.latex(r"N^\alpha = \frac{(1-\alpha) z K^\alpha}{w}")
+            st.markdown("Elevamos ambos lados a la potencia $\frac{1}{\alpha}$ para despejar $N$:")
+            st.latex(r"N^d = \left( \frac{(1-\alpha) z K^\alpha}{w} \right)^{\frac{1}{\alpha}}")
+            
+            st.markdown("**Paso 5: Sustitución Numérica**")
+            const_f = (1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"])
+            st.latex(rf"N^d = \left( \frac{{{const_f:,.2f}}}{{{v['w']}}} \right)^{{\frac{{1}}{{{v['alpha']}}}}} = {nd_optimo:,.2f} \text{{ horas}}")
+        with st.expander("📝 Carpintería: Inversión Óptima y Demanda de Trabajo"):
+            st.markdown("**1. Valor Presente de la Firma ($V$)**")
+            st.latex(r"V = Y_1 - I_1 - w_1 N_1 + \frac{Y_2 - I_2 - w_2 N_2}{1+r}")
+            st.markdown("Sabiendo que $I_1 = K_2 - (1-\delta)K_1$")
+            
+            st.markdown("**2. Condición de Primer Orden para el Capital**")
+            st.markdown("Derivamos $V$ respecto al capital futuro $K_2$ e igualamos a cero:")
+            st.latex(r"\frac{\partial V}{\partial K_2} = -1 + \frac{1}{1+r} \left( \frac{\partial Y_2}{\partial K_2} + (1-\delta) \right) = 0")
+            
+            st.markdown("**3. Regla de Inversión Óptima**")
+            st.markdown("El producto marginal del capital de mañana debe igualar el costo de uso del capital:")
+            st.latex(r"PMgK_2 = r + \delta")
+            
+            st.markdown("**4. Demanda de Trabajo Dinámica**")
+            st.markdown("La firma sigue contratando hasta que la productividad marginal del trabajo iguale al salario en cada período:")
+            st.latex(r"PMgN_1 = w_1 \quad \text{y} \quad PMgN_2 = w_2")
+    # 2. PESTAÑA DEL HOGAR
+    with tab_hogar:
+        st.subheader("El Hogar: Decisión Trabajo vs. Ocio")
+        
+        c_h1, c_h2 = st.columns([1, 1.2])
+        with c_h1:
+            st.metric("Oferta Laboral ($N^s$)", f"{ns_optimo:,.2f} h")
+            st.metric("Tiempo de Ocio ($l^*$)", f"{l_optimo:,.2f} h")
+        
+        with c_h2:
+            # Gráfica de Indiferencia
+            l_axis = np.linspace(0.1, v["h"], 100)
+            util_opt = np.log(max(0.1, v["w"]*ns_optimo)) + v["gamma"]*np.log(max(0.1, l_optimo))
+            c_indif = np.exp(util_opt) / (l_axis**v["gamma"])
+            c_rest = v["w"] * (v["h"] - l_axis)
+            st.line_chart(pd.DataFrame({"Ocio (l)": l_axis, "Indiferencia": c_indif, "Restricción": c_rest}).set_index("Ocio (l)").clip(upper=v["w"]*v["h"]), color=["#9CA3AF", "#10B981"])
+
+        with st.expander("📝 Carpintería Paso a Paso: Oferta de Trabajo"):
+            st.markdown("**Paso 1: Plantear el Problema del Consumidor**")
+            st.markdown("El hogar maximiza su utilidad. Para evitar un Lagrangiano complejo, sustituimos directamente el consumo ($C$) por su restricción presupuestaria ($C = w(h-l)$):")
+            st.latex(r"\max_{l} U = \ln(w(h - l)) + \gamma \ln(l)")
+            
+            st.markdown("**Paso 2: Condición de Primer Orden (CPO)**")
+            st.markdown("Derivamos respecto al ocio ($l$) e igualamos a cero, usando la regla de la cadena para el logaritmo:")
+            st.latex(r"\frac{\partial U}{\partial l} = \frac{1}{w(h - l)} \cdot (-w) + \frac{\gamma}{l} = 0")
+            
+            st.markdown("**Paso 3: Simplificación de Fracciones**")
+            st.markdown("El salario $w$ se cancela en la primera fracción. Pasamos la fracción negativa al otro lado:")
+            st.latex(r"-\frac{1}{h - l} + \frac{\gamma}{l} = 0 \quad \implies \quad \frac{\gamma}{l} = \frac{1}{h - l}")
+            
+            st.markdown("**Paso 4: Multiplicación en Cruz y Despeje del Ocio ($l^*$)**")
+            st.latex(r"\gamma (h - l) = l \quad \implies \quad \gamma h - \gamma l = l")
+            st.latex(r"\gamma h = l(1 + \gamma) \quad \implies \quad l^* = \frac{\gamma}{1+\gamma} h")
+            
+            st.markdown("**Paso 5: Calcular la Oferta Laboral ($N^s$)**")
+            st.markdown("Como el tiempo se divide en trabajo y ocio ($N^s = h - l^*$):")
+            st.latex(r"N^s = h - \frac{\gamma}{1+\gamma} h = \frac{1}{1+\gamma} h")
+            
+            st.markdown("**Paso 6: Sustitución Numérica**")
+            st.latex(rf"l^* = \frac{{{v['gamma']}}}{{1 + {v['gamma']}}} \cdot {v['h']} = {l_optimo:,.1f} \text{{ horas}}")
+            st.latex(rf"N^s = {v['h']} - {l_optimo:,.1f} = {ns_optimo:,.2f} \text{{ horas}}")
+        with st.expander("📝 Carpintería: Utilidad Intertemporal y Oferta Laboral"):
+            st.markdown("**1. Función de Utilidad Intertemporal**")
+            st.latex(r"U = \ln(C_1) + \gamma \ln(l_1) + \beta [\ln(C_2) + \gamma \ln(l_2)]")
+            
+            st.markdown("**2. Restricción Presupuestaria Intertemporal**")
+            st.latex(r"C_1 + \frac{C_2}{1+r} = w_1(1-l_1) + \pi_1 - T_1 + \frac{w_2(1-l_2) + \pi_2 - T_2}{1+r}")
+            
+            st.markdown("**3. Condiciones de Primer Orden**")
+            st.markdown("De aquí nacen tres grandes reglas económicas:")
+            st.latex(r"\text{Ecuación de Euler: } \frac{C_2}{C_1} = \beta (1+r)")
+            st.latex(r"\text{Trade-off Ocio-Consumo Hoy: } \frac{\gamma C_1}{l_1} = w_1")
+            
+            st.markdown("**4. Efecto de la Tasa de Interés**")
+            st.info("💡 **Análisis:** Si la tasa de interés ($r$) sube, la ecuación de Euler dice que el consumo futuro ($C_2$) debe ser mayor al presente ($C_1$). Para lograrlo, la familia decide sacrificar ocio hoy (ofrece más $N^s$) para ahorrar ese dinero a la alta tasa de interés y disfrutar mañana.")
+
+    # 3. PESTAÑA DEL EQUILIBRIO
+    with tab_equilibrio:
+        st.subheader("Equilibrio General Laboral")
+        
+        # Gráfica de Equilibrio
+        w_eq_axis = np.linspace(w_equilibrio*0.4, w_equilibrio*1.6, 50)
+        d_eq = (((1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"])) / w_eq_axis)**(1 / v["alpha"])
+        s_eq = [ns_optimo] * len(w_eq_axis)
+        st.line_chart(pd.DataFrame({"Salario": w_eq_axis, "Demanda": d_eq, "Oferta": s_eq}).set_index("Salario"), color=["#2563EB", "#10B981"])
+        
+        
+
+        with st.expander("📝 Carpintería Paso a Paso: Salario de Equilibrio"):
+            st.markdown("**Paso 1: Condición de Vaciado del Mercado**")
+            st.markdown("Igualamos la Demanda de la Firma ($N^d$) con la Oferta del Hogar ($N^s$):")
+            st.latex(r"N^d = N^s")
+            st.latex(r"\left( \frac{(1-\alpha) z K^\alpha}{w^*} \right)^{\frac{1}{\alpha}} = \frac{1}{1+\gamma} h")
+            
+            st.markdown("**Paso 2: Eliminar el Exponente Fraccionario**")
+            st.markdown("Elevamos ambos lados a la potencia $\alpha$ para destruir el exponente del lado izquierdo:")
+            st.latex(r"\frac{(1-\alpha) z K^\alpha}{w^*} = \left( \frac{1}{1+\gamma} h \right)^\alpha")
+            
+            st.markdown("**Paso 3: Aislar el Salario ($w^*$)**")
+            st.markdown("Intercambiamos posiciones: pasamos $w^*$ a multiplicar a la derecha y el término de la derecha a dividir:")
+            st.latex(r"w^* = \frac{(1-\alpha) z K^\alpha}{\left( \frac{1}{1+\gamma} h \right)^\alpha}")
+            st.markdown("Aplicando propiedades de fracciones, el denominador invertido sube a multiplicar:")
+            st.latex(r"w^* = (1-\alpha) z K^\alpha \left( \frac{1+\gamma}{h} \right)^\alpha")
+            
+            st.markdown("**Paso 4: Sustitución Numérica**")
+            termino_1 = (1 - v["alpha"]) * v["z"] * (v["K"]**v["alpha"])
+            termino_2 = ((1 + v["gamma"]) / v["h"])**v["alpha"]
+            st.latex(rf"w^* = {termino_1:,.2f} \cdot {termino_2:,.5f}")
+            st.latex(rf"w^* = {w_equilibrio:,.2f} \text{{ COP/hora}}")
+        with st.expander("📝 Carpintería: Distorsión Fiscal"):
+            st.markdown("**El efecto de un impuesto al salario ($\tau$)**")
+            st.markdown("Si el gobierno cobra un impuesto al trabajo, la familia ya no recibe $w$, sino $w(1-\tau)$. Su nueva condición de ocio-consumo es:")
+            st.latex(r"\frac{\gamma C_1}{l_1} = w_1(1-\tau)")
+            
+            st.error("📉 **Conclusión de Política:** El impuesto hace que el costo de oportunidad de descansar sea menor (ganas menos por trabajar). La familia decide descansar más, lo que contrae la Oferta Laboral ($N^s$), reduce la producción ($Y$) y genera una ineficiencia en la economía de Medellín.")
+        # Diagnóstico
+        if abs(v["w"] - w_equilibrio) < 100:
+            st.success("⚖️ **Estado:** El mercado está en equilibrio.")
+        elif v["w"] > w_equilibrio:
+            st.error(f"⚠️ **Estado:** El salario actual (${v['w']:,.0f}) genera Desempleo (Exceso de Oferta de {ns_optimo - nd_optimo:,.1f} horas).")
         else:
-            st.success("🔓 **Desbloqueado:**")
-            st.markdown("**Condición de Primer Orden para el Trabajo:**")
-            st.latex(r"\frac{\partial V}{\partial N_t} = (1-\alpha) z_t K_t^\alpha N_t^{-\alpha} - W_t = 0")
-            st.markdown("**Despeje de la Demanda Óptima:**")
-            st.latex(r"N_t^* = \left[ \frac{(1-\alpha)z_t}{W_t} \right]^{\frac{1}{\alpha}} K_t")
+            st.warning(f"⚠️ **Estado:** El salario actual (${v['w']:,.0f}) genera Vacantes (Exceso de Demanda de {nd_optimo - ns_optimo:,.1f} horas).")
+
+    # INTERPRETACIÓN GLOBAL
+    st.divider()
+    st.subheader("🧐 Interpretación para el Analista")
+    c1, c2 = st.columns(2)
+    c1.info(f"**Sobre la Firma:** Para que la empresa sea competitiva con salarios de (${v['w']:,.0f}), su tecnología z debe ser lo suficientemente alta para que la productividad marginal supere el costo.")
+    c2.info(f"**Sobre el Hogar:** Dado que la preferencia por el ocio es {v['gamma']}, la familia dedica el {l_optimo/v['h']*100:.1f}% de su tiempo total al descanso.")
+# ==========================================
+# MÓDULO: EQUILIBRIO GENERAL DINÁMICO (2 PERIODOS)
+# ==========================================
+elif tema_seleccionado == "Equilibrio General Dinámico":
+    st.markdown("<h2><i class='fas fa-project-diagram' style='color:#1E3A8A;'></i> Equilibrio Dinámico y Fricciones</h2>", unsafe_allow_html=True)
+    tema = datos["macroeconomia_1"]["equilibrio_dinamico"]
+    
+    st.subheader("⚙️ Panel de Control Intertemporal")
+    st.info("💡 **Análisis de 2 Períodos:** En este modelo (Capítulo 5), las decisiones de hoy dependen de lo que esperamos mañana. La Tasa de Interés ($r$) es el puente entre ambos tiempos.")
+
+    col_in1, col_in2 = st.columns(2)
+    v = {}
+
+    for i, (simbolo, info) in enumerate(tema["variables"].items()):
+        # Rastreador de impacto pedagógico
+        if simbolo in ["z1", "z2", "K1", "delta"]: 
+            impacto = "🏭 Afecta la Inversión y Demanda de la Firma."
+        elif simbolo in ["beta", "gamma", "r"]: 
+            impacto = "🏠 Afecta el Ahorro y la Oferta del Hogar."
+        else: 
+            impacto = "🏛️ Genera ineficiencia en el mercado laboral."
+
+        with col_in1 if i % 2 == 0 else col_in2:
+            with st.container(border=True):
+                paso_v = 0.01 if simbolo in ["delta", "r", "beta", "gamma", "tau", "alpha"] else 500.0
+                v[simbolo] = st.number_input(
+                    f"{info['nombre']}", 
+                    value=float(info['valor_defecto']), 
+                    step=paso_v, 
+                    key=f"dyn_input_{simbolo}"
+                )
+                with st.expander("📖 Contexto e Impacto"):
+                    st.markdown(info['ayuda_real'])
+                    st.caption(f"**🎯 Variable clave en:** {impacto}")
+
+    # --- MOTOR MATEMÁTICO (Alineado con Notas de Wilman Gómez) ---
+    alpha = 0.35 # Parámetro tecnológico estándar
+    # 1. Inversión Óptima (K2 tal que PMgK2 = r + delta)
+    # PMgK2 = alpha * z2 * K2^(alpha-1) * N2^(1-alpha) -> Asumiendo N2=1 para despeje simple
+    k2_optimo = ( (alpha * v["z2"]) / (v["r"] + v["delta"]) )**(1 / (1 - alpha))
+    inversion = k2_optimo - (1 - v["delta"]) * v["K1"]
+    
+    # 2. Equilibrio Laboral Hoy (w1*)
+    w1_equilibrio = (1 - alpha) * v["z1"] * (v["K1"]**alpha) * ((1 + v["gamma"]) / v["h"])**alpha
+    ns_hoy = v["h"] / (1 + v["gamma"])
+    
+    # 3. Ecuación de Euler (Relación de consumo)
+    ratio_euler = v["beta"] * (1 + v["r"])
+
+    st.divider()
+    
+    tab_inv, tab_euler, tab_friccion = st.tabs([
+        "📈 1. Inversión (Firma)", 
+        "⏳ 2. Euler (Hogar)", 
+        "🏛️ 3. Fricción Fiscal"
+    ])
+
+    # --- TAB 1: LA FIRMA Y LA INVERSIÓN ---
+    with tab_inv:
+        c1, c2 = st.columns([1, 1.2])
+        with c1:
+            st.metric("Inversión Hoy ($I_1$)", f"${inversion:,.0f}")
+            st.metric("Capital Mañana ($K_2$)", f"{k2_optimo:,.2f} u.")
+            st.write("Si $I_1$ es negativo, la firma está desinvirtiendo (vendiendo máquinas).")
+
+        with c2:
+            # Gráfica de PMgK2 vs Costo de Uso
+            k_axis = np.linspace(k2_optimo*0.5, k2_optimo*1.5, 50)
+            pmgk_axis = alpha * v["z2"] * (k_axis**(alpha-1))
+            costo_uso = [v["r"] + v["delta"]] * len(k_axis)
+            st.line_chart(pd.DataFrame({"Capital (K2)": k_axis, "PMgK2": pmgk_axis, "Costo (r+d)": costo_uso}).set_index("Capital (K2)"), color=["#2563EB", "#EF4444"])
+
+        with st.expander("📝 Carpintería Algebraica: El Problema de la Firma"):
+            st.markdown("**Paso 1: Definir el Valor de la Firma ($V$)**")
+            st.latex(r"V = \pi_1 + \frac{\pi_2}{1+r}")
+            st.markdown("**Paso 2: Sustituir la Inversión ($I_1$)**")
+            st.latex(r"I_1 = K_2 - (1-\delta)K_1")
+            st.markdown("**Paso 3: Derivar respecto al Capital futuro ($K_2$)**")
+            st.latex(r"\frac{\partial V}{\partial K_2} = -1 + \frac{1}{1+r} [PMgK_2 + (1-\delta)] = 0")
+            st.markdown("**Paso 4: Llegar a la Regla de Inversión**")
+            st.latex(r"1+r = PMgK_2 + 1 - \delta \implies PMgK_2 = r + \delta")
+            st.success(f"La firma comprará máquinas hasta que su rentabilidad sea {v['r']+v['delta']:.3f}")
+
+    # --- TAB 2: EL HOGAR Y EULER ---
+    with tab_euler:
+        c1, c2 = st.columns([1, 1.2])
+        with c1:
+            st.metric("Ratio de Consumo ($C_2/C_1$)", f"{ratio_euler:.3f}")
+            if ratio_euler > 1:
+                st.write("La familia **ahorrará** hoy para consumir más mañana.")
+            else:
+                st.write("La familia es **impaciente** y prefiere gastar hoy.")
+        
+        with c2:
+            # Gráfica de Euler
+            c1_axis = np.linspace(100, 1000, 50)
+            c2_euler = ratio_euler * c1_axis
+            st.line_chart(pd.DataFrame({"Consumo Hoy (C1)": c1_axis, "Consumo Mañana (C2)": c2_euler}).set_index("Consumo Hoy (C1)"), color="#10B981")
+
+        with st.expander("📝 Carpintería Algebraica: El Ahorro Intertemporal"):
+            st.markdown("**Paso 1: Maximizar Utilidad Intertemporal**")
+            st.latex(r"U = \ln(C_1) + \beta \ln(C_2)")
+            st.markdown("**Paso 2: Restricción Presupuestaria**")
+            st.latex(r"C_1 + \frac{C_2}{1+r} = \text{Riqueza (W)}")
+            st.markdown("**Paso 3: Condición de Primer Orden (Euler)**")
+            st.latex(r"\frac{U'_{C_1}}{U'_{C_2}} = 1+r \implies \frac{1/C_1}{\beta/C_2} = 1+r")
+            st.latex(rf"C_2 = {v['beta']}(1+{v['r']})C_1 = {ratio_euler:.3f} C_1")
+
+    # --- TAB 3: GOBIERNO ---
+    with tab_friccion:
+        st.subheader("La Cuña Fiscal (Tax Wedge)")
+        st.latex(rf"\text{{Salario Neto}} = w_1(1 - {v['tau']})")
+        
+        # Gráfica de Oferta con Impuesto
+        w_plot = np.linspace(w1_equilibrio*0.5, w1_equilibrio*1.5, 50)
+        ns_sin = [ns_hoy] * len(w_plot)
+        # El impuesto reduce el incentivo a trabajar, desplazando la oferta (o reduciendo el salario percibido)
+        st.line_chart(pd.DataFrame({"Salario": w_plot, "Oferta (Ideal)": ns_sin}).set_index("Salario"), color="#9CA3AF")
+        
+        with st.expander("📝 Carpintería Algebraica: El Efecto del Impuesto"):
+            st.markdown("**Paso 1: Nueva Condición de Ocio-Consumo**")
+            st.latex(r"\frac{\gamma C_1}{l_1} = w_1(1-\tau)")
+            st.markdown("**Paso 2: Interpretación Económica**")
+            st.write(f"Con un impuesto del {v['tau']*100:.1f}%, el costo de oportunidad de descansar baja. Por cada hora que la familia en Medellín decide no trabajar, 'pierde' menos dinero que antes, lo que incentiva el ocio y reduce la producción nacional.")
