@@ -169,7 +169,7 @@ with st.sidebar:
         
     else: # Estadística 2
         st.markdown("<h3><i class='fas fa-chart-pie' style='color:#00FFAA;'></i> Temas Activos</h3>", unsafe_allow_html=True)
-        tema_seleccionado = st.radio("Selecciona el Tema:", ["Estimadores Estadísticos", "Intervalos y Tamaño de Muestra", "Pruebas de Hipótesis"])
+        tema_seleccionado = st.radio("Selecciona el Tema:", ["Estimadores Estadísticos", "Intervalos y Tamaño de Muestra", "Pruebas de Hipótesis", "Pruebas de Hipótesis Avanzadas"])
     
     st.divider()
     
