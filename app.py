@@ -1696,6 +1696,174 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
         else:
             st.warning("⚠️ La dualidad exacta y simétrica con los intervalos de confianza estándar se visualiza mejor en pruebas de Dos Colas. Estás usando una prueba de una sola cola.")
 # ==========================================
+# MÓDULO: CLASE 15 - PRUEBAS DE HIPÓTESIS AVANZADAS
+# ==========================================
+elif tema_seleccionado == "Prueba de Hipótesis Avanzada":
+    import math
+    import scipy.stats as stats
+
+    st.markdown("<h2><i class='fas fa-chart-bar' style='color:#00FFAA;'></i> Clase 15: Pruebas de Hipótesis</h2>", unsafe_allow_html=True)
+    
+    # 1. Selección del tipo de prueba
+    tipo_parametro = st.selectbox("Selecciona la prueba a realizar:", [
+        "Diferencia de Proporciones",
+        "Una Varianza",
+        "Cociente de Varianzas"
+    ])
+    
+    # 2. Tipo de Prueba (Colas)
+    tipo_prueba = st.radio("Tipo de Prueba (Cola):", [
+        "Dos Colas (Diferente a: ≠)",
+        "Cola Derecha (Mayor que: >)",
+        "Cola Izquierda (Menor que: <)"
+    ], horizontal=True)
+    
+    st.divider()
+    st.markdown("**Ingresa los parámetros de la(s) muestra(s) y la hipótesis:**")
+    
+    col1, col2, col3 = st.columns(3)
+    val = {}
+
+    # --- ENTRADAS DINÁMICAS SEGÚN LA PRUEBA ---
+    if tipo_parametro == "Diferencia de Proporciones":
+        with col1:
+            val["x1"] = st.number_input("Éxitos Muestra 1 (x₁)", value=45, step=1)
+            val["n1"] = st.number_input("Tamaño Muestra 1 (n₁)", value=100, step=1)
+        with col2:
+            val["x2"] = st.number_input("Éxitos Muestra 2 (x₂)", value=30, step=1)
+            val["n2"] = st.number_input("Tamaño Muestra 2 (n₂)", value=80, step=1)
+        with col3:
+            val["d0"] = st.number_input("Diferencia Hipotética (d₀)", value=0.0, step=0.01)
+            val["alpha"] = st.number_input("Significancia (α)", value=0.05, step=0.01)
+
+    elif tipo_parametro == "Una Varianza":
+        with col1:
+            val["n"] = st.number_input("Tamaño Muestral (n)", value=30, step=1)
+        with col2:
+            val["s2"] = st.number_input("Varianza Muestral (S²)", value=12.5, step=0.1)
+        with col3:
+            val["sigma2_0"] = st.number_input("Varianza Hipotética (σ²₀)", value=10.0, step=0.1)
+            val["alpha"] = st.number_input("Significancia (α)", value=0.05, step=0.01)
+
+    elif tipo_parametro == "Cociente de Varianzas":
+        with col1:
+            val["n1"] = st.number_input("Tamaño Muestra 1 (n₁)", value=25, step=1)
+            val["s2_1"] = st.number_input("Varianza Muestral 1 (S²₁)", value=15.0, step=0.1)
+        with col2:
+            val["n2"] = st.number_input("Tamaño Muestra 2 (n₂)", value=20, step=1)
+            val["s2_2"] = st.number_input("Varianza Muestral 2 (S²₂)", value=10.0, step=0.1)
+        with col3:
+            val["alpha"] = st.number_input("Significancia (α)", value=0.05, step=0.01)
+
+    st.divider()
+    
+    alpha = val["alpha"]
+    
+    # Determinar operadores para H0 y H1
+    if "Dos Colas" in tipo_prueba:
+        operador_h0, operador_h1 = "=", "\\neq"
+    elif "Cola Derecha" in tipo_prueba:
+        operador_h0, operador_h1 = "\\leq", ">"
+    else: 
+        operador_h0, operador_h1 = "\\geq", "<"
+
+    st.subheader("⚖️ Veredicto del Test")
+
+    # --- MOTOR MATEMÁTICO Y RENDERIZADO ---
+    if tipo_parametro == "Diferencia de Proporciones":
+        x1, n1, x2, n2, d0 = val["x1"], val["n1"], val["x2"], val["n2"], val["d0"]
+        
+        p_hat1 = x1 / n1
+        p_hat2 = x2 / n2
+        p_star = (x1 + x2) / (n1 + n2)
+        
+        # Cálculo del estadístico Z_c
+        numerador = (p_hat1 - p_hat2) - d0
+        denominador = math.sqrt((p_star * (1 - p_star) / n1) + (p_star * (1 - p_star) / n2))
+        stat_calc = numerador / denominador
+        
+        # P-Valor
+        if "Dos Colas" in tipo_prueba:
+            p_valor = 2 * (1 - stats.norm.cdf(abs(stat_calc)))
+        elif "Cola Derecha" in tipo_prueba:
+            p_valor = 1 - stats.norm.cdf(stat_calc)
+        else:
+            p_valor = stats.norm.cdf(stat_calc)
+
+        # Planteamiento
+        c1, c2 = st.columns(2)
+        c1.markdown("**Hipótesis Nula ($H_0$):**")
+        c1.latex(f"H_0: p_1 - p_2 {operador_h0} {d0}")
+        c2.markdown("**Hipótesis Alternativa ($H_1$):**")
+        c2.latex(f"H_1: p_1 - p_2 {operador_h1} {d0}")
+        
+        st.markdown("**Proporción agrupada ($p^*$):**")
+        st.latex(f"p^* = \\frac{{{x1} + {x2}}}{{{n1} + {n2}}} = {p_star:.4f}")
+        
+        st.markdown(f"**1. Estadístico de Prueba ($Z_c$):**")
+        st.latex(f"Z_c = \\frac{{(\\hat{{p}}_1 - \\hat{{p}}_2) - d_0}}{{\\sqrt{{\\frac{{p^*(1-p^*)}}{{n_1}} + \\frac{{p^*(1-p^*)}}{{n_2}}}}}} = {stat_calc:.4f}")
+
+    elif tipo_parametro == "Una Varianza":
+        n, s2, sigma2_0 = val["n"], val["s2"], val["sigma2_0"]
+        df = n - 1
+        
+        # Cálculo del estadístico Chi-cuadrado
+        stat_calc = (df * s2) / sigma2_0
+        
+        # P-Valor
+        cdf_val = stats.chi2.cdf(stat_calc, df)
+        if "Dos Colas" in tipo_prueba:
+            p_valor = min(2 * cdf_val, 2 * (1 - cdf_val))
+        elif "Cola Derecha" in tipo_prueba:
+            p_valor = 1 - cdf_val
+        else:
+            p_valor = cdf_val
+
+        # Planteamiento
+        c1, c2 = st.columns(2)
+        c1.markdown("**Hipótesis Nula ($H_0$):**")
+        c1.latex(f"H_0: \\sigma^2 {operador_h0} {sigma2_0}")
+        c2.markdown("**Hipótesis Alternativa ($H_1$):**")
+        c2.latex(f"H_1: \\sigma^2 {operador_h1} {sigma2_0}")
+        
+        st.markdown(f"**1. Estadístico de Prueba ($\\chi^2_c$):**")
+        st.latex(f"\\chi^2_c = \\frac{{({n}-1){s2}}}{{{sigma2_0}}} = {stat_calc:.4f}")
+
+    elif tipo_parametro == "Cociente de Varianzas":
+        n1, s2_1, n2, s2_2 = val["n1"], val["s2_1"], val["n2"], val["s2_2"]
+        df1 = n1 - 1
+        df2 = n2 - 1
+        
+        # Cálculo del estadístico F
+        stat_calc = s2_1 / s2_2
+        
+        # P-Valor
+        cdf_val = stats.f.cdf(stat_calc, df1, df2)
+        if "Dos Colas" in tipo_prueba:
+            p_valor = min(2 * cdf_val, 2 * (1 - cdf_val))
+        elif "Cola Derecha" in tipo_prueba:
+            p_valor = 1 - cdf_val
+        else:
+            p_valor = cdf_val
+
+        # Planteamiento
+        c1, c2 = st.columns(2)
+        c1.markdown("**Hipótesis Nula ($H_0$):**")
+        c1.latex(f"H_0: \\sigma_1^2 {operador_h0} \\sigma_2^2")
+        c2.markdown("**Hipótesis Alternativa ($H_1$):**")
+        c2.latex(f"H_1: \\sigma_1^2 {operador_h1} \\sigma_2^2")
+        
+        st.markdown(f"**1. Estadístico de Prueba ($F_c$):**")
+        st.latex(f"F_c = \\frac{{{s2_1}}}{{{s2_2}}} = {stat_calc:.4f}")
+
+    # --- CONCLUSIÓN GENERAL ---
+    st.markdown(f"**2. P-Valor:** `{p_valor:.4f}`")
+    
+    if p_valor < alpha:
+        st.error(f"🚨 **CONCLUSIÓN:** Como P-Valor ({p_valor:.4f}) < $\\alpha$ ({alpha}), **RECHAZAMOS $H_0$**.")
+    else:
+        st.success(f"✅ **CONCLUSIÓN:** Como P-Valor ({p_valor:.4f}) ≥ $\\alpha$ ({alpha}), **NO RECHAZAMOS $H_0$**.")
+# ==========================================
 # MODULO 11: TEORÍA DE JUEGOS - EQUILIBRIOS PURAS
 # ==========================================
 elif tema_seleccionado == "Equilibrios de Nash (Puras)":
