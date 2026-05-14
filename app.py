@@ -1695,13 +1695,12 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
                 st.markdown(f"Como tu valor hipotético (${param_simbolo}_0 = {valor_hipotetico}$) **CAE AFUERA** de este intervalo, es altamente improbable que sea el verdadero valor. Por lo tanto, **Rechazamos $H_0$**.")
         else:
             st.warning("⚠️ La dualidad exacta y simétrica con los intervalos de confianza estándar se visualiza mejor en pruebas de Dos Colas. Estás usando una prueba de una sola cola.")
+
 # ==========================================
 # MÓDULO: CLASE 15 - PRUEBAS DE HIPÓTESIS AVANZADAS
 # ==========================================
-st.write(f"🔍 DEBUG: El texto exacto del menú es: '{tema_seleccionado}'")
-
-elif tema_seleccionado == "Prueba de Hipótesis Avanzada":
-
+elif tema_seleccionado == "Clase 15":
+    
     import math
     import scipy.stats as stats
 
