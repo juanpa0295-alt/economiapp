@@ -3,3 +3,4 @@ pandas
 sympy
 numpy
 google-generativeai
+scipy
