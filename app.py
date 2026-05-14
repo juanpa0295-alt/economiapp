@@ -1698,7 +1698,7 @@ elif tema_seleccionado == "Pruebas de Hipótesis":
 # ==========================================
 # MÓDULO: CLASE 15 - PRUEBAS DE HIPÓTESIS AVANZADAS
 # ==========================================
-elif tema_seleccionado == "Prueba de Hipótesis Avanzada":
+elif tema_seleccionado == "Clase 15":
     import math
     import scipy.stats as stats
 
