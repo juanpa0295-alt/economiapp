@@ -110,7 +110,7 @@ with st.sidebar:
     # 4.1 Cargar el logo de Cifras Claras
     try:
         # ¡AQUÍ ESTÁ EL CAMBIO! Ponemos el nombre sencillo
-        st.image("logo.jpg", use_container_width=True)
+        st.image("Logo.jpg", use_container_width=True)
     except:
         st.warning("⚠️ Logo no encontrado. Verifica que se llame 'Logo.jpg'.")
     
