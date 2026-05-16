@@ -1,0 +1,58 @@
+{
+  "materia": "Matemáticas",
+  "modulos": {
+    "matematicas_1": {
+      "nombre": "Matemáticas 1: Cálculo Diferencial",
+      "descripcion_general": "Análisis de funciones, límites y derivadas. Fundamental para entender el análisis marginal en economía (costos, ingresos y utilidades marginales).",
+      "formula_general": "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
+      "variables": {
+        "x": {
+          "nombre": "Variable Independiente (Ej: Cantidad Q)",
+          "valor_defecto": 100.0,
+          "ayuda_real": "Suele representar el nivel de producción o consumo en modelos económicos."
+        }
+      }
+    },
+    "matematicas_2": {
+      "nombre": "Matemáticas 2: Cálculo Integral",
+      "descripcion_general": "Antiderivadas y el área bajo la curva. Clave para calcular el excedente del consumidor, del productor y la acumulación de capital a lo largo del tiempo.",
+      "formula_general": "\\int_{a}^{b} f(x) dx = F(b) - F(a)",
+      "variables": {
+        "a": {
+          "nombre": "Límite Inferior",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Punto de inicio del intervalo de análisis."
+        },
+        "b": {
+          "nombre": "Límite Superior",
+          "valor_defecto": 50.0,
+          "ayuda_real": "Punto final del intervalo de análisis."
+        }
+      }
+    },
+    "matematicas_3": {
+      "nombre": "Matemáticas 3: Álgebra Lineal y Multivariable",
+      "descripcion_general": "Matrices, determinantes y optimización con restricciones (Multiplicadores de Lagrange). Es la base del equilibrio general y la maximización de utilidad.",
+      "formula_general": "\\mathcal{L}(x, y, \\lambda) = f(x,y) - \\lambda(g(x,y) - c)",
+      "variables": {
+        "lambda": {
+          "nombre": "Multiplicador de Lagrange (λ)",
+          "valor_defecto": 1.0,
+          "ayuda_real": "Precio sombra de la restricción. Cuánta utilidad extra gano si aflojo mi restricción presupuestaria en una unidad."
+        }
+      }
+    },
+    "matematicas_premium": {
+      "nombre": "Matemáticas Avanzadas [Premium]",
+      "descripcion_general": "Aplicación directa de los métodos cuantitativos a problemas económicos complejos y demostraciones teóricas rigurosas.",
+      "formula_general": "H = \\begin{bmatrix} f_{xx} & f_{xy} \\\\ f_{yx} & f_{yy} \\end{bmatrix}",
+      "variables": {
+        "H": {
+          "nombre": "Matriz Hessiana",
+          "valor_defecto": 0.0,
+          "ayuda_real": "Garantiza si el punto crítico hallado es un máximo (utilidad) o un mínimo (costos) comprobando su concavidad/convexidad."
+        }
+      }
+    }
+  }
+}

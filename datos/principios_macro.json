@@ -1,0 +1,46 @@
+{
+  "materia": "Principios de Macroeconomía",
+  "modulos": {
+    "pib_gasto": {
+      "nombre": "PIB (Enfoque Gasto)",
+      "descripcion_general": "Medición de la actividad económica sumando todo el gasto en bienes y servicios finales.",
+      "formula_general": "Y = C_0 + c_1(Y - T) + I + G",
+      "variables": {
+        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 800000, "ayuda_real": "Consumo base de los hogares cuando el ingreso es cero. Refleja supervivencia o expectativas."},
+        "c1": {"nombre": "PMgC (c1)", "valor_defecto": 0.8, "ayuda_real": "Propensión Marginal a Consumir. Fracción de cada peso extra de ingreso disponible que se consume."},
+        "T": {"nombre": "Impuestos Netos", "valor_defecto": 200000, "ayuda_real": "Impuestos cobrados por el gobierno menos las transferencias."},
+        "I": {"nombre": "Inversión Autónoma", "valor_defecto": 1000000, "ayuda_real": "Gasto de las empresas en bienes de capital e inventarios."},
+        "G": {"nombre": "Gasto Público", "valor_defecto": 1500000, "ayuda_real": "Gasto del gobierno en bienes y servicios (sin contar transferencias)."}
+      }
+    },
+    "mercado_dinero": {
+      "nombre": "Mercado de Dinero",
+      "descripcion_general": "Estudio de la oferta y demanda de saldos reales en la economía para hallar la tasa de interés.",
+      "formula_general": "\\frac{M}{P} = kY - h \\cdot r",
+      "variables": {
+        "M": {"nombre": "Oferta Monetaria", "valor_defecto": 500000, "ayuda_real": "Cantidad de dinero nominal controlada por el Banco Central."},
+        "P": {"nombre": "Nivel de Precios", "valor_defecto": 1.0, "ayuda_real": "Índice de precios (Deflactor o IPC)."},
+        "Y": {"nombre": "PIB Real", "valor_defecto": 3000000, "ayuda_real": "Nivel de actividad económica actual."},
+        "k": {"nombre": "Sensibilidad (k)", "valor_defecto": 0.5, "ayuda_real": "Sensibilidad de la demanda de dinero ante cambios en el ingreso (motivo transacción)."},
+        "h": {"nombre": "Sensibilidad (h)", "valor_defecto": 20000, "ayuda_real": "Sensibilidad de la demanda de dinero ante cambios en la tasa de interés (motivo especulación)."}
+      }
+    },
+    "is_lm_basico": {
+      "nombre": "Modelo IS-LM",
+      "descripcion_general": "Introducción al equilibrio simultáneo de los mercados de bienes (IS) y financieros (LM).",
+      "formula_general": "IS = LM",
+      "variables": {
+        "C0": {"nombre": "Consumo Autónomo", "valor_defecto": 800000},
+        "c1": {"nombre": "PMgC", "valor_defecto": 0.8},
+        "T": {"nombre": "Impuestos", "valor_defecto": 200000},
+        "I0": {"nombre": "Inversión Autónoma", "valor_defecto": 500000},
+        "b": {"nombre": "Sensibilidad Inversión (b)", "valor_defecto": 10000},
+        "G": {"nombre": "Gasto Público", "valor_defecto": 1500000},
+        "M": {"nombre": "Oferta Monetaria", "valor_defecto": 500000},
+        "P": {"nombre": "Precios", "valor_defecto": 1.0},
+        "k": {"nombre": "Sensibilidad k", "valor_defecto": 0.5},
+        "h": {"nombre": "Sensibilidad h", "valor_defecto": 20000}
+      }
+    }
+  }
+}

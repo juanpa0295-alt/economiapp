@@ -1,0 +1,81 @@
+{
+  "materia": "Macroeconomía 1",
+  "modulos": {
+    "teoria_consumo": {
+      "nombre": "Teoría del Consumo",
+      "descripcion_general": "Análisis de las decisiones de gasto de los hogares en función de su ingreso.",
+      "formula_general": "C = C_0 + c_1(Y - T)",
+      "variables": {
+        "C0": { "nombre": "Consumo Autónomo", "valor_defecto": 500.0, "ayuda_real": "Consumo base." },
+        "c1": { "nombre": "PMgC (c1)", "valor_defecto": 0.8, "ayuda_real": "Propensión marginal." },
+        "Y": { "nombre": "Ingreso Total (Y)", "valor_defecto": 2000.0, "ayuda_real": "Renta total." },
+        "T": { "nombre": "Impuestos (T)", "valor_defecto": 400.0, "ayuda_real": "Impuestos." }
+      }
+    },
+    "consumo_intertemporal": {
+      "nombre": "Consumo Intertemporal",
+      "descripcion_general": "Análisis de las decisiones de consumo y ahorro a lo largo de múltiples periodos.",
+      "formula_general": "U = u(C_1) + \\beta u(C_2)",
+      "variables": {
+        "r": { "nombre": "Tasa de Interés Real", "valor_defecto": 0.05, "ayuda_real": "Costo de oportunidad." },
+        "beta": { "nombre": "Factor de Descuento", "valor_defecto": 0.95, "ayuda_real": "Impaciencia." },
+        "Y1": { "nombre": "Ingreso Periodo 1", "valor_defecto": 1000.0, "ayuda_real": "Renta presente." },
+        "Y2": { "nombre": "Ingreso Periodo 2", "valor_defecto": 1100.0, "ayuda_real": "Renta futura." }
+      }
+    },
+    "inversion": {
+      "nombre": "Inversión",
+      "descripcion_general": "Decisiones de acumulación de capital de las empresas.",
+      "formula_general": "I = I(q)",
+      "variables": {
+        "PMK": { "nombre": "Producto Marginal del Capital", "valor_defecto": 0.15, "ayuda_real": "Rendimiento extra." },
+        "r": { "nombre": "Tasa de Interés (r)", "valor_defecto": 0.05, "ayuda_real": "Costo financiero." },
+        "delta": { "nombre": "Depreciación (δ)", "valor_defecto": 0.10, "ayuda_real": "Desgaste del capital." }
+      }
+    },
+    "gobierno": {
+      "nombre": "Gobierno y Política Fiscal",
+      "descripcion_general": "Análisis de la restricción presupuestaria intertemporal del gobierno.",
+      "formula_general": "G_t + (1+r)B_{t-1} = T_t + B_t",
+      "variables": {
+        "G": { "nombre": "Gasto Público (G)", "valor_defecto": 500.0, "ayuda_real": "Gasto del Estado." },
+        "T": { "nombre": "Impuestos Totales (T)", "valor_defecto": 400.0, "ayuda_real": "Recaudación total." },
+        "T0": { "nombre": "Impuestos Autónomos (T0)", "valor_defecto": 100.0, "ayuda_real": "Impuestos base independientes de la renta." },
+        "t": { "nombre": "Tasa Impositiva Marginal (t)", "valor_defecto": 0.20, "ayuda_real": "Porcentaje de impuesto sobre la renta." },
+        "Y": { "nombre": "Ingreso Nacional (Y)", "valor_defecto": 2000.0, "ayuda_real": "Nivel de renta actual." },
+        "B": { "nombre": "Deuda Pública", "valor_defecto": 1000.0, "ayuda_real": "Stock de bonos." },
+        "r": { "nombre": "Tasa de Interés (r)", "valor_defecto": 0.05, "ayuda_real": "Costo de la deuda." }
+      }
+    },
+    "microfundamentos": {
+      "nombre": "Microfundamentos: El Problema de la Firma",
+      "descripcion_general": "Derivación de las funciones de demanda de factores.",
+      "formula_general": "\\max \\Pi = P \\cdot F(K,L) - wL - rK",
+      "variables": {
+        "alpha": { "nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "Elasticidad del capital." },
+        "z": { "nombre": "Productividad (z)", "valor_defecto": 1.0, "ayuda_real": "Eficiencia actual." },
+        "K": { "nombre": "Stock de Capital (K)", "valor_defecto": 100.0, "ayuda_real": "Maquinaria disponible." },
+        "w": { "nombre": "Salario Real (w)", "valor_defecto": 2.5, "ayuda_real": "Costo laboral." },
+        "gamma": { "nombre": "Preferencia Ocio/Consumo (γ)", "valor_defecto": 1.5, "ayuda_real": "Peso del ocio en la función de utilidad." },
+        "h": { "nombre": "Dotación de Tiempo (h)", "valor_defecto": 24.0, "ayuda_real": "Horas disponibles para ocio o trabajo." }
+      }
+    },
+    "equilibrio_dinamico": {
+      "nombre": "Equilibrio General Dinámico",
+      "descripcion_general": "Integración de hogares, firmas y gobierno con vaciado de mercados.",
+      "formula_general": "Y_t = C_t + I_t + G_t",
+      "variables": {
+        "alpha": { "nombre": "Participación del Capital (α)", "valor_defecto": 0.33, "ayuda_real": "Elasticidad del capital." },
+        "z1": { "nombre": "Productividad Actual (z1)", "valor_defecto": 1.0, "ayuda_real": "Eficiencia en periodo 1." },
+        "z2": { "nombre": "Productividad Futura (z2)", "valor_defecto": 1.05, "ayuda_real": "Eficiencia en periodo 2." },
+        "r": { "nombre": "Tasa de Interés (r)", "valor_defecto": 0.05, "ayuda_real": "Precio del tiempo." },
+        "delta": { "nombre": "Depreciación (δ)", "valor_defecto": 0.10, "ayuda_real": "Desgaste." },
+        "K1": { "nombre": "Capital Inicial (K1)", "valor_defecto": 100.0, "ayuda_real": "Stock de capital en el periodo 1." },
+        "gamma": { "nombre": "Preferencia Ocio (γ)", "valor_defecto": 1.5, "ayuda_real": "Peso del ocio." },
+        "h": { "nombre": "Dotación de Tiempo (h)", "valor_defecto": 24.0, "ayuda_real": "Horas disponibles." },
+        "beta": { "nombre": "Factor de Descuento (β)", "valor_defecto": 0.95, "ayuda_real": "Paciencia del consumidor." },
+        "tau": { "nombre": "Tasa Impositiva Laboral (τ)", "valor_defecto": 0.15, "ayuda_real": "Impuesto sobre el salario." }
+      }
+    }
+  }
+}
