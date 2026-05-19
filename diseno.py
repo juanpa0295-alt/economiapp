@@ -3,60 +3,136 @@ import streamlit as st
 def cargar_estilos_premium():
     st.markdown("""
     <style>
-    /* 1. Fondo Oscuro Profundo */
+    /* 1. IMPORTACIÓN DE FUENTES MODERNAS (Poppins e Inter) */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+    /* 2. CONFIGURACIÓN BASE DE LA APP (FONDO CLARO Y FUENTE) */
     .stApp {
-        background-color: #040914;
-        background-image: 
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2300ffa8' fill-opacity='0.03'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9H16v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9H16v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9H16v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9h9v-9h1v9H16z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        background-size: cover;
-        background-attachment: fixed;
+        background-color: #F8FAFC; /* Un gris/azul casi blanco, súper limpio */
+        color: #1E293B; /* Texto azul pizarra oscuro para máximo contraste */
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Configuración global de textos y fuentes */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+        color: #1E293B !important;
+        font-weight: 700 !important;
+    }
+    
+    p, li, span, label, td, th {
+        font-family: 'Inter', sans-serif;
+        color: #475569 !important; /* Un gris oscuro suave para párrafos */
+        font-size: 1.05rem !important;
     }
 
-    /* 2. Estilos de Interfaz (Glassmorphism Profesional) */
+    /* 3. ESTILOS DE LA BARRA LATERAL (SIDEBAR) - Ahora Limpia y Blanca */
     [data-testid="stSidebar"] {
-        background-color: rgba(10, 18, 42, 0.7) !important;
-        backdrop-filter: blur(15px);
-        border-right: 1px solid rgba(0, 255, 170, 0.1);
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #E2E8F0;
+        backdrop-filter: none !important; /* Adiós al desenfoque viejo */
     }
-
-    div[data-testid="stVerticalBlock"] div[style*="border"] {
-        background: rgba(20, 30, 60, 0.6) !important;
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(0, 255, 170, 0.15) !important;
+    
+    /* Títulos en el Sidebar */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 {
+        font-size: 1.5rem;
+        color: #1E293B !important;
+        text-align: center;
+        padding-bottom: 20px;
+    }
+    
+    /* Elementos de navegación activos/inactivos */
+    [data-testid="stSidebarNav"] ul li a {
+        color: #475569 !important;
         border-radius: 8px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease;
     }
-
-    /* 3. Tipografía y Colores */
-    h1, h2, h3, h4 { color: white !important; font-weight: 700 !important; }
-    p, li, span { color: #d1d5db !important; }
+    
+    /* Hover y Activo en navegación (Estilo Morado Vibrante) */
+    [data-testid="stSidebarNav"] ul li a:hover {
+        background-color: #EEF2FF !important;
+        color: #4F46E5 !important;
+    }
+    
+    [data-testid="stSidebarNav"] ul li a[aria-current="page"] {
+        background-color: #EEF2FF !important;
+        color: #4F46E5 !important;
+        border-left: 4px solid #4F46E5;
+        font-weight: 600;
+    }
+    
+    /* 4. ESTILO DE TARJETAS (CONTENEDORES DE CÁLCULO) */
+    /* Cuando usas st.container(border=True) en tu código, se verá así: */
+    div[data-testid="stVerticalBlock"] div[style*="border"] {
+        background-color: #FFFFFF !important; /* Tarjeta blanca pura */
+        border: 1px solid #E2E8F0 !important; /* Borde sutil */
+        border-radius: 16px !important; /* Bordes muy redondeados modernos */
+        padding: 30px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important; /* Sombra suave para dar profundidad */
+        color: #1E293B !important;
+    }
+    
+    /* Neon glow effect para títulos principales (Vibrante) */
     h1 { text-shadow: 0 0 10px rgba(0,255,170,0.3); }
 
-    /* 4. LIMPIEZA DE INTERFAZ NATIVA Y BOTÓN DE MÓVIL */
+    /* 5. INPUTS Y ELEMENTOS DE FORMULARIO (PROFESIONALES Y LIMPIOS) */
+    
+    /* Botones Estilo Morado SaaS */
+    .stButton>button {
+        background-color: #4F46E5 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        padding: 12px 24px !important;
+        transition: all 0.3s ease !important;
+        font-family: 'Poppins', sans-serif;
+    }
+    .stButton>button:hover {
+        background-color: #4338CA !important;
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3) !important;
+    }
+    
+    /* Inputs de texto, números y Sliders */
+    .stNumberInput input, .stTextInput input, .stSelectbox select {
+        border-radius: 8px !important;
+        border: 1px solid #D1D5DB !important;
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+    }
+    
+    /* Sliders Morados */
+    [data-testid="stWidgetLabel"] {
+        color: #475569 !important;
+        font-weight: 500;
+    }
+    .stSlider .stSliderTickBar, .stSlider .stSliderTrack, .stSlider .stSliderThumb {
+        color: #4F46E5 !important;
+    }
+
+    /* 6. LIMPIEZA DE INTERFAZ NATIVA Y AJUSTE DE MÓVIL */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {background-color: transparent !important;}
     
-    /* Hacer el botón de menú en móviles más visible (Verde neón) */
+    /* Botón de menú en móviles (Verde neón para que resalte un poco) */
     [data-testid="collapsedControl"] {
-        color: #00FFAA !important;
-        background-color: rgba(10, 18, 42, 0.8) !important;
-        border: 1px solid #00FFAA;
+        color: #10B981 !important;
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2E8F0;
         border-radius: 5px;
+        padding: 5px;
     }
 
-    /* Botones Estilo FinTech */
-    .stButton>button {
-        background-color: transparent !important;
-        color: #00FFAA !important;
-        border: 2px solid #00FFAA !important;
-        border-radius: 20px !important;
-        transition: all 0.3s ease;
+    /* 7. AJUSTE DE FÓRMULAS Y DATAFRAMES PARA FONDO CLARO */
+    div.stDataframe th {
+        background-color: #F1F5F9 !important;
+        color: #1E293B !important;
     }
-    .stButton>button:hover {
-        background-color: #00FFAA !important;
-        color: #020617 !important;
-        box-shadow: 0 0 15px rgba(0,255,170,0.5);
+    div.stDataframe td {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
     }
+    
     </style>
     """, unsafe_allow_html=True)
