@@ -1,15 +1,15 @@
 [theme]
-# El azul principal de la lupa de Cifras Claras
-primaryColor = "#2B6CB0"
+# Color principal (Botones y sliders: Morado vibrante)
+primaryColor="#4F46E5"
 
-# Fondo blanco puro para máxima legibilidad académica
-backgroundColor = "#FFFFFF"
+# Color de fondo principal (Un gris/azul muy claro, casi blanco)
+backgroundColor="#F8FAFC"
 
-# Fondo gris muy tenue (casi blanco) para el menú lateral
-secondaryBackgroundColor = "#F7FAFC"
+# Color de fondo secundario (Para el panel lateral y tarjetas: Blanco puro)
+secondaryBackgroundColor="#FFFFFF"
 
-# Azul oscuro/Gris grafito para el texto (mucho más elegante que el negro puro)
-textColor = "#2D3748"
+# Color del texto principal (Azul pizarra oscuro para alto contraste)
+textColor="#1E293B"
 
-# Fuente limpia sin serifas
-font = "sans serif"
+# Fuente profesional
+font="sans serif"
