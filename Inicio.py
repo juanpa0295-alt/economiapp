@@ -1,79 +1,111 @@
 import streamlit as st
 import diseno
 
-diseno.cargar_estilos_premium()
 # ==========================================
-# 1. CONFIGURACIÓN DE LA PÁGINA (Debe ser la primera línea)
+# 1. CONFIGURACIÓN DE LA PÁGINA
 # ==========================================
 st.set_page_config(
-    page_title="Economiapp | Entorno Analítico",
-    page_icon="📈",
+    page_title="Economiapp | Laboratorio de Análisis",
+    page_icon="📜",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Cargamos los estilos base (asegúrate de que diseno.py tenga las fuentes Playfair y Inter)
+diseno.cargar_estilos_premium()
+
 # ==========================================
-# 2. MOTOR DE DISEÑO (CSS ANIMADO Y GLASSMORPHISM)
+# 2. ESTILOS EXCLUSIVOS PARA PORTADA ACADÉMICA
 # ==========================================
-def cargar_estilos_premium():
-    st.markdown("""
+st.markdown("""
     <style>
-    /* 1. Fondo animado (Gradiente en movimiento constante) */
+    /* Importamos Playfair Display para ese toque de libro clásico */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600&display=swap');
+
+    /* Fondo de Cuadrícula Analítica (Blueprint/Millimeter paper) */
     .stApp {
-        background: linear-gradient(-45deg, #0f172a, #1e293b, #020617, #081229);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-    }
-    
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        background-color: #FDFDFD;
+        background-image: 
+            linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+        background-size: 30px 30px; /* Tamaño de la cuadrícula */
     }
 
-    /* 2. Barra lateral con efecto Vidrio Esmerilado (Glassmorphism) */
-    [data-testid="stSidebar"] {
-        background-color: rgba(15, 23, 42, 0.4) !important;
-        backdrop-filter: blur(15px);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    /* Título Académico */
+    .academic-title {
+        font-family: 'Playfair Display', serif !important;
+        font-size: 5.5rem !important;
+        font-weight: 900 !important;
+        color: #1E293B !important;
+        text-align: center;
+        line-height: 1 !important;
+        margin-bottom: 0px;
     }
 
-    /* 3. Ocultar el menú genérico de Streamlit y el pie de página para aspecto SaaS nativo */
-    #MainMenu {visibility: hidden;}
-    header {background-color: transparent !important;}
-    footer {visibility: hidden;}
-    
-    /* 4. Estilizar sutilmente los contenedores para que encajen con el fondo */
-    div[data-testid="stVerticalBlock"] div[style*="border"] {
-        background: rgba(30, 41, 59, 0.6) !important;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(0, 255, 170, 0.15) !important;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    .academic-subtitle {
+        font-family: 'Inter', sans-serif !important;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        color: #4F46E5 !important;
+        font-size: 1rem !important;
+        text-align: center;
+        font-weight: 600;
+        margin-bottom: 40px;
     }
+
+    /* Marco del Laboratorio (Parece un documento oficial) */
+    .lab-frame {
+        background: white !important;
+        border: 1px solid #E2E8F0 !important;
+        border-top: 8px solid #1E293B !important; /* Borde superior grueso estilo Oxford */
+        border-radius: 4px !important; /* Menos redondeado, más formal */
+        padding: 50px !important;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05) !important;
+    }
+
     </style>
-    """, unsafe_allow_html=True)
-
-# Ejecutamos los estilos
-cargar_estilos_premium()
+""", unsafe_allow_html=True)
 
 # ==========================================
-# 3. INTERFAZ DE INICIO
+# 3. CONTENIDO DE LA PORTADA
 # ==========================================
+
 st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<h1 style='text-align: center; color: white; font-size: 4rem; text-shadow: 0px 0px 15px rgba(0,255,170,0.5);'>Economiapp</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: #94a3b8; font-weight: 300;'>Entorno Virtual de Análisis Económico y Cuantitativo</h3>", unsafe_allow_html=True)
-st.divider()
 
-col1, col2, col3 = st.columns([1, 2, 1])
+# Encabezado de la institución virtual
+st.markdown("<p class='academic-subtitle'>Laboratorio de Ciencias Económicas y Cuantitativas</p>", unsafe_allow_html=True)
+
+# Título Principal con fuente de libro
+st.markdown("<h1 class='academic-title'>Economiapp</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-style: italic; color: #64748B; font-size: 1.2rem;'>Herramienta de Simulación y Optimización Analítica</p>", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Cuerpo central enmarcado
+col1, col2, col3 = st.columns([1, 2.5, 1])
 
 with col2:
-    with st.container(border=True):
-        st.markdown("<h4 style='color: #00FFAA;'><i class='fas fa-terminal'></i> Bienvenido al Laboratorio</h4>", unsafe_allow_html=True)
-        st.markdown("""
-        <p style='color: #cbd5e1; font-size: 1.1rem; line-height: 1.6;'>
-        Has ingresado a una herramienta diseñada con el rigor analítico que exige la disciplina. 
-        <br><br>
-        👈 Utiliza el <b>Panel de Navegación</b> a la izquierda para seleccionar los módulos de cálculo. El motor está optimizado para resolver modelos macroeconómicos, optimización multivariable y escenarios de Teoría de Juegos.
-        </p>
-        """, unsafe_allow_html=True)
+    st.markdown("""
+        <div class='lab-frame'>
+            <h4 style='font-family: "Playfair Display", serif; color: #1E293B; margin-bottom: 20px;'>
+                📜 Directrices del Entorno Virtual
+            </h4>
+            <p style='color: #334155; line-height: 1.8; font-family: "Inter", sans-serif; text-align: justify;'>
+                Bienvenido al sistema de procesamiento económico. Este entorno ha sido desarrollado para 
+                cerrar la brecha entre la <b>teoría pura</b> y la <b>resolución numérica compleja</b>. 
+                <br><br>
+                A través del panel de navegación lateral, podrá acceder a los diferentes módulos de 
+                investigación, los cuales integran motores de cálculo simbólico y modelización 
+                de juegos estratégicos. 
+                <br><br>
+                <span style='color: #4F46E5; font-weight: 600;'>Seleccione una materia para iniciar la sesión de análisis.</span>
+            </p>
+            <hr style='margin: 30px 0;'>
+            <div style='display: flex; justify-content: space-between; font-size: 0.8rem; color: #94A3B8;'>
+                <span>VERSION 2.4.0 (MODULAR)</span>
+                <span>DESARROLLO ACADÉMICO PRO</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br><br>", unsafe_allow_html=True)
