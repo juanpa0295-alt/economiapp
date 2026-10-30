@@ -185,6 +185,25 @@ deep:[
 qs:[{q:"¿Puede un EN que no es EPS darle a todos los jugadores el mismo resultado que el EPS?",a:"Sí. Pueden diferir solo en lo que pasa fuera de la trayectoria. Por ejemplo, en Norte/Sur, (N,(N,N)) y (N,(N,S)) llevan ambos a (4, 3); solo el segundo es EPS, porque el primero dice que tras S la empresa 2 elegiría N, y no le conviene."},
  {q:"¿Por qué en un juego sin subjuegos propios todo EN es EPS?",a:"Porque el único subjuego es el juego completo, y un EN ya es equilibrio en él. Por eso con información imperfecta hace falta un refinamiento más fuerte: el equilibrio bayesiano perfecto."}]},
 
+{id:"bayesnash", t:"Juegos bayesianos: equilibrio Bayes-Nash", nuevo:true, sim:"bayes", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Hasta ahora todos conocían los pagos de todos. En un juego con <b>información incompleta</b>, cada jugador sabe algo que los demás no: su costo, su valoración, sus preferencias. Eso se modela con <b>tipos</b>. El equilibrio Bayes-Nash es el equilibrio de Nash de ese juego: cada tipo de cada jugador hace lo mejor para él, dado lo que espera que hagan los tipos del otro.</p></section>
+<section><h3>Forma normal de un juego bayesiano</h3><p>Siguiendo a Harsanyi (1967-68), un juego bayesiano estático es</p>
+<div class="mj">\[G=\{A_1,\dots,A_n;\;T_1,\dots,T_n;\;p_1,\dots,p_n;\;u_1,\dots,u_n\}\]</div>
+<ul><li>\(A_i\): acciones del jugador \(i\).</li><li>\(T_i\): sus tipos posibles. Solo \(i\) conoce su tipo \(t_i\).</li><li>\(p_i(t_{-i}\mid t_i)\): lo que el tipo \(t_i\) cree sobre los tipos de los demás. Con tipos independientes y una distribución previa común, \(p_i(t_{-i}\mid t_i)=p(t_{-i})\).</li><li>\(u_i(a_1,\dots,a_n;\,t_i)\): el pago, que depende del tipo.</li></ul>
+<p><b>Transformación de Harsanyi:</b> el juego empieza con una jugada de la naturaleza que elige los tipos; cada jugador observa el suyo y luego todos mueven a la vez. Así, la información incompleta se convierte en información imperfecta sobre una jugada del azar.</p></section>
+<section><h3>Estrategias y equilibrio</h3><p>Una estrategia es una función \(s_i:T_i\to A_i\): un plan que dice qué hace <b>cada</b> tipo, aunque en la realidad solo exista uno. Si el jugador tiene dos tipos y dos acciones, tiene \(2\times2=4\) estrategias.</p>
+<p><b>Definición.</b> \(s^*=(s_1^*,\dots,s_n^*)\) es un equilibrio Bayes-Nash si para cada jugador \(i\) y <b>cada</b> tipo \(t_i\in T_i\):</p>
+<div class="mj">\[s_i^*(t_i)\in\arg\max_{a_i\in A_i}\;\sum_{t_{-i}\in T_{-i}}u_i\big(s_1^*(t_1),\dots,a_i,\dots,s_n^*(t_n);\,t\big)\;p_i(t_{-i}\mid t_i)\]</div>
+<p>Es equivalente a buscar los equilibrios de Nash de la tabla de pagos esperados <i>ex ante</i>, siempre que todos los tipos tengan probabilidad positiva. Todo juego bayesiano finito tiene al menos un equilibrio Bayes-Nash, quizá en mixtas.</p></section>
+<section><h3>Receta para el parcial</h3><ol class="steps"><li>Identifica quién tiene información privada, sus tipos y las probabilidades.</li><li>Escribe una tabla de pagos por cada combinación de tipos.</li><li>Lista las estrategias como planes por tipo: \((\text{acción del tipo 1},\ \text{acción del tipo 2})\).</li><li>Para cada tipo, calcula el pago esperado de cada acción ponderando las tablas por la probabilidad del tipo del otro, y busca su mejor respuesta.</li><li>Un perfil es equilibrio si todos los tipos están en su mejor respuesta a la vez.</li></ol></section>
+<section><h3>Ejemplo: batalla de los sexos con información incompleta</h3><p>El jugador 2 quiere encontrarse con el 1 (probabilidad ½) o evitarlo (½), y solo él lo sabe. Prueba con \(s_1=B\) y \(s_2=(B,S)\) (B si quiere encontrarse, S si quiere evitar):</p>
+<ul><li>Tipo «encontrarse» ante B: B le da 1 y S le da 0 → B ✓.</li><li>Tipo «evitar» ante B: B le da 0 y S le da 2 → S ✓.</li><li>Jugador 1: \(B\to\tfrac12\cdot2+\tfrac12\cdot0=1\), \(S\to\tfrac12\cdot0+\tfrac12\cdot1=\tfrac12\) → B ✓.</li></ul>
+<p>El único equilibrio Bayes-Nash en puras es \(\big(B,(B,S)\big)\). Si la probabilidad de «encontrarse» baja a ¼, al jugador 1 ya no le conviene B y no queda ninguno en puras: compruébalo en el laboratorio.</p></section>
+${LAB}
+<p class="warn"><b>Error común:</b> dar como respuesta la acción del tipo que «realmente» salió. El equilibrio exige especificar qué haría cada tipo, porque el rival decide con base en lo que harían todos los tipos posibles.</p>`,
+qs:[{q:"Un jugador tiene 3 tipos y 2 acciones. ¿Cuántas estrategias puras tiene?",a:"2³ = 8: una acción para cada uno de sus 3 tipos."},
+ {q:"¿En qué se diferencian el equilibrio Bayes-Nash y el equilibrio bayesiano perfecto?",a:"El Bayes-Nash es para juegos estáticos con información incompleta: las creencias son las probabilidades de los tipos. El bayesiano perfecto es para juegos dinámicos: además, las creencias se actualizan con la regla de Bayes a medida que se observan jugadas, y se exige racionalidad secuencial."}]},
+
 {id:"ebp", t:"Equilibrio bayesiano perfecto", nuevo:true, sim:"ebp", html:String.raw`
 <section><h3>La idea</h3><p class="lead">Con conjuntos de información de varios nodos puede no haber subjuegos propios, y el EPS no descarta nada. El equilibrio bayesiano perfecto (EBP, o PBE) exige que, en cada conjunto de información, el jugador tenga una <b>creencia</b> sobre en qué nodo está y que actúe de forma óptima dada esa creencia.</p></section>
 <section><h3>Ejemplo 1</h3><p>El 1 elige A, que termina en (0, 2), o B o C. El 2 no sabe si el 1 jugó B o C y elige a o b. Tras B: a da (2, 1) y b da (−1, −1). Tras C: a da (1, 1) y b da (−2, 0). Hay dos EN en puras, \((A,b)\) y \((B,a)\), y como no hay subjuegos propios los dos son EPS. Pero \((A,b)\) no es razonable: b nunca le conviene al 2, esté donde esté.</p>
@@ -340,7 +359,31 @@ ${LAB}`,
 <div class="mj">\[x^*=\frac{1-\delta_2}{1-\delta_1\delta_2}\qquad\text{y con }\delta_1=\delta_2=\delta:\qquad x^*=\frac{1}{1+\delta}\]</div>
 <p>Es más paciente quien tiene \(\delta\) más alto, y eso le da más poder de negociación. Proponer primero también da ventaja, que desaparece cuando \(\delta\to1\).</p></section>
 ${LAB}`,
- qs:[{q:"Con T = 3, δ₁ = 0,9, δ₂ = 0,8 y s = 1/2, ¿cuánto se lleva cada jugador?",a:"x₂ = 0,9·0,5 = 0,45. x₁ = 1 − 0,8·(1 − 0,45) = 1 − 0,44 = 0,56. El jugador 1 se lleva 0,56 y el 2, 0,44, en el primer período."}]}]}
+ qs:[{q:"Con T = 3, δ₁ = 0,9, δ₂ = 0,8 y s = 1/2, ¿cuánto se lleva cada jugador?",a:"x₂ = 0,9·0,5 = 0,45. x₁ = 1 − 0,8·(1 − 0,45) = 1 − 0,44 = 0,56. El jugador 1 se lleva 0,56 y el 2, 0,44, en el primer período."}]}]},
+{g:"Aplicaciones de los juegos bayesianos", from:"bayesnash", items:[
+ {id:"cournot-asim", t:"Cournot con información asimétrica", sim:"bcour", nuevo:true, html:String.raw`
+<section><h3>Planteamiento (Gibbons, 3.1.A)</h3><p class="lead">\(P(Q)=a-q_1-q_2\). El costo de la firma 1 es \(c\) y todos lo saben. La firma 2 conoce su propio costo: \(c_H\) con probabilidad \(\theta\) o \(c_L\) con probabilidad \(1-\theta\). La firma 1 no lo conoce.</p>
+<p>\(T_1=\{c\}\), \(T_2=\{c_H,c_L\}\). La estrategia de la firma 2 es un par \((q_2(c_H),q_2(c_L))\).</p></section>
+<section><h3>Mejores respuestas</h3><p>Cada tipo de la firma 2 maximiza conociendo su costo:</p>
+<div class="mj">\[\max_{q_2}\;[a-q_1^*-q_2-c_H]\,q_2\;\Rightarrow\;q_2^*(c_H)=\frac{a-q_1^*-c_H}{2}\qquad q_2^*(c_L)=\frac{a-q_1^*-c_L}{2}\]</div>
+<p>La firma 1 maximiza su beneficio <b>esperado</b>:</p>
+<div class="mj">\[\max_{q_1}\;\theta\,[a-q_1-q_2^*(c_H)-c]\,q_1+(1-\theta)\,[a-q_1-q_2^*(c_L)-c]\,q_1\;\Rightarrow\;q_1^*=\frac{\theta[a-q_2^*(c_H)-c]+(1-\theta)[a-q_2^*(c_L)-c]}{2}\]</div></section>
+<section><h3>Equilibrio Bayes-Nash</h3>
+<div class="mj">\[q_2^*(c_H)=\frac{a-2c_H+c}{3}+\frac{1-\theta}{6}(c_H-c_L)\qquad q_2^*(c_L)=\frac{a-2c_L+c}{3}-\frac{\theta}{6}(c_H-c_L)\]</div>
+<div class="mj">\[q_1^*=\frac{a-2c+\theta c_H+(1-\theta)c_L}{3}\]</div>
+<p>Con información completa, la firma 2 de costo alto produciría \((a-2c_H+c)/3\). Con información asimétrica produce más, porque la firma 1 no puede ajustar su cantidad al costo real de la 2: produce pensando en un rival promedio, que es más agresivo que una firma de costo alto.</p></section>
+${LAB}`,
+ qs:[{q:"Con a = 100, c = 20, c_H = 30, c_L = 10 y θ = 1/2, ¿cuánto produce la firma 1?",a:"q₁* = (100 − 40 + 15 + 5)/3 = 80/3 ≈ 26,67."}]},
+ {id:"subastas", t:"Subasta de primer precio", sim:"subasta", nuevo:true, html:String.raw`
+<section><h3>Planteamiento (Gibbons, 3.2.B)</h3><p class="lead">Dos postores con valoraciones privadas \(v_i\sim U[0,1]\), independientes. Pujan en sobre cerrado; gana la puja más alta y paga lo que pujó. El pago es \(v_i-b_i\) si gana y 0 si pierde.</p>
+<p>\(A_i=[0,\infty)\), \(T_i=[0,1]\) y la estrategia es una función \(b_i(v_i)\).</p></section>
+<section><h3>Equilibrio lineal</h3><p>Se busca un equilibrio simétrico de la forma \(b_j(v_j)=a_j+c_j v_j\). El postor \(i\) con valoración \(v_i\) resuelve</p>
+<div class="mj">\[\max_{b_i}\;(v_i-b_i)\,P\big(b_i&gt;a_j+c_jv_j\big)=(v_i-b_i)\,\frac{b_i-a_j}{c_j}\;\Rightarrow\;b_i=\frac{v_i+a_j}{2}\]</div>
+<p>Para que esto tenga la forma lineal supuesta hace falta \(a_i=a_j/2\) y \(c_i=1/2\). En el equilibrio simétrico, \(a=0\):</p>
+<div class="mj">\[b(v)=\frac{v}{2}\qquad\text{y con } n \text{ postores:}\qquad b(v)=\frac{n-1}{n}\,v\]</div>
+<p>Cada uno puja por debajo de su valoración. Esa reducción baja a medida que aumenta la competencia: con \(n\to\infty\), \(b(v)\to v\). El ingreso esperado del vendedor es \(\frac{n-1}{n+1}\bar v\).</p></section>
+${LAB}`,
+ qs:[{q:"Con tres postores y valoraciones uniformes en [0, 100], ¿cuánto puja quien valora el objeto en 60?",a:"b = (3 − 1)/3 · 60 = 40."}]}]}
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
