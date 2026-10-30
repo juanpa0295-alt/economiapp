@@ -142,10 +142,9 @@ LAB.planilla=function(cfg,rec){const J=cfg.jornada,F=LAB.factCols(cfg.d),N=cfg.n
         let k;if(extra)k=dom?(noct?"HEND":"HEDD"):(noct?"HEN":"HED");else{ord+=15;k=base?(dom?(noct?"RND":"RDD"):(noct?"RN":"D0")):(dom?(noct?"HND":"HDD"):(noct?"HN":"HD"))}
         r.h[k]+=0.25;const last=segsOut[segsOut.length-1];if(last&&last.k===k&&last.b===t)last.b=t+15;else segsOut.push({k,a:t,b:t+15,sd,dom,noct,extra})}}
     r.detalle=segsOut;r.base=base;r.trabajo=true});
-  // descanso remunerado: el festivo siempre (7 h, y si lo trabaja además las horas en H); el domingo solo si no lo trabajó
-  rows.forEach(r=>{if(!(r.dom&&r.desc))return;const domTrab=r.trabajo&&r.dow===0;
-    if(domTrab){r.descSum=0;r.notas.push(r.comp>0?`domingo trabajado: descansa el día ${r.comp} en la semana siguiente, así que aquí solo va el recargo (R) y las 7 h se pagan en el día de descanso`:r.comp===-1?"domingo trabajado: solo el recargo (R), porque se compensa con un descanso":"domingo trabajado sin descanso en la semana siguiente: se paga la hora completa con el recargo (H) y no se suman 7 h aparte")}
-    else{r.h.HD+=r.desc.h;r.descSum=r.desc.h}});
+  // descanso remunerado: domingos y festivos suman sus 7 h (si las ganó); si además los trabaja, las horas van en R o H
+  rows.forEach(r=>{if(!(r.dom&&r.desc))return;r.h.HD+=r.desc.h;r.descSum=r.desc.h;
+    if(r.trabajo&&r.dow===0)r.notas.push(r.comp>0?`domingo trabajado: descansa el día ${r.comp} en la semana siguiente, así que sus horas llevan solo el recargo del 90 % (R)`:r.comp===-1?"domingo trabajado: sus horas llevan solo el recargo (R)":"domingo trabajado sin descanso en la semana siguiente: sus horas se pagan completas con el recargo del 90 % (H)")});
   rows.forEach(r=>{if(r.compDe)r.notas.unshift(`descanso compensatorio del domingo ${r.compDe}`)});
   // día 31 suspendido: se restan 7 h (art. 51)
   if(N===31){const r31=rows[30],x=R(31);if(x&&(x.kind==="sancion"||x.kind==="licencia")){r31.h.HD-=J;r31.notas=[`${x.kind==="sancion"?"sanción":"licencia no remunerada"} el día 31: se restan ${J} h (art. 51), porque el salario del mes ya lo incluía`]}}
