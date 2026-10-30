@@ -101,7 +101,7 @@ LAB.parsePlanilla=function(text,ndias){const rec={},errs=[];
       if(!segs.length){errs.push(`falta el horario en «${ln}».`);return}r={kind:"trabajo",segs}}
     ds.forEach(d=>{if(rec[d])errs.push(`el día ${d} aparece dos veces.`);rec[d]=r})});
   return{rec,errs}};
-// cfg: {ndias, dow1 (0 = domingo), festivos[], ingreso (día; 1 si venía laborando), venia, salario, jornada, d, noct, smmlv, pierde (sanción/licencia quitan el dominical), incap (fracción)}
+// cfg: {propHoras (proporción del dominical por horas: 7 × h/42), ndiasPrev, ndias, dow1 (0 = domingo), festivos[], ingreso (día; 1 si venía laborando), venia, salario, jornada, d, noct, smmlv, pierde (sanción/licencia quitan el dominical), incap (fracción)}
 LAB.planilla=function(cfg,rec){const J=cfg.jornada,F=LAB.factCols(cfg.d),N=cfg.ndias,vh=cfg.salario/(J*30);
   const dow=d=>((cfg.dow1+d-1)%7+7)%7,fest=new Set(cfg.festivos),esDom=d=>d<=N?(dow(d)===0||fest.has(d)):(dow(d)===0||(cfg.festSig||[]).includes(d-N));
   const emp=d=>d>=cfg.ingreso,R=d=>rec[d]||null,susp=d=>{const r=R(d);return r&&(r.kind==="sancion"||r.kind==="licencia")};
@@ -111,11 +111,14 @@ LAB.planilla=function(cfg,rec){const J=cfg.jornada,F=LAB.factCols(cfg.d),N=cfg.n
     const r=R(d);if(r&&r.kind==="incapacidad")return{h:0,why:"ese día recibe el auxilio por incapacidad (art. 173)"};if(susp(d))return{h:0,why:"está suspendido ese día (art. 51)"};
     if(fest.has(d)&&dow(d)!==0)return{h:J,why:"festivo remunerado (art. 177)"};
     // domingo: semana de lunes a sábado anterior
-    let cub=0,lab=0,perdio=null;for(let k=d-6;k<=d-1;k++){if(k<1){if(cfg.venia){cub++;lab++}continue}if(!emp(k))continue;lab++;
-      if(susp(k)){perdio=k;continue}const rk=R(k);if(rk||fest.has(k))cub++}
+    const fx=x=>(+x.toFixed(2)).toLocaleString("es-CO");
+    const ordH=k=>{const rk=R(k);if(!rk)return fest.has(k)?J:0;if(rk.kind==="trabajo"){const m=rk.segs.reduce((t,[a,b])=>t+(b-a),0);return Math.min(J,m/60)}return rk.kind==="sancion"||rk.kind==="licencia"?0:J};
+    let cub=0,horas=0,perdio=null;const det=[];for(let k=d-6;k<=d-1;k++){if(k<1){if(cfg.venia){cub++;horas+=J;det.push(`día ${k+cfg.ndiasPrev} del mes anterior: ${J} h`)}continue}if(!emp(k))continue;
+      if(susp(k)){perdio=k;continue}const h=ordH(k);if(R(k)||fest.has(k))cub++;horas+=h;if(h)det.push(`día ${k}: ${fx(h)} h`)}
     if(perdio&&cfg.pierde)return{h:0,why:`el día ${perdio} hubo ${R(perdio).kind==="sancion"?"sanción disciplinaria":"licencia no remunerada"}: faltó por culpa o disposición suya, así que pierde el dominical (art. 173)`};
-    const total=6;if(cub>=total)return{h:J,why:"descanso dominical remunerado (art. 172 y 173): cumplió la semana"};
-    return{h:J*cub/total,why:`descanso dominical proporcional: cubrió ${cub} de los 6 días de la semana (art. 173, parágrafo)`,prop:true}};
+    const total=6;if(cub>=total&&horas>=6*J-1e-9)return{h:J,why:"descanso dominical remunerado (art. 172 y 173): cumplió la semana"};
+    if(cfg.propHoras){const v=J*Math.min(horas,6*J)/(6*J);return{h:v,why:`descanso dominical proporcional a las horas de la semana (art. 173, parágrafo): ${J} × ${fx(horas)} / ${6*J} = ${fx(v)} h . Horas que cuentan, de lunes a sábado (ordinarias, máximo ${J} por día, sin las extra; 7 por festivo, permiso o descanso): ${det.join(", ")||"ninguna"}`,prop:true,horas,form:`${J} × ${fx(horas)}/${6*J}`}}
+    return{h:J*cub/total,why:`descanso dominical proporcional a los días: ${J} × ${cub}/6 = ${fx(J*cub/total)} h (art. 173, parágrafo)`,prop:true,form:`${J} × ${cub}/6`}};
   rows.forEach(r=>{if(r.dom){const p=pagoDescanso(r.d);r.desc=p}});
   // novedades sin trabajo
   rows.forEach(r=>{const x=R(r.d);if(!x||x.kind==="trabajo")return;
