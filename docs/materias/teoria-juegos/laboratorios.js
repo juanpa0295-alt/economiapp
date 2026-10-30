@@ -26,7 +26,10 @@ const PRESETS={
  tabla6:{t:"Ej. 16 · Tabla 6 (reparto de 10 US$)",R:["A","B","C"],C:["A","B","C"],cells:[["9, 1","1, 9","2, 8"],["6, 4","5, 5","4, 6"],["7, 3","8, 2","3, 7"]]},
  ej17a:{t:"Ej. 17 · Suma cero, primera matriz",zs:true,R:["1","2"],C:["1","2"],cells:[["1","0"],["0","1"]]},
  ej17b:{t:"Ej. 17 · Suma cero, segunda matriz",zs:true,R:["1","2","3"],C:["1","2"],cells:[["2","3"],["1","0"],["2","3"]]},
- ej18:{t:"Ej. 18 · Penal (portero contra pateador)",zs:true,R:["I","D"],C:["I","D"],cells:[["1","-1"],["-1","1"]]}};
+ ej18:{t:"Ej. 18 · Penal (portero contra pateador)",zs:true,R:["I","D"],C:["I","D"],cells:[["1","-1"],["-1","1"]]},
+ c3:{t:"Taller 2 · Ej. 2 · Cournot con q ∈ {1, 2, 3}",R:["1","2","3"],C:["1","2","3"],cells:[["4, 4","3, 6","2, 6"],["6, 3","4, 4","2, 3"],["6, 2","3, 2","0, 0"]]},
+ c6:{t:"Taller 2 · Ej. 6 · Cournot finito (a − c = 12)",R:["qm/2","qc"],C:["qm/2","qc"],cells:[["18, 18","15, 20"],["20, 15","16, 16"]]},
+ hr:{t:"Taller 2 · Ej. 13 · Harrison y Rutström (1991), Tabla I",R:["K","A"],C:["K","A"],p1:"EE. UU.",p2:"CE",cells:[["0, 0","0.85, -3.85"],["-3.31, 1.06","1.46, 0.62"]]}};
 const ALPH=["A","B","C","D","E","F"],ALPH2=["R","S","T","U","V","W"];
 
 // ---------- Presentación de una bimatriz con mejores respuestas subrayadas
@@ -169,6 +172,7 @@ SIMS.nash=()=>solverUI($("sim"),{id:"sn",preset:"tabla1",sections:["forma","nash
 SIMS.mix=()=>solverUI($("sim"),{id:"sm",preset:"app",sections:["nash","mixtas"],presets:["app","tabla1","ej6","tabla2","tabla3","tabla5","ej1","ej18"]});
 SIMS.rac=()=>solverUI($("sim"),{id:"sr",preset:"tabla4",sections:["forma","elim"],presets:["tabla4","tabla3","tabla2"]});
 SIMS.mm=()=>solverUI($("sim"),{id:"sx",preset:"ej18",sections:["forma","maximin"],presets:["ej18","ej17a","ej17b","tabla6","tabla1"]});
+SIMS.apl=()=>solverUI($("sim"),{id:"sa",preset:"c3",sections:["forma","elim","nash"],presets:["c3","c6","hr"]});
 SIMS.full=()=>solverUI($("sim"),{id:"sf",preset:"tabla2",sections:["forma","elim","nash","mixtas","maximin"]});
 
 // ---------- Forma extensiva: editor de árboles, forma estratégica y equilibrio perfecto en subjuegos
@@ -438,9 +442,188 @@ SIMS.tres=function(){let st=JSON.parse(JSON.stringify(T3P.f4));
 SIMS.arb=function(){
   $("sim").innerHTML=`<div class="ctr">${ctl("ar-m","Media del árbitro (m)",50,200,1,110)}${ctl("ar-s","Incertidumbre (σ)",1,40,0.5,10)}</div><div class="res" id="ar-res"></div><div id="ar-plot"></div><p id="ar-txt" style="margin:0"></p>`;
   const run=()=>{const m=V("ar-m"),s=V("ar-s");if(!(s>0)||!isFinite(m))return;const d=Math.sqrt(Math.PI*s*s/2),wf=m-d,wg=m+d;
-    $("ar-res").innerHTML=tiles([["Oferta del sindicato w*g",fmt(wg)],["Oferta de la empresa w*f",fmt(wf)],["Brecha w*g − w*f",fmt(wg-wf)]]);
+    $("ar-res").innerHTML=tiles([["Oferta de los trabajadores",fmt(wg)],["Oferta de la empresa",fmt(wf)],["Brecha entre ofertas",fmt(wg-wf)]]);
     const pdf=x=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
     $("ar-plot").innerHTML=curvePlot({lo:m-4*s,hi:m+4*s,curves:[{f:pdf}],areas:[{f:pdf,a:m-4*s,b:m,col:"--bad",op:.15},{f:pdf,a:m,b:m+4*s,col:"--line",op:.15}],marks:[{x:wf,label:`w*f = ${fmt(wf)}`,col:"--bad",dash:1},{x:wg,label:`w*g = ${fmt(wg)}`,col:"--line",dash:1,row:1},{x:m,label:`m = ${fm(m)}`,col:"--muted",dash:1,row:2}],xl:"salario que el árbitro considera justo (x)",label:"Distribución del salario justo según el árbitro"});
     $("ar-txt").innerHTML=`Cada parte gana el arbitraje con probabilidad 1/2, porque el punto medio de las ofertas coincide con m. Si σ sube, la brecha crece: con más incertidumbre sobre el árbitro, las ofertas pueden ser más agresivas.`};
   bindCtl(["ar-m","ar-s"],run);run();
 };
+
+// ---------- Forma extensiva general: árbol, forma estratégica, EN, EPS y EBP (motor EXT)
+const EXP={
+  eps1:{t:"EPS · Ejemplo 1 (amenaza no creíble)",x:"r 1: A>n2 B>(0,2)\nn2 2: a>(-1,-1) b>(1,1)"},
+  eps2:{t:"EPS · Ejemplo 2",x:"r 1: A>n2 D>(2,0)\nn2 2: B>n3 E>(1,1)\nn3 1: C>(0,2) F>(3,0)"},
+  damme:{t:"EPS · Ejemplo 3 (van Damme, 1987)",x:"r 1: A>n2 B>(1,1)\nn2 2: a>n3 b>(2,2)\nn3 1: C>(0,3) D>(-1,-1)"},
+  ent:{t:"Taller 3 · Ej. 1 · Entrada al mercado (millones US$)",x:"r 1: E>n2 NE>(0,2)\nn2 2: P>(-1,-1) C>(1,1)"},
+  ns:{t:"Taller 3 · Ej. 2 · Norte o Sur en secuencia",x:"r 1: N>a S>b\na 2: N>(4,3) S>(2,2)\nb 2: N>(1,1) S>(3,4)"},
+  f1:{t:"Taller 3 · Ej. 3 · Figura 1",x:"r 1: A>x B>y\nx 2 h: X>z Y>(5,5)\ny 2 h: X>(8,3) Y>(3,8)\nz 1: C>(1,0) D>(2,10)"},
+  f2:{t:"Taller 3 · Ej. 4 · Figura 2",x:"r 1: C>(3,2) B>x A>y\nx 2 h: b>(3,1) a>(0,2)\ny 2 h: b>(0,0) a>(3,1)"},
+  f3:{t:"Taller 3 · Ej. 5 · Figura 3",x:"r 1: A>(1,3) B>x C>y\nx 2 h: a>(0,1) b>(0,2)\ny 2 h: a>(0,0) b>(2,1)"},
+  f4:{t:"Taller 3 · Ej. 6 · Figura 4 (tres jugadores)",x:"r 1: C>x B>y\nx 2: C'>(1,1,1) B'>z\ny 3 h: I>(3,2,2) D>(0,0,0)\nz 3 h: I>(4,4,0) D>(0,0,1)"},
+  f5:{t:"Taller 3 · Ej. 6 · Figura 5",x:"r 1: A>x B>(1,0)\nx 2: a>y b>w\ny 1 h: C>(3,-1) D>(1,-2)\nw 1 h: C>(0,-3) D>(0,0)"},
+  f6:{t:"Taller 3 · Ej. 9 · Figura 6",x:"r 1: Z>x X>y Y>w\nx 2 h: R>(1,1) L>(0,0)\ny 2 h: R>(0,0) L>v\nv 1: B>(3,2) A>(1,2)\nw 2 k: R>(2,2) L>(2,3)"},
+  ebp1:{t:"EBP · Ejemplo 1",x:"r 1: A>(0,2) B>x C>y\nx 2 h: a>(2,1) b>(-1,-1)\ny 2 h: a>(1,1) b>(-2,0)"},
+  ebp2:{t:"EBP · Ejemplo 2",x:"r 1: D>(1,3) C>x I>y\nx 2 h: a>(0,1) b>(0,2)\ny 2 h: a>(0,0) b>(2,1)"},
+  tres:{t:"EBP · Tres jugadores (requisito 4)",x:"r 1: A>x B>(1,0,3)\nx 2: X>y Y>z\ny 3 h: C>(2,2,2) D>(0,2,0)\nz 3 h*: C>(0,1,0) D>(2,1,2)"},
+  req5:{t:"EBP · Requisito 5 (estrategias dominadas)",x:"r 1: D>(2,2) C>x I>y\nx 2 h: a>(0,1) b>(1,0)\ny 2 h*: a>(0,0) b>(3,1)"}};
+const uS=u=>`(${u.map(qs_).join(", ")})`;
+function arbTree(g,A,path){const ids=g.pre,leaves=ids.filter(id=>g.nodes[id].leaf),Y={},dx=150,dy=34;let k=0;
+  const place=id=>{const n=g.nodes[id];if(n.leaf){Y[id]=k++*dy;return Y[id]}const ys=n.ch.map(place);Y[id]=(ys[0]+ys[ys.length-1])/2;return Y[id]};place(g.root);
+  const md=Math.max(...ids.map(id=>g.nodes[id].depth)),W=40+md*dx+120,H=(leaves.length-1)*dy+56,X=id=>24+g.nodes[id].depth*dx,YY=id=>28+Y[id];
+  const onP=new Set(path||[]);let e="",t="";
+  ids.forEach(id=>{const n=g.nodes[id];if(n.leaf){t+=`<text x="${X(id)+7}" y="${YY(id)+4}" font-size="12.5" fill="var(--ink)" font-family="var(--f-mono)">${uS(n.u)}</text>`;return}
+    n.ch.forEach((c,a)=>{const ch=A&&A[n.si]===a,hot=ch&&onP.has(id)&&onP.has(c);
+      e+=`<line x1="${X(id)}" y1="${YY(id)}" x2="${X(c)}" y2="${YY(c)}" stroke="var(${ch?"--exam":"--line"})" stroke-width="${hot?4.5:ch?3:1.6}" stroke-linecap="round"/>`;
+      const mx=(X(id)+X(c))/2,my=(YY(id)+YY(c))/2;t+=`<text x="${mx}" y="${my-6}" font-size="12" text-anchor="middle" fill="var(--ink)" font-weight="${ch?700:500}">${n.acts[a]}</text>`});
+    t+=`<circle cx="${X(id)}" cy="${YY(id)}" r="5.5" fill="var(--ink)"/><text x="${X(id)-4}" y="${YY(id)-10}" font-size="12" text-anchor="end" fill="var(--muted)">${n.pl}</text>`});
+  g.sets.forEach(s=>{if(s.nodes.length<2)return;const ns=s.nodes.slice().sort((a,b)=>Y[a]-Y[b]);
+    for(let i=0;i+1<ns.length;i++)e+=`<line x1="${X(ns[i])}" y1="${YY(ns[i])}" x2="${X(ns[i+1])}" y2="${YY(ns[i+1])}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    if(s.nodes.length===2)s.nodes.forEach((id,j)=>t+=`<text x="${X(id)+9}" y="${YY(id)+(Y[id]===Math.min(...s.nodes.map(z=>Y[z]))?16:-9)}" font-size="12" fill="var(--exam)" font-weight="600">${j===s.muIdx?"μ":"1−μ"}</text>`)});
+  return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W}px" role="img" aria-label="Árbol del juego en forma extensiva">${e}${t}</svg></div>`}
+const nodeTxt=(g,id)=>{const p=g.nodes[id].path;if(!p.length)return"la raíz";return "el nodo al que se llega con "+p.map(([x,k])=>g.nodes[x].acts[k]).join(", ")};
+const sgTxt=(g,r)=>r===g.root?"el juego completo":"el subjuego que empieza después de "+g.nodes[r].path.map(([x,k])=>g.nodes[x].acts[k]).join(", ");
+function arbStrategic(g,sol){const S=sol.S,nm=(p,k)=>EXT.stratName(g,p,S[p][k]),find=pr=>sol.all.find(z=>z.prof.join()===pr.join());
+  if(g.n===2){const G={R:S[0].map((_,i)=>nm(0,i)),C:S[1].map((_,j)=>nm(1,j))};G.A=G.R.map((_,i)=>G.C.map((_,j)=>find([i,j]).u[0]));G.B=G.R.map((_,i)=>G.C.map((_,j)=>find([i,j]).u[1]));
+    const br=GT.bestResponses(G);return{G,html:matHTML(G,{br,ne:br.ne})}}
+  if(g.n===3){let h=`<div class="t3grid">`;S[2].forEach((_,k)=>{h+=`<div class="tbl gm"><table><tr><th>S₃ = ${nm(2,k)}</th>${S[1].map((_,j)=>`<th>${nm(1,j)}</th>`).join("")}</tr>${S[0].map((_,i)=>`<tr><th>${nm(0,i)}</th>${S[1].map((_,j)=>{const z=find([i,j,k]);return `<td class="${sol.ne.includes(z)?"ne":""}">${z.u.map(qs_).join(", ")}</td>`}).join("")}</tr>`).join("")}</table></div>`});return{html:h+"</div>"}}
+  return{html:`<p>${sol.all.map(z=>sol.name(z)+" → "+uS(z.u)).join("<br>")}</p>`}}
+function arbStep(g,st,n){const who=p=>`jugador ${p}`;let h=`<p><b>${n}. Resolvemos ${sgTxt(g,st.r)}.</b>`;
+  if(st.inner.length)h+=` Los subjuegos de adentro ya están resueltos y se reemplazan por sus pagos: ${st.inner.map(o=>`${sgTxt(g,o.x).replace("el subjuego que empieza ","")} → ${uS(o.u)}`).join("; ")}.`;h+="</p>";
+  const s=st.strat;
+  if(s.length===1&&s[0].os.length===1){const si=s[0].os[0],set=g.sets[si],p=s[0].p;
+    h+=`<ul>${st.prof.map(pr=>`<li>Con ${set.acts[s[0].L[pr[0]][0]]}, el ${who(p)} recibe ${qs_(st.val(pr)[p-1])}; pagos ${uS(st.val(pr))}</li>`).join("")}</ul><p>El ${who(p)} elige <b>${st.eqs.map(e=>set.acts[s[0].L[e[0]][0]]).join(" o ")}</b>.</p>`;return h}
+  const nmR=(i,k)=>{const a=s[i].os.map((si,j)=>g.sets[si].acts[s[i].L[k][j]]);return a.length===1?a[0]:`(${a.join(", ")})`};
+  if(s.length===2){const G={R:s[0].L.map((_,i)=>nmR(0,i)),C:s[1].L.map((_,j)=>nmR(1,j))};G.A=G.R.map((_,i)=>G.C.map((_,j)=>st.val([i,j])[s[0].p-1]));G.B=G.R.map((_,i)=>G.C.map((_,j)=>st.val([i,j])[s[1].p-1]));
+    const br=GT.bestResponses(G);h+=`<p>Hay movidas sin información perfecta, así que este subjuego se resuelve como un juego simultáneo (filas: ${who(s[0].p)}; columnas: ${who(s[1].p)}).</p>`+matHTML(G,{br,ne:br.ne,p1:String(s[0].p),p2:String(s[1].p)});
+    if(st.mixed){h+=`<p>No hay equilibrio en puras. En mixtas, el ${who(s[0].p)} juega ${G.R[0]} con probabilidad ${qs_(st.p)} para que el otro quede indiferente, y el ${who(s[1].p)} juega ${G.C[0]} con probabilidad ${qs_(st.x)}.</p>`}
+    else h+=`<p>Equilibrio${st.eqs.length>1?"s":""} de este subjuego: ${st.eqs.map(e=>`(${nmR(0,e[0])}, ${nmR(1,e[1])})`).join(", ")}.</p>`;return h}
+  h+=`<div class="tbl"><table><tr><th>Perfil</th><th>Pagos</th><th>¿Equilibrio?</th></tr>${st.prof.map(pr=>`<tr class="${st.eqs.includes(pr)?"ne":""}"><td>(${pr.map((k,i)=>nmR(i,k)).join(", ")})</td><td class="num">${uS(st.val(pr))}</td><td>${st.eqs.includes(pr)?"✓":""}</td></tr>`).join("")}</table></div>`;return h}
+SIMS.arbol=function(opt){opt=opt||{};const pfx=opt.id||"ex",secs=opt.sections||["forma","nash","eps","ebp"],list=opt.presets||Object.keys(EXP);let txt=EXP[opt.preset||list[0]].x,pick=-1;
+  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="${pfx}-pre">Ejercicio<select id="${pfx}-pre">${list.map(k=>`<option value="${k}"${k===(opt.preset||list[0])?" selected":""}>${EXP[k].t}</option>`).join("")}</select></label></div>
+  <details class="exted"><summary>Editar o escribir otro árbol</summary><p class="hint">Una línea por nodo de decisión: <code>nombre jugador conjunto : acción&gt;destino …</code>. El destino es otro nodo o los pagos entre paréntesis. Los nodos con el mismo conjunto (por ejemplo <code>h</code>) están unidos por la línea punteada; si no escribes conjunto, el nodo está solo. Un <code>*</code> después del conjunto (<code>h*</code>) indica a qué nodo se refiere μ.</p><textarea id="${pfx}-tx" rows="6" spellcheck="false" aria-label="Árbol del juego"></textarea></details>
+  <div id="${pfx}-out" class="slv-out"></div>`;
+  const tx=$(pfx+"-tx");tx.value=txt;
+  const run=()=>{let g,sol;try{g=EXT.parse(tx.value);sol=EXT.solve(g)}catch(e){$(pfx+"-out").innerHTML=`<p class="err">Revisa el árbol: ${e.message}</p>`;return}
+    const hl=pick>=0&&sol.all[pick]?sol.all[pick]:null,S=sol.S,out=[];let n=0;
+    const chips=(arr,lab)=>arr.length?`<div class="chips" role="group" aria-label="${lab}">${arr.map(z=>{const i=sol.all.indexOf(z);return `<button type="button" data-i="${i}" aria-pressed="${i===pick}">${sol.name(z)}</button>`}).join("")}</div>`:"";
+    out.push(`<div class="stepc"><h4><span class="n">${++n}</span>Forma extensiva</h4>${arbTree(g,hl&&hl.A,hl&&hl.path)}<p class="hint">${hl?`Resaltado: ${sol.name(hl)}. Las ramas de color son las acciones que el perfil elige en cada nodo; la más gruesa es la trayectoria que se juega.`:"Toca un equilibrio de abajo para ver en el árbol qué elige cada jugador."}</p></div>`);
+    if(secs.includes("forma")){const sf=arbStrategic(g,sol);
+      out.push(`<div class="stepc"><h4><span class="n">${++n}</span>Forma estratégica</h4><p>Una estrategia es un plan completo: dice qué hace el jugador en <b>cada</b> conjunto de información, aunque no se llegue a él.</p>
+      <div class="eq al" style="text-align:left">G(Γ) = {N, S${sb("i")}, π${sb("i")}} con N = {${[...Array(g.n)].map((_,p)=>p+1).join(", ")}}${S.map((s,p)=>`<br>S${sb(p+1)} = ${g.players[p].length>1?g.players[p].map(si=>setS(g.sets[si].acts)).join(" × ")+" = ":""}${setS(s.map(v=>EXT.stratName(g,p,v)))}`).join("")}</div>${sf.html}</div>`)}
+    if(secs.includes("nash"))out.push(`<div class="stepc"><h4><span class="n">${++n}</span>Equilibrios de Nash en puras</h4><div class="eq al" style="text-align:left">EN = ${sol.ne.length?`{ ${sol.ne.map(sol.name).join(", ")} }`:"∅"}</div>${chips(sol.ne,"Equilibrios de Nash")}</div>`);
+    if(secs.includes("eps")){const roots=sol.roots,bw=EXT.backward(g);
+      let h=`<p>Un subjuego empieza en un nodo que está solo en su conjunto de información y no corta ningún conjunto de información. Este juego tiene ${roots.length} subjuego${roots.length>1?"s":""}: ${roots.map(r=>sgTxt(g,r)).join("; ")}.${roots.length===1?" Como no hay subjuegos propios, todo EN es EPS.":""}</p>`;
+      if(roots.length>1){const seen=new Set(),byR={};let j=0;
+        bw.forEach(b=>b.steps.forEach(st=>{const key=st.r+"|"+JSON.stringify(st.A0);if(seen.has(key))return;seen.add(key);(byR[st.r]=byR[st.r]||[]).push(key);
+          const cs=byR[st.r].length>1||bw.some(o=>o.steps.some(t=>t.r===st.r&&JSON.stringify(t.A0)!==JSON.stringify(st.A0)));
+          const cap=cs&&Object.keys(st.A0).length?`<p class="hint">Caso en que adentro se juega ${Object.entries(st.A0).map(([si,a])=>`${g.sets[si].acts[a]} (jugador ${g.sets[si].pl})`).join(", ")}:</p>`:"";
+          h+=cap+arbStep(g,st,++j)}))}
+      bw.slice(0,4).forEach(b=>{
+        if(b.mixed){const m=b.mixed;h+=`<div class="verdict warnv">No hay EPS en estrategias puras. El EPS es en mixtas: el jugador ${m.pl[0]} juega ${m.G.R[0]} con probabilidad ${qs_(m.p)} y ${m.G.R[1]} con ${qs_(GT.q(1).sub(m.p))}; el jugador ${m.pl[1]} juega ${m.G.C[0]} con ${qs_(m.x)} y ${m.G.C[1]} con ${qs_(GT.q(1).sub(m.x))}${Object.keys(b.A).length?`; en los demás nodos: ${Object.entries(b.A).map(([si,a])=>`${g.sets[si].acts[a]} (jugador ${g.sets[si].pl})`).join(", ")}`:""}. Pagos esperados: ${uS(m.u)}.</div>`}});
+      if(bw.length>4)h+=`<p class="hint">Hay ${bw.length} ramas; se muestran 4.</p>`;
+      const noSPE=sol.ne.filter(z=>!z.spe);
+      h+=`<div class="verdict ${sol.spe.length?"acc":"warnv"}">EPS en puras = ${sol.spe.length?`{ ${sol.spe.map(sol.name).join(", ")} }`:"∅"}</div>${chips(sol.spe,"Equilibrios perfectos en subjuegos")}`;
+      if(noSPE.length)h+=`<p>Los demás EN no son perfectos en subjuegos:</p><ul>${noSPE.map(z=>`<li>${sol.name(z)}: en ${sgTxt(g,z.fail.r)}, el jugador ${z.fail.p+1} gana ${qs_(z.fail.gain)} en vez de ${qs_(z.fail.base)} si en ese subjuego juega ${(()=>{const U=EXT.under(g,z.fail.r),v=S[z.fail.p][z.fail.k],own=g.players[z.fail.p];const a=own.map((si,k)=>g.sets[si].nodes.some(x=>U.has(x))?g.sets[si].acts[v[k]]:null).filter(Boolean);return a.join(", ")})()}. Lo que el perfil dice que haría ahí no es creíble.</li>`).join("")}</ul>`;
+      out.push(`<div class="stepc"><h4><span class="n">${++n}</span>Equilibrios perfectos en subjuegos (inducción hacia atrás)</h4>${h}</div>`)}
+    if(secs.includes("ebp")){const pb=EXT.pbe(g,sol),multi=g.sets.filter(s=>s.nodes.length>1);
+      let h=multi.length?`<p>${multi.map(s=>s.nodes.length===2?`En el conjunto de información del jugador ${s.pl} (${s.nodes.map(x=>nodeTxt(g,x).replace("el nodo al que se llega con ","")).join(" / ")}), μ es la probabilidad que asigna a ${nodeTxt(g,s.nodes[s.muIdx])} y 1 − μ al otro.`:`El conjunto del jugador ${s.pl} tiene ${s.nodes.length} nodos.`).join(" ")}</p>`:`<p>Todos los conjuntos de información tienen un solo nodo: las creencias son triviales y los EBP coinciden con los EPS.</p>`;
+      h+=`<ol class="steps"><li><b>Requisito 1:</b> en cada conjunto de información el jugador tiene una creencia μ.</li><li><b>Requisito 2:</b> dada la creencia, su acción es óptima (racionalidad secuencial).</li><li><b>Requisito 3:</b> en la trayectoria de equilibrio, μ sale de la regla de Bayes.</li><li><b>Requisito 4:</b> fuera de la trayectoria, también se usa Bayes donde sea posible (dentro de cada subjuego).</li></ol>`;
+      const strong=pb.filter(x=>x.ok),weak=pb.filter(x=>!x.ok&&x.weakOk);
+      const muCol=(x,weakMode)=>x.info.filter(i=>!i.single).map(i=>{const fv=weakMode?i.muW:i.muS,txt=fv?`μ = ${fv.s()} (Bayes)`:EXT.muText({free:i.free,multi:i.multi});return `${g.sets[i.si].nodes.length>2?"":""}${txt}${i.r5&&!weakMode?` · con el requisito 5: μ = ${i.r5.mu.s()} ${i.r5.ok?"✓":"✗"}`:""}`}).join("; ")||"—";
+      h+=`<div class="tbl"><table><tr><th>Perfil</th><th>Creencias que lo sostienen</th><th>Trayectoria</th></tr>${strong.map(x=>`<tr class="ne"><td>${sol.name(x.z)}</td><td>${muCol(x)}</td><td class="num">${uS(x.z.u)}</td></tr>`).join("")||`<tr><td colspan="3">Ningún perfil en puras cumple los requisitos 1 a 4.</td></tr>`}</table></div>`;
+      h+=`<div class="verdict ${strong.length?"acc":"warnv"}">EBP en puras = ${strong.length?`{ ${strong.map(x=>`(${sol.name(x.z)}, ${muCol(x).replace(/ \(Bayes\)/g,"")})`).join("; ")} }`:"∅"}</div>${chips(strong.map(x=>x.z),"Equilibrios bayesianos perfectos")}`;
+      const r5bad=strong.filter(x=>!x.r5ok);if(r5bad.length)h+=`<p><b>Requisito 5.</b> Fuera de la trayectoria, la creencia debe dar probabilidad cero a los nodos a los que solo se llega con una estrategia estrictamente dominada. ${r5bad.map(x=>sol.name(x.z)).join(", ")} ${r5bad.length>1?"no lo cumplen":"no lo cumple"}: con esa creencia la acción del jugador deja de ser óptima.</p>`;
+      if(weak.length)h+=`<p><b>Solo débil.</b> ${weak.map(x=>`${sol.name(x.z)} con ${muCol(x,true)}`).join("; ")} cumple los requisitos 1 a 3 pero no el 4: la creencia contradice lo que el propio perfil dice que pasa en un subjuego al que no se llega.</p>`;
+      const fails=sol.spe.filter(z=>!strong.some(x=>x.z===z));
+      if(fails.length)h+=`<p>EPS que no son EBP: ${fails.map(z=>{let why="";for(let si=0;si<g.sets.length;si++){const s=g.sets[si];if(s.nodes.length<2)continue;const p=s.pl-1,a=z.A[si];const anyB=s.nodes.length===2?EXT.interval(s.acts.map((_,b)=>[EXT.cont(g,z.A,s.nodes[s.muIdx],a)[p].sub(EXT.cont(g,z.A,s.nodes[s.muIdx],b)[p]),EXT.cont(g,z.A,s.nodes[1-s.muIdx],a)[p].sub(EXT.cont(g,z.A,s.nodes[1-s.muIdx],b)[p])])):true;
+        if(!anyB){why=`la acción ${s.acts[a]} del jugador ${s.pl} no es óptima con ninguna creencia μ (está dominada en ese conjunto de información)`;break}}return `${sol.name(z)}${why?": "+why:""}`}).join("; ")}.</p>`;
+      out.push(`<div class="stepc"><h4><span class="n">${++n}</span>Equilibrio bayesiano perfecto</h4>${h}</div>`)}
+    $(pfx+"-out").innerHTML=out.join("");
+    $(pfx+"-out").querySelectorAll(".chips button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;pick=pick===i?-1:i;run()})};
+  $(pfx+"-pre").onchange=e=>{tx.value=EXP[e.target.value].x;pick=-1;run()};tx.addEventListener("input",()=>{pick=-1;run()});run()};
+
+// ---------- Funciones de reacción lineales: s1 = α1 + β1·s2, s2 = α2 + β2·s1
+function reacPlot({R1,R2,pts=[],xl,yl,max}){const W=420,H=330,f=frame(W,H,[0,max],[0,max],ticks(0,max,nice(max/5)),ticks(0,max,nice(max/5)),xl,yl);let b="";
+  const line=(fx,col,dash)=>{const P=[];for(let i=0;i<=80;i++){const t=max*i/80,[x,y]=fx(t);if(x>=-1e-9&&y>=-1e-9&&x<=max*1.0001&&y<=max*1.0001)P.push([x,y])}
+    return P.length>1?`<path d="${P.map((p,i)=>(i?"L":"M")+f.sx(p[0]).toFixed(1)+","+f.sy(p[1]).toFixed(1)).join("")}" fill="none" stroke="var(${col})" stroke-width="2.5" ${dash?'stroke-dasharray="7 5"':""}/>`:""};
+  b+=line(t=>[R1.f(t),t],"--line");b+=line(t=>[t,R2.f(t)],"--branch",1);
+  b+=`<text x="${f.W-f.R-4}" y="${f.T+14}" text-anchor="end" font-size="12" fill="var(--line)">${R1.lab}</text><text x="${f.W-f.R-4}" y="${f.T+30}" text-anchor="end" font-size="12" fill="var(--branch)">${R2.lab}</text>`;
+  pts.forEach(p=>{if(p.x>max||p.y>max)return;b+=`<circle cx="${f.sx(p.x)}" cy="${f.sy(p.y)}" r="6.5" fill="var(${p.col||"--exam"})" stroke="var(--card)" stroke-width="2"/><text x="${f.sx(p.x)+9}" y="${f.sy(p.y)-8}" font-size="12" fill="var(${p.col||"--exam"})" font-weight="600">${p.lab}</text>`});
+  return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W+60}px" role="img" aria-label="Funciones de mejor respuesta">${f.g}<line x1="${f.L}" x2="${f.W-f.R}" y1="${f.sy(0)}" y2="${f.sy(0)}" stroke="var(--muted)"/><line x1="${f.L}" x2="${f.L}" y1="${f.sy(0)}" y2="${f.T}" stroke="var(--muted)"/>${b}</svg></div>`}
+SIMS.reac=function(opt){opt=opt||{};let mod=opt.model||"cournot";
+  const M={cournot:{t:"Cournot",c:[["re-a","a (intercepto de la demanda)",10,200,1,100],["re-b","b (pendiente)",0.2,5,0.1,1],["re-c","c (costo marginal)",0,90,1,10],["re-n","N (número de firmas)",1,50,1,2]]},
+    bert:{t:"Bertrand diferenciado",c:[["re-a","a (demanda propia)",0,100,1,10],["re-b","b (sustitución, b < 2)",0,1.9,0.05,1],["re-c","c (costo marginal)",0,50,1,4]]},
+    esf:{t:"Esfuerzo en la relación",c:[["re-c","c (constante)",0.5,20,0.5,4]]}};
+  $("sim").innerHTML=`${seg("re-m","Modelo",Object.keys(M).map(k=>[k,M[k].t]),mod)}<div id="re-box"></div>`;
+  const draw=()=>{$("re-box").innerHTML=`<div class="ctr">${M[mod].c.map(a=>ctl(...a)).join("")}</div><div class="res" id="re-res"></div><div id="re-plot"></div><div id="re-txt"></div>`;bindCtl(M[mod].c.map(a=>a[0]),run);run()};
+  const run=()=>{const v=id=>V(id);let h="";
+    if(mod==="cournot"){const a=v("re-a"),b=v("re-b"),c=v("re-c"),N=Math.max(1,Math.round(v("re-n")));if(!(b>0)||!(a>c)){$("re-res").innerHTML="";$("re-txt").innerHTML=`<p class="err">Hace falta a &gt; c y b &gt; 0.</p>`;$("re-plot").innerHTML="";return}
+      const q=(a-c)/((N+1)*b),Q=N*q,P=a-b*Q,pi=(P-c)*q;
+      $("re-res").innerHTML=tiles([["Cada firma produce",fm(q)],["Total del mercado",fm(Q)],["Precio",fm(P)],["Beneficio de cada firma",fm(pi)]]);
+      const R=t=>Math.max(0,(a-c-b*t)/(2*b)),mx=(a-c)/b;
+      $("re-plot").innerHTML=N===2?reacPlot({R1:{f:R,lab:"r₁(q₂)"},R2:{f:R,lab:"r₂(q₁)"},pts:[{x:q,y:q,lab:"EN"}],xl:"q₁",yl:"q₂",max:mx}):"";
+      const rows=[1,2,3,5,10,100,1000].map(n=>{const qq=(a-c)/((n+1)*b);return `<tr${n===N?' class="ne"':""}><td>${n}</td><td class="num">${fm(qq)}</td><td class="num">${fm(n*qq)}</td><td class="num">${fm(a-b*n*qq)}</td><td class="num">${fm((a-b*n*qq-c)*qq)}</td></tr>`}).join("");
+      h=`<p>Condición de primer orden de la firma i: \\(a-b\\,Q_{-i}-2b\\,q_i-c=0\\Rightarrow r_i(Q_{-i})=\\dfrac{a-c-b\\,Q_{-i}}{2b}\\). Con simetría \\(Q_{-i}=(N-1)q\\):</p>
+      <div class="mj">\\[q^*=\\frac{a-c}{(N+1)\\,b}\\qquad Q^*=\\frac{N}{N+1}\\cdot\\frac{a-c}{b}\\qquad P^*=\\frac{a+N c}{N+1}\\]</div>
+      <div class="tbl"><table><tr><th>N</th><th>Cada firma</th><th>Total</th><th>Precio</th><th>Beneficio</th></tr>${rows}</table></div><p>Cuando \\(N\\to\\infty\\), \\(P^*\\to c\\) y \\(Q^*\\to(a-c)/b\\): el resultado de competencia perfecta. Con \\(N=1\\) se obtiene el monopolio.</p>`}
+    if(mod==="bert"){const a=v("re-a"),b=v("re-b"),c=v("re-c");if(!(b<2)||b<0){$("re-txt").innerHTML=`<p class="err">Hace falta 0 ≤ b &lt; 2.</p>`;return}
+      const p=(a+c)/(2-b),q=a-p+b*p,pi=(p-c)*q;
+      $("re-res").innerHTML=tiles([["Precio de cada firma",fm(p)],["Cantidad de cada firma",fm(q)],["Beneficio de cada firma",fm(pi)],["Margen sobre el costo",fm(p-c)]]);
+      const R=t=>(a+c+b*t)/2,mx=Math.max(p*1.6,R(0)*2.2,1);
+      $("re-plot").innerHTML=reacPlot({R1:{f:R,lab:"R₁(p₂)"},R2:{f:R,lab:"R₂(p₁)"},pts:[{x:p,y:p,lab:"EN"}],xl:"p₁",yl:"p₂",max:mx});
+      h=`<p>Demanda \\(q_i=a-p_i+b\\,p_j\\). Beneficio \\(\\pi_i=(p_i-c)(a-p_i+b\\,p_j)\\). Condición de primer orden:</p><div class="mj">\\[a-2p_i+b\\,p_j+c=0\;\\Rightarrow\;R_i(p_j)=\\frac{a+c+b\\,p_j}{2}\\qquad p^*=\\frac{a+c}{2-b}\\]</div>
+      <p>Las funciones de reacción tienen pendiente positiva: los precios son <b>complementos estratégicos</b>. En el Taller 2, Ej. 12 (\\(b=1\\)): \\(p^*=a+c\\), \\(q^*=a\\), \\(\\pi^*=a^2\\). En el Ej. 5 (\\(F_i=-p_i+p_j\\), es decir \\(a=0,\\ b=1\\)): \\(p^*=c\\) y el beneficio es cero, así que la paradoja de Bertrand se mantiene.</p>`}
+    if(mod==="esf"){const c=v("re-c");const e=c,u=c*c;$("re-res").innerHTML=tiles([["Esfuerzo de cada uno",fm(e)],["Bienestar de cada uno",fm(u)],["Bienestar si ambos suben 1",fm((e+1)*c)]]);
+      const R=t=>(c+t)/2;$("re-plot").innerHTML=reacPlot({R1:{f:R,lab:"e₁ = r₁(e₂)"},R2:{f:R,lab:"e₂ = r₂(e₁)"},pts:[{x:e,y:e,lab:"EN"}],xl:"e₁",yl:"e₂",max:c*2.2});
+      h=`<p>\\(u_1=e_1(c+e_2-e_1)\\). Condición de primer orden: \\(c+e_2-2e_1=0\\), así que</p><div class="mj">\\[r_1(e_2)=\\frac{c+e_2}{2},\\qquad r_2(e_1)=\\frac{c+e_1}{2},\\qquad e_1^*=e_2^*=c,\\qquad u_1^*=u_2^*=c^2\\]</div>
+      <p>El esfuerzo del otro aumenta mi bienestar, pero nadie lo tiene en cuenta al elegir el suyo. Si los dos subieran el esfuerzo a la vez a \\(c+k\\), cada uno obtendría \\((c+k)c&gt;c^2\\): el equilibrio es ineficiente, con muy poco esfuerzo.</p>`}
+    $("re-txt").innerHTML=h;typeset($("re-txt"))};
+  bindSeg("re-m",k=>{mod=k;draw()});draw()};
+
+// ---------- Recursos comunes (pescadores) y bienes públicos: Nash contra óptimo social
+SIMS.comunes=function(){let mod="pesca";
+  $("sim").innerHTML=`${seg("co-m","Modelo",[["pesca","Pescadores (recurso común)"],["bp","Bien público"]],mod)}<div id="co-box"></div>`;
+  const C={pesca:[["co-A","A en ρ(H) = A − bH",10,200,1,100],["co-b","b",0.1,5,0.1,1],["co-k","k en c(h) = k·h²/2",0.1,10,0.1,1],["co-n","n pescadores",1,30,1,5]],bp:[["co-al","α (peso del bien público)",0.1,3,0.1,1],["co-w","w (dotación)",1,200,1,90],["co-n","n agentes",1,30,1,2]]};
+  const draw=()=>{$("co-box").innerHTML=`<div class="ctr">${C[mod].map(a=>ctl(...a)).join("")}</div><div class="res" id="co-res"></div><div id="co-txt"></div>`;bindCtl(C[mod].map(a=>a[0]),run);run()};
+  const run=()=>{const n=Math.max(1,Math.round(V("co-n")));let h="";
+    if(mod==="pesca"){const A=V("co-A"),b=V("co-b"),k=V("co-k");const hN=A/(b*(n+1)+k),hP=A/(2*b*n+k),U=x=>(A-b*n*x)*x-k*x*x/2;
+      $("co-res").innerHTML=tiles([["Horas de cada uno, Nash",fm(hN)],["Horas de cada uno, planificador",fm(hP)],["Utilidad de cada uno, Nash",fm(U(hN))],["Utilidad de cada uno, planificador",fm(U(hP))]]);
+      h=`<p><b>Planificador:</b> \\(\\max_{h_1,\\dots,h_n}\\sum_i[\\rho(H)h_i-c(h_i)]\\). La condición de primer orden para cada \\(h_i\\) es</p><div class="mj">\\[\\rho(H)+\\rho'(H)\\,H=c'(h_i)\\]</div>
+      <p><b>Juego:</b> \\(G(\\Gamma)=\\{N=\\{1,\\dots,n\\},\;S_i=[0,T],\;U_i(h_i,h_{-i})=\\rho(H)h_i-c(h_i)\\}\\). Cada pescador maximiza solo su utilidad:</p><div class="mj">\\[\\rho(H^*)+\\rho'(H^*)\\,h_i^*=c'(h_i^*)\\]</div>
+      <p>La diferencia está en \\(\\rho'(H)\\,h_i\\) contra \\(\\rho'(H)\\,H\\): cada pescador solo cuenta cuánto baja el retorno de <b>sus</b> horas. Como \\(\\rho'&lt;0\\), en el EN se trabajan más horas que en el óptimo y todos quedan peor (tragedia de los comunes). Con las formas del laboratorio: \\(h^N=\\dfrac{A}{b(n+1)+k}\\) y \\(h^P=\\dfrac{A}{2bn+k}\\); coinciden solo si \\(n=1\\).</p>`}
+    else{const al=V("co-al"),w=V("co-w");const gN=al*w/(n+al),gP=al*w/(1+al),u=g=>al*Math.log(n*g)+Math.log(w-g);
+      $("co-res").innerHTML=tiles([["Aporte de cada uno, Nash",fm(gN)],["G de Nash",fm(n*gN)],["Aporte eficiente",fm(gP)],["G eficiente",fm(n*gP)],["Utilidad Nash",fm(u(gN))],["Utilidad eficiente",fm(u(gP))]]);
+      h=`<p>Con \\(u_i=\\alpha\\ln G+\\ln x_i\\), \\(x_i=w-g_i\\) y \\(G=\\sum_j g_j\\).</p><p><b>Eficiencia (Lindahl-Bowen-Samuelson):</b> la suma de las tasas marginales de sustitución es igual a la tasa marginal de transformación (aquí 1):</p><div class="mj">\\[\\sum_{i=1}^n \\mathrm{TMS}_i=\\sum_{i=1}^n\\frac{\\partial u_i/\\partial G}{\\partial u_i/\\partial x_i}=\\sum_i\\frac{\\alpha\\,x_i}{G}=1\;\\Rightarrow\;g^P=\\frac{\\alpha w}{1+\\alpha}\\]</div>
+      <p><b>Aportes voluntarios (EN):</b> cada uno toma como dado el aporte de los demás e iguala su <b>propia</b> TMS a 1:</p><div class="mj">\\[\\frac{\\alpha\\,x_i}{G}=1\;\\Rightarrow\;g^N=\\frac{\\alpha w}{n+\\alpha}\\]</div><p>Con \\(n&gt;1\\) el bien público queda subprovisto: cada uno ignora el beneficio que su aporte da a los otros (problema del polizón).</p>`}
+    $("co-txt").innerHTML=h;typeset($("co-txt"))};
+  bindSeg("co-m",k=>{mod=k;draw()});draw()};
+
+// ---------- Stackelberg: líder y seguidora
+SIMS.stack=function(){
+  $("sim").innerHTML=`<div class="ctr">${ctl("st-M","M (intercepto)",10,200,1,100)}${ctl("st-d","d (pendiente)",0.2,5,0.1,1)}${ctl("st-c","c (costo marginal)",0,90,1,10)}</div><div class="res" id="st-res"></div><div id="st-plot"></div><div class="tbl" id="st-tab"></div>`;
+  const run=()=>{const M=V("st-M"),d=V("st-d"),c=V("st-c");if(!(M>c)||!(d>0)){$("st-res").innerHTML=`<p class="err">Hace falta M &gt; c y d &gt; 0.</p>`;return}
+    const q1=(M-c)/(2*d),q2=(M-c)/(4*d),qc=(M-c)/(3*d),P=M-d*(q1+q2),Pc=M-2*d*qc;
+    $("st-res").innerHTML=tiles([["Líder produce",fm(q1)],["Seguidora produce",fm(q2)],["Precio",fm(P)],["Beneficio líder",fm((P-c)*q1)],["Beneficio seguidora",fm((P-c)*q2)]]);
+    const R=t=>Math.max(0,(M-c-d*t)/(2*d));
+    $("st-plot").innerHTML=reacPlot({R1:{f:R,lab:"r₁(q₂) (Cournot)"},R2:{f:R,lab:"s̃₂(q₁)"},pts:[{x:qc,y:qc,lab:"Cournot",col:"--muted"},{x:q1,y:q2,lab:"Stackelberg"}],xl:"q₁",yl:"q₂",max:(M-c)/d});
+    $("st-tab").innerHTML=`<table><tr><th></th><th>Firma 1</th><th>Firma 2</th><th>Total</th><th>Precio</th><th>Beneficio 1</th><th>Beneficio 2</th></tr><tr class="ne"><td>Stackelberg</td><td class="num">${fm(q1)}</td><td class="num">${fm(q2)}</td><td class="num">${fm(q1+q2)}</td><td class="num">${fm(P)}</td><td class="num">${fm((P-c)*q1)}</td><td class="num">${fm((P-c)*q2)}</td></tr><tr><td>Cournot</td><td class="num">${fm(qc)}</td><td class="num">${fm(qc)}</td><td class="num">${fm(2*qc)}</td><td class="num">${fm(Pc)}</td><td class="num">${fm((Pc-c)*qc)}</td><td class="num">${fm((Pc-c)*qc)}</td></tr></table>`};
+  bindCtl(["st-M","st-d","st-c"],run);run()};
+
+// ---------- Negociación de Stahl (1972) y Rubinstein (1982)
+SIMS.neg=function(){let rule="exo";
+  $("sim").innerHTML=`<div class="ctr">${ctl("ng-d1","δ₁ (paciencia del jugador 1)",0,0.99,0.01,0.9)}${ctl("ng-d2","δ₂ (paciencia del jugador 2)",0,0.99,0.01,0.8)}${ctl("ng-T","T (períodos)",1,40,1,3)}${ctl("ng-s","s (reparto impuesto en T)",0,1,0.05,0.5)}</div>
+  ${seg("ng-r","Qué pasa en el último período",[["exo","Se impone (s, 1 − s), como en Gibbons"],["ult","El que propone se queda con todo"]],rule)}<div class="res" id="ng-res"></div><div class="tbl" id="ng-tab"></div><p id="ng-txt"></p>`;
+  const run=()=>{const d1=V("ng-d1"),d2=V("ng-d2"),T=Math.max(1,Math.round(V("ng-T"))),s=V("ng-s");if(!(d1>=0&&d1<1&&d2>=0&&d2<1&&s>=0&&s<=1))return;
+    const x=Array(T+1);x[T]=rule==="exo"?s:(T%2===1?1:0);const rows=[];
+    for(let t=T;t>=1;t--){if(t<T)x[t]=t%2===1?1-d2*(1-x[t+1]):d1*x[t+1];
+      rows.push(`<tr${t===1?' class="ne"':""}><td>${t}</td><td>${t===T&&rule==="exo"?"(se impone)":t%2===1?"Jugador 1":"Jugador 2"}</td><td class="num">${fmt(x[t],4)}</td><td class="num">${fmt(1-x[t],4)}</td><td>${t===T?(rule==="exo"?"Reparto dado":"El que responde acepta 0"):t%2===1?`Ofrece al 2 exactamente δ₂·(1 − x${sb(t+1)}) = ${fmt(1-x[t],4)}`:`Ofrece al 1 exactamente δ₁·x${sb(t+1)} = ${fmt(x[t],4)}`}</td></tr>`)}
+    const inf=(1-d2)/(1-d1*d2);
+    $("ng-res").innerHTML=tiles([["Parte del jugador 1 en t = 1",fmt(x[1],4)],["Parte del jugador 2 en t = 1",fmt(1-x[1],4)],["Rubinstein (T → ∞): jugador 1",fmt(inf,4)]]);
+    $("ng-tab").innerHTML=`<table><tr><th>Período</th><th>Propone</th><th>Parte del 1</th><th>Parte del 2</th><th>Razonamiento</th></tr>${rows.join("")}</table>`;
+    $("ng-txt").innerHTML=`Se resuelve desde el último período hacia atrás: quien propone le ofrece al otro justo lo que este obtendría esperando un período (descontado), y el otro acepta en el primer período. Con T grande el resultado se acerca a x* = (1 − δ₂)/(1 − δ₁δ₂) = ${fmt(inf,4)}, sin importar la regla del final.`};
+  bindCtl(["ng-d1","ng-d2","ng-T","ng-s"],run);bindSeg("ng-r",k=>{rule=k;run()});run()};
+
+SIMS.cour=()=>SIMS.reac({model:"cournot"});SIMS.bertr=()=>SIMS.reac({model:"bert"});SIMS.esf=()=>SIMS.reac({model:"esf"});
+SIMS.eps=()=>SIMS.arbol({id:"xe",preset:"eps1",sections:["forma","nash","eps"],presets:["eps1","eps2","damme","ent","ns","f1","f4","f5","f6"]});
+SIMS.ebp=()=>SIMS.arbol({id:"xb",preset:"ebp1",sections:["forma","nash","eps","ebp"],presets:["ebp1","ebp2","tres","req5","f2","f3","f4","f5","f6"]});
+SIMS.extfull=()=>SIMS.arbol({id:"xf",preset:"f6"});

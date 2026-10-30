@@ -209,6 +209,12 @@ td.ok,td.bad{font-weight:400}
 .stepc ul{margin:0 0 6px;padding-left:20px}
 .calcf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .calcf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px;color:var(--muted);font-weight:600}
+.exted summary{cursor:pointer;font-size:13.5px;color:var(--line);font-weight:600}
+.exted textarea{width:100%;box-sizing:border-box;font-family:var(--f-mono);font-size:13.5px;padding:8px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);margin-top:6px}
+.exted textarea:focus-visible{outline:2px solid var(--line);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:inherit;font-size:13px;font-family:var(--f-mono);padding:5px 10px;border-radius:999px;border:1.5px solid var(--exam);background:var(--card);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--exam);color:var(--card)}
 /* forma extensiva */
 .ext-ed{display:flex;flex-direction:column;gap:8px}
 .ext-ed textarea{font-family:var(--f-mono);font-size:13.5px;font-weight:400;line-height:1.55;color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;width:100%;resize:vertical;tab-size:2;white-space:pre;overflow-x:auto}
@@ -221,6 +227,9 @@ td.ok,td.bad{font-weight:400}
 .ext-step:first-of-type{border-top:0;padding-top:0}
 .ext-tree svg{max-width:760px;margin:0 auto}
 
+.calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
+.calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
+.calcf>span{display:contents}
 /* --- calculadoras simbólicas --- */
 .cas{font-size:13px;font-weight:600;padding:8px 12px;border-radius:8px;border:1.5px solid;line-height:1.45}
 .cas.ok{color:var(--good);border-color:var(--good)}

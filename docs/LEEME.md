@@ -11,7 +11,9 @@ docs/
 │   ├── ruta.css                  Diseño compartido por todas las rutas
 │   ├── ruta.js                   Motor: mapa de metro, lecciones, progreso, gráficos
 │   ├── estadistica.js            Distribuciones (reemplazan a scipy.stats)
-│   ├── juegos.js                 Teoría de juegos con fracciones exactas
+│   ├── juegos.js                 Teoría de juegos con fracciones exactas (incluye EN, EPS y EBP en árboles)
+│   ├── extensiva.js              Árboles de juego: editor, subjuegos y EPS con azar
+│   ├── laboral.js                Derecho Laboral: tabla LEY (actualizar cada año) y cálculos
 │   ├── macro.js                  Cálculos de Macroeconomía 1
 │   ├── principios.js             Cálculos de Principios de Macroeconomía
 │   └── simbolico.js              SymPy en el navegador (Pyodide) y respaldo numérico
@@ -24,7 +26,8 @@ docs/
     ├── principios-macro.html + principios-macro/
     ├── estadistica-2.html  + estadistica-2/
     ├── macroeconomia-1.html + macroeconomia-1/
-    └── teoria-juegos.html  + teoria-juegos/
+    ├── teoria-juegos.html  + teoria-juegos/
+    └── derecho-laboral.html + derecho-laboral/
 ```
 
 ## Publicar con GitHub Pages
@@ -47,6 +50,10 @@ Cada lección del contenido acepta estos campos: `id`, `t` (título), `html`, `q
 ## Calculadoras de Matemáticas
 
 Las calculadoras de límites, derivadas e integrales usan SymPy, igual que la app de Streamlit, corriendo en el navegador con Pyodide. La primera vez que un estudiante abre una calculadora se descargan unos 15 MB y tarda unos segundos; después queda en la caché del navegador. Mientras carga, se muestran resultados numéricos aproximados.
+
+## Derecho Laboral: actualización anual
+
+En `comun/laboral.js`, la tabla `LEY` guarda el salario mínimo, el auxilio de transporte, la jornada máxima, el recargo dominical y la hora de inicio de la jornada nocturna, cada uno con la fecha desde la que rige. Cada enero hay que agregar la fila del nuevo salario mínimo y auxilio de transporte. El 1 de julio de 2027 el recargo dominical pasa al 100 % (ya está cargado).
 
 ## Progreso de los estudiantes
 
