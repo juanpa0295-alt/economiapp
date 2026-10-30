@@ -226,6 +226,15 @@ td.ok,td.bad{font-weight:400}
 .ext-step{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-top:1px dashed var(--rule)}
 .ext-step:first-of-type{border-top:0;padding-top:0}
 .ext-tree svg{max-width:760px;margin:0 auto}
+/* planilla de horas */
+.pltx{width:100%;box-sizing:border-box;font-family:var(--f-mono);font-size:13.5px;padding:8px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);margin-top:4px}
+.pltx:focus-visible{outline:2px solid var(--line);outline-offset:1px}
+.plcal table{min-width:0;width:auto}.plcal td,.plcal th{text-align:center;padding:4px 6px;min-width:38px}.plcal td small{display:block;font-size:10.5px;color:var(--muted)}
+tr.pdom td,.plcal td.pdom{background:var(--paper)}.plcal td.pfuera{opacity:.45}
+.ptab table{font-size:13px}.ptab th small{font-family:var(--f-mono);font-weight:400;color:var(--muted)}.ptab td{padding:4px 6px}
+.ptab td.pnota{font-size:12px;color:var(--muted);min-width:150px;max-width:220px}
+tr.psub td{font-weight:700;border-top:2px solid var(--rule);background:var(--paper)}
+.pdet{border:1px solid var(--rule);border-radius:8px;padding:8px 12px;background:var(--card);margin:0}.pdet summary{cursor:pointer;font-weight:600}.pdet ul{margin:6px 0;padding-left:20px;font-size:13.5px}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
