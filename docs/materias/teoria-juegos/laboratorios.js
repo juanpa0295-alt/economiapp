@@ -627,3 +627,53 @@ SIMS.cour=()=>SIMS.reac({model:"cournot"});SIMS.bertr=()=>SIMS.reac({model:"bert
 SIMS.eps=()=>SIMS.arbol({id:"xe",preset:"eps1",sections:["forma","nash","eps"],presets:["eps1","eps2","damme","ent","ns","f1","f4","f5","f6"]});
 SIMS.ebp=()=>SIMS.arbol({id:"xb",preset:"ebp1",sections:["forma","nash","eps","ebp"],presets:["ebp1","ebp2","tres","req5","f2","f3","f4","f5","f6"]});
 SIMS.extfull=()=>SIMS.arbol({id:"xf",preset:"f6"});
+
+// ---------- Juegos bayesianos estáticos: equilibrio Bayes-Nash (motor BN)
+const BNP={
+  bos:{t:"Batalla de los sexos: el 2 quiere encontrarse o evitar (½, ½)",x:"acciones 1: B S\nacciones 2: B S\ntipos 1: -\ntipos 2: encontrarse 1/2, evitar 1/2\ntabla -, encontrarse:\n2,1  0,0\n0,0  1,2\ntabla -, evitar:\n2,0  0,2\n0,1  1,0"},
+  ent:{t:"Entrada con costo privado del incumbente (Fudenberg y Tirole)",x:"acciones 1: Construir No\nacciones 2: Entrar Quedarse\ntipos 1: alto 1/2, bajo 1/2\ntipos 2: -\ntabla alto, -:\n0,-1  2,0\n2,1  3,0\ntabla bajo, -:\n1.5,-1  3.5,0\n2,1  3,0"},
+  bp:{t:"Bien público con costos privados (los dos tienen tipo)",x:"acciones 1: Aportar No\nacciones 2: Aportar No\ntipos 1: bajo 1/2, alto 1/2\ntipos 2: bajo 1/2, alto 1/2\ntabla bajo, bajo:\n3/4,3/4  3/4,1\n1,3/4  0,0\ntabla bajo, alto:\n3/4,1/4  3/4,1\n1,1/4  0,0\ntabla alto, bajo:\n1/4,3/4  1/4,1\n1,3/4  0,0\ntabla alto, alto:\n1/4,1/4  1/4,1\n1,1/4  0,0"},
+  bos2:{t:"Batalla de los sexos con p = 1/4 de querer encontrarse",x:"acciones 1: B S\nacciones 2: B S\ntipos 1: -\ntipos 2: encontrarse 1/4, evitar 3/4\ntabla -, encontrarse:\n2,1  0,0\n0,0  1,2\ntabla -, evitar:\n2,0  0,2\n0,1  1,0"}};
+SIMS.bayes=function(){
+  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="bn-pre">Ejemplo<select id="bn-pre">${Object.keys(BNP).map(k=>`<option value="${k}">${BNP[k].t}</option>`).join("")}</select></label></div>
+  <details class="exted"><summary>Editar o escribir otro juego</summary><p class="hint">Escribe las acciones de cada jugador, sus tipos con la probabilidad de cada uno (usa <code>-</code> si un jugador tiene un solo tipo) y una tabla de pagos por cada par de tipos. Cada fila de la tabla es una acción del jugador 1 y cada celda es «π₁,π₂».</p><textarea id="bn-tx" rows="12" spellcheck="false" aria-label="Juego bayesiano"></textarea></details><div id="bn-out" class="slv-out"></div>`;
+  const tx=$("bn-tx");tx.value=BNP.bos.x;
+  const run=()=>{let g,r;try{g=BN.parse(tx.value);r=BN.solve(g)}catch(e){$("bn-out").innerHTML=`<p class="err">Revisa el juego: ${e.message}</p>`;return}
+    const T=g.T,A=g.A,multi=i=>T[i].length>1,sol=([x,y])=>`(${r.G.R[x]}, ${r.G.C[y]})`;let n=0,h=[];
+    // 1. transformación de Harsanyi
+    let tabs="";T[0].forEach((t1,k1)=>T[1].forEach((t2,k2)=>{const G={R:A[0],C:A[1],A:A[0].map((_,a)=>A[1].map((_,b)=>BN.u(g,a,b,k1,k2)[0])),B:A[0].map((_,a)=>A[1].map((_,b)=>BN.u(g,a,b,k1,k2)[1]))};
+      tabs+=`<div><p class="hint" style="margin:0 0 4px">${[multi(0)?`tipo ${t1.n} del 1`:"",multi(1)?`tipo ${t2.n} del 2`:""].filter(Boolean).join(", ")} · probabilidad ${qs_(t1.p.mul(t2.p))}</p>${matHTML(G)}</div>`}));
+    h.push(`<div class="stepc"><h4><span class="n">${++n}</span>Transformación de Harsanyi</h4><p>Primero la naturaleza elige los tipos; cada jugador conoce el suyo, no el del otro, y las probabilidades son conocidas por todos. ${[0,1].map(i=>multi(i)?`T${sb(i+1)} = ${setS(T[i].map(t=>t.n))} con p(${T[i].map(t=>`${t.n}) = ${qs_(t.p)}`).join(", p(")}.`:`El jugador ${i+1} tiene un solo tipo.`).join(" ")} Como los tipos son independientes, lo que cada tipo cree del otro es la probabilidad previa.</p><div class="t3grid">${tabs}</div></div>`);
+    // 2. estrategias
+    h.push(`<div class="stepc"><h4><span class="n">${++n}</span>Estrategias: un plan por tipo</h4><p>Una estrategia \\(s_i:T_i\\to A_i\\) dice qué hace <b>cada</b> tipo del jugador, aunque en la realidad solo exista uno de ellos.</p><div class="eq al" style="text-align:left">${[0,1].map(i=>`S${sb(i+1)} = ${multi(i)?`A${sb(i+1)}${T[i].length>2?`<sup>${T[i].length}</sup>`:` × A${sb(i+1)}`} = `:""}${setS(r.S[i].map(v=>BN.sname(g,i,v)))}${multi(i)?` &nbsp;(orden: ${T[i].map(t=>t.n).join(", ")})`:""}`).join("<br>")}</div></div>`);
+    // 3. forma estratégica con pagos esperados
+    const br=GT.bestResponses(r.G);
+    h.push(`<div class="stepc"><h4><span class="n">${++n}</span>Forma estratégica con pagos esperados</h4><p>Cada celda promedia los pagos de las tablas con la probabilidad de cada par de tipos. Los equilibrios de Nash de esta tabla son los equilibrios Bayes-Nash (si todos los tipos tienen probabilidad positiva).</p>${matHTML(r.G,{br,ne:br.ne})}<div class="eq al" style="text-align:left">EN de la tabla = ${br.ne.length?`{ ${br.ne.map(([x,y])=>`(${r.G.R[x]}, ${r.G.C[y]})`).join(", ")} }`:"∅"}</div></div>`);
+    // 4. verificación tipo por tipo
+    const ver=([x,y])=>{const s=[r.S[0][x],r.S[1][y]];return [0,1].map(i=>T[i].map((t,k)=>{const o=s[1-i],j=1-i;const rows=A[i].map((a,ai)=>{const terms=T[j].map((tj,kj)=>{const b=o[kj],u=i===0?BN.u(g,ai,b,k,kj)[0]:BN.u(g,b,ai,kj,k)[1];return T[j].length>1?`${qs_(tj.p)}·${coefP(u)}`:qs_(u)});const v=BN.eu(g,i,k,ai,o);return{a,ai,txt:terms.join(" + "),v}});
+      const mx=rows.reduce((m,z)=>z.v.gt(m)?z.v:m,rows[0].v);return `<li><b>${multi(i)?`Tipo ${t.n} del jugador ${i+1}`:`Jugador ${i+1}`}</b> (juega ${A[i][s[i][k]]}): ${rows.map(z=>`${z.a} → ${T[j].length>1?z.txt+" = ":""}${qs_(z.v)}${z.v.eq(mx)?" ✓":""}`).join("; ")}</li>`}).join("")).join("")};
+    const eqs=r.eq;
+    h.push(`<div class="stepc"><h4><span class="n">${++n}</span>Verificación tipo por tipo</h4><p>En un equilibrio Bayes-Nash, cada tipo de cada jugador maximiza su pago esperado dadas sus creencias sobre el tipo del otro y la estrategia del otro:</p>
+      <div class="mj">\\[s_i^*(t_i)\\in\\arg\\max_{a_i\\in A_i}\\sum_{t_j\\in T_j}u_i\\big(a_i,\\,s_j^*(t_j);\\,t_i,t_j\\big)\\,p_i(t_j\\mid t_i)\\]</div>
+      ${eqs.length?eqs.map((e,q)=>`<p><b>${sol(e)}</b></p><ul>${ver(e)}</ul>`).join(""):`<p>Ningún perfil en puras pasa la prueba.</p>`}
+      <div class="verdict ${eqs.length?"acc":"warnv"}">Equilibrios Bayes-Nash en puras = ${eqs.length?`{ ${eqs.map(sol).join(", ")} }`:"∅. Como el juego es finito, hay al menos uno en estrategias mixtas."}</div></div>`);
+    $("bn-out").innerHTML=h.join("");typeset($("bn-out"))};
+  $("bn-pre").onchange=e=>{tx.value=BNP[e.target.value].x;run()};tx.addEventListener("input",run);run()};
+
+// ---------- Aplicaciones con estrategias continuas: Cournot con información asimétrica y subasta de primer precio
+SIMS.bcont=function(opt){opt=opt||{};const mod=opt.model||"cour";
+  if(mod==="cour"){$("sim").innerHTML=`<div class="ctr">${ctl("bc-a","a (intercepto)",10,200,1,100)}${ctl("bc-c","c (costo de la firma 1)",0,60,1,20)}${ctl("bc-h","c_H (costo alto de la 2)",0,80,1,30)}${ctl("bc-l","c_L (costo bajo de la 2)",0,80,1,10)}${ctl("bc-t","θ = P(c_H)",0,1,0.05,0.5)}</div><div class="res" id="bc-res"></div><div class="tbl" id="bc-tab"></div><p id="bc-txt"></p>`;
+    const run=()=>{const a=V("bc-a"),c=V("bc-c"),cH=V("bc-h"),cL=V("bc-l"),t=V("bc-t");if(!(cH>=cL)||t<0||t>1){$("bc-res").innerHTML=`<p class="err">Hace falta c_H ≥ c_L y 0 ≤ θ ≤ 1.</p>`;return}
+      const q2H=(a-2*cH+c)/3+(1-t)*(cH-cL)/6,q2L=(a-2*cL+c)/3-t*(cH-cL)/6,q1=(a-2*c+t*cH+(1-t)*cL)/3,fH=(a-2*cH+c)/3,fL=(a-2*cL+c)/3,f1H=(a-2*c+cH)/3,f1L=(a-2*c+cL)/3;
+      if([q2H,q2L,q1].some(v=>v<0)){$("bc-res").innerHTML=`<p class="err">Con estos valores alguna cantidad sale negativa: sube a o baja los costos.</p>`;$("bc-tab").innerHTML="";return}
+      $("bc-res").innerHTML=tiles([["Firma 1",fm(q1)],["Firma 2 si su costo es alto",fm(q2H)],["Firma 2 si su costo es bajo",fm(q2L)]]);
+      $("bc-tab").innerHTML=`<table><tr><th></th><th>Información asimétrica</th><th>Información completa</th></tr><tr><td>Firma 2, costo alto</td><td class="num">${fm(q2H)}</td><td class="num">${fm(fH)}</td></tr><tr><td>Firma 2, costo bajo</td><td class="num">${fm(q2L)}</td><td class="num">${fm(fL)}</td></tr><tr><td>Firma 1 (frente a costo alto / bajo)</td><td class="num">${fm(q1)}</td><td class="num">${fm(f1H)} / ${fm(f1L)}</td></tr></table>`;
+      $("bc-txt").innerHTML=`Con costo alto, la firma 2 produce más que con información completa, porque sabe que la firma 1 está produciendo pensando en un rival «promedio», más fuerte que ella; con costo bajo produce menos por la razón contraria. La firma 1 produce una sola cantidad, la mejor respuesta a la producción esperada de la 2.`};
+    bindCtl(["bc-a","bc-c","bc-h","bc-l","bc-t"],run);run();return}
+  $("sim").innerHTML=`<div class="ctr">${ctl("su-n","n (número de postores)",2,20,1,2)}${ctl("su-v","Tu valoración v",0,100,1,60)}${ctl("su-m","Valoración máxima v̄",1,100,1,100)}</div><div class="res" id="su-res"></div><div id="su-plot"></div><p id="su-txt"></p>`;
+  const run=()=>{const n=Math.max(2,Math.round(V("su-n"))),M=V("su-m"),v=Math.min(V("su-v"),M);if(!(M>0))return;const b=(n-1)/n*v,pw=(v/M)**(n-1),eu=pw*(v-b),rev=(n-1)/(n+1)*M;
+    $("su-res").innerHTML=tiles([["Puja de equilibrio b(v)",fm(b)],["Probabilidad de ganar",fmt(pw,4)],["Pago esperado",fm(eu)],["Ingreso esperado del vendedor",fm(rev)]]);
+    $("su-plot").innerHTML=curvePlot({lo:0,hi:M,curves:[{f:x=>x,col:"--muted",w:1.5},{f:x=>(n-1)/n*x,col:"--line"}],marks:[{x:v,label:`v = ${fm(v)}, puja ${fm(b)}`,col:"--exam",dash:1}],xl:"valoración v",label:"Puja de equilibrio contra valoración"});
+    $("su-txt").innerHTML=`Cada postor puja una fracción (n − 1)/n de su valoración: con ${n} postores, el ${fm(100*(n-1)/n)} %. Pujar menos que v sube la ganancia si gana, pero baja la probabilidad de ganar. Con más postores la competencia empuja la puja hacia la valoración (línea gris).`};
+  bindCtl(["su-n","su-v","su-m"],run);run()};
+SIMS.bcour=()=>SIMS.bcont({model:"cour"});SIMS.subasta=()=>SIMS.bcont({model:"sub"});
