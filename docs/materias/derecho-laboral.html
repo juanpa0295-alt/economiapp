@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Derecho Laboral y Constitucional · Economiapp</title>
+<meta name="description" content="Prórrogas del contrato a término fijo, indemnizaciones y nómina con horas extras según el Código Sustantivo del Trabajo, con calculadoras.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#7a5a2e;--line-soft:#efe4d3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#d9b07a;--line-soft:#352a1c}}
+:root[data-theme="dark"]{--line:#d9b07a;--line-soft:#352a1c}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(l&&MathJax.typesetPromise)MathJax.typesetPromise([l]).catch(()=>{})})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Derecho Laboral y Constitucional</div>
+    <h1>Derecho Laboral y Constitucional</h1>
+    <p>Los tres temas del curso con el Código Sustantivo del Trabajo vigente (reformado por la Ley 2466 de 2025): prórrogas del contrato a término fijo, indemnizaciones, y jornada, horas extras y nómina. Cada estación tiene una calculadora que muestra el cálculo paso a paso. Es una herramienta de estudio, no asesoría legal.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-lab-done";window.RUTA_TRUNK_NOTE="";</script>
+<script src="../comun/laboral.js"></script>
+<script src="derecho-laboral/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="derecho-laboral/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>
