@@ -119,6 +119,22 @@ const BRANCHES=[
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
+ {id:"planilla",t:"Resolvedor del taller de horas extras",anchor:"jornada",links:["jornada","nomina"],sim:"planilla",html:String.raw`
+<details class="pdet" open><summary><b>Reglas que aplica el resolvedor</b></summary>
+<ol class="steps">
+<li><b>Valor de la hora.</b> Salario / (jornada diaria × 30). Con 7 horas de lunes a sábado: salario / 210. En la planilla todo se paga por horas: el salario del mes es la suma de 7 horas por cada uno de los 30 días.</li>
+<li><b>Cada día paga su jornada una sola vez.</b> O con las horas ordinarias que se trabajan ese día (HD, HN, HDD, HND), o con el descanso remunerado (7 HD).</li>
+<li><b>Turnos.</b> Cada turno va en la fila del día en que empieza. Las primeras 7 horas del turno son ordinarias y las demás son extra; las extra siempre se pagan completas (HED, HEN, HEDD, HEND). La noche va de 7:00 p. m. a 6:00 a. m. (art. 160).</li>
+<li><b>Turnos que cruzan la medianoche.</b> Cada franja se clasifica por el día en que cae. <b>Sábado → domingo:</b> lo que pasa de las 12 es dominical y se paga completo (HND o HDD), porque la base es la del sábado. <b>Domingo → lunes:</b> lo del lunes ya no es dominical; como la base de ese turno la pagó el descanso del domingo, las ordinarias del lunes llevan solo el recargo nocturno (RN), o nada si son de día.</li>
+<li><b>Domingo o festivo trabajado con descanso pagado.</b> Se pagan 7 HD por el descanso y las horas ordinarias trabajadas llevan <b>solo el recargo</b>: RDD (0,90) de día y RND (1,25) de noche. Las extra van completas.</li>
+<li><b>Domingo sin derecho a descanso</b> (sanción o licencia no remunerada en la semana): no hay 7 HD y las ordinarias trabajadas se pagan completas (HDD, HND).</li>
+<li><b>Día 31.</b> El salario cubre 30 días: las ordinarias diurnas no suman, las nocturnas llevan solo el recargo (RN o RND) y las extra se pagan completas. Un descanso o una novedad el 31 no suma.</li>
+<li><b>Descanso dominical (art. 172 y 173).</b> 7 HD si en la semana de lunes a sábado trabajó o faltó con justa causa; los festivos cuentan como trabajados. Si ingresó a mitad de semana, se paga proporcional: 7 × días cubiertos / 6. Se pierde si faltó por sanción o licencia no remunerada.</li>
+<li><b>Novedades.</b> Descanso: todo descanso es remunerado (compensatorio), 7 HD. Permiso remunerado: 7 HD. Incapacidad por enfermedad general: los dos primeros días los paga el empleador a 2/3 del salario (art. 227), es decir 4,67 h, y nunca menos del mínimo. Sanción disciplinaria y licencia no remunerada: suspensión del contrato (art. 51); se resta el día, 0 h. Un festivo anterior al ingreso no se paga.</li>
+</ol>
+<p class="hint">Si tu profesor usa otra convención en algún punto (por ejemplo, que la sanción no quite el dominical o que la incapacidad se pague completa), cámbiala en los datos del mes.</p></details>
+<div class="sim" id="sim"></div>`,
+  d:"Escribe los turnos y las novedades del mes como vienen en el enunciado. El resolvedor llena la planilla del taller día por día (HD, HN, RN, HED, HEN, HDD, RDD, HND, RND, HEDD, HEND), dice cuándo solo se pagan los recargos, separa lo que pasa de medianoche a un domingo o festivo, y paga las dos quincenas. Trae cargados los dos ejercicios del taller."},
  {id:"valores",t:"Valores y porcentajes por fecha",anchor:"jornada",links:["prorrogas","indemnizaciones","jornada","nomina"],sim:"val",html:WSBOX,
   d:"El salario mínimo, el auxilio de transporte, la jornada máxima, el recargo dominical y la hora nocturna que aplican en cualquier fecha desde 2025."}
 ];
