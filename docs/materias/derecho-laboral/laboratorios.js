@@ -138,6 +138,7 @@ SIMS.planilla=function(){
   ${selIn("pl-d","Recargo dominical y festivo",[["0.8","80 % (desde 1-jul-2025)"],["0.9","90 % (desde 1-jul-2026)"],["1","100 % (desde 1-jul-2027)"]],"0.9")}
   ${selIn("pl-no","Jornada nocturna desde",[["19","7:00 p. m. (desde 25-dic-2025)"],["21","9:00 p. m. (antes)"]],"19")}
   ${selIn("pl-pd","Sanción o licencia en la semana",[["1","pierde el dominical (art. 173)"],["0","no afecta el dominical"]],"1")}
+  ${selIn("pl-pr","Dominical proporcional (si no cumplió la semana)",[["h","por horas: 7 × horas/42"],["d","por días: 7 × días/6"]],"h")}
   ${selIn("pl-in","Incapacidad (días 1 y 2)",[["2/3","2/3 del día (art. 227)"],["1","día completo"]],"2/3")}
   ${selIn("pl-ax","Auxilio de transporte",[["0","no incluir"],["1","incluir si gana hasta 2 SMMLV"]],"0")}
   ${selIn("pl-de","Deducciones",[["0","no descontar"],["1","salud 4 % y pensión 4 %"]],"0")}</div></details>
@@ -149,7 +150,7 @@ SIMS.planilla=function(){
     if(!(n>=28&&n<=31)||!(sal>0)||!(J>0&&J<=10)||!(ing>=1&&ing<=n)){out.innerHTML=`<p class="err">Revisa los datos: días del mes entre 28 y 31, salario positivo, jornada entre 0 y 10 horas y día de ingreso dentro del mes.</p>`;return}
     const fs=($("pl-f").value.match(/\d+/g)||[]).map(Number).filter(d=>d>=1&&d<=n);
     const p=LAB.parsePlanilla($("pl-tx").value,n);if(p.errs.length){out.innerHTML=`<p class="err">Revisa las novedades: ${p.errs.join(" ")}</p>`;return}
-    const V0=LAB.valores({y:2026,m:10,d:1}),cfg={ndias:n,dow1:w,festivos:fs,ingreso:ing,venia,salario:sal,jornada:J,d:+$("pl-d").value,noct:+$("pl-no").value,smmlv:V0.smmlv,pierde:$("pl-pd").value==="1",incap:$("pl-in").value==="2/3"?2/3:1};
+    const V0=LAB.valores({y:2026,m:10,d:1}),cfg={ndias:n,dow1:w,festivos:fs,ingreso:ing,venia,salario:sal,jornada:J,d:+$("pl-d").value,noct:+$("pl-no").value,smmlv:V0.smmlv,pierde:$("pl-pd").value==="1",propHoras:$("pl-pr").value==="h",ndiasPrev:30,incap:$("pl-in").value==="2/3"?2/3:1};
     const r=LAB.planilla(cfg,p.rec),C=LAB.COLS,F=r.F;
     // calendario
     let cal=`<div class="tbl plcal"><table><tr>${DI1.split("").map(x=>`<th>${x}</th>`).join("")}</tr><tr>`;for(let i=0;i<w;i++)cal+="<td></td>";
@@ -157,7 +158,7 @@ SIMS.planilla=function(){
     cal+="</tr></table></div>";
     // tabla principal
     const head=`<tr><th>Día</th>${C.map(k=>`<th title="${LAB.NOMCOL[k]}">${k}<br><small>${fmt(F[k],2)}</small></th>`).join("")}<th>Nota</th></tr>`;
-    const corto=row=>{const t=[];if(row.dom&&row.desc){const w=row.desc.why;t.push(row.desc.h?(row.descSum?(row.desc.prop?`descanso proporcional ${hN(row.descSum)} h`:(row.fest&&row.dow!==0?"festivo remunerado 7 h":"descanso dominical 7 h")):"descanso proporcional no se suma"):(/no trabajaba/.test(w)?"aún no trabajaba":/31/.test(w)?"día 31":/incapacidad/.test(w)?"recibe incapacidad":"pierde el dominical"))}
+    const corto=row=>{const t=[];if(row.dom&&row.desc){const w=row.desc.why;t.push(row.desc.h?(row.descSum?(row.desc.prop?`descanso proporcional: ${row.desc.form} = ${hN(row.descSum)} h`:(row.fest&&row.dow!==0?"festivo remunerado 7 h":"descanso dominical 7 h")):"descanso proporcional no se suma"):(/no trabajaba/.test(w)?"aún no trabajaba":/31/.test(w)?"día 31":/incapacidad/.test(w)?"recibe incapacidad":"pierde el dominical"))}
       if(row.trabajo){if(row.base==="desc")t.push("ordinarias: solo recargo");if(row.base==="31")t.push("día 31: base ya pagada");const ex=["HED","HEN","HEDD","HEND"].reduce((q,k)=>q+row.h[k],0);if(ex>2)t.push(`⚠ ${hN(ex)} h extra (máx. 2)`)}
       const x=row.tipo;if(x&&x!=="trabajo")t.push({descanso:row.dom?"":"descanso compensatorio",permiso:"permiso remunerado",incapacidad:"incapacidad 2/3",sancion:"sanción (art. 51)",licencia:"licencia no remunerada",vacaciones:"vacaciones"}[x]+(row.d===31?" (no suma)":""));
       return t.filter(Boolean).join(" · ")};
@@ -185,4 +186,4 @@ SIMS.planilla=function(){
     <div class="stepc"><h4><span class="n">5</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
   load("ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
-  watch(["pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-in","pl-ax","pl-de","pl-tx"],run);run()};
+  watch(["pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-in","pl-ax","pl-de","pl-tx"],run);run()};
