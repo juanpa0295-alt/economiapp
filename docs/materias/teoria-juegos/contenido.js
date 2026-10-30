@@ -5,7 +5,7 @@
 const LAB=`<section><h3>Laboratorio</h3><div class="sim" id="sim"></div></section>`;
 const M2=(p1,p2,R,C,cells)=>`<div class="tbl gm"><table><tr><th class="pl" rowspan="2">${p1}</th><th></th><th class="pl" colspan="${C.length}">${p2}</th></tr><tr><th></th>${C.map(c=>`<th>${c}</th>`).join("")}</tr>${R.map((r,i)=>`<tr><th></th><th>${r}</th>${cells[i].map(c=>`<td class="${c[1]?"ne":""}">${c[0]}</td>`).join("")}</tr>`).join("")}</table></div>`;
 const TRUNK=[
-{id:"representacion", t:"Representación de juegos", nuevo:true, html:String.raw`
+{id:"representacion", t:"Representación de juegos", nuevo:true, sim:"ext", html:String.raw`
 <section><h3>La idea</h3>
 <p class="lead">Un juego se puede escribir de dos formas. La <b>forma estratégica</b> (o normal) lista jugadores, estrategias y pagos. La <b>forma extensiva</b> dibuja el árbol: quién mueve, en qué orden y qué sabe cuando mueve.</p></section>
 <section><h3>Forma estratégica</h3>
@@ -28,6 +28,8 @@ ${M2("G","B",["B","S"],["B","S"],[["3, 2"],["1, 1"]].map((x,i)=>i?[["0, 0"],["2,
 <div class="mj">\[S_B=\{B,S\}\times\{B,S\}=\{BB,\;BS,\;SB,\;SS\}\]</div>
 <p>donde \(BS\) se lee: «si G juega B, juego B; si G juega S, juego S».</p>
 ${M2("G","B",["B","S"],["BB","BS","SB","SS"],[[["3, 2"],["3, 2"],["1, 1"],["1, 1"]],[["0, 0"],["2, 3"],["0, 0"],["2, 3"]]])}</section>
+<section><h3>Del árbol a la tabla</h3><p>Escribe el árbol en el laboratorio: lo dibuja, cuenta los conjuntos de información, arma las estrategias de cada jugador y construye la forma estratégica. Abajo encuentra los subjuegos y el equilibrio perfecto en subjuegos. Viene cargada la Figura 1.</p></section>
+${LAB}
 <p class="warn"><b>Error común:</b> en la Figura 1 olvidar que el jugador 1 vuelve a mover después de X. Su estrategia debe decir qué haría allí aunque elija Z o Y, así que \(S_1=\{Z,X,Y\}\times\{B,A\}\) tiene 6 estrategias, no 3.</p>`,
 deep:[
 {k:"Ej. 1",t:"Entrada al mercado",html:String.raw`<p>La firma 1 decide entrar (E) o no (NE). Si entra, la 2 pelea (P) o concede (C). Monopolio: 2 millones. Si concede, se reparten (1, 1); si pelea, ambas pierden 1 millón.</p><div class="mj">\[G(\Gamma)=\{N=\{1,2\},\;S_1=\{E,NE\},\;S_2=\{P,C\},\;\pi_i\}\]</div>${M2("1","2",["E","NE"],["P","C"],[[["−1, −1"],["1, 1",1]],[["0, 2",1],["0, 2"]]])}<p>\(EN=\{(E,C),\,(NE,P)\}\). La rama «Juegos secuenciales» muestra por qué solo \((E,C)\) sobrevive a la inducción hacia atrás.</p>`},
@@ -148,14 +150,31 @@ const BRANCHES=[
 <section><h3>La idea</h3><p class="lead">En un juego secuencial con información perfecta se resuelve desde el final: el último en mover elige lo mejor para él, y los anteriores anticipan esa respuesta. El resultado es el <b>equilibrio perfecto en subjuegos</b> (EPS).</p></section>
 <section><h3>Amenazas no creíbles</h3><p>En el juego de entrada (Ej. 1), \((NE,P)\) es equilibrio de Nash: si la firma 2 amenaza con pelear, a la 1 no le conviene entrar. Pero si la 1 entra, pelear le da −1 a la 2 y conceder le da 1. La amenaza no es creíble y la inducción hacia atrás la descarta: el EPS es \((E,C)\).</p>
 <p>Todo EPS es equilibrio de Nash, pero no todo equilibrio de Nash es EPS.</p></section>
+<section><h3>Procedimiento</h3><ol class="steps"><li>Ve a los nodos de decisión más cercanos a los pagos. En cada uno, el jugador que mueve elige la rama con el mayor pago <b>para él</b>.</li><li>Reemplaza ese nodo por los pagos que resultan de esa elección.</li><li>Repite subiendo hasta la raíz.</li><li>Escribe el EPS como perfil de estrategias completas: lo que cada jugador hace en <b>todos</b> sus nodos, también en los que no se alcanzan.</li></ol>
+<p>Si hay un empate, cada opción da un EPS distinto. En el laboratorio puedes probar más etapas, más acciones, tres jugadores o jugadas del azar.</p></section>
 ${LAB}`,
  qs:[{q:"En la batalla de los sexos secuencial (Ej. 3b), ¿cuál es el EPS?",a:"B responde B si G juega B (2 &gt; 1) y S si G juega S (3 &gt; 0): su estrategia es BS. G anticipa y compara 3 con 2: juega B. El EPS es (B, BS) y el resultado es que ambos van a B."}]},
+ {id:"subjuegos", t:"Subjuegos e información imperfecta", nuevo:true, sim:"sub", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Cuando un jugador no ve lo que hizo otro, ya no se puede ir nodo por nodo hacia atrás. Se va <b>subjuego por subjuego</b>: se resuelve con Nash cada pedazo del árbol que se puede jugar por sí solo y se reemplaza por sus pagos.</p></section>
+<section><h3>Subjuego</h3><p>Un subjuego empieza en un nodo \(x\) que cumple dos condiciones:</p><ul><li>\(x\) es por sí solo un conjunto de información (quien mueve sabe que está ahí);</li><li>todo conjunto de información que contiene algún nodo que sigue a \(x\) queda completo después de \(x\): la línea punteada nunca «se sale» del subárbol.</li></ul>
+<p>El juego completo siempre es un subjuego. Los demás se llaman <b>subjuegos propios</b>.</p>
+<div class="mj">\[s^*\text{ es EPS}\iff s^*\text{ induce un equilibrio de Nash en cada subjuego}\]</div></section>
+<section><h3>Inducción hacia atrás por subjuegos</h3><ol class="steps"><li>Marca los subjuegos propios.</li><li>Empieza por los más pequeños. Si solo decide un jugador, elige su mejor acción. Si deciden varios sin verse, escribe la tabla de ese pedazo y busca sus equilibrios de Nash, en puras o en mixtas.</li><li>Reemplaza el subjuego por los pagos del equilibrio y sigue subiendo.</li><li>Si un subjuego tiene varios equilibrios, cada uno da un EPS distinto.</li></ol></section>
+<section><h3>Figura 2 (Ej. 10)</h3><p>El único subjuego propio empieza en el segundo nodo del jugador 1, después de A y X. Allí elige D, porque \(2&gt;1\). Reemplazando, queda un juego simultáneo:</p>
+${M2("1","2",["A","B"],["X","Y"],[[["2, 10"],["5, 5"]],[["8, 3"],["3, 8"]]])}
+<p>No tiene equilibrio en puras. En mixtas, el 2 queda indiferente si \(10\sigma_A+3(1-\sigma_A)=5\sigma_A+8(1-\sigma_A)\), o sea \(\sigma_A=1/2\); el 1 queda indiferente si \(2\sigma_X+5(1-\sigma_X)=8\sigma_X+3(1-\sigma_X)\), o sea \(\sigma_X=1/4\).</p>
+<div class="mj">\[EPS:\ \sigma_1=\big(\tfrac12 A+\tfrac12 B,\ D\big),\qquad \sigma_2=\tfrac14 X+\tfrac34 Y,\qquad \pi=\big(\tfrac{17}{4},\ \tfrac{13}{2}\big)\]</div>
+<p>El equilibrio de Nash en puras \((AC,Y)\) <b>no</b> es perfecto: pide jugar C en un subjuego donde D es mejor. Como el 2 juega Y, ese nodo no se alcanza y por eso C no le cuesta nada al 1 en la tabla.</p></section>
+${LAB}
+<p class="warn"><b>Error común:</b> tratar como subjuego un nodo que está dentro de un conjunto de información con otros nodos. En la Figura 1 los nodos del jugador 2 después de Z y de X no inician subjuegos: el 2 no sabe en cuál está.</p>`,
+ qs:[{q:"En la Figura 4 (Ej. 13), ¿cuántos subjuegos propios hay y cuál es el EPS?",a:"Uno: el que empieza en el nodo del jugador 2 (el conjunto del 3 queda completo dentro de él). Allí X domina a Y para el 2 y, dado X, el 3 elige C. El 1 compara 2 con 1 y juega A. El EPS es (A, X, C); los equilibrios de Nash (B, X, D) y (B, Y, C) no son perfectos."},
+  {q:"Si un juego no tiene subjuegos propios, ¿qué relación hay entre EN y EPS?",a:"Son lo mismo: el único subjuego es el juego completo, así que pedir Nash en cada subjuego es pedir Nash en el juego."}]},
  {id:"tres", t:"Juegos con tres jugadores", sim:"tres", html:String.raw`
 <section><h3>La idea</h3><p class="lead">Con tres jugadores la forma estratégica son varias tablas: una por cada estrategia del jugador 3. Un perfil \((s_1,s_2,s_3)\) es equilibrio si ninguno de los tres gana desviándose solo.</p>
 <div class="mj">\[EN=r_1\cap r_2\cap r_3,\qquad r_1(s_2,s_3),\;r_2(s_1,s_3),\;r_3(s_1,s_2)\]</div></section>
 <section><h3>Figura 4 (Ej. 13)</h3><p>El jugador 3 no sabe si el 2 jugó X o Y, y si el 1 juega B el juego termina en (1, 0, 3). Entonces \(S_1=\{A,B\}\), \(S_2=\{X,Y\}\), \(S_3=\{C,D\}\), y</p>
 <div class="mj">\[EN=\{(A,X,C),\;(B,X,D),\;(B,Y,C)\}\]</div>
-<p>Los dos últimos se sostienen porque, si el 1 juega B, el 2 y el 3 quedan indiferentes y el 1 prefiere B ante la combinación que eligen.</p></section>
+<p>Los dos últimos se sostienen porque, si el 1 juega B, el 2 y el 3 quedan indiferentes y el 1 prefiere B ante la combinación que eligen.</p><p>Solo \((A,X,C)\) es perfecto en subjuegos: en el subjuego que empieza en el nodo del 2, X domina a Y y el 3 responde C. Los otros dos se apoyan en jugadas que el 2 o el 3 no harían si les tocara mover. Puedes verlo en el laboratorio de la lección «Subjuegos e información imperfecta».</p></section>
 ${LAB}`,
  qs:[{q:"En la Figura 3 (Ej. 12), ¿por qué (C, C′, D) es equilibrio si el jugador 3 nunca mueve?",a:"Porque con C y C′ el juego termina en (1, 1, 1) sin pasar por el 3, que queda indiferente. Y D sostiene el equilibrio: si el 1 se desvía a B o el 2 a B′, D los castiga con 0."}]}]},
 {g:"Racionalidad", from:"dominancia", items:[
@@ -176,6 +195,8 @@ ${LAB}`}]}
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
+ {id:"arboles",t:"Resolvedor de árboles",anchor:"representacion",links:["representacion","secuencial","subjuegos","tres"],sim:"ext",nuevo:true,html:WSBOX,
+  d:"Escribe cualquier juego en forma extensiva: varias etapas, conjuntos de información, tres jugadores o azar. Dibuja el árbol, arma las estrategias y la forma estratégica, marca los subjuegos y encuentra el equilibrio perfecto en subjuegos paso a paso."},
  {id:"resolvedor",t:"Resolvedor paso a paso",anchor:"mixtas",links:["dominancia","nash","mixtas","maximin"],sim:"full",html:WSBOX,
   d:"Escribe cualquier tabla de pagos o carga un ejercicio del taller. Muestra la forma estratégica, la eliminación iterativa, los equilibrios en puras y en mixtas, y el maximin, con la notación del curso. El modo práctica oculta cada paso hasta que lo resuelvas a mano."}
 ];

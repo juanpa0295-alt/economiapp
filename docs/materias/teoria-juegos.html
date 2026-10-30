@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Teoría de Juegos · Economiapp</title>
-<meta name="description" content="Forma estratégica, dominancia, equilibrio de Nash en puras y mixtas, maximin, con resolvedor paso a paso.">
+<meta name="description" content="Forma extensiva y estratégica, subjuegos, dominancia, equilibrio de Nash en puras y mixtas, maximin, con resolvedor paso a paso.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +29,7 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
     <a class="home" href="../index.html">← Todas las materias</a>
     <div class="lbl">Economiapp · Teoría de Juegos</div>
     <h1>Teoría de Juegos</h1>
-    <p>Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub> y σ. Los ejemplos son los ejercicios del Taller 1, y el resolvedor muestra cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.</p>
+    <p>Del árbol del juego a los equilibrios en estrategias puras y mixtas, pasando por subjuegos e inducción hacia atrás, con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub> y σ. Los ejemplos son los ejercicios del Taller 1, y el resolvedor muestra cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.</p>
     <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
   </header>
   <div class="grid">
@@ -52,6 +52,7 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
 </div>
 <script>window.RUTA_KEY="ruta-tj-done";</script>
 <script src="../comun/juegos.js"></script>
+<script src="../comun/extensiva.js"></script>
 <script src="teoria-juegos/contenido.js"></script>
 <script src="../comun/ruta.js"></script>
 <script src="teoria-juegos/laboratorios.js"></script>

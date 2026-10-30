@@ -209,6 +209,17 @@ td.ok,td.bad{font-weight:400}
 .stepc ul{margin:0 0 6px;padding-left:20px}
 .calcf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .calcf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px;color:var(--muted);font-weight:600}
+/* forma extensiva */
+.ext-ed{display:flex;flex-direction:column;gap:8px}
+.ext-ed textarea{font-family:var(--f-mono);font-size:13.5px;font-weight:400;line-height:1.55;color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;width:100%;resize:vertical;tab-size:2;white-space:pre;overflow-x:auto}
+.ext-ed textarea:focus-visible{outline:2px solid var(--line);outline-offset:1px}
+.ext-help{font-size:13.5px;border:1px solid var(--rule);border-radius:8px;padding:8px 12px;background:var(--card)}
+.ext-help summary{cursor:pointer;font-weight:600;color:var(--line)}
+.ext-help ul{margin:8px 0 2px;padding-left:20px}
+.ext-help code,.ext-step code{font-family:var(--f-mono);font-size:12.5px;background:var(--code);padding:1px 5px;border-radius:4px}
+.ext-step{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-top:1px dashed var(--rule)}
+.ext-step:first-of-type{border-top:0;padding-top:0}
+.ext-tree svg{max-width:760px;margin:0 auto}
 
 /* --- calculadoras simbólicas --- */
 .cas{font-size:13px;font-weight:600;padding:8px 12px;border-radius:8px;border:1.5px solid;line-height:1.45}

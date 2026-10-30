@@ -171,44 +171,246 @@ SIMS.rac=()=>solverUI($("sim"),{id:"sr",preset:"tabla4",sections:["forma","elim"
 SIMS.mm=()=>solverUI($("sim"),{id:"sx",preset:"ej18",sections:["forma","maximin"],presets:["ej18","ej17a","ej17b","tabla6","tabla1"]});
 SIMS.full=()=>solverUI($("sim"),{id:"sf",preset:"tabla2",sections:["forma","elim","nash","mixtas","maximin"]});
 
-// ---------- Juego secuencial (módulo «Forma extensiva» de Economiapp, generalizado)
-const SEQP={
-  app:{t:"Ejemplo de Economiapp",a1:["Arriba","Abajo"],a2:["Izquierda","Derecha"],L:[["3, 2","0, 1"],["0, 0","1, 3"]]},
-  bos:{t:"Ej. 3b · Batalla de los sexos secuencial",a1:["B","S"],a2:["B","S"],L:[["3, 2","1, 1"],["0, 0","2, 3"]]},
-  ent:{t:"Ej. 1 · Entrada (si no entra, el 2 no mueve: repite los pagos)",a1:["E","NE"],a2:["P","C"],L:[["-1, -1","1, 1"],["0, 2","0, 2"]]},
-  t5:{t:"Ej. 7 · Tabla 5 jugada en secuencia",a1:["A","B"],a2:["I","D"],L:[["1, 9","1, 9"],["0, 0","2, 1"]]}};
-SIMS.seq=function(){let st=JSON.parse(JSON.stringify(SEQP.app));
-  $("sim").innerHTML=`<p>El jugador 1 mueve primero; el 2 observa esa jugada y luego elige. Escribe los pagos de cada nodo terminal.</p>
-  <div class="row slv-top"><label class="selw" for="q-pre">Ejemplo<select id="q-pre">${Object.keys(SEQP).map(k=>`<option value="${k}">${SEQP[k].t}</option>`).join("")}</select></label>
-  <label class="selw" for="q-m">Acciones del 1<select id="q-m"><option>2</option><option>3</option></select></label><label class="selw" for="q-n">Acciones del 2<select id="q-n"><option>2</option><option>3</option></select></label></div>
-  <div id="q-in"></div><div id="q-out" class="slv-out"></div>`;
-  const build=()=>{$("q-m").value=st.a1.length;$("q-n").value=st.a2.length;
-    $("q-in").innerHTML=`<div class="calcf">${st.a1.map((a,i)=>`<label for="q-a${i}">Acción ${i+1} del jugador 1<input id="q-a${i}" value="${a}"></label>`).join("")}${st.a2.map((a,j)=>`<label for="q-b${j}">Acción ${j+1} del jugador 2<input id="q-b${j}" value="${a}"></label>`).join("")}</div>
-    <div class="tbl gin"><table><tr><th>Si 1 juega…</th>${st.a2.map(b=>`<th>y 2 juega ${b}</th>`).join("")}</tr>${st.a1.map((a,i)=>`<tr><th>${a}</th>${st.a2.map((_,j)=>`<td><input id="q-x${i}-${j}" value="${st.L[i][j]}" aria-label="Pagos si 1 juega ${a} y 2 juega ${st.a2[j]}"></td>`).join("")}</tr>`).join("")}</table></div>`;
-    $("q-in").querySelectorAll("input").forEach(el=>el.addEventListener("input",()=>{read();run()}))};
-  const read=()=>{st.a1=st.a1.map((_,i)=>$("q-a"+i).value.trim()||ALPH[i]);st.a2=st.a2.map((_,j)=>$("q-b"+j).value.trim()||ALPH2[j]);st.L=st.a1.map((_,i)=>st.a2.map((_,j)=>$(`q-x${i}-${j}`).value))};
-  const tree=(L)=>{const m=st.a1.length,n=st.a2.length,W=600,leafH=34,H=m*n*leafH+30,x0=20,x1=230,x2=470;let g="",k=0;
-    const ry=H/2;g+=`<circle cx="${x0}" cy="${ry}" r="6" fill="var(--ink)"/><text x="${x0}" y="${ry-12}" font-size="12" text-anchor="middle" fill="var(--ink)">1</text>`;
-    st.a1.forEach((a,i)=>{const ny=15+(i*n+(n-1)/2)*leafH+leafH/2;g+=`<line x1="${x0}" y1="${ry}" x2="${x1}" y2="${ny}" stroke="var(--line)" stroke-width="2"/><text x="${(x0+x1)/2}" y="${(ry+ny)/2-6}" font-size="12" text-anchor="middle" fill="var(--ink)" font-weight="600">${a}</text><circle cx="${x1}" cy="${ny}" r="6" fill="var(--ink)"/><text x="${x1}" y="${ny-12}" font-size="12" text-anchor="middle" fill="var(--ink)">2</text>`;
-      st.a2.forEach((b,j)=>{const ly=15+k*leafH+leafH/2;k++;g+=`<line x1="${x1}" y1="${ny}" x2="${x2}" y2="${ly}" stroke="var(--branch)" stroke-width="2"/><text x="${(x1+x2)/2}" y="${(ny+ly)/2-5}" font-size="11.5" text-anchor="middle" fill="var(--muted)">${b}</text><text x="${x2+8}" y="${ly+4}" font-size="12.5" fill="var(--ink)" font-family="var(--f-mono)">(${qs_(L[i][j][0])}, ${qs_(L[i][j][1])})</text>`})});
-    return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Árbol del juego secuencial">${g}</svg></div>`};
-  const run=()=>{let L;try{L=st.L.map(r=>r.map(c=>{const p=String(c).split(/[;,]\s*|\s+/).filter(Boolean);if(p.length!==2)throw new Error("cada nodo terminal necesita dos pagos separados por coma.");return[GT.parseQ(p[0]),GT.parseQ(p[1])]}))}catch(e){$("q-out").innerHTML=`<p class="err">Revisa los datos: ${e.message}</p>`;return}
-    if(new Set(st.a1).size!==st.a1.length||new Set(st.a2).size!==st.a2.length){$("q-out").innerHTML=`<p class="err">Revisa los datos: cada acción necesita un nombre distinto.</p>`;return}
-    const r=GT.sequential(st.a1,st.a2,L),G=r.G,br=GT.bestResponses(G),m=st.a1.length;
-    const expl=`La estrategia ${r.names[0]} significa: ${st.a1.map((a,i)=>`si 1 juega ${a}, el 2 juega ${st.a2[r.strat[0][i]]}`).join("; ")}.`;
-    let h=`<div class="stepc"><h4><span class="n">1</span>Forma extensiva</h4>${tree(L)}</div>`;
-    h+=`<div class="stepc"><h4><span class="n">2</span>Forma estratégica</h4><p>El jugador 2 tiene ${m} conjuntos de información (uno por cada acción del 1), así que su estrategia es un plan completo: S${sb(2)} = ${st.a1.map(()=>setS(st.a2)).join(" × ")} = ${setS(r.names)}. ${expl}</p>
-      <div class="eq al" style="text-align:left">G(Γ) = {N, S${sb("i")}, π${sb("i")}} con N = {1, 2}, S${sb(1)} = ${setS(st.a1)}, S${sb(2)} = ${setS(r.names)}</div>${matHTML(G,{br,ne:br.ne})}
-      <div class="eq al" style="text-align:left">EN = r${sb(1)} ∩ r${sb(2)} = ${br.ne.length?`{ ${br.ne.map(([i,j])=>`(${G.R[i]}, ${G.C[j]})`).join(", ")} }`:"∅"}</div></div>`;
-    h+=`<div class="stepc"><h4><span class="n">3</span>Inducción hacia atrás</h4><p><b>Paso 1: empezamos por el final.</b> El jugador 2 observa lo que hizo el 1 y elige la rama con mayor pago para él.</p><ul>${st.a1.map((a,i)=>`<li>Si 1 juega <b>${a}</b>, el 2 elige <b>${r.resp[i].map(j=>st.a2[j]).join(" o ")}</b> (${st.a2.map((b,j)=>`${b}: ${qs_(L[i][j][1])}`).join(", ")}).</li>`).join("")}</ul>
-      <p><b>Paso 2: la decisión del jugador 1.</b> El 1 anticipa esas respuestas y compara lo que obtiene en cada rama.</p><ul>${st.a1.map((a,i)=>`<li>Con <b>${a}</b> obtiene ${r.resp[i].map(j=>qs_(L[i][j][0])).join(" o ")}.</li>`).join("")}</ul>
-      <div class="verdict acc">Equilibrio perfecto en subjuegos: ${[...new Set(r.spe.map(s=>`(${st.a1[s.i]}, ${s.name})`))].join(" y ")}. Resultado del juego: ${[...new Set(r.spe.map(s=>`${st.a1[s.i]} y luego ${st.a2[s.plan[s.i]]}`))].join("; ")}.</div>
-      ${br.ne.length>r.spe.length?`<p>Los demás equilibrios de Nash de la tabla (${br.ne.map(([i,j])=>`(${G.R[i]}, ${G.C[j]})`).filter(x=>!r.spe.some(s=>x===`(${st.a1[s.i]}, ${s.name})`)).join(", ")}) se sostienen con amenazas no creíbles: el jugador 2 promete hacer algo que no le conviene cuando le llega el turno.</p>`:""}</div>`;
-    $("q-out").innerHTML=h};
-  $("q-pre").onchange=e=>{st=JSON.parse(JSON.stringify(SEQP[e.target.value]));build();run()};
-  const rs=()=>{read();const m=+$("q-m").value,n=+$("q-n").value;st.a1=[...Array(m)].map((_,i)=>st.a1[i]||ALPH[i]);st.a2=[...Array(n)].map((_,j)=>st.a2[j]||ALPH2[j]);st.L=[...Array(m)].map((_,i)=>[...Array(n)].map((_,j)=>(st.L[i]&&st.L[i][j])||"0, 0"));build();run()};
-  $("q-m").onchange=rs;$("q-n").onchange=rs;build();run();
-};
+// ---------- Forma extensiva: editor de árboles, forma estratégica y equilibrio perfecto en subjuegos
+const EXTP={
+ ent:{t:"Ej. 1 · Entrada al mercado",x:`# La firma 1 entra (E) o no (NE); si entra, la 2 pelea (P) o concede (C)
+1
+  E: 2
+    P: -1, -1
+    C: 1, 1
+  NE: 0, 2`},
+ bosSeq:{t:"Ej. 3b · Batalla de los sexos secuencial",x:`# B observa lo que hizo G antes de elegir
+G
+  B: B
+    B: 3, 2
+    S: 1, 1
+  S: B
+    B: 0, 0
+    S: 2, 3`},
+ bosSim:{t:"Ej. 3a · Batalla de los sexos simultánea",x:`# Igual que la secuencial, pero B no sabe qué hizo G:
+# sus dos nodos van en el mismo conjunto de información [h]
+G
+  B: B [h]
+    B: 3, 2
+    S: 1, 1
+  S: B [h]
+    B: 0, 0
+    S: 2, 3`},
+ fig1:{t:"Ej. 2 · Figura 1",x:`# El 2 no distingue si el 1 jugó Z o X: conjunto [h]
+# El 1 vuelve a mover después de X y L
+1
+  Z: 2 [h]
+    R: 1, 1
+    L: 0, 0
+  X: 2 [h]
+    R: 0, 0
+    L: 1
+      B: 3, 2
+      A: 1, 2
+  Y: 2
+    R: 2, 2
+    L: 2, 3`},
+ t5:{t:"Ej. 7 · Tabla 5 jugada en secuencia",x:`1
+  A: 2
+    I: 1, 9
+    D: 1, 9
+  B: 2
+    I: 0, 0
+    D: 2, 1`},
+ fig2:{t:"Ej. 10 · Figura 2",x:`# El 2 no sabe si el 1 jugó A o B: conjunto [h]
+# Después de A y X, el 1 vuelve a mover
+1
+  A: 2 [h]
+    X: 1
+      C: 1, 0
+      D: 2, 10
+    Y: 5, 5
+  B: 2 [h]
+    X: 8, 3
+    Y: 3, 8`},
+ fig3:{t:"Ej. 12 · Figura 3 (tres jugadores)",x:`# El 3 no sabe si llegó por B o por (C, B')
+1
+  C: 2
+    C': 1, 1, 1
+    B': 3 [h]
+      I: 4, 4, 0
+      D: 0, 0, 1
+  B: 3 [h]
+    I: 3, 2, 2
+    D: 0, 0, 0`},
+ fig4:{t:"Ej. 13 · Figura 4 (tres jugadores)",x:`# El 3 no sabe si el 2 jugó X o Y
+1
+  A: 2
+    X: 3 [h]
+      C: 2, 2, 2
+      D: 0, 2, 0
+    Y: 3 [h]
+      C: 0, 1, 0
+      D: 2, 1, 2
+  B: 1, 0, 3`},
+ app:{t:"Ejemplo de Economiapp (secuencial 2×2)",x:`1
+  Arriba: 2
+    Izq: 3, 2
+    Der: 0, 1
+  Abajo: 2
+    Izq: 0, 0
+    Der: 1, 3`},
+ cien:{t:"Ciempiés (cuatro etapas)",x:`# En cada nodo: seguir (S) o terminar (T)
+1
+  T: 1, 0
+  S: 2
+    T: 0, 2
+    S: 1
+      T: 3, 1
+      S: 2
+        T: 2, 4
+        S: 5, 3`},
+ azar:{t:"Con azar: el tipo del jugador 1",x:`# La naturaleza decide si el 1 es fuerte (1/3) o débil (2/3).
+# El 1 conoce su tipo; el 2 solo ve si el 1 pelea.
+Azar
+  Fuerte (1/3): 1
+    Pelea: 2 [v]
+      Cede: 2, 0
+      Lucha: 1, -1
+    Huye: 0, 1
+  Debil (2/3): 1
+    Pelea: 2 [v]
+      Cede: 2, 0
+      Lucha: -1, 1
+    Huye: 0, 1`}};
+
+// Dibujo del árbol (de arriba hacia abajo, como en el taller)
+function extTree(T,{behav,reach,subs}={}){const leaves=[],pay=n=>`(${n.pay.map(qs_).join(", ")})`;
+  const lw=Math.max(58,...T.nodes.filter(n=>n.kind==="t").map(n=>pay(n).length*7.6+16));
+  const maxD=Math.max(...T.nodes.map(n=>n.depth)),dy=maxD>4?70:84,top=34;const pos=new Map();
+  const place=n=>{if(n.kind==="t"){const x=20+lw/2+leaves.length*lw;leaves.push(n);pos.set(n.id,{x,y:top+n.depth*dy});return x}
+    const xs=n.acts.map(a=>place(a.child)),x=(xs[0]+xs[xs.length-1])/2;pos.set(n.id,{x,y:top+n.depth*dy});return x};
+  place(T.root);const W=Math.max(320,leaves.length*lw+40),H=top+maxD*dy+44;
+  let edges="",labs="",nodesS="",hs="";
+  T.nodes.forEach(n=>{if(n.kind==="t")return;const P=pos.get(n.id);
+    n.acts.forEach(a=>{const C=pos.get(a.child.id);const pr=n.kind==="c"?a.p:(behav&&behav[n.h.key]?behav[n.h.key][a.k]:null);
+      const chosen=pr&&!pr.z()&&n.kind==="d",onPath=reach&&chosen&&reach.get(n.id)&&!reach.get(n.id).z();
+      const col=onPath?"var(--exam)":chosen?"var(--line)":"var(--rule)",sw=chosen?(pr.eq(1)?3.6:2.6):1.8;
+      edges+=`<line x1="${P.x}" y1="${P.y}" x2="${C.x}" y2="${C.y}" stroke="${behav?col:"var(--muted)"}" stroke-width="${behav?sw:1.6}" ${behav&&chosen&&!pr.eq(1)?'stroke-dasharray="7 4"':""} stroke-linecap="round"/>`;
+      const mx=(P.x+C.x)/2,my=(P.y+C.y)/2,side=C.x<P.x-1?-1:C.x>P.x+1?1:1,anc=side<0?"end":"start";
+      const extra=n.kind==="c"?` (${a.p.s()})`:(behav&&pr&&!pr.z()&&!pr.eq(1)?` · ${pr.s()}`:"");
+      labs+=`<text x="${mx+side*7}" y="${my-3}" text-anchor="${anc}" font-size="12.5" font-weight="600" fill="${behav&&chosen?(onPath?"var(--exam)":"var(--line)"):"var(--ink)"}" paint-order="stroke" stroke="var(--card)" stroke-width="4" stroke-linejoin="round">${a.a}${extra}</text>`});
+    const isSub=subs&&n.sub&&n!==T.root;
+    if(isSub)nodesS+=`<circle cx="${P.x}" cy="${P.y}" r="12" fill="none" stroke="var(--branch)" stroke-width="1.6"/>`;
+    nodesS+=n.kind==="c"?`<circle cx="${P.x}" cy="${P.y}" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="1.8"/><text x="${P.x}" y="${P.y-14}" text-anchor="middle" font-size="12" fill="var(--muted)">Azar</text>`
+      :`<circle cx="${P.x}" cy="${P.y}" r="6.5" fill="var(--ink)"/><text x="${P.x}" y="${P.y-15}" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--line)" font-family="var(--f-display)">${n.pl}</text>`});
+  T.nodes.filter(n=>n.kind==="t").forEach(n=>{const P=pos.get(n.id),on=reach&&reach.get(n.id)&&!reach.get(n.id).z();
+    nodesS+=`<circle cx="${P.x}" cy="${P.y}" r="3" fill="${on?"var(--exam)":"var(--muted)"}"/><text x="${P.x}" y="${P.y+19}" text-anchor="middle" font-size="12.5" font-family="var(--f-mono)" fill="${on?"var(--exam)":"var(--ink)"}" font-weight="${on?600:400}">${pay(n)}</text>`});
+  T.H.filter(h=>h.nodes.length>1).forEach(h=>{const ps=h.nodes.map(n=>pos.get(n.id)).sort((a,b)=>a.x-b.x);
+    for(let k=0;k+1<ps.length;k++)hs+=`<line x1="${ps[k].x+9}" y1="${ps[k].y}" x2="${ps[k+1].x-9}" y2="${ps[k+1].y}" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>`;
+    const a=ps[0],b=ps[ps.length-1];hs+=`<text x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2+16}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${h.lab}</text>`});
+  return `<div class="plot ext-tree"><svg viewBox="0 0 ${W} ${H}" style="min-width:${Math.min(W,Math.max(320,W*0.72))}px" role="img" aria-label="Árbol del juego en forma extensiva">${edges}${hs}${labs}${nodesS}</svg></div>`}
+
+// Texto de una estrategia de comportamiento
+function extBehavText(T,p,behav,{detail}={}){const Hs=T.H.filter(h=>h.p===p);
+  const parts=Hs.map(h=>{const v=behav[h.key],i=v.findIndex(x=>x.eq(1));return i>=0?{pure:true,a:h.acts[i]}:{pure:false,a:v.map((x,k)=>x.z()?null:`${x.s()}·${h.acts[k]}`).filter(Boolean).join(" + ")}});
+  if(parts.every(x=>x.pure)&&!detail)return GT.extJoin(T,p,parts.map(x=>x.a));
+  return parts.map((x,k)=>Hs.length>1?`${x.pure?x.a:`(${x.a})`} ${extWhere(Hs[k])}`:(x.pure?x.a:`(${x.a})`)).join("; ")}
+function extWhere(h){const hs=h.nodes.map(GT.extHistory);return hs[0]==="inicio"?"al inicio":`tras ${hs.join(" o ")}`}
+
+function extUI(root,preset){const P=`x${Math.random().toString(36).slice(2,7)}`;let practice=false,sel=0,last=null,timer=null;
+  root.innerHTML=`<div class="row slv-top"><label class="selw" for="${P}-pre">Ejercicio<select id="${P}-pre">${Object.keys(EXTP).map(k=>`<option value="${k}" ${k===preset?"selected":""}>${EXTP[k].t}</option>`).join("")}</select></label>
+    <label class="chkl" for="${P}-pr"><input type="checkbox" id="${P}-pr"> Modo práctica: ocultar la solución</label></div>
+    <div class="ext-ed"><label class="selw" for="${P}-tx">Árbol del juego<textarea id="${P}-tx" spellcheck="false" autocapitalize="off" autocomplete="off" rows="12"></textarea></label>
+    <details class="ext-help"><summary>Cómo escribir el árbol</summary>
+      <ul><li>La primera línea es el jugador que mueve primero, por ejemplo <code>1</code>.</li>
+      <li>Debajo, con más sangría (dos espacios), cada acción: <code>acción: destino</code>. El destino es otro jugador (<code>E: 2</code>) o los pagos de un nodo terminal (<code>P: -1, -1</code>).</li>
+      <li>Los pagos van en el orden de los jugadores: 1, 2, 3… Con nombres como G y B, en el orden en que aparecen, o fíjalo con una primera línea <code>jugadores: G, B</code>.</li>
+      <li><b>Conjunto de información:</b> pon la misma etiqueta entre corchetes en los nodos que el jugador no distingue: <code>Z: 2 [h]</code> y <code>X: 2 [h]</code>. Deben tener las mismas acciones.</li>
+      <li><b>Azar:</b> usa el jugador <code>Azar</code> y la probabilidad de cada rama: <code>Alta (1/3): 2</code>.</li>
+      <li>Se aceptan negativos, decimales con punto y fracciones (<code>1/2</code>). Lo que va después de <code>#</code> es un comentario.</li></ul></details></div>
+    <div id="${P}-out" class="slv-out"></div>`;
+  const tx=$(`${P}-tx`);
+  const card=(n,t,body)=>`<div class="stepc"><h4><span class="n">${n}</span>${t}</h4>${practice?`<button class="btn reveal" type="button" data-reveal>Ver la solución de este paso</button><div hidden>${body}</div>`:`<div>${body}</div>`}</div>`;
+  const run=()=>{let T;const out=$(`${P}-out`);
+    try{T=GT.extParse(tx.value)}catch(e){out.innerHTML=`<p class="err">Revisa el árbol: ${e.message}</p>`;return}
+    const N=GT.extNormal(T),R=GT.extSPE(T),pl=T.players,np=pl.length;last={T,N,R};if(sel>=R.spe.length)sel=0;
+    const spe=R.spe[sel],reach=spe?GT.extReach(T,spe.behav):null;
+    const pS=p=>`S${sb(pl[p])}`,piS=p=>`π${sb(pl[p])}`;
+    let h="",k=1;
+    // 1. árbol
+    h+=`<div class="stepc"><h4><span class="n">${k++}</span>Forma extensiva</h4>${extTree(T,{behav:practice?null:spe&&spe.behav,reach:practice?null:reach,subs:true})}
+      <div class="legend">${practice?"":`<span><i style="background:var(--exam)"></i>Camino del equilibrio</span><span><i style="background:var(--line)"></i>Lo que se haría fuera del camino</span>`}<span><i style="background:transparent;border:1.6px solid var(--branch);border-radius:50%;width:12px;height:12px"></i>Inicio de un subjuego propio</span><span><i style="background:transparent;border-top:2px dotted var(--ink);height:0"></i>Conjunto de información</span></div>
+      ${!practice&&R.spe.length>1?`<label class="selw" for="${P}-sel" style="max-width:420px">Equilibrio resaltado<select id="${P}-sel">${R.spe.map((s,i)=>`<option value="${i}" ${i===sel?"selected":""}>${i+1}. ${pl.map((_,p)=>extBehavText(T,p,s.behav)).join(", ")}</option>`).join("")}</select></label>`:""}</div>`;
+    // 2. elementos
+    const Hp=p=>T.H.filter(x=>x.p===p);
+    h+=card(k++,"Jugadores y conjuntos de información",`<div class="eq al" style="text-align:left">N = ${setS(pl)}${T.nodes.some(n=>n.kind==="c")?" &nbsp;(más el azar, que no es jugador: solo mueve con probabilidades fijas)":""}</div>
+      <ul>${pl.map((_,p)=>`<li><b>Jugador ${pl[p]}</b>: ${Hp(p).length} conjunto${Hp(p).length>1?"s":""} de información. ${Hp(p).map((x,i)=>`h${sb(`${pl[p]}${Hp(p).length>1?","+(i+1):""}`)} = {${x.nodes.map(GT.extHistory).join("; ")}} con acciones ${setS(x.acts)}`).join(" · ")}</li>`).join("")}</ul>
+      <p>${T.perfect?"Todos los conjuntos tienen un solo nodo: el juego es de <b>información perfecta</b> (cada jugador sabe todo lo que pasó antes de mover).":"Hay conjuntos con varios nodos (unidos con línea punteada): el juego es de <b>información imperfecta</b>. El jugador no sabe en cuál de esos nodos está, así que elige la misma acción en todos."}</p>`);
+    // 3. estrategias
+    const sz=N.S.map(s=>s?s.length:null);
+    h+=card(k++,"Estrategias: planes completos",`<p>Una estrategia dice qué hacer en <b>cada</b> conjunto de información del jugador, incluso en los que no se alcanzan.</p>
+      <div class="eq al" style="text-align:left">${pl.map((_,p)=>{const Hs=Hp(p),prod=Hs.map(x=>setS(x.acts)).join(" × "),cnt=Hs.map(x=>x.acts.length);
+        return `${pS(p)} = ${prod}${N.S[p]&&N.S[p].length<=24?` = ${setS(N.S[p].map(s=>s.name))}`:""} &nbsp;→&nbsp; |${pS(p)}| = ${cnt.length>1?cnt.join(" × ")+" = ":""}${cnt.reduce((a,b)=>a*b,1)}`}).join("<br>")}</div>
+      ${pl.map((_,p)=>Hp(p).length>1?`<p class="hint" style="margin:0">Jugador ${pl[p]}: ${Hp(p).map((x,i)=>`la ${["primera","segunda","tercera","cuarta","quinta","sexta"][i]||`${i+1}.ª`} parte es lo que hace ${extWhere(x)}`).join("; ")}.</p>`:"").join("")}`);
+    // 4. forma estratégica
+    if(N.tooBig)h+=card(k++,"Forma estratégica",`<p>La tabla tendría ${N.total?N.total.toLocaleString("es-CO"):"demasiados"} perfiles, demasiado grande para mostrarla. Los equilibrios perfectos en subjuegos sí se calculan abajo.</p>`);
+    else{let b=`<div class="eq al" style="text-align:left">G(Γ) = {N, S${sb("i")}, π${sb("i")}} con ${pl.map((_,p)=>`${pS(p)} = ${setS(N.S[p].map(s=>s.name))}`).join(", ")}</div>`;
+      const neN=N.ne.map(idx=>`(${idx.map((i,p)=>N.S[p][i].name).join(", ")})`);
+      if(np===2){const br=GT.bestResponses(N.G);b+=`<p>Cada celda se obtiene recorriendo el árbol con las dos estrategias. Subrayados, los mejores pagos de cada jugador.</p>${matHTML(N.G,{br,ne:br.ne,p1:pl[0],p2:pl[1]})}`}
+      else if(np===3)b+=`<p>Una tabla por cada estrategia del jugador ${pl[2]}; cada celda es (${pl.map((_,p)=>piS(p)).join(", ")}).</p><div class="t3grid">${N.S[2].map((s3,c)=>`<div class="tbl gm"><table><tr><th>${pS(2)} = ${s3.name}</th>${N.S[1].map(s=>`<th>${s.name}</th>`).join("")}</tr>${N.S[0].map((s1,a)=>`<tr><th>${s1.name}</th>${N.S[1].map((_,bb)=>{const ne=N.ne.some(x=>x[0]===a&&x[1]===bb&&x[2]===c);return `<td class="${ne?"ne":""}">${N.payOf([a,bb,c]).map(qs_).join(", ")}</td>`}).join("")}</tr>`).join("")}</table></div>`).join("")}</div>`;
+      b+=`<div class="eq al" style="text-align:left"><b>EN (puras) = ${neN.length?`{ ${neN.join(", ")} }`:"∅"}</b></div>`;
+      if(np===2&&N.S[0].length>1&&N.S[1].length>1){const se=supportEnum(N.G).eq.filter(e=>e.I.length>1||e.J.length>1);if(se.length)b+=`<p class="hint" style="margin:0">En mixtas la tabla tiene además ${se.length===1?"un equilibrio":`${se.length} equilibrios`}; para el detalle, copia la tabla en el resolvedor paso a paso.</p>`}
+      h+=card(k++,"Forma estratégica y equilibrios de Nash",b)}
+    // 5. subjuegos
+    const subs=R.subs,prop=subs.filter(n=>n!==T.root);
+    h+=card(k++,"Subjuegos",`<p>Un subjuego empieza en un nodo que es por sí solo un conjunto de información y contiene <b>completos</b> todos los conjuntos de información que toca. ${prop.length?`Además del juego completo hay ${prop.length} subjuego${prop.length>1?"s":""} propio${prop.length>1?"s":""} (marcados con un círculo en el árbol):`:"Este juego no tiene subjuegos propios: el único subjuego es el juego completo, así que todo equilibrio de Nash es perfecto en subjuegos."}</p>
+      ${prop.length?`<ul>${prop.map(n=>`<li>El que empieza ${n.hist.length?`después de <b>${n.hist.join(", ")}</b>`:"al inicio"} (mueve ${n.kind==="c"?"el azar":"el jugador "+n.pl}).</li>`).join("")}</ul>`:""}
+      ${T.H.some(x=>x.nodes.length>1)?`<p class="hint" style="margin:0">Un nodo que está en un conjunto de información con otros nodos nunca inicia un subjuego: quien mueve allí no sabe dónde está.</p>`:""}`);
+    // 6. EPS paso a paso
+    let b="";const seenX=new Map();
+    R.steps.forEach(st=>{const x=st.x,isRoot=x===T.root,cnt=(seenX.get(x.id)||0)+1;seenX.set(x.id,cnt);
+      const title=isRoot?(prop.length?"Juego completo, con los subjuegos ya resueltos":"Juego completo"):`Subjuego que empieza después de ${x.hist.join(", ")}`;
+      let s=`<div class="ext-step"><p><b>${title}</b>${cnt>1?` · caso ${cnt}`:""}</p>`;
+      if(st.kids.length)s+=`<p>Se reemplaza cada subjuego ya resuelto por los pagos de su equilibrio: ${st.kids.map((kd,i)=>`después de ${kd.hist.join(", ")} → (${st.combo[i].pay.map(qs_).join(", ")})`).join("; ")}.</p>`;
+      const single=st.act.length===1&&st.Hs.length===1&&st.Hs[0].nodes.length===1;
+      if(!st.act.length)s+=`<p>Solo mueve el azar: el pago esperado es (${st.found[0].pay.map(qs_).join(", ")}).</p>`;
+      else if(single){const p=st.act[0],hh=st.Hs[0];const vals=hh.acts.map((a,i)=>({a,v:st.payOf([i])[p]}));const mx=vals.reduce((m,o)=>o.v.gt(m)?o.v:m,vals[0].v);
+        s+=`<div class="eq al" style="text-align:left">Jugador ${pl[p]}: ${vals.map(o=>`${o.a} → ${piS(p)} = ${qs_(o.v)}`).join(", ")} &nbsp;⇒&nbsp; elige <b>${vals.filter(o=>o.v.eq(mx)).map(o=>o.a).join(" o ")}</b></div>`;
+        if(vals.filter(o=>o.v.eq(mx)).length>1)s+=`<p class="hint" style="margin:0">Hay empate: cada opción da un equilibrio distinto y se siguen todas hacia arriba.</p>`}
+      else if(st.act.length===1){const p=st.act[0];s+=`<div class="eq al" style="text-align:left">Solo decide el jugador ${pl[p]}, con varios conjuntos: ${st.S[0].map((sg,i)=>`${sg.name} → ${qs_(st.payOf([i])[p])}`).join(", ")} &nbsp;⇒&nbsp; elige <b>${st.ne.map(i=>st.S[0][i[0]].name).join(" o ")}</b></div>`}
+      else if(st.G2){const G2=st.G2,br=GT.bestResponses(G2),p1=pl[G2.act[0]],p2=pl[G2.act[1]];
+        s+=`<p>Aquí deciden los jugadores ${p1} y ${p2} sin saber todo lo que hizo el otro, así que se resuelve como un juego en forma estratégica:</p>${matHTML(G2,{br,ne:br.ne,p1,p2})}
+          <div class="eq al" style="text-align:left">EN en puras = ${br.ne.length?`{ ${br.ne.map(([i,j])=>`(${G2.R[i]}, ${G2.C[j]})`).join(", ")} }`:"∅"}</div>`;
+        if(G2.R.length===2&&G2.C.length===2&&(st.mixed.length||!br.ne.length))s+=`<p>${br.ne.length?"Además hay un equilibrio en mixtas:":"No hay equilibrio en puras, así que se busca en mixtas:"}</p>${mixedHTML(G2,p1,p2)}`;
+        else if(st.mixed.length)s+=`<div class="eq al" style="text-align:left">${st.mixed.map(m=>`En mixtas: σ${sb(p1)} = (${m.mix[0].map(t=>t.s()).join(", ")}) sobre ${setS(G2.R)}, σ${sb(p2)} = (${m.mix[1].map(t=>t.s()).join(", ")}) sobre ${setS(G2.C)} · pagos (${m.pay.map(qs_).join(", ")})`).join("<br>")}</div>`;
+        if(G2.degenerate)s+=`<p class="hint" style="margin:0">Hay empates en los pagos: puede haber tramos con infinitos equilibrios además de los que se listan.</p>`}
+      else{s+=`<p>Deciden ${st.act.length} jugadores a la vez. Equilibrios de Nash en puras de este juego: ${st.ne.length?st.ne.map(idx=>`(${idx.map((i,t)=>st.S[t][i].name).join(", ")})`).join(", "):"ninguno"}.</p>`;
+        if(!st.ne.length)s+=`<p class="hint" style="margin:0">Con tres o más jugadores el resolvedor solo busca equilibrios en puras.</p>`}
+      b+=s+"</div>"});
+    if(R.truncated)b+=`<p class="hint" style="margin:0">Hay muchos empates; se muestran los primeros casos.</p>`;
+    const speTxt=R.spe.map(s=>`(${pl.map((_,p)=>extBehavText(T,p,s.behav)).join(", ")})`);
+    const pureSpe=R.spe.filter(s=>pl.every((_,p)=>T.H.filter(x=>x.p===p).every(x=>s.behav[x.key].some(v=>v.eq(1)))));
+    const pathOf=s=>{const r=GT.extReach(T,s.behav),o=[];const go=n=>{if(n.kind==="t")return;const as=n.acts.filter(a=>!r.get(a.child.id).z());if(n.kind==="d"&&as.length===1){o.push(`${n.pl} juega ${as[0].a}`);go(as[0].child)}}; go(T.root);return o.join(", luego ")};
+    b+=R.spe.length?`<div class="verdict acc">EPS = { ${speTxt.join("; ")} }</div>
+      <ul>${R.spe.map((s,i)=>{const pth=pathOf(s);return `<li>${speTxt[i]}: ${pth?`en el camino, ${pth}; `:""}pagos esperados (${s.pay.map(qs_).join(", ")}).</li>`}).join("")}</ul>`
+      :`<div class="verdict warnv">No se encontró un equilibrio en puras en algún subjuego con tres o más jugadores; puede existir en mixtas.</div>`;
+    if(R.spe.some(s=>!pureSpe.includes(s))&&np>0)b+=`<p class="hint" style="margin:0">Las expresiones como (1/4·X + 3/4·Y) son estrategias de comportamiento: la probabilidad con la que el jugador elige cada acción en ese conjunto de información.</p>`;
+    if(!N.tooBig&&N.ne){const name=idx=>`(${idx.map((i,p)=>N.S[p][i].name).join(", ")})`,speN=new Set(pureSpe.map(s=>`(${pl.map((_,p)=>extBehavText(T,p,s.behav)).join(", ")})`));
+      const notSpe=N.ne.map(name).filter(x=>!speN.has(x));
+      if(notSpe.length)b+=`<p>Los equilibrios de Nash ${notSpe.join(", ")} no son perfectos en subjuegos: piden jugar algo que no es óptimo en un subjuego que no se alcanza. Son <b>amenazas no creíbles</b>; cuando llega el momento, al jugador no le conviene cumplirlas.</p>`;
+      else if(pureSpe.length)b+=`<p>Todos los equilibrios de Nash en puras son también perfectos en subjuegos.</p>`}
+    h+=card(k++,`Equilibrio perfecto en subjuegos (${T.perfect?"inducción hacia atrás":"inducción hacia atrás por subjuegos"})`,`<p>${T.perfect?"Se resuelve desde el final: en cada nodo, quien mueve elige lo mejor para él sabiendo lo que pasará después.":"Se resuelven primero los subjuegos más pequeños, se reemplaza cada uno por los pagos de su equilibrio y se sigue hacia arriba. Donde un jugador no sabe lo que hizo el otro, ese pedazo se resuelve como un juego simultáneo (Nash, en puras o mixtas)."}</p>${b}`);
+    out.innerHTML=h;
+    const s2=$(`${P}-sel`);if(s2)s2.onchange=e=>{sel=+e.target.value;run()}};
+  const load=key=>{tx.value=EXTP[key].x;sel=0;run()};
+  $(`${P}-pre`).onchange=e=>load(e.target.value);
+  tx.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{sel=0;run()},250)});
+  tx.addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const a=tx.selectionStart,z=tx.selectionEnd;tx.value=tx.value.slice(0,a)+"  "+tx.value.slice(z);tx.selectionStart=tx.selectionEnd=a+2;tx.dispatchEvent(new Event("input"))}
+    if(e.key==="Enter"){const a=tx.selectionStart,ls=tx.value.lastIndexOf("\n",a-1)+1,ind=tx.value.slice(ls,a).match(/^ */)[0],prev=tx.value.slice(ls,a).trim(),dest=prev.includes(":")?prev.slice(prev.indexOf(":")+1).trim():prev,opens=dest&&!dest.includes(",")&&dest[0]!=="("&&dest[0]!=="#"&&!/^jugadores/i.test(prev),extra=opens?"  ":"";
+      e.preventDefault();const ins="\n"+ind+extra;tx.value=tx.value.slice(0,a)+ins+tx.value.slice(tx.selectionEnd);tx.selectionStart=tx.selectionEnd=a+ins.length;tx.dispatchEvent(new Event("input"))}});
+  $(`${P}-pr`).onchange=e=>{practice=e.target.checked;run()};
+  root.addEventListener("click",e=>{const b=e.target.closest("[data-reveal]");if(b){b.nextElementSibling.hidden=false;b.remove()}});
+  load(preset)}
+
+SIMS.ext=()=>extUI($("sim"),"fig1");
+SIMS.seq=()=>extUI($("sim"),"ent");
+SIMS.sub=()=>extUI($("sim"),"fig2");
 
 // ---------- Tres jugadores en puras (figuras 3 y 4)
 const T3P={
