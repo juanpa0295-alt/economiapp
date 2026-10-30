@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Matemáticas · Economiapp</title>
+<meta name="description" content="Álgebra, límites, derivadas, integrales y optimización con restricciones, con calculadoras paso a paso.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#b5501c;--line-soft:#f6e2d6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#f0a070;--line-soft:#3d2618}}
+:root[data-theme="dark"]{--line:#f0a070;--line-soft:#3d2618}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(l&&MathJax.typesetPromise)MathJax.typesetPromise([l]).catch(()=>{})})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Matemáticas</div>
+    <h1>Matemáticas</h1>
+    <p>Los módulos de Economiapp ordenados por tema: álgebra, límites, derivadas e integrales, más una estación nueva de optimización con restricciones. Las calculadoras usan SymPy, el mismo motor de la app, corriendo en tu navegador. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: módulos de la app</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-mat-done";</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.3/lib/browser/math.js"></script>
+<script src="../comun/simbolico.js"></script>
+<script src="matematicas/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="matematicas/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Teoría de Juegos · Economiapp</title>
+<meta name="description" content="Forma estratégica, dominancia, equilibrio de Nash en puras y mixtas, maximin, con resolvedor paso a paso.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#6b3fa0;--line-soft:#ebe1f6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#c3a6f0;--line-soft:#2e2244}}
+:root[data-theme="dark"]{--line:#c3a6f0;--line-soft:#2e2244}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(l&&MathJax.typesetPromise)MathJax.typesetPromise([l]).catch(()=>{})})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Teoría de Juegos</div>
+    <h1>Teoría de Juegos</h1>
+    <p>Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub> y σ. Los ejemplos son los ejercicios del Taller 1, y el resolvedor muestra cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-tj-done";</script>
+<script src="../comun/juegos.js"></script>
+<script src="teoria-juegos/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="teoria-juegos/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>

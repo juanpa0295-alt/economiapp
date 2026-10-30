@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Econometría · Economiapp</title>
+<meta name="description" content="De las variables a las ramas avanzadas: MCO, inferencia, cambio estructural y más, con talleres en 3D.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#2546a8;--line-soft:#dbe2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#7f9cf0;--line-soft:#22305a}}
+:root[data-theme="dark"]{--line:#7f9cf0;--line-soft:#22305a}
+/* estilos propios de esta materia */
+.mscroll{overflow-x:auto;padding-bottom:6px;max-width:100%}
+.mrow{display:flex;flex-wrap:nowrap;gap:12px;align-items:center;width:max-content}
+.mx{display:inline-flex;flex-direction:column;gap:4px;flex:0 0 auto}
+.mx .cap{font-family:var(--f-math);font-style:italic;font-size:15px;text-align:center;white-space:nowrap}
+.mx .cap small{font-family:var(--f-body);font-style:normal;color:var(--muted);font-size:11px;margin-left:4px}
+.mg{display:grid;gap:2px;padding:3px 9px;position:relative;font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.mg::before,.mg::after{content:"";position:absolute;top:0;bottom:0;width:6px;border:1.5px solid var(--ink)}
+.mg::before{left:0;border-right:0}
+.mg::after{right:0;border-left:0}
+.mg span{padding:2px 6px;text-align:right;border-radius:4px;min-width:3em;white-space:nowrap}
+.mg span.b1{background:var(--line-soft)}
+.mg span.b2{background:var(--branch-soft)}
+.mg span.b3{background:var(--exam-soft)}
+.mg span.cl{cursor:pointer}
+.mg span.cl:hover,.mg span.hl{outline:2px solid var(--line);outline-offset:-1px}
+.op{font-family:var(--f-math);font-size:22px;color:var(--muted);flex:0 0 auto}
+.dtable table{min-width:0}
+.dtable td,.dtable th{padding:3px 8px}
+.dtable input{width:4.8em;font-family:var(--f-mono);font-size:13px;padding:3px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);text-align:right}
+canvas.c3{display:block;width:100%;height:min(440px,75vw);min-height:260px;touch-action:none;cursor:grab;border-radius:10px;background:var(--card);border:1px solid var(--rule)}
+canvas.c3:active{cursor:grabbing}
+.calcf input,.calcf select{font-family:var(--f-mono);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Econometría · de las variables a las ramas avanzadas</div>
+    <h1>Econometría</h1>
+    <p>Cada estación se apoya en la anterior. El tronco llega hasta cambio estructural y prueba de Chow; las líneas punteadas son las ramas que salen de él. En cada lección hay una sección para profundizar y código en R, Stata y Python. Los talleres tienen calculadoras y visualizaciones en 3D para practicar.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco principal</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-eco-done";window.RUTA_EXAM="Parcial 2";window.RUTA_TRUNK_NOTE="";</script>
+<script src="econometria/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="econometria/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>

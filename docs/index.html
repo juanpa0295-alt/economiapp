@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!--INICIO-PAGINA-->
+<title>Economiapp</title>
+<meta name="description" content="Rutas de estudio interactivas para las materias de Economía: lecciones, laboratorios y ejercicios resueltos paso a paso.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: la portada es el plano de la red; cada materia es una línea de metro con sus estaciones */
+:root{
+  --paper:#edf0ea; --card:#f8f9f5; --ink:#1b2430; --muted:#5c6670; --rule:#cfd5cb; --accent:#1b2430; --hl:#dfe6d9;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742; --accent:#e4e8ec; --hl:#232d38; color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742; --accent:#e4e8ec; --hl:#232d38; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+.lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+header{display:flex;flex-direction:column;gap:10px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(40px,8vw,72px);line-height:.95;letter-spacing:-.02em;margin:0;text-wrap:balance}
+header p{margin:0;max-width:60ch;color:var(--muted);font-size:16.5px}
+.legendline{display:flex;gap:6px;align-items:center;margin-top:4px}
+.legendline i{display:block;height:6px;width:46px;border-radius:3px}
+/* buscador */
+.search{display:flex;flex-direction:column;gap:8px;max-width:640px}
+.search label{font-weight:600;font-size:14px}
+.search input{font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink);width:100%}
+.search input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:transparent}
+.results{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:10px;background:var(--card);overflow:hidden}
+.results a{display:flex;gap:10px;align-items:center;padding:9px 14px;text-decoration:none;color:var(--ink);border-top:1px solid var(--rule)}
+.results a:first-child{border-top:0}
+.results a:hover,.results a:focus-visible{background:var(--hl);outline:none}
+.results .dot{flex:0 0 10px;height:10px;border-radius:50%;background:var(--cc)}
+.results .k{margin-left:auto;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.results .m{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.results .t{min-width:0;display:flex;flex-direction:column}
+.results .t small{font-size:12.5px;color:var(--muted)}
+.results p{margin:0;padding:10px 14px;color:var(--muted)}
+/* líneas de la red */
+.net{display:flex;flex-direction:column;gap:14px}
+.line{--cc:var(--c);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:18px 20px 16px;position:relative;transition:border-color .2s,transform .2s}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .line,:root:not([data-theme="light"]) .results a{--cc:var(--cd)}}
+:root[data-theme="dark"] .line,:root[data-theme="dark"] .results a{--cc:var(--cd)}
+.results a{--cc:var(--c)}
+.line:hover{border-color:var(--cc);transform:translateY(-2px)}
+.line:focus-visible{outline:2px solid var(--cc);outline-offset:3px}
+.line h2{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.4vw,28px);line-height:1.1;margin:0;color:var(--cc)}
+.line .sum{margin:2px 0 0;color:var(--muted);font-size:14.5px;max-width:62ch}
+.line .meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.line .meta b{font-family:var(--f-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.line .meta small{font-size:12px;color:var(--muted)}
+.track{grid-column:1/-1;display:flex;align-items:center;margin-top:10px;position:relative;height:22px}
+.track::before{content:"";position:absolute;left:8px;right:8px;top:50%;height:5px;margin-top:-2.5px;background:var(--cc);border-radius:3px;opacity:.9}
+.track span{position:relative;flex:1;display:flex;justify-content:center}
+.track span:first-child{justify-content:flex-start}.track span:last-child{justify-content:flex-end}
+.track span i{width:16px;height:16px;border-radius:50%;background:var(--card);border:3.5px solid var(--cc);display:block}
+.track span.done i{background:var(--cc)}
+.ends{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
+.ends span:last-child{text-align:right}
+.go{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:6px;font-size:14px}
+.go strong{color:var(--cc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:12px;border:1px solid var(--rule);border-radius:99px;padding:1px 9px;color:var(--muted)}
+.soon{display:flex;flex-wrap:wrap;gap:10px}
+.soon div{border:1.5px dashed var(--rule);border-radius:12px;padding:12px 16px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:2px;min-width:0}
+.soon small{font-weight:400;font-size:12.5px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.how div{display:flex;flex-direction:column;gap:4px}
+.how h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:18px}
+.how p{margin:0;color:var(--muted);font-size:14.5px}
+footer{border-top:1px solid var(--rule);padding-top:16px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+@media (max-width:560px){.line{grid-template-columns:minmax(0,1fr)}.line .meta{align-items:flex-start;text-align:left;flex-direction:row;gap:8px;align-items:baseline}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<!--FIN-HEAD-->
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="lbl">Rutas de estudio para Economía</div>
+    <h1>Economiapp</h1>
+    <p>Cada materia es una línea de metro: las estaciones van de lo básico a lo avanzado, con lecciones, laboratorios interactivos y ejercicios resueltos paso a paso para que puedas hacerlos a mano en el examen.</p>
+    <div class="legendline" id="legend" aria-hidden="true"></div>
+  </header>
+
+  <section class="search" role="search">
+    <label for="q">Buscar un tema</label>
+    <input id="q" type="search" placeholder="Por ejemplo: prueba de Chow, estrategias mixtas, intervalo de confianza" autocomplete="off">
+    <div class="results" id="res" hidden></div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <div class="lbl">Materias</div>
+    <div class="net" id="net"></div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:12px" id="soonsec">
+    <div class="lbl">En preparación</div>
+    <div class="soon" id="soon"></div>
+  </section>
+
+  <section class="how" aria-label="Cómo estudiar con la app">
+    <div><h3>Sigue el tronco</h3><p>Las estaciones están en el orden en que conviene estudiar. Cada una se apoya en la anterior.</p></div>
+    <div><h3>Practica en los talleres</h3><p>Cambia los datos y mira cómo responde el resultado. Los resolvedores muestran cada paso con la notación de clase.</p></div>
+    <div><h3>Marca lo que dominas</h3><p>Tu avance se guarda en este navegador y aparece aquí, en cada línea.</p></div>
+  </section>
+
+  <footer><span>Economiapp</span><span>El progreso se guarda solo en este dispositivo.</span></footer>
+</div>
+<script>
+const MATERIAS=[{"slug": "matematicas", "nombre": "Matemáticas", "key": "ruta-mat-done", "color": ["#b5501c", "#f0a070"], "resumen": "Álgebra, límites, derivadas e integrales con calculadoras paso a paso, y optimización con restricciones.", "t": [["algebra", "Álgebra para economistas", "La idea · Potenciación · Radicación · Logaritmo natural · Desigualdades"], ["limites", "Límites y continuidad", "La idea · Cómo resolverlo a mano · Evaluación directa. · Si da \\tfrac{0}{0} · Si da \\tfrac{k}{0} con k\\neq0 · Si los límites laterales son distintos · continua · Laboratorio · El 0/0 que la app no mostraba · Límites al infinito de cocientes de polinomios"], ["derivadas", "Derivadas y optimización", "La idea · Reglas de derivación · Optimización de una variable · Condición de primer orden (CPO): · Condición de segundo orden (CSO): · Laboratorio · Ejemplo económico: · Qué cambió frente a la app"], ["integrales", "Integrales y área bajo la curva", "La idea · Integrales inmediatas y linealidad · Técnicas · Sustitución · Por partes · Laboratorio · Qué cambió frente a la app"], ["lagrange", "Optimización con restricciones (Lagrange)", "La idea · Procedimiento · hessiana orlada · Cobb-Douglas · precio sombra · Laboratorio · Cómo se arma · Sin restricciones: concavidad"]], "b": [["elasticidad", "Elasticidad", "Aplicaciones de la derivada", "La idea · Laboratorio"], ["excedentes", "Excedente del consumidor y del productor", "Aplicaciones de la integral", "La idea · Laboratorio"]], "w": [["formulario", "Formulario", ""]]}, {"slug": "principios-macro", "nombre": "Principios de Macroeconomía", "key": "ruta-pmac-done", "color": ["#9e2a3e", "#ec8a9c"], "resumen": "PIB y multiplicador keynesiano, mercado de dinero y modelo IS-LM.", "t": [["pib", "PIB y multiplicador keynesiano", "La idea · Equilibrio · Multiplicadores · Laboratorio · ∂Y/∂G · ∂Y/∂T · ∂Y/∂c₁ (regla del cociente)"], ["dinero", "Mercado de dinero", "La idea · Los dos motivos de la demanda de dinero · La curva LM · Laboratorio · Política monetaria: · Las unidades de la tasa de interés"], ["islm", "Modelo IS-LM", "La idea · Las dos curvas · Equilibrio · Multiplicadores de política · efecto expulsión · Laboratorio · Mismo problema de unidades"]], "b": [["equilibrado", "Multiplicador del presupuesto equilibrado", "Política fiscal", "La idea · Laboratorio"], ["expulsion", "Política fiscal y monetaria: efecto expulsión", "Política en IS-LM", "La idea · Laboratorio"]], "w": [["formulas", "Hoja de fórmulas", ""]]}, {"slug": "macroeconomia-1", "nombre": "Macroeconomía 1", "key": "ruta-macro1-done", "color": ["#3d6b1f", "#9fd06f"], "resumen": "Consumo, inversión, política fiscal y equilibrio general, con resolución paso a paso.", "t": [["consumo", "Teoría del consumo", "La idea · consumo autónomo · Conceptos clave · Laboratorio · Error común: · ∂C/∂Y = c₁ · ∂C/∂T = −c₁ · Del consumo al multiplicador"], ["intertemporal", "Consumo intertemporal", "La idea · riqueza · Restricción presupuestaria · Ecuación de Euler · Canasta óptima · Laboratorio · Error común: · Sensibilidad de la riqueza a la tasa · Sensibilidad de la riqueza al ingreso futuro · Una inconsistencia en la app original"], ["inversion", "Inversión", "La idea · costo de uso · Capital óptimo · Inversión bruta y neta · Laboratorio · Regla rápida: · ∂K*/∂r y ∂K*/∂δ · ∂K*/∂Y · Variables que la app no dejaba cambiar"], ["gobierno", "Gobierno y política fiscal", "La idea · Estabilizadores automáticos · Multiplicador con impuesto proporcional · Restricción presupuestaria intertemporal · Laboratorio · El balance respecto al ciclo · Qué cambió frente a la app"], ["micro", "Microfundamentos: la firma y el hogar", "La idea · La firma: demanda de trabajo · El hogar: oferta de trabajo · Equilibrio · Laboratorio · Demanda de trabajo · Oferta de trabajo · Salario de equilibrio · El diagnóstico de equilibrio de la app"], ["dinamico", "Equilibrio general dinámico", "La idea · La firma: inversión óptima · El hogar: ecuación de Euler · Mercado laboral hoy · Laboratorio · La cuña fiscal, bien calculada · El α fijo de la app"]], "b": [["nperiodos", "Riqueza en N períodos", "Más allá de dos períodos", "La idea · Laboratorio"], ["tobin", "La q de Tobin", "Valoración de la empresa", "La idea · La q marginal y los costos de ajuste · q marginal · Laboratorio"], ["estructural", "Balance estructural y cíclico", "Política fiscal", "La idea · Laboratorio"]], "w": [["formulas", "Hoja de fórmulas", ""]]}, {"slug": "estadistica-2", "nombre": "Estadística 2", "key": "ruta-est2-done", "color": ["#0d6e6a", "#5cc8bd"], "resumen": "Estimadores, intervalos de confianza y pruebas de hipótesis con simulaciones.", "t": [["estimadores", "Estimadores y sus propiedades", "La idea · estimador · estimación · Propiedades frente a métodos. · Las cuatro propiedades · Error cuadrático medio · Laboratorio · Error común: · Insesgadez de la media · Varianza de la media y consistencia · Por qué S² divide por n − 1"], ["intervalos", "Intervalos y tamaño de muestra", "La idea · intervalo de confianza · tamaño de muestra · Los dos modelos · Laboratorio · Error común: · De dónde sale la fórmula de n · Si σ es desconocida: t de Student · Intervalo y tamaño de muestra para una proporción"], ["pruebas", "Pruebas de hipótesis", "La idea · statu quo · El procedimiento · Los tres estadísticos · Las tres colas · Laboratorio · ¿Qué es el p-valor? · Error común: · Dualidad con los intervalos de confianza · Errores tipo I y tipo II · Por qué la proporción usa p₀ en la prueba y p̂ en el intervalo"], ["avanzadas", "Pruebas de hipótesis avanzadas", "La idea · Las tres pruebas · Dos colas en distribuciones asimétricas · Laboratorio · Ojo: · Por qué se agrupa p* · Leer la tabla F por la cola izquierda"]], "b": [["momentos", "Método de momentos", "Métodos de estimación", "La idea · Demostración para la distribución normal · Primer momento, para hallar \\mu. · Segundo momento, para hallar \\sigma^2. · Despejar. · Ojo: · sesgado · Otro ejemplo: uniforme en [0,\\theta] Nuevo"], ["verosimilitud", "Máxima verosimilitud", "Métodos de estimación", "La idea · Demostración para la distribución normal · Función de verosimilitud. · Log-verosimilitud. · Maximizar respecto a \\mu. · Maximizar respecto a \\sigma^2. · sesgado · Laboratorio · Momentos frente a máxima verosimilitud"], ["cobertura", "Qué significa 95 % de confianza", "Confianza", "La idea · Laboratorio"], ["potencia", "Potencia de una prueba", "Más allá del p-valor", "La idea · Laboratorio"], ["welch", "Diferencia de medias (Welch)", "Dos poblaciones", "La idea · Laboratorio"]], "w": [["tablas", "Tablas de distribuciones", ""]]}, {"slug": "econometria", "nombre": "Econometría", "key": "ruta-eco-done", "color": ["#2546a8", "#7f9cf0"], "resumen": "De las variables y las matrices a MCO, inferencia, cambio estructural y las ramas avanzadas.", "t": [["variables", "Variables y escalas", "La idea · variable dependiente · independientes · Tipos y escalas de medición · continuas · discretas · Formas funcionales y cómo se leen · Error común: · Por qué el logaritmo se lee como porcentaje · Variables de control y variables proxy"], ["datos", "Estructura y formato de los datos", "Los cuatro tipos de base de datos · el orden importa · Formato largo y formato ancho · largo · ancho · Conexión con el parcial: · Del formato ancho al largo, con un ejemplo · Panel balanceado y no balanceado"], ["matrices", "Notación matricial", "Del renglón a la matriz · Ejemplo con 4 observaciones y una regresora · Operaciones que vas a usar · Transpuesta · Producto · Inversa · Error común: · Resolver el ejemplo a mano con matrices · Rango, inversa y multicolinealidad perfecta"], ["mco-simple", "Regresión simple por MCO", "Qué hace MCO · Laboratorio: intenta ganarle a MCO · Descomposición de la variación · SCR · Error común: · De dónde salen las fórmulas · El R² ajustado"], ["mco-matricial", "Regresión múltiple en forma matricial", "El estimador · ceteris paribus · Varianza y error estándar · Grados de libertad · Derivación de β̂ en una línea · Teorema de Frisch-Waugh-Lovell"], ["supuestos", "Supuestos de Gauss-Markov", "Lo que necesita MCO para funcionar bien · MELI · Conexión con Chow: · Insesgadez en dos líneas · Insesgadez frente a consistencia"], ["inferencia", "Inferencia: pruebas t y F", "Prueba t: un solo coeficiente · Prueba F: varias restricciones a la vez · restringido · no restringido · Clave para el parcial: · es · La prueba F en términos de R² · p-valor, errores tipo I y II"], ["dicotomicas", "Variables dicotómicas e interacciones", "Cambio en el intercepto · Cambio en la pendiente: interacción · Trampa de las dicotómicas: · Dicotómicas en modelos con logaritmo · Diferencias en diferencias"], ["chow", "Cambio estructural y prueba de Chow", "La pregunta · cambio estructural · El estadístico · Paso a paso para el examen · toda · Ejemplo resuelto · Laboratorio: mueve el quiebre y mira qué pasa · Versión con dicotómicas (equivalente) · dónde · Supuestos y variantes · El punto de quiebre se conoce de antemano · Misma varianza del error · Chow predictiva · Error común: · Por qué Chow es una prueba F restringida · Comprobar varianzas iguale"]], "b": [["hetero", "Heterocedasticidad", "Cuando fallan los supuestos", "La idea · Consecuencias · insesgado y consistente · Laboratorio: abre el abanico · Cómo detectarla · Breusch-Pagan. · White. · Cómo corregirla · Errores estándar robustos · Mínimos cuadrados ponderados (MCP) · MCG factible · Por qué MCP es más eficiente · Goldfeld-Quandt"], ["autocorr", "Autocorrelación", "Cuando fallan los supuestos", "La idea · Consecuencias · demasiado pequeños · Prueba de Durbin-Watson · Prueba de Breusch-Godfrey · Corrección · Errores de Newey-West · Cochrane-Orcutt / Prais-Winsten · Por qué d ≈ 2(1 − ρ̂) · Autocorrelación que en realidad es mala especificación"], ["multicol", "Multicolinealidad", "Cuando fallan los supuestos", "La idea · Dónde se ve en la fórmula · Síntomas · Qué hacer · Por qué la prueba F detecta lo que las t no · La trampa clásica: variables que suman un total"], ["especificacion", "Especificación del modelo", "Cuando fallan los supuestos", "La idea · Sesgo por variable omitida · y · Variables irrelevantes · Prueba RESET de Ramsey · Error de medición · x · sesgo de atenuación · De dónde sale la fórmula del sesgo · Criterios de información AIC y BIC"], ["vi", "Variables instrumentales", "Más allá de MCO", "El problema: endogeneidad · La solución: un instrumento · Relevancia: · Exogeneidad: · Mínimos cuadrados en dos etapas (MC2E) · Primera etapa: · Segunda etapa: · Pruebas asociadas · Instrumentos débiles: · Hausman (endogeneidad): · Sargan (sobreidentificación): · Error común: · Qué hace realmente el instrumento · Instrumentos famosos en economía"], ["simultaneas", "Ecuaciones simultáneas", "Más allá de MCO", "La idea · Sesgo de simultaneidad · Forma estructural y forma reducida · estructural · reducida · identificación · Condición de orden · excluidas · incluidas · Por qué el clima identifica la demanda · Condición de rango"], ["discreta", "Elección discreta: logit y probit", "Más allá de MCO", "La idea · Modelo de probabilidad lineal (MPL) · Logit y probit · máxima verosimilitud · Laboratorio: MPL contra logit · Efectos marginales · Bondad de ajuste y pruebas · Pseudo R² de McFadden: · Razón de verosimilitud: · Porcentaje correctamente predicho: · Razones de odds en el logit · Logit y probit dan casi lo mismo"], ["panel", "Datos de panel", "Según la estructura de datos", "La idea · El problema del MCO agrupado · Los tres estimadores · Prueba de Hausman · efectos fijos · efectos aleatorios · Error común: · Efectos fijos con dicotómicas · Qué hace efectos aleatorios por dentro"], ["series", "Series de tiempo", "Según la estructura de datos", "Estacionariedad · Regresión espuria · Prueba de Dickey-Fuller · aumentada (ADF) · Modelos ARIMA · ARIMA(p, d, q) · Identificación: · Estimación · Diagnóstico: · Cointegración · cointegradas · Series de tiempo y cambio estructural · Modelos VAR"]], "w": [["t-matrices", "Matrices paso a paso y partición", ""], ["t-geometria", "Geometría de MCO en 3D", ""], ["t-plano", "Plano de regresión y superficie de la SCR", ""], ["t-calc", "Calculadora de pruebas", ""]]}, {"slug": "teoria-juegos", "nombre": "Teoría de Juegos", "key": "ruta-tj-done", "color": ["#6b3fa0", "#c3a6f0"], "resumen": "Dominancia, equilibrio de Nash en puras y mixtas y maximin, con un resolvedor paso a paso.", "t": [["representacion", "Representación de juegos", "La idea · forma estratégica · forma extensiva · Forma estratégica · Forma extensiva · Estrategia = plan completo · cada · Simultáneo frente a secuencial: la batalla de los sexos (Ej. 3) · Simultáneo. · Secuencial. · Error común: · Entrada al mercado · Figura 1 en forma estratégica · Figura 2 en forma estratégica · Simultáneo frente a secuencial con la Tabla 5"], ["dominancia", "Dominancia y eliminación iterativa", "La idea · Definiciones · estrictamente · débil · mezcla · Procedimiento por rondas · Ejemplo, Tabla 2 (Ej. 4a): · Laboratorio · Error común: · «Si un juego es soluble por dominancia, tiene un único EN» · Tabla 3 resuelta"], ["nash", "Equilibrio de Nash en estrategias puras", "La idea · Definición · estricto · Mejor respuesta · Ejemplo, batalla de los sexos: · EN = rG ∩ rB = {(B, B), (S, S)} · Laboratorio · Error común: · filas · Qué implica que s′ no sea un equilibrio de Nash · Juegos o Macro · Tragedia de los comunes"], ["mixtas", "Estrategias mixtas", "La idea · otro · Procedimiento en un 2×2 · Ejemplo resuelto: batalla de los sexos (Ej. 3c) · Laboratorio · Error común: · jugador 2 · Atajo para 2×2 y corrección a la app · Tabla 2: mixtas después de eliminar · Cuando hay infinitos equilibrios"], ["maximin", "Maximin y juegos de suma cero", "La idea · Definiciones · Maximin · Minimax · punto de silla · valor del juego · Teorema minimax (von Neumann) · Laboratorio · Ej. 18, el penal: · Tabla 6: reparto de 10 dólares · Las dos matrices"]], "b": [["secuencial", "Inducción hacia atrás", "Juegos secuenciales", "La idea · equilibrio perfecto en subjuegos · Amenazas no creíbles · Laboratorio"], ["tres", "Juegos con tres jugadores", "Juegos secuenciales", "La idea · Figura 4 (Ej. 13) · Laboratorio"], ["racionalizables", "Estrategias racionalizables", "Racionalidad", "La idea · estrategias mixtas · Tabla 4 (Ej. 15) · Laboratorio"], ["arbitraje", "Arbitraje de oferta final", "Aplicaciones", "La idea · Laboratorio"]], "w": [["resolvedor", "Resolvedor paso a paso", ""]]}];
+const PROXIMAS=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const read=k=>{try{return JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){return{}}};
+const last=k=>{try{return localStorage.getItem(k+"-last")||""}catch(e){return""}};
+const href=(m,id)=>`materias/${m.slug}.html${id?"#"+id:""}`;
+$("legend").innerHTML=MATERIAS.map(m=>`<i style="background:${m.color[0]}"></i>`).join("");
+function render(){
+  $("net").innerHTML=MATERIAS.map(m=>{
+    const done=read(m.key),lessons=[...m.t,...m.b],n=lessons.filter(([id])=>done[id]).length,pct=Math.round(n/lessons.length*100);
+    const l=last(m.key),lt=[...m.t,...m.b,...m.w].find(([id])=>id===l);
+    const groups=[...new Set(m.b.map(x=>x[2]).filter(Boolean))];
+    return `<a class="line" href="${href(m,lt?l:"")}" style="--c:${m.color[0]};--cd:${m.color[1]}">
+      <div><h2>${esc(m.nombre)}</h2><p class="sum">${esc(m.resumen)}</p></div>
+      <div class="meta"><b>${pct} %</b><small>${n} de ${lessons.length} temas dominados</small></div>
+      <div class="track" aria-label="${m.t.length} estaciones en el tronco">${m.t.map(([id,t])=>`<span class="${done[id]?"done":""}" title="${esc(t)}"><i></i></span>`).join("")}</div>
+      <div class="ends"><span>${esc(m.t[0][1])}</span><span>${esc(m.t[m.t.length-1][1])}</span></div>
+      <div class="go">${lt?`<span>Continuar en <strong>${esc(lt[1])}</strong> →</span>`:`<span><strong>Empezar la ruta</strong> →</span>`}<span class="chips"><span>${m.t.length} estaciones</span><span>${m.b.length} ramas</span><span>${m.w.length} ${m.w.length===1?"taller":"talleres"}</span></span></div>
+    </a>`}).join("");
+  $("soonsec").hidden=!PROXIMAS.length;
+  $("soon").innerHTML=PROXIMAS.map(p=>`<div>${esc(p)}<small>Próximamente</small></div>`).join("");
+}
+const INDEX=MATERIAS.flatMap(m=>[...m.t.map(([id,t,kw])=>({m,id,t,kw,k:"Estación"})),...m.b.map(([id,t,g,kw])=>({m,id,t,kw,k:"Rama",g})),...m.w.map(([id,t,kw])=>({m,id,t,kw,k:"Taller"}))])
+  .map(x=>Object.assign(x,{n:norm(x.t+" "+(x.g||"")+" "+x.m.nombre),nk:norm(x.kw||"")}));
+const hint=(x,words)=>{if(words.every(w=>x.n.includes(w)))return"";const p=(x.kw||"").split(" · ").find(s=>words.some(w=>norm(s).includes(w)));return p||""};
+function search(){const v=norm($("q").value.trim()),box=$("res");
+  if(!v){box.hidden=true;box.innerHTML="";return}
+  const words=v.split(/\s+/),title=INDEX.filter(x=>words.every(w=>x.n.includes(w))),body=INDEX.filter(x=>!title.includes(x)&&words.every(w=>(x.n+" "+x.nk).includes(w))),hits=[...title,...body].slice(0,12);
+  box.hidden=false;
+  box.innerHTML=hits.length?hits.map(x=>`<a href="${href(x.m,x.id)}" style="--c:${x.m.color[0]};--cd:${x.m.color[1]}"><span class="dot"></span><span class="t">${esc(x.t)}${hint(x,words)?`<small>${esc(hint(x,words))}</small>`:""}</span><span class="m">${esc(x.m.nombre)}</span><span class="k">${x.k}</span></a>`).join("")
+    :`<p>No hay temas con «${esc($("q").value.trim())}». Prueba con otra palabra o revisa la ortografía.</p>`}
+$("q").addEventListener("input",search);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter"){const a=$("res").querySelector("a");if(a){e.preventDefault();location.href=a.getAttribute("href")}}});
+window.addEventListener("pageshow",render);
+window.addEventListener("storage",render);
+render();
+</script>
+</body>
+</html>
