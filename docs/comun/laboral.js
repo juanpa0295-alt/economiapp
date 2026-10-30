@@ -101,7 +101,7 @@ LAB.parsePlanilla=function(text,ndias){const rec={},errs=[];
       if(!segs.length){errs.push(`falta el horario en «${ln}».`);return}r={kind:"trabajo",segs}}
     ds.forEach(d=>{if(rec[d])errs.push(`el día ${d} aparece dos veces.`);rec[d]=r})});
   return{rec,errs}};
-// cfg: {propHoras (proporción del dominical por horas: 7 × h/42), ndiasPrev, ndias, dow1 (0 = domingo), festivos[], ingreso (día; 1 si venía laborando), venia, salario, jornada, d, noct, smmlv, pierde (sanción/licencia quitan el dominical), incap (fracción)}
+// cfg: {domTrab ("auto" | "H" | "R"), propHoras (proporción del dominical por horas: 7 × h/42), ndiasPrev, ndias, dow1 (0 = domingo), festivos[], ingreso (día; 1 si venía laborando), venia, salario, jornada, d, noct, smmlv, pierde (sanción/licencia quitan el dominical), incap (fracción)}
 LAB.planilla=function(cfg,rec){const J=cfg.jornada,F=LAB.factCols(cfg.d),N=cfg.ndias,vh=cfg.salario/(J*30);
   const dow=d=>((cfg.dow1+d-1)%7+7)%7,fest=new Set(cfg.festivos),esDom=d=>d<=N?(dow(d)===0||fest.has(d)):(dow(d)===0||(cfg.festSig||[]).includes(d-N));
   const emp=d=>d>=cfg.ingreso,R=d=>rec[d]||null,susp=d=>{const r=R(d);return r&&(r.kind==="sancion"||r.kind==="licencia")};
@@ -123,22 +123,32 @@ LAB.planilla=function(cfg,rec){const J=cfg.jornada,F=LAB.factCols(cfg.d),N=cfg.n
   // novedades sin trabajo
   rows.forEach(r=>{const x=R(r.d);if(!x||x.kind==="trabajo")return;
     if(r.d===31){r.notas.push(`${x.kind}: el día 31 no suma (el salario cubre 30 días)`);return}
-    if(x.kind==="descanso"){if(!r.dom){r.h.HD+=J;r.notas.push("descanso remunerado (compensatorio): "+J+" h")}}
+    if(x.kind==="descanso"){if(!r.dom){r.h.HD+=J;r.notas.push("descanso remunerado: "+J+" h (todo descanso es remunerado)")}}
     else if(x.kind==="permiso"){r.h.HD+=J;r.notas.push("permiso remunerado: "+J+" h")}
     else if(x.kind==="vacaciones"){r.h.HD+=J;r.notas.push("vacaciones: "+J+" h")}
     else if(x.kind==="incapacidad"){const f=Math.max(cfg.incap,cfg.smmlv/cfg.salario);r.h.HD+=J*f;r.notas.push(`incapacidad por enfermedad general: se paga ${f===cfg.incap?"2/3":"el mínimo"} del día (art. 227) = ${(J*f).toFixed(2)} h`)}
     else if(x.kind==="sancion"){r.notas.push("sanción disciplinaria: suspensión, no se paga (art. 51)")}
     else if(x.kind==="licencia"){r.notas.push("licencia no remunerada: suspensión, no se paga (art. 51)")}});
+  // domingos trabajados: ¿descansa en la semana siguiente? (compensatorio → solo recargo R; si no → hora completa H)
+  const usado=new Set();
+  rows.forEach(r=>{const x=R(r.d);if(!x||x.kind!=="trabajo"||r.dow!==0)return;let k=null;
+    if(cfg.domTrab==="R")k=-1;else if(cfg.domTrab!=="H")for(let j=r.d+1;j<=Math.min(r.d+6,N);j++){const rj=R(j);if(rj&&rj.kind==="descanso"&&!esDom(j)&&!usado.has(j)){k=j;break}}
+    if(k>0){usado.add(k);rows[k-1].compDe=r.d}r.comp=k});
   // turnos
   rows.forEach(r=>{const x=R(r.d);if(!x||x.kind!=="trabajo")return;const d=r.d;
-    const descPagado=r.dom&&r.desc&&r.desc.h>=J;const base=d===31?"31":descPagado?"desc":null;
+    const base=d===31?"31":(r.dow===0&&r.comp)?"comp":null;
     let ord=0;const segsOut=[];
     for(const [a,b] of x.segs.slice().sort((p,q)=>p[0]-q[0])){for(let t=a;t<b;t+=15){const off=Math.floor(t/1440),sd=d+off,m=t%1440,dom=esDom(sd),noct=m>=cfg.noct*60||m<360,extra=ord>=J*60;
         let k;if(extra)k=dom?(noct?"HEND":"HEDD"):(noct?"HEN":"HED");else{ord+=15;k=base?(dom?(noct?"RND":"RDD"):(noct?"RN":"D0")):(dom?(noct?"HND":"HDD"):(noct?"HN":"HD"))}
         r.h[k]+=0.25;const last=segsOut[segsOut.length-1];if(last&&last.k===k&&last.b===t)last.b=t+15;else segsOut.push({k,a:t,b:t+15,sd,dom,noct,extra})}}
     r.detalle=segsOut;r.base=base;r.trabajo=true});
-  rows.forEach(r=>{if(r.dom&&r.desc){if(r.trabajo&&r.desc.h>0&&r.desc.h<J){r.notas.push(`dominical proporcional (${r.desc.h.toFixed(2)} h) no se suma: trabajó ese domingo y sus horas ordinarias se pagan completas`);r.descSum=0}
-      else{r.h.HD+=r.desc.h;r.descSum=r.desc.h}}});
+  // descanso remunerado: el festivo siempre (7 h, y si lo trabaja además las horas en H); el domingo solo si no lo trabajó
+  rows.forEach(r=>{if(!(r.dom&&r.desc))return;const domTrab=r.trabajo&&r.dow===0;
+    if(domTrab){r.descSum=0;r.notas.push(r.comp>0?`domingo trabajado: descansa el día ${r.comp} en la semana siguiente, así que aquí solo va el recargo (R) y las 7 h se pagan en el día de descanso`:r.comp===-1?"domingo trabajado: solo el recargo (R), porque se compensa con un descanso":"domingo trabajado sin descanso en la semana siguiente: se paga la hora completa con el recargo (H) y no se suman 7 h aparte")}
+    else{r.h.HD+=r.desc.h;r.descSum=r.desc.h}});
+  rows.forEach(r=>{if(r.compDe)r.notas.unshift(`descanso compensatorio del domingo ${r.compDe}`)});
+  // día 31 suspendido: se restan 7 h (art. 51)
+  if(N===31){const r31=rows[30],x=R(31);if(x&&(x.kind==="sancion"||x.kind==="licencia")){r31.h.HD-=J;r31.notas=[`${x.kind==="sancion"?"sanción":"licencia no remunerada"} el día 31: se restan ${J} h (art. 51), porque el salario del mes ya lo incluía`]}}
   // completar 30 días si el mes es corto
   const extra30=N<30?(30-N)*J:0;
   const q=[[],[]];rows.forEach(r=>q[r.d<=15?0:1].push(r));
