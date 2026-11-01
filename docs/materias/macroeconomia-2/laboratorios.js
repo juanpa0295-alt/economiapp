@@ -34,8 +34,10 @@ const chain=s=>`<div class="eq al chain">${s}</div>`;
 
 // ====================================================================
 // 1. Registro en la balanza de pagos
-SIMS.bp=function(){const K=Object.keys(M2.BPT);let hide=false;
-  $("sim").innerHTML=`<div class="calcf"><label for="bp-t">Transacción<select id="bp-t">${K.map(k=>`<option value="${k}">${M2.BPT[k].t}</option>`).join("")}</select></label></div>
+SIMS.bp=function(start){let vista=start||"una";
+  $("sim").innerHTML=`${seg("bp-v","Ejercicio",[["una","Una transacción"],["libro","Libro registro completo"]],vista)}<div id="bp-una"></div><div id="bp-lib"></div>`;
+  const una=()=>{const K=Object.keys(M2.BPT);let hide=false;
+  $("bp-una").innerHTML=`<div class="calcf"><label for="bp-t">Transacción<select id="bp-t">${K.map(k=>`<option value="${k}">${M2.BPT[k].t}</option>`).join("")}</select></label></div>
   ${seg("bp-m","Modo",[["ver","Ver el registro"],["prac","Practicar (ocultar)"]],"ver")}<div id="bp-out"></div>`;
   const CN={CC:"Cuenta corriente",CK:"Cuenta de capital",CF:"Cuenta financiera",RI:"Reservas internacionales"};
   const run=()=>{const x=M2.BPT[$("bp-t").value];
@@ -44,25 +46,58 @@ SIMS.bp=function(){const K=Object.keys(M2.BPT);let hide=false;
       :`<div class="tbl"><table><tr><th>Cuenta</th><th>Partida</th><th>Crédito</th><th>Débito</th></tr>${rows}</table></div><p>${x.x}</p><p class="hint">Partida doble: cada transacción se registra dos veces, y la suma de créditos es igual a la suma de débitos.</p>`;
     const b=$("bp-sh");if(b)b.onclick=()=>{hide=false;$("bp-m").querySelectorAll("button").forEach(z=>z.setAttribute("aria-pressed",z.dataset.v==="ver"));run()}};
   $("bp-t").onchange=run;bindSeg("bp-m",v=>{hide=v==="prac";run()});run()};
+  const libro=()=>{const K=Object.keys(M2.BPL);let key=start==="libro"&&SIMS.bp.preset?SIMS.bp.preset:"clase",prac=false;
+    $("bp-lib").innerHTML=`<div class="calcf"><label for="bp-l">Ejercicio<select id="bp-l">${K.map(k=>`<option value="${k}"${k===key?" selected":""}>${M2.BPL[k].t}</option>`).join("")}</select></label></div>
+    ${seg("bp-lm","Modo",[["ver","Ver la solución"],["prac","Practicar: calcula los saldos"]],"ver")}<div id="bp-lo"></div>`;
+    const CN={BC:"CC · Balanza comercial",BS:"CC · Balanza de servicios",T:"CC · Transferencias",CFA:"CF · Activo",CFP:"CF · Pasivo",RI:"Reservas internacionales"};
+    const sg=v=>(v>0?"+":"")+f0(v);
+    const run=()=>{const P=M2.BPL[key],R=M2.bpLibro(key);
+      const enun=`<ol class="steps">${P.tr.map(t=>`<li>${t.d}</li>`).join("")}</ol>`;
+      if(prac){$("bp-lo").innerHTML=`${enun}<p>Registra cada transacción con la convención de clase y calcula los tres saldos (en US$, con signo).</p>
+        <div class="calcf"><label for="bp-qcc">Saldo de la CC<input id="bp-qcc" type="number" step="any"></label><label for="bp-qcf">Saldo de la CF (entrada neta)<input id="bp-qcf" type="number" step="any"></label><label for="bp-qri">Variación de RI (acumulación +)<input id="bp-qri" type="number" step="any"></label></div>
+        <button type="button" class="btn" id="bp-chk">Revisar</button><div id="bp-fb"></div>`;
+        $("bp-chk").onclick=()=>{const a=[["CC",R.cc,"bp-qcc"],["CF",R.cf,"bp-qcf"],["ΔRI",R.dri,"bp-qri"]].map(([n,v,id])=>{const u=parseFloat($(id).value);return`<li>${n}: ${isFinite(u)?(Math.abs(u-v)<0.5?"✔ correcto":"✘ revisa (no es "+f0(u)+")"):"sin respuesta"}</li>`});
+          $("bp-fb").innerHTML=`<ul>${a.join("")}</ul><p class="hint">Pista: CC = créditos − débitos de BC, BS y T; CF = créditos − débitos de la cuenta financiera; ΔRI = débitos − créditos de reservas. Debe cumplirse CC + CF = ΔRI.</p>`};return}
+      const rows=P.tr.map((t,n)=>t.e.map(([c,p,s,v],k)=>`<tr><td>${k?"":n+1}</td><td>${p}</td><td>${CN[c]}</td><td class="num">${s==="D"?f0(v):""}</td><td class="num">${s==="C"?f0(v):""}</td></tr>`).join("")).join("");
+      const g=R.g,line=(n,c)=>`<tr><td>${n}</td><td class="num">${f0(g(c).C)}</td><td class="num">${f0(g(c).D)}</td><td class="num">${sg(R.net(c))}</td></tr>`;
+      $("bp-lo").innerHTML=`${enun}<div class="tbl"><table><tr><th>N.º</th><th>Partida</th><th>Cuenta</th><th>Débito</th><th>Crédito</th></tr>${rows}<tr><td></td><td><b>Totales</b></td><td></td><td class="num"><b>${f0(R.D)}</b></td><td class="num"><b>${f0(R.C)}</b></td></tr></table></div>
+      <div class="tbl"><table><tr><th>Cuenta</th><th>Créditos</th><th>Débitos</th><th>Saldo</th></tr>
+      <tr><td><b>I. Cuenta corriente</b></td><td class="num">${f0(g("BC").C+g("BS").C+g("T").C)}</td><td class="num">${f0(g("BC").D+g("BS").D+g("T").D)}</td><td class="num"><b>${sg(R.cc)}</b></td></tr>
+      ${line("A. Balanza comercial","BC")}${line("B. Balanza de servicios","BS")}${line("C. Transferencias","T")}
+      <tr><td><b>II. Cuenta financiera</b></td><td class="num">${f0(g("CFA").C+g("CFP").C)}</td><td class="num">${f0(g("CFA").D+g("CFP").D)}</td><td class="num"><b>${sg(R.cf)}</b></td></tr>
+      <tr><td><b>III. Variación de RI</b> (débito = entran divisas)</td><td class="num">${f0(g("RI").C)}</td><td class="num">${f0(g("RI").D)}</td><td class="num"><b>${sg(R.dri)}</b> ${R.dri>=0?"de acumulación":"de pérdida"}</td></tr></table></div>
+      <div class="res">${tiles([["CC",sg(R.cc),R.cc>=0?"okt":"badt"],["CF",sg(R.cf)],["ΔRI",sg(R.dri)]])}</div>
+      <p>Identidad: \\(CC+CF=\\Delta RI\\Rightarrow ${f0(R.cc)}+${f0(R.cf)}=${f0(R.dri)}\\)${R.ok?" ✔":" ✘"}. En la forma del profesor: saldo CC = saldo CF ± variación de RI ± EyO, con EyO = 0.</p>
+      <p>${R.cc<0?"La CC es deficitaria: el país absorbe más de lo que produce (CC = PNB − A < 0) e invierte más de lo que ahorra (S − I < 0). ":"La CC tiene superávit: el país produce más de lo que absorbe y presta al exterior. "}${R.cf>0?"Entra capital neto por la CF":"La CF no aporta entrada neta"}${R.dri>0?"; lo que sobra lo acumula el banco central como reservas.":R.dri<0?"; el faltante se cubre con reservas.":"."}</p>`;
+      typeset($("bp-lo"))};
+    $("bp-l").onchange=()=>{key=$("bp-l").value;run()};bindSeg("bp-lm",v=>{prac=v==="prac";run()});run()};
+  una();libro();const go=()=>{$("bp-una").hidden=vista!=="una";$("bp-lib").hidden=vista!=="libro"};
+  bindSeg("bp-v",v=>{vista=v;go()});go()};
+SIMS.pardr=()=>SIMS.par("dr");SIMS.parcarry=()=>SIMS.par("carry");
+SIMS.bplibro=()=>{SIMS.bp.preset="clase";SIMS.bp("libro")};
+SIMS.bpsupl=()=>{SIMS.bp.preset="supl";SIMS.bp("libro")};
 
 // ====================================================================
 // 2. Paridades internacionales
-SIMS.par=function(){let mode="abs";
-  const MODES=[["abs","PPC absoluta (Big Mac)"],["rel","PPC relativa"],["esp","Tipo de cambio esperado"],["pci","Paridad cubierta (forward)"],["pnci","Paridad no cubierta"],["tcr","Tipo de cambio real"]];
+SIMS.par=function(start){let mode=start||"abs";
+  const MODES=[["abs","PPC absoluta (Big Mac)"],["rel","PPC relativa"],["esp","Tipo de cambio esperado"],["pci","Paridad cubierta (forward)"],["pnci","Paridad no cubierta"],["dr","RI frente a RE"],["tcr","Tipo de cambio real"],["var","Variación causada"],["carry","Carry trade"]];
   $("sim").innerHTML=`${seg("pa-m","Cálculo",MODES,mode)}<div id="pa-box"></div>`;
   const F={abs:[["pa-a","Precio en Colombia ($)",15000],["pa-b","Precio en EE. UU. (US$)",2.5],["pa-c","Tipo de cambio de mercado ($/US$)",8500]],
     rel:[["pa-a","Tipo de cambio del período anterior ($/US$)",4150],["pa-b","Inflación en Colombia Π (%)",6.5],["pa-c","Inflación en EE. UU. Π* (%)",3.2]],
     esp:[["pa-a","Tipo de cambio spot hoy ($/US$)",4000],["pa-b","Inflación esperada en Colombia Πᵉ (%)",6],["pa-c","Inflación esperada en EE. UU. Πᵉ* (%)",3]],
     pci:[["pa-a","Tipo de cambio spot ($/US$)",3980],["pa-b","Tasa de interés en Colombia i (% del período)",2],["pa-c","Tasa de interés en EE. UU. i* (% del período)",0.5]],
     pnci:[["pa-a","Tipo de cambio spot ($/US$)",4000],["pa-b","Tasa de interés en Colombia i (%)",9],["pa-c","Tasa de interés en EE. UU. i* (%)",4],["pa-d","Prima de riesgo país μ (%)",2]],
+    dr:[["pa-a","Tipo de cambio de hoy Eₜ ($/US$)",3139],["pa-b","Tasa de interés en Colombia i (%)",11.2],["pa-c","Tasa externa i* (%)",5],["pa-d","Eᵉ(t+1) que espera el mercado",3800],["pa-e","EMBI (puntos básicos)",0]],
+    var:[["pa-a","Tipo de cambio del período anterior Eₜ₋₁",4200],["pa-b","Tipo de cambio de hoy Eₜ",3050]],
+    carry:[["pa-a","Préstamo en EE. UU. (US$)",100000],["pa-b","Tasa del préstamo i* (%)",5],["pa-c","Tipo de cambio al entrar ($/US$)",3100],["pa-d","Tasa en Colombia i (%)",12],["pa-e","Tipo de cambio al salir ($/US$)",3000]],
     tcr:[["pa-a","Tipo de cambio nominal E ($/US$)",4200],["pa-b","Índice de precios externo P*",105],["pa-c","Índice de precios interno P",110],["pa-d","Devaluación nominal del año (%)",8],["pa-e","Inflación externa Π* (%)",3],["pa-f","Inflación interna Π (%)",5]]};
   const draw=()=>{$("pa-box").innerHTML=`<div class="calcf">${F[mode].map(([id,l,v])=>`<label for="${id}">${l}<input id="${id}" type="number" step="any" value="${v}"></label>`).join("")}</div><div class="res" id="pa-res"></div><div id="pa-txt"></div>`;
     F[mode].forEach(([id])=>$(id).addEventListener("input",run));run()};
   const run=()=>{const v=id=>parseFloat($(id).value),ok=(...a)=>a.every(x=>isFinite(x));let h="",t="";
     if(mode==="abs"){const a=v("pa-a"),b=v("pa-b"),c=v("pa-c");if(!ok(a,b,c)||b<=0||c<=0){$("pa-res").innerHTML=err("los precios y el tipo de cambio deben ser positivos.");return}const r=M2.ppcAbs(a,b,c);
-      h=tiles([["Tipo de cambio de la PPC",f2(r.e)],["Tipo de cambio de mercado",f2(c)],["Desalineamiento",fmt(r.des,1)+" %",r.des<0?"okt":"badt"]]);
+      const tq=c*b/a;h=tiles([["Tipo de cambio de la PPC",f2(r.e)],["Tipo de cambio de mercado",f2(c)],["Desalineamiento",fmt(r.des,1)+" %",r.des<0?"okt":"badt"],["TCR = E·P*/P",fmt(tq,3)]]);
       t=`<p>\\(TCN_{PPC}=\\dfrac{P_\\$}{P_{us}}=\\dfrac{${fm(a)}}{${fm(b)}}=${fm(r.e)}\\)</p><p>\\(\\%\\ \\text{subvaluación}=\\left[\\dfrac{TCN_{PPC}}{TCN_{mercado}}-1\\right]\\times100=\\left[\\dfrac{${fm(r.e)}}{${fm(c)}}-1\\right]\\times100=${fmt(r.des,1)}\\%\\)</p>
-      <p>El peso está <b>${r.estado}</b>${r.estado!=="en paridad"?` un ${fmt(Math.abs(r.des),1)} %`:""}. ${r.des<0?"Con el tipo de cambio de mercado se necesitan más pesos por dólar que los que indica la PPC: el peso está depreciado frente a la paridad. Eso abarata las exportaciones colombianas en dólares y encarece las importaciones en pesos, así que mejora la competitividad-precio del país.":r.des>0?"Se necesitan menos pesos por dólar que en la PPC: el peso está apreciado. Eso abarata las importaciones y encarece las exportaciones, y el país pierde competitividad-precio.":""}</p>`}
+      <p>\\(TCR=\\dfrac{E\\,P^*}{P}=\\dfrac{${fm(c)}\\times${fm(b)}}{${fm(a)}}=${fmt(tq,3)}\\)${tq<1?": menor que 1, lo extranjero es más barato y Colombia pierde competitividad.":tq>1?": mayor que 1, Colombia gana competitividad.":": se cumple la PPC."}</p><p>El peso está <b>${r.estado}</b>${r.estado!=="en paridad"?` un ${fmt(Math.abs(r.des),1)} %`:""}. ${r.des<0?"Con el tipo de cambio de mercado se necesitan más pesos por dólar que los que indica la PPC: el peso está depreciado frente a la paridad. Eso abarata las exportaciones colombianas en dólares y encarece las importaciones en pesos, así que mejora la competitividad-precio del país.":r.des>0?"Se necesitan menos pesos por dólar que en la PPC: el peso está apreciado. Eso abarata las importaciones y encarece las exportaciones, y el país pierde competitividad-precio.":""}</p>`}
     if(mode==="rel"){const a=v("pa-a"),b=v("pa-b")/100,c=v("pa-c")/100;if(!ok(a,b,c)){$("pa-res").innerHTML=err("completa los datos.");return}const e=M2.ppcRel(a,b,c);
       h=tiles([["Tipo de cambio spot (PPC relativa)",f2(e)],["Devaluación",fmt((e/a-1)*100,2)+" %"]]);
       t=`<p>\\(E_t=E_{t-1}\\,\\dfrac{1+\\Pi}{1+\\Pi^*}=${fm(a)}\\times\\dfrac{${fm(1+b)}}{${fm(1+c)}}=${fmt(e,2)}\\)</p><p>La devaluación es aproximadamente la diferencia de inflaciones: \\(\\Pi-\\Pi^*=${fmt((b-c)*100,2)}\\%\\). Si Colombia tiene más inflación que EE. UU., el peso se debe devaluar para mantener la PPC.</p>`}
@@ -75,6 +110,20 @@ SIMS.par=function(){let mode="abs";
     if(mode==="pnci"){const a=v("pa-a"),b=v("pa-b")/100,c=v("pa-c")/100,d=v("pa-d")/100;if(!ok(a,b,c,d)){$("pa-res").innerHTML=err("completa los datos.");return}const e=M2.pnci(a,b,c,d),e0=M2.pnci(a,b,c,0);
       h=tiles([["Tipo de cambio esperado (sin riesgo)",f2(e0)],["Con prima de riesgo μ",f2(e)],["Devaluación esperada",fmt((e/a-1)*100,2)+" %"]]);
       t=`<p>\\(1+i=(1+i^*)(1+e^e)(1+\\mu)\\;\\Rightarrow\\;E^e_{t+1}=E_t\\,\\dfrac{1+i}{(1+i^*)(1+\\mu)}\\)</p><p>Para cambios pequeños: \\(i\\approx i^*+e^e+\\mu\\). Si \\(i>i^*+e^e+\\mu\\) entran capitales: baja \\(i\\) o se aprecia el peso hasta recuperar la paridad.</p>`}
+    if(mode==="dr"){const E=v("pa-a"),i=v("pa-b")/100,is=v("pa-c")/100,Ee=v("pa-d"),eb=v("pa-e")/10000;if(!ok(E,i,is,Ee,eb)||E<=0||Ee<=0){$("pa-res").innerHTML=err("completa los datos con tipos de cambio positivos.");return}
+      const RI=1+i,RE=(1+is)*(Ee/E)*(1+eb),DR=RI-RE,Eep=E*(1+i)/((1+is)*(1+eb)),Ep=Ee*(1+is)*(1+eb)/(1+i);
+      h=tiles([["RI = 1 + i",fmt(RI,4)],["RE = (1+i*)·Eᵉ/E"+(eb?"·(1+EMBI)":""),fmt(RE,4)],["DR = RI − RE",fmt(DR,4),DR>=0?"okt":"badt"],["Eᵉ de paridad",f2(Eep)],["Eₜ que restablece la paridad",f2(Ep)]]);
+      t=`<p>\\(RI=1+i=${fmt(RI,4)}\\). \\(RE=(1+i^*)\\dfrac{E^e_{t+1}}{E_t}${eb?"(1+EMBI)":""}=${fm(1+is)}\\times\\dfrac{${fm(Ee)}}{${fm(E)}}${eb?`\\times${fmt(1+eb,4)}`:""}=${fmt(RE,4)}\\)</p>
+      <p>${Math.abs(DR)<5e-5?"DR = 0: se cumple la PNCI, entradas = salidas de capital.":DR>0?"<b>DR &gt; 0</b>: rinde más invertir en pesos. Entran capitales (Δ⁺F) → EOD → baja \\(E_t\\) (el peso se aprecia).":"<b>DR &lt; 0</b>: rinde más invertir afuera. Salen capitales (∇F) → EDD → sube \\(E_t\\) (el peso se deprecia)."}</p>
+      <p>La depreciación esperada por el mercado es ${fmt((Ee/E-1)*100,2)} %; la que cumple la paridad es ${fmt((Eep/E-1)*100,2)} %. Con \\(E^e\\) fijo, el tipo de cambio de hoy que iguala las rentabilidades es \\(E_t=E^e\\,\\dfrac{(1+i^*)${eb?"(1+EMBI)":""}}{1+i}=${fmt(Ep,2)}\\).</p>${eb?`<p>El EMBI se suma como prima de riesgo país: con más riesgo, Colombia necesita una tasa más alta para atraer el mismo capital.</p>`:""}`}
+    if(mode==="var"){const a=v("pa-a"),b=v("pa-b");if(!ok(a,b)||a<=0||b<=0){$("pa-res").innerHTML=err("los tipos de cambio deben ser positivos.");return}const r=(b/a-1)*100,back=(a/b-1)*100;
+      h=tiles([["Variación causada",(r>0?"+":"")+fmt(r,1)+" %",r>0?"badt":"okt"],["Para volver al valor anterior",(back>0?"+":"")+fmt(back,1)+" %"]]);
+      t=`<p>\\(\\%\\Delta E=\\left(\\dfrac{E_t}{E_{t-1}}-1\\right)\\times100=\\left(\\dfrac{${fm(b)}}{${fm(a)}}-1\\right)\\times100=${fmt(r,1)}\\%\\)</p><p>${r>0?"El dólar subió: el peso se <b>depreció</b> (o se devaluó, si lo decidió el banco central con tipo de cambio fijo).":r<0?"El dólar bajó: el peso se <b>apreció</b> (o se revaluó, con tipo de cambio fijo).":"No hay variación."} Ojo con la base: devolverse de ${fm(b)} a ${fm(a)} es un ${fmt(back,1)} %, no el mismo porcentaje con otro signo. Siempre divide por el valor del período anterior.</p>`}
+    if(mode==="carry"){const L=v("pa-a"),is=v("pa-b")/100,E0=v("pa-c"),i=v("pa-d")/100,E1=v("pa-e");if(!ok(L,is,E0,i,E1)||L<=0||E0<=0||E1<=0){$("pa-res").innerHTML=err("completa los datos con valores positivos.");return}
+      const deuda=L*(1+is),pesos=L*E0,fin=pesos*(1+i),usd=fin/E1,g=usd-deuda,sinInt=pesos/E1;
+      h=tiles([["Pesos invertidos",f0(pesos)],["Pesos al final",f0(fin)],["Dólares al salir",f0(usd)],["Deuda a pagar",f0(deuda)],["Ganancia (US$)",f0(g),g>=0?"okt":"badt"]]);
+      t=`<ol class="steps"><li>Pide prestado US$${fm(L)} al ${fmt(is*100,2)} %: debe devolver US$${f0(deuda)}.</li><li>Los trae a Colombia a ${fm(E0)}: $${f0(pesos)}.</li><li>Los invierte al ${fmt(i*100,2)} %: $${f0(fin)}.</li><li>Sale a ${fm(E1)}: ${f0(fin)} / ${fm(E1)} = US$${f0(usd)}.</li><li>Ganancia: US$${f0(usd)} − US$${f0(deuda)} = <b>US$${f0(g)}</b>.</li></ol>
+      <p>La ganancia viene del diferencial de tasas y de la ${E1<E0?"apreciación":"depreciación"} del peso (sin intereses habría salido con US$${f0(sinInt)}). ${E1>E0?"Si el peso se deprecia, la pérdida cambiaria puede borrar el diferencial: es el riesgo de la operación.":""} En la BdeP la inversión entra como pasivo de la CF (crédito) y los intereses que paga Colombia son un débito en servicios financieros de la CC. Para frenar estas entradas: bajar i, exigir un tiempo mínimo de permanencia o gravar los rendimientos.</p>`}
     if(mode==="tcr"){const a=v("pa-a"),b=v("pa-b"),c=v("pa-c"),dE=v("pa-d"),pe=v("pa-e"),pi=v("pa-f");if(!ok(a,b,c,dE,pe,pi)||c<=0){$("pa-res").innerHTML=err("completa los datos.");return}const T=M2.tcr(a,b,c),dr=M2.devReal(dE,pe,pi);
       h=tiles([["TCR = E·P*/P",f2(T)],["Devaluación real (aprox.)",fmt(dr,2)+" %",dr>=0?"okt":"badt"]]);
       t=`<p>\\(TCR=\\dfrac{E\\,P^*}{P}=\\dfrac{${fm(a)}\\times${fm(b)}}{${fm(c)}}=${fmt(T,2)}\\)</p><p>\\(\\dfrac{\\Delta TCR}{TCR}\\approx\\dfrac{\\Delta E}{E}+\\Pi^*-\\Pi=${fm(dE)}+${fm(pe)}-${fm(pi)}=${fmt(dr,2)}\\%\\)</p><p>${dr>0?"Hay <b>devaluación real</b>: los bienes externos se encarecen en pesos frente a los nacionales; ganan competitividad las exportaciones.":dr<0?"Hay <b>revaluación real</b>: la inflación interna supera la devaluación nominal más la inflación externa; se pierde competitividad.":"El TCR no cambia."}</p>`}

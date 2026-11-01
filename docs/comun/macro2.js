@@ -30,13 +30,41 @@ M2.BPT={
  condona:{t:"Un gobierno extranjero condona una deuda del Gobierno colombiano.",v:0,e:[["CK","Cuenta de capital: transferencias de capital recibidas","C"],["CF","Otra inversión: disminución de pasivos (la deuda condonada)","D"]],x:"La condonación es una transferencia de capital: va en la cuenta de capital como crédito. La deuda que desaparece es una disminución de pasivos: débito en la cuenta financiera."},
  remesaEnv:{t:"Un trabajador extranjero en Colombia envía remesas a su país.",v:0,e:[["CC","Ingreso secundario: remesas enviadas","D"],["CF","Otra inversión: disminución de activos en divisas","C"]],x:"Es una transferencia corriente pagada: débito en la cuenta corriente. Salen divisas: disminución de activos, crédito en la cuenta financiera."},
  ied:{t:"Una multinacional invierte US$50 millones en una planta en Colombia.",v:50e6,e:[["CF","Inversión directa: pasivos (IED en Colombia)","C"],["CF","Otra inversión o reservas: aumento de activos en divisas","D"]],x:"La IED en Colombia aumenta los pasivos externos del país: crédito. Las divisas que entran aumentan los activos: débito."},
- dividendos:{t:"Una filial gira dividendos a su casa matriz en el exterior.",v:0,e:[["CC","Ingreso primario: renta de la inversión pagada","D"],["CF","Otra inversión: disminución de activos en divisas","C"]],x:"Los dividendos pagados a no residentes son ingreso primario pagado: débito en la cuenta corriente."},
- intereses:{t:"El Gobierno paga intereses de su deuda externa.",v:0,e:[["CC","Ingreso primario: intereses pagados","D"],["CF","Otra inversión o reservas: disminución de activos","C"]],x:"Los intereses son renta de la inversión: ingreso primario pagado (débito en la cuenta corriente)."},
+ dividendos:{t:"Una filial gira dividendos a su casa matriz en el exterior.",v:0,e:[["CC","Ingreso primario: renta de la inversión pagada","D"],["CF","Otra inversión: disminución de activos en divisas","C"]],x:"Los dividendos pagados a no residentes son ingreso primario pagado (MBP6): débito en la cuenta corriente. En la convención de clase, utilidades e intereses van en la balanza de servicios (servicios financieros); el signo es el mismo."},
+ intereses:{t:"El Gobierno paga intereses de su deuda externa.",v:0,e:[["CC","Ingreso primario: intereses pagados","D"],["CF","Otra inversión o reservas: disminución de activos","C"]],x:"Los intereses son renta de la inversión: ingreso primario pagado (débito en la cuenta corriente) según el MBP6. En clase se registran en la balanza de servicios como servicios financieros; así se calificó el parcial."},
  turista:{t:"Turistas extranjeros gastan en hoteles colombianos y pagan con tarjeta.",v:0,e:[["CC","Servicios: viajes (exportación de servicios)","C"],["CF","Otra inversión: aumento de activos en divisas","D"]],x:"El gasto de no residentes en Colombia es una exportación de servicios (viajes): crédito en la cuenta corriente."},
  bonos:{t:"Inversionistas extranjeros compran TES colombianos.",v:0,e:[["CF","Inversión de cartera: pasivos (TES en manos de no residentes)","C"],["CF","Otra inversión o reservas: aumento de activos en divisas","D"]],x:"Es inversión de cartera: aumentan los pasivos de Colombia con el exterior (crédito)."},
  banrep:{t:"El Banco de la República compra dólares en el mercado cambiario.",v:0,e:[["RI","Activos de reserva: aumento de reservas internacionales","D"],["CF","Otra inversión: disminución de activos en divisas de los bancos","C"]],x:"Un aumento de reservas es un débito (aumento de activos externos del Banco Central). Los bancos que le venden los dólares reducen sus activos externos: crédito."},
  donacion:{t:"Colombia recibe una donación en alimentos de un organismo internacional.",v:0,e:[["CC","Bienes: importaciones (los alimentos que entran)","D"],["CC","Ingreso secundario: transferencias corrientes recibidas","C"]],x:"Los bienes que entran son una importación (débito) y, como no se pagan, la contrapartida es una transferencia corriente recibida (crédito). Ambas partidas en la cuenta corriente."},
  cafe:{t:"Se exporta café por US$5 millones y los exportadores venden los dólares al Banco de la República.",v:5e6,e:[["CC","Bienes: exportaciones","C"],["RI","Activos de reserva: aumento de reservas","D"]],x:"La exportación es crédito en la cuenta corriente; el aumento de reservas internacionales es débito."}};
+
+// ---------- Libro registro con la convención de clase (BC, BS, T | CF activo, CF pasivo | RI)
+// e: [cuenta, partida, "D"|"C", monto]. CC = créditos − débitos de BC+BS+T; CF = créditos − débitos (entrada neta de capital);
+// ΔRI = débitos − créditos de RI (acumulación). Identidad: CC + CF = ΔRI (con EyO = 0).
+M2.BPL={
+ clase:{t:"Ejemplo de clase (27-08-26)",tr:[
+  {d:"Exportación de café por US$5.000, pagada con un depósito en el exterior",e:[["BC","Exportación de café","C",5000],["CFA","Depósitos en el exterior (aumenta un activo)","D",5000]]},
+  {d:"Importación de maquinaria por US$3.000, pagada con depósitos en el exterior",e:[["BC","Importación de maquinaria","D",3000],["CFA","Depósitos en el exterior (disminuye un activo)","C",3000]]},
+  {d:"Remesas recibidas por US$1.000",e:[["T","Remesas recibidas","C",1000],["RI","Divisas que entran al banco central","D",1000]]},
+  {d:"Servicio financiero de la deuda (intereses) por US$500",e:[["BS","Intereses de la deuda (servicios financieros)","D",500],["RI","Divisas que salen","C",500]]},
+  {d:"IED por US$2.000",e:[["CFP","IED en Colombia (aumenta un pasivo)","C",2000],["RI","Divisas que entran","D",2000]]}]},
+ e9:{t:"Ejercicio de la guía (E9)",tr:[
+  {d:"Se pagan US$800 de intereses de deuda externa con reservas",e:[["BS","Intereses (servicios financieros)","D",800],["RI","Reservas que salen","C",800]]},
+  {d:"Un extranjero compra TES por US$3.000",e:[["CFP","TES en manos de no residentes (pasivo)","C",3000],["RI","Reservas que entran","D",3000]]},
+  {d:"Se exportan flores por US$4.000: 50 % al contado y 50 % a crédito al comprador",e:[["BC","Exportación de flores","C",4000],["RI","Cobro al contado (50 %)","D",2000],["CFA","Crédito otorgado al comprador (activo)","D",2000]]},
+  {d:"Llegan remesas por US$1.200",e:[["T","Remesas recibidas","C",1200],["RI","Reservas que entran","D",1200]]}]},
+ supl:{t:"Examen supletorio 2025-2, punto 1",tr:[
+  {d:"Importación de maquinaria por US$15.000: 60 % al contado y 40 % a crédito",e:[["BC","Importación de maquinaria","D",15000],["RI","Pago al contado (60 %)","C",9000],["CFP","Crédito comercial recibido (pasivo)","C",6000]]},
+  {d:"Fletes y seguros de esa importación, US$400, pagados a una empresa extranjera",e:[["BS","Fletes y seguros (servicio importado)","D",400],["RI","Pago en divisas","C",400]]},
+  {d:"Exportación de café por US$10.000: 80 % cobrado y 20 % a crédito al comprador",e:[["BC","Exportación de café","C",10000],["RI","Cobro al contado (80 %)","D",8000],["CFA","Crédito comercial otorgado (activo)","D",2000]]},
+  {d:"Turistas extranjeros gastan US$2.500 en Colombia",e:[["BS","Viajes: turismo receptivo","C",2500],["RI","Divisas recibidas","D",2500]]},
+  {d:"Colombianos gastan US$1.500 en el exterior",e:[["BS","Viajes: turismo emisor","D",1500],["RI","Divisas pagadas","C",1500]]},
+  {d:"Un extranjero compra el 15 % de una empresa por US$5.000",e:[["CFP","IED (15 % ≥ 10 %: no es cartera)","C",5000],["RI","Divisas recibidas","D",5000]]}]}};
+M2.bpLibro=function(key){const P=M2.BPL[key],acc={};let D=0,C=0;
+  P.tr.forEach(t=>t.e.forEach(([c,_,s,v])=>{acc[c]=acc[c]||{C:0,D:0};acc[c][s]+=v;s==="D"?D+=v:C+=v}));
+  const g=c=>acc[c]||{C:0,D:0},net=c=>g(c).C-g(c).D;
+  const cc=net("BC")+net("BS")+net("T"),cf=net("CFA")+net("CFP"),dri=g("RI").D-g("RI").C;
+  return{acc,g,net,cc,cf,dri,D,C,ok:Math.abs(cc+cf-dri)<1e-9&&Math.abs(D-C)<1e-9}};
 
 // ---------- Unidad 2B: Mundell-Fleming (EMB-EMM-BP) con números
 // EMB: Y = C0 + c(Y−T) + I0 − b·i + G + XN ;  XN = x0 + v·R + z·Y* − m·Y ;  R = E·P*/P
