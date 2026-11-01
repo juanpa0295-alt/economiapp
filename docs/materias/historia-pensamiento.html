@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Historia del Pensamiento Económico · Economiapp</title>
+<meta name="description" content="Mercantilismo, fisiocracia, Smith, Sraffa, Marx, Walras, fallos de mercado, Pigou, Keynes y de Hicks a Lucas, con laboratorios y preparación del parcial.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#8a5a12;--line-soft:#f3e6cc}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#e0b25e;--line-soft:#3a2a10}}
+:root[data-theme="dark"]{--line:#e0b25e;--line-soft:#3a2a10}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(l&&MathJax.typesetPromise)MathJax.typesetPromise([l]).catch(()=>{})})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Historia del Pensamiento Económico</div>
+    <h1>Historia del Pensamiento Económico</h1>
+    <p>Las tres unidades del programa con el libro de Tobón, <i>La génesis de la teoría económica contemporánea</i> (2023): la riqueza y el nacimiento de la ciencia, la coordinación por los precios (Sraffa, Marx, Walras y los fallos de mercado) y la determinación del empleo (Pigou, Keynes y de Hicks a Lucas). Los laboratorios resuelven los modelos con números, los visuales muestran los gráficos de la unidad 3, y las ramas y talleres preparan cada punto del parcial: definiciones, «explique la teoría», tablas de diferencias y ensayo.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las tres unidades del programa</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-hpe-done";</script>
+<script src="../comun/historia.js"></script>
+<script src="../comun/visual.js"></script>
+<script src="historia-pensamiento/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="historia-pensamiento/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>

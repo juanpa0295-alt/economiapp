@@ -19,7 +19,7 @@ VIS.draw=function(P,uid){const W=P.W||560,H=P.H||340,L=W<420?46:56,R=14,T=30,B=4
   let g=`<defs><clipPath id="${uid}c"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath><marker id="${uid}m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="var(--ink)"/></marker></defs>`;
   for(let k=0;k<=4;k++){const xv=x0+k*(x1-x0)/4,yv=y0+k*(y1-y0)/4;
     g+=`<line x1="${L}" x2="${W-R}" y1="${sy(yv)}" y2="${sy(yv)}" stroke="var(--rule)" stroke-width="1"/><text x="${L-6}" y="${sy(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${fy(yv)}</text>`;
-    g+=`<text x="${sx(xv)}" y="${H-B+16}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${fx(xv)}</text>`}
+    g+=`<text x="${sx(xv)+(k===4?4:0)}" y="${H-B+16}" text-anchor="${k===4?"end":"middle"}" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${fx(xv)}</text>`}
   g+=`<line x1="${L}" x2="${L}" y1="${T}" y2="${H-B}" stroke="var(--ink)" stroke-width="1.2"/><line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="var(--ink)" stroke-width="1.2"/>`;
   g+=`<text x="${W-R}" y="${H-9}" text-anchor="end" font-size="12" fill="var(--ink)">${P.xl}</text><text x="${L-4}" y="${T-12}" font-size="12" fill="var(--ink)">${P.yl}</text>`;
   const labs=[];

@@ -275,6 +275,21 @@ tr.psub td{font-weight:700;border-top:2px solid var(--rule);background:var(--pap
 .rman>.dp pre{white-space:pre-wrap;word-break:break-word}
 .rm-o{margin:0;font-size:13px;color:var(--muted)}
 .rman>.dp{margin-top:12px}
+/* --- Historia del Pensamiento: tablas editables, tarjetas de conceptos y ensayo --- */
+input.cell{width:5.2em;font-family:var(--f-mono);font-size:13.5px;padding:4px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);text-align:right}
+input.cell:focus-visible{outline:2px solid var(--line);outline-offset:1px}
+.card-q{border:1.5px solid var(--rule);border-radius:10px;padding:14px 16px;background:var(--paper);margin:10px 0;min-height:96px}
+.card-q .gq{font-family:var(--f-display);font-size:1.25em;font-weight:700;margin:4px 0 8px;color:var(--ink)}
+details.dp-lite{border:1px solid var(--rule);border-radius:8px;padding:8px 12px;margin-bottom:8px;background:var(--card)}
+details.dp-lite summary{cursor:pointer}
+dl.glos{margin:8px 0 0}
+dl.glos dt{font-weight:700;margin-top:8px}
+dl.glos dd{margin:2px 0 0 0;color:var(--ink)}
+.e-form{grid-template-columns:1fr!important}
+.e-form textarea{width:100%;box-sizing:border-box;font-family:var(--f-body);font-size:14.5px;line-height:1.5;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical;font-weight:400}
+.e-form textarea:focus-visible{outline:2px solid var(--line);outline-offset:1px}
+ul.chk{list-style:none;padding-left:0}
+ul.chk li{margin:3px 0}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
