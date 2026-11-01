@@ -45,6 +45,7 @@ qs:[{q:"Con C₀ = 500, c₁ = 0,8, Y = 2.000 y T = 400, ¿cuánto vale el ahorr
 <section><h3>Canasta óptima</h3>
 <p>Reemplazando Euler en la restricción:</p>
 <div class="mj">\[C_1^*=\frac{W}{1+\dfrac{1}{1+r}\left(\dfrac{1+r}{1+\rho}\right)^{1/\theta}},\qquad C_2^*=C_1^*\left(\frac{1+r}{1+\rho}\right)^{1/\theta}\]</div></section>
+<section><h3>Visual de cambios</h3><div data-vis="inter"></div></section>
 ${LAB}
 <p class="warn"><b>Error común:</b> sumar \(Y_1+Y_2\) para obtener la riqueza. El ingreso de mañana vale menos hoy: hay que dividirlo por \(1+r\).</p>`,
 deep:[
@@ -71,6 +72,7 @@ qs:[{q:"Si r = ρ, ¿cómo se comparan C₁ y C₂?",a:String.raw`El factor de E
 <section><h3>Inversión bruta y neta</h3>
 <div class="mj">\[I_t^{bruta}=K^*-(1-\delta)K_{t-1}\qquad\qquad I_t^{neta}=K^*-K_{t-1}\]</div>
 <p>La inversión bruta incluye la reposición del capital que se depreció; la neta es el crecimiento real del stock.</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="capital"></div></section>
 ${LAB}
 <p class="link"><b>Regla rápida:</b> si \(PMgK>r+\delta\), conviene invertir; si es menor, conviene desinvertir. Con los datos del JSON de Economiapp, \(PMgK=0{,}15\) y \(uc=0{,}05+0{,}10=0{,}15\): la empresa ya está en su capital óptimo.</p>`,
 deep:[
@@ -169,6 +171,12 @@ qs:[{q:"Si la productividad futura z₂ sube, ¿qué pasa con la inversión de h
 ];
 
 const BRANCHES=[
+{g:"Visuales", from:"intertemporal", items:[
+ {id:"visuales", t:"Visuales de cambios: todos los gráficos", nuevo:true, html:String.raw`
+<section><h3>Para qué sirve</h3><p class="lead">Los gráficos del curso en los que se estudian desplazamientos, juntos. Mueve una curva y el texto de abajo te dice qué cambió, qué pudo haberlo causado, el mecanismo y el resultado.</p>
+<ul><li><b>Línea punteada:</b> posición inicial; <b>sólida:</b> posición actual.</li><li><b>Círculos:</b> arrástralos (o usa las flechas del teclado) para mover la curva.</li><li><b>Choques de ejemplo:</b> cargan casos típicos; después puedes seguir moviendo a mano.</li></ul>
+<p class="hint">Los números son ilustrativos: sirven para ver direcciones y magnitudes relativas.</p></section>
+<section><h3>Gráficos</h3><div data-vis="*"></div></section>`}]},
 {g:"Más allá de dos períodos", from:"intertemporal", items:[
  {id:"nperiodos", t:"Riqueza en N períodos", sim:"nper", html:String.raw`
 <section><h3>La idea</h3><p class="lead">Con más períodos la riqueza es la suma de los ingresos traídos a valor presente: cada período adicional se descuenta una vez más.</p>

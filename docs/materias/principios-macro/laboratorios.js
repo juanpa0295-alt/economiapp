@@ -115,3 +115,66 @@ SIMS.hoja=function(){
     $("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th></tr>`+(rows.length?rows.map(([a,b,c])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td></tr>`).join(""):`<tr><td colspan="3">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h-q").addEventListener("input",run);run();
 };
+
+// Visuales de cambios de Principios de Macroeconomía (usa el motor comun/visual.js)
+// Parámetros base: C0 = 100, T = 100, I0 = 200, G = 100, b = 10, k = 0,5, h = 25, M/P = 300.
+
+// 1. Cruz keynesiana: DA = gasto autónomo + c1·Y contra la recta de 45°
+VIS.add("keynes",{t:"Cruz keynesiana: demanda agregada y recta de 45°",
+  hint:"Arrastra la DA hacia arriba o hacia abajo (cambio del gasto autónomo). Cambia c₁ para ver cómo cambia el multiplicador.",
+  opts:[{id:"c1",lab:"Propensión a consumir c₁",ch:[["0.6","0,6"],["0.75","0,75"],["0.8","0,8"]],v:"0.8"}],
+  p0:{dA:0},lim:{dA:[-120,120]},
+  presets:[["∆G = +40",{dA:40}],["∆T = +50",{dA:-1}],["∆I = −30",{dA:-30}],["∆G = ∆T = +50",{dA:0.001}]],
+  fit:{dA:(Y,D,st)=>{const c=+st.o.c1,A0=100-c*100+200+100;return D-c*Y-A0}},
+  compute(st){const c=+st.o.c1,A0=100-c*100+200+100,m=1/(1-c);let dA=st.p.dA,nota="";
+    if(Math.abs(dA+1)<1e-9){dA=-c*50;nota="Una subida de impuestos de 50 reduce el ingreso disponible en 50 y el consumo en c₁·50 = "+VIS.n(c*50,1)+": la DA baja ese monto, no los 50 completos."}
+    if(Math.abs(dA-0.001)<1e-9){dA=50-c*50;nota="Con ∆G = ∆T = 50 la DA sube 50 por el gasto y baja c₁·50 por los impuestos: neto, sube (1 − c₁)·50 = "+VIS.n(50-c*50,1)+". Multiplicado por 1/(1 − c₁), el PIB sube exactamente 50: el multiplicador del presupuesto equilibrado es 1."}
+    const A=A0+dA,Y0=A0*m,Y1=A*m,DA=a=>Y=>a+c*Y,mv=Math.abs(dA)>0.5;
+    const curves=[{sh:VIS.fx(Y=>Y),col:"--muted",w:1.6,lab:"45°: DA = Y"},{sh:VIS.fx(DA(A0)),col:"--line",dash:1,op:.55,lab:mv?"DA":""},{sh:VIS.fx(DA(A)),col:"--line",lab:mv?"DA’":"DA = C + I + G"}];
+    const pts=[{x:Y0,y:Y0,lab:"0"}],segs=[];if(mv){pts.push({x:Y1,y:Y1,lab:"1",col:"--good"});segs.push({x1:Y0,y1:Y0,x2:Y0,y2:DA(A)(Y0),col:"--bad",w:3,lab:dA>0?"DA > Y":"DA < Y"});segs.push({x1:Y0,y1:120,x2:Y1,y2:120,col:"--good",arrow:1,lab:"∆Y"})}
+    const hx=1700,P={cap:"Cruz keynesiana · c₁ = "+VIS.n(c,2),xr:[0,2400],yr:[0,2400],xl:"Ingreso Y",yl:"Demanda agregada DA",fx:v=>VIS.n(v,0),fy:v=>VIS.n(v,0),curves,segs,pts,handles:[{c:"dA",x:hx,y:DA(A)(hx),col:"--line",name:"la DA"}]};
+    let h;if(!mv)h=`<p>Todavía no hay cambios. El equilibrio está donde la DA corta la recta de 45°: Y* = gasto autónomo × multiplicador = ${VIS.n(A0,0)} × ${VIS.n(m,2)} = ${VIS.n(Y0,0)}. Arrastra la DA o prueba un choque.</p>`;
+    else{h=VIS.sec("Qué cambió",VIS.list([`La DA se desplazó <b>${dA>0?"hacia arriba":"hacia abajo"}</b> en ${VIS.n(Math.abs(dA),1)}: el gasto autónomo pasó de ${VIS.n(A0,0)} a ${VIS.n(A,0)}.`]));
+      h+=VIS.sec("Qué pudo haberlo causado",(nota?`<p>${nota}</p>`:"")+VIS.list([dA>0?"∆+G o ∆+I (entran completos a la DA), ∆+C₀ (más consumo autónomo) o ∆-T (sube la DA en c₁·∆T).":"∆-G o ∆-I, ∆-C₀ o ∆+T (baja la DA en c₁·∆T)."]));
+      h+=VIS.sec("Mecanismo",`<p>Al ingreso inicial ${VIS.n(Y0,0)} ahora ${dA>0?"la demanda supera a la producción: se desacumulan inventarios y las empresas producen más":"la producción supera a la demanda: se acumulan inventarios y las empresas producen menos"}. El nuevo ingreso genera más (menos) consumo, y así en rondas: ${VIS.n(Math.abs(dA),1)} × (1 + ${VIS.n(c,2)} + ${VIS.n(c,2)}² + …) = ${VIS.n(Math.abs(dA),1)} × ${VIS.n(m,2)}.</p><div class="eq al chain">∆Y = ∆A / (1 − c₁) = ${VIS.n(dA,1)} / ${VIS.n(1-c,2)} = ${VIS.n(Y1-Y0,1)}</div>`);
+      h+=VIS.sec("Resultado",`<div class="res">${tiles([VIS.tile("Ingreso Y*",Y0,Y1,0),["Multiplicador",VIS.n(m,2)],VIS.tile("Consumo C",100+c*(Y0-100),100+c*(Y1-100),0)])}</div>`)}
+    return{panels:[P],text:h}}});
+
+// 2. Mercado de dinero en (M/P, r): oferta vertical, demanda L = kY − hr
+VIS.add("dinero",{t:"Mercado de dinero: oferta real y demanda L(r, Y)",
+  hint:"Arrastra la oferta monetaria real (vertical) o la demanda de dinero (cambia con el ingreso Y).",
+  p0:{M:300,Y:1100},lim:{M:[150,450],Y:[800,1400]},
+  presets:[["El banco central expande M",{M:375}],["Sube el ingreso Y",{Y:1300}],["Suben los precios P",{M:240}]],
+  fit:{M:x=>x,Y:(m,r)=>(m+25*r)/0.5},
+  compute(st){const{M,Y}=st.p,L=y=>m=>(0.5*y-m)/25,r0=L(1100)(300),r1=L(Y)(M),mM=Math.abs(M-300)>1,mY=Math.abs(Y-1100)>2;
+    const curves=[{sh:VIS.vx(300),col:"--line",dash:1,op:.55,lab:mM?"M/P":""},{sh:VIS.fx(L(1100)),col:"--branch",dash:1,op:.55,lab:mY?"L":""},{sh:VIS.vx(M),col:"--line",lab:mM?"M/P’":"M/P (oferta)"},{sh:VIS.fx(L(Y)),col:"--branch",lab:mY?"L’ = kY’ − hr":"L = kY − hr"}];
+    const pts=[{x:300,y:r0,lab:"0"}];if(mM||mY)pts.push({x:M,y:r1,lab:"1",col:"--good"});
+    const hx=VIS.clamp(0.5*Y-25*4,20,580),P={cap:"Mercado de dinero",xr:[0,600],yr:[0,20],xl:"Saldos reales M/P",yl:"Tasa de interés r (%)",fx:v=>VIS.n(v,0),curves,pts,handles:[{c:"M",x:M,y:18,col:"--line",name:"la oferta monetaria"},{c:"Y",x:hx,y:L(Y)(hx),col:"--branch",name:"la demanda de dinero"}]};
+    let h;if(!mM&&!mY)h=`<p>Todavía no hay cambios: r* = (kY − M/P)/h = (0,5·1.100 − 300)/25 = ${VIS.n(r0,1)} %. Arrastra una curva o prueba un choque.</p>`;
+    else{const mv=[],cs=[];if(mM){mv.push(`La oferta real se desplazó <b>${M>300?"a la derecha":"a la izquierda"}</b> (M/P = ${VIS.n(M,0)}).`);cs.push(M>300?"El banco central aumenta M (compra bonos) o bajan los precios P.":"El banco central reduce M (vende bonos) o suben los precios P.")}
+      if(mY){mv.push(`La demanda de dinero se desplazó <b>${Y>1100?"a la derecha":"a la izquierda"}</b> (Y = ${VIS.n(Y,0)}).`);cs.push(Y>1100?"Sube el ingreso: se necesitan más saldos para transacciones (motivo transacción, kY).":"Baja el ingreso: se necesita menos dinero para transacciones.")}
+      const dr=r1-r0;h=VIS.sec("Qué cambió",VIS.list(mv))+VIS.sec("Qué pudo haberlo causado",VIS.list(cs))+VIS.sec("Mecanismo",`<p>A la tasa inicial de ${VIS.n(r0,1)} % hay ${dr<0?"<b>exceso de oferta de dinero</b>: la gente compra bonos, su precio sube y la tasa baja":"<b>exceso de demanda de dinero</b>: la gente vende bonos, su precio baja y la tasa sube"} hasta ${VIS.n(r1,1)} %, donde el público quiere tener justo el dinero que hay.</p>`)
+        +VIS.sec("Resultado",`<div class="res">${tiles([VIS.tile("Tasa r (%)",r0,r1,2)])}</div>`)}
+    return{panels:[P],text:h}}});
+
+// 3. IS-LM en (Y, r)
+VIS.add("islm",{t:"Modelo IS-LM",
+  hint:"Arrastra la IS (política fiscal o gasto autónomo) o la LM (política monetaria). La línea punteada horizontal muestra cuánto subiría Y si la tasa no cambiara: la diferencia es el efecto expulsión.",
+  p0:{dA:0,M:300},lim:{dA:[-100,100],M:[180,420]},
+  presets:[["∆G = +40",{dA:40}],["∆M/P = +60",{M:360}],["∆T = +50",{dA:-40}],["Política mixta: ∆G y ∆M",{dA:40,M:350}]],
+  fit:{dA:(Y,r)=>0.2*Y+10*r-320,M:(Y,r)=>0.5*Y-25*r},
+  compute(st){const{dA,M}=st.p,A=320+dA,IS=a=>Y=>(a-0.2*Y)/10,LM=m=>Y=>(0.5*Y-m)/25,solve=(a,m)=>{const Y=(25*a+10*m)/(25*0.2+10*0.5);return{Y,r:(0.5*Y-m)/25}};
+    const e0=solve(320,300),e1=solve(A,M),mI=Math.abs(dA)>0.5,mL=Math.abs(M-300)>1;
+    const curves=[{sh:VIS.fx(IS(320)),col:"--branch",dash:1,op:.55,lab:mI?"IS":""},{sh:VIS.fx(LM(300)),col:"--line",dash:1,op:.55,lab:mL?"LM":""},{sh:VIS.fx(IS(A)),col:"--branch",lab:mI?"IS’":"IS"},{sh:VIS.fx(LM(M)),col:"--line",lab:mL?"LM’":"LM"}];
+    const pts=[{x:e0.Y,y:e0.r,lab:"0"}],segs=[];let Yk=null;
+    if(mI||mL)pts.push({x:e1.Y,y:e1.r,lab:"1",col:"--good"});
+    if(mI&&!mL){Yk=(A-10*e0.r)/0.2;segs.push({x1:e0.Y,y1:e0.r,x2:Yk,y2:e0.r,col:"--muted",dash:1,w:1.5,arrow:1});pts.push({x:Yk,y:e0.r,lab:"sin expulsión",col:"--muted"})}
+    const hi=1450,hl=VIS.clamp(800+2*(M-300),300,1900),P={cap:"Equilibrio IS-LM",xr:[0,2200],yr:[0,25],xl:"Ingreso Y",yl:"Tasa de interés r (%)",fx:v=>VIS.n(v,0),curves,segs,pts,
+      handles:[{c:"dA",x:hi,y:IS(A)(hi),col:"--branch",name:"la IS"},{c:"M",x:hl,y:LM(M)(hl),col:"--line",name:"la LM"}]};
+    let h;if(!mI&&!mL)h=`<p>Todavía no hay cambios. En 0 se cruzan la IS (bienes) y la LM (dinero): Y* = ${VIS.n(e0.Y,0)}, r* = ${VIS.n(e0.r,1)} %. Arrastra una curva o prueba un choque.</p>`;
+    else{const mv=[],cs=[];if(mI){mv.push(`La IS se desplazó <b>${dA>0?"a la derecha":"a la izquierda"}</b>: el gasto autónomo cambió en ${VIS.n(dA,1)}.`);cs.push(dA>0?"∆+G, ∆+I₀, ∆+C₀ o ∆-T (política fiscal expansiva).":"∆-G, ∆-I₀, ∆-C₀ o ∆+T (política fiscal contractiva).")}
+      if(mL){mv.push(`La LM se desplazó <b>${M>300?"a la derecha":"a la izquierda"}</b>: M/P = ${VIS.n(M,0)}.`);cs.push(M>300?"∆+M (política monetaria expansiva) o ∆-P.":"∆-M (política monetaria contractiva) o ∆+P.")}
+      let m="";if(mI)m+=`<p><b>Fiscal:</b> ${dA>0?"∆+G → ∆+DA → ∆+Y → ∆+L (más dinero para transacciones) → ∆+r → ∆-I":"∆-G → ∆-DA → ∆-Y → ∆-L → ∆-r → ∆+I"}.${Yk!==null?` Con la tasa fija, Y llegaría a ${VIS.n(Yk,0)} (multiplicador simple); con la subida de r llega solo a ${VIS.n(e1.Y,0)}. La diferencia es el <b>efecto expulsión</b>: ∆I = −b·∆r = −10 × ${VIS.n(e1.r-e0.r,2)} = ${VIS.n(-10*(e1.r-e0.r),1)}.`:""}</p>`;
+      if(mL)m+=`<p><b>Monetaria:</b> ${M>300?"∆+M/P → exceso de oferta de dinero → ∆-r → ∆+I → ∆+DA → ∆+Y":"∆-M/P → exceso de demanda de dinero → ∆+r → ∆-I → ∆-DA → ∆-Y"}.</p>`;
+      h=VIS.sec("Qué cambió",VIS.list(mv))+VIS.sec("Qué pudo haberlo causado",VIS.list(cs))+VIS.sec("Mecanismo",m)+VIS.sec("Resultado",`<div class="res">${tiles([VIS.tile("Ingreso Y",e0.Y,e1.Y,0),VIS.tile("Tasa r (%)",e0.r,e1.r,2),VIS.tile("Inversión I",200-10*e0.r,200-10*e1.r,1)])}</div>`)}
+    return{panels:[P],text:h}}});

@@ -16,7 +16,7 @@ docs/
 │   ├── laboral.js                Derecho Laboral: tabla LEY (actualizar cada año) y cálculos
 │   ├── macro.js                  Cálculos de Macroeconomía 1
 │   ├── macro2.js                 Macroeconomía 2: Mundell-Fleming, Krugman, SA-DA, modelo i-P, transables y no transables
-│   ├── visual.js                 Visuales de cambios: curvas que se arrastran y lectura del cambio en texto (data-vis)
+│   ├── visual.js                 Motor de los visuales de cambios (data-vis); las escenas viven en el laboratorios.js de cada materia
 │   ├── principios.js             Cálculos de Principios de Macroeconomía
 │   └── simbolico.js              SymPy en el navegador (Pyodide) y respaldo numérico
 └── materias/
