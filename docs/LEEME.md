@@ -15,6 +15,7 @@ docs/
 │   ├── extensiva.js              Árboles de juego: editor, subjuegos y EPS con azar
 │   ├── laboral.js                Derecho Laboral: tabla LEY (actualizar cada año) y cálculos
 │   ├── macro.js                  Cálculos de Macroeconomía 1
+│   ├── macro2.js                 Macroeconomía 2: Mundell-Fleming, Krugman, SA-DA, modelo i-P, transables y no transables
 │   ├── principios.js             Cálculos de Principios de Macroeconomía
 │   └── simbolico.js              SymPy en el navegador (Pyodide) y respaldo numérico
 └── materias/
@@ -26,6 +27,7 @@ docs/
     ├── principios-macro.html + principios-macro/
     ├── estadistica-2.html  + estadistica-2/
     ├── macroeconomia-1.html + macroeconomia-1/
+    ├── macroeconomia-2.html + macroeconomia-2/
     ├── teoria-juegos.html  + teoria-juegos/
     └── derecho-laboral.html + derecho-laboral/
 ```
