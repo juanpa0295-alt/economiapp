@@ -18,6 +18,7 @@ const TRUNK=[
 <tr><td>Impuestos \(T\)</td><td>\(\frac{\partial Y}{\partial T}=-\frac{c_1}{1-c_1}\)</td><td class="num">−4</td></tr>
 <tr><td>Propensión a consumir \(c_1\)</td><td>\(\frac{\partial Y}{\partial c_1}=\frac{C_0-T+I+G}{(1-c_1)^2}\)</td><td>Depende del nivel de gasto</td></tr></table></div>
 <p>El multiplicador de los impuestos es menor en valor absoluto porque una parte de la rebaja de impuestos se ahorra.</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="keynes"></div></section>
 ${LAB}`,
 deep:[
 {k:"Derivada",t:"∂Y/∂G",html:String.raw`<div class="mj">\[\frac{\partial Y}{\partial G}=\frac{1}{1-c_1}\cdot\frac{\partial}{\partial G}\big[C_0-c_1T+I+G\big]=\frac{1}{1-c_1}(0-0+0+1)=\frac{1}{1-c_1}\]</div>`},
@@ -46,6 +47,7 @@ qs:[{q:"Con c₁ = 0,75, ¿cuánto sube el PIB si el gobierno gasta 100 más?",a
 <p>Las combinaciones de \(Y\) y \(r\) que equilibran el mercado de dinero forman la curva LM. Su pendiente es</p>
 <div class="mj">\[\frac{\partial r}{\partial Y}=\frac{k}{h}>0\]</div>
 <p>Si el ingreso sube, la gente demanda más dinero; con la oferta fija, la tasa debe subir para reducir la demanda especulativa.</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="dinero"></div></section>
 ${LAB}
 <p class="link"><b>Política monetaria:</b> si el banco central aumenta \(M\), la tasa baja: \(\frac{\partial r}{\partial M}=-\frac{1}{Ph}\).</p>`,
 deep:[{k:"Revisión",n:true,t:"Las unidades de la tasa de interés",html:String.raw`<p>Con los valores del JSON de Economiapp (\(k=0{,}5\), \(Y=3.000.000\), \(M=500.000\), \(h=20.000\)) la tasa de equilibrio da \(r^*=50\). La app la mostraba como «5.000 %», que no tiene sentido económico. El problema está en la escala de \(h\): para que \(r\) quede como una fracción razonable (por ejemplo 0,05), \(h\) tendría que ser del orden de veinte millones. Aquí \(r\) se muestra tal como sale de la fórmula, sin convertirla a porcentaje.</p>`}],
@@ -69,6 +71,7 @@ qs:[{q:"Si los precios suben y el banco central no cambia M, ¿qué pasa con la 
 <section><h3>Multiplicadores de política</h3>
 <div class="mj">\[\frac{\partial Y}{\partial G}=\frac{h}{h(1-c_1)+bk}\qquad\frac{\partial Y}{\partial M}=\frac{b/P}{h(1-c_1)+bk}\qquad\frac{\partial Y}{\partial T}=-\frac{c_1h}{h(1-c_1)+bk}\]</div>
 <p>El multiplicador fiscal es menor que el keynesiano \(\frac{1}{1-c_1}\): al subir el gasto sube la demanda de dinero, la tasa de interés aumenta y la inversión privada cae. Eso es el <b>efecto expulsión</b> (crowding out).</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="islm"></div></section>
 ${LAB}`,
 deep:[{k:"Revisión",n:true,t:"Mismo problema de unidades",html:String.raw`<p>Con los valores del JSON, \(r^*\approx135{,}6\): igual que en el mercado de dinero, la escala de \(h\) y \(b\) no corresponde a una tasa en porcentaje. Los multiplicadores sí son razonables (\(\partial Y/\partial G\approx2{,}22\) frente a 5 del modelo keynesiano simple).</p>`}],
 py:`def is_lm(C0, c1, T, I0, b, G, M, P, k, h):
@@ -83,15 +86,23 @@ qs:[{q:"Si la demanda de dinero no depende de la tasa (h → 0), ¿qué efecto t
 ];
 
 const BRANCHES=[
+{g:"Visuales", from:"pib", items:[
+ {id:"visuales", t:"Visuales de cambios: todos los gráficos", nuevo:true, html:String.raw`
+<section><h3>Para qué sirve</h3><p class="lead">Los gráficos del curso en los que se estudian desplazamientos, juntos. Mueve una curva y el texto de abajo te dice qué cambió, qué pudo haberlo causado, el mecanismo y el resultado.</p>
+<ul><li><b>Línea punteada:</b> posición inicial; <b>sólida:</b> posición actual.</li><li><b>Círculos:</b> arrástralos (o usa las flechas del teclado) para mover la curva.</li><li><b>Choques de ejemplo:</b> cargan casos típicos; después puedes seguir moviendo a mano.</li></ul>
+<p class="hint">Usa los mismos parámetros del laboratorio por defecto (C₀ = 100, T = 100, I₀ = 200, G = 100, b = 10, k = 0,5, h = 25, M/P = 300).</p></section>
+<section><h3>Gráficos</h3><div data-vis="*"></div></section>`}]},
 {g:"Política fiscal", from:"pib", items:[
  {id:"equilibrado", t:"Multiplicador del presupuesto equilibrado", nuevo:true, sim:"equi", html:String.raw`
 <section><h3>La idea</h3><p class="lead">Si el gobierno sube el gasto y lo financia subiendo los impuestos en la misma cantidad, el déficit no cambia, pero el PIB sí: sube exactamente lo mismo que el gasto.</p>
-<div class="mj">\[\Delta Y=\frac{1}{1-c_1}\Delta G-\frac{c_1}{1-c_1}\Delta T\;\overset{\Delta G=\Delta T}{=}\;\frac{1-c_1}{1-c_1}\Delta G=\Delta G\]</div></section>${LAB}`,
+<div class="mj">\[\Delta Y=\frac{1}{1-c_1}\Delta G-\frac{c_1}{1-c_1}\Delta T\;\overset{\Delta G=\Delta T}{=}\;\frac{1-c_1}{1-c_1}\Delta G=\Delta G\]</div></section><section><h3>Visual: prueba «∆G = ∆T = +50»</h3><div data-vis="keynes"></div></section>
+${LAB}`,
  qs:[{q:"¿Depende el multiplicador del presupuesto equilibrado de c₁?",a:"No, siempre vale 1 en el modelo keynesiano simple, sea cual sea la propensión a consumir."}]}]},
 {g:"Política en IS-LM", from:"islm", items:[
  {id:"expulsion", t:"Política fiscal y monetaria: efecto expulsión", nuevo:true, sim:"expu", html:String.raw`
 <section><h3>La idea</h3><p class="lead">Un aumento del gasto desplaza la IS a la derecha: sube el PIB, pero también la tasa de interés, y eso reduce la inversión. Un aumento de la oferta monetaria desplaza la LM a la derecha: baja la tasa, sube la inversión y sube el PIB.</p>
-<div class="mj">\[\text{Expulsión}=\Delta I=-b\,\Delta r\]</div></section>${LAB}`}]}
+<div class="mj">\[\text{Expulsión}=\Delta I=-b\,\Delta r\]</div></section><section><h3>Visual: mira el efecto expulsión</h3><div data-vis="islm"></div></section>
+${LAB}`}]}
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
