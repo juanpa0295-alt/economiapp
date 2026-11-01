@@ -1,6 +1,6 @@
-// Derecho Laboral y Constitucional · contenido de la ruta
+// Derecho Laboral y Comercial · contenido de la ruta
 // =====================================================================
-// CONTENIDO: Derecho Laboral y Constitucional. Temas del curso: prórrogas, indemnizaciones y nómina/horas extras (CST).
+// CONTENIDO: Derecho Laboral y Comercial. Temas del curso: prórrogas, indemnizaciones y nómina/horas extras (CST).
 // Normas verificadas a octubre de 2026: CST con la Ley 2466 de 2025, Ley 2101 de 2021, Decretos 1469 y 1470 de 2025.
 // =====================================================================
 const LAB_=`<section><h3>Calculadora</h3><div class="sim" id="sim"></div></section>`;

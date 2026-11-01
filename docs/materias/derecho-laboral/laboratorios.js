@@ -1,4 +1,4 @@
-// Derecho Laboral y Constitucional · calculadoras
+// Derecho Laboral y Comercial · calculadoras
 // ===================== CALCULADORAS DE DERECHO LABORAL =====================
 const SIMS={};
 const HOY=(()=>{const t=new Date();return{y:t.getFullYear(),m:t.getMonth()+1,d:t.getDate()}})();
