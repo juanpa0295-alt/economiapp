@@ -116,6 +116,7 @@ qs:[{q:"i = 9,25 %, i* = 4,5 %, Eₜ = 3.900. ¿Qué Eᵉ cumple la PNCI? Si el 
 <tr><td>BdeP (CC + CF)</td><td>ICE (inversión colombiana afuera), Y (más importaciones)</td><td>Precio del petróleo, superávit en BC y BS, turismo, remesas, IEC, Y*, mejores términos de intercambio</td></tr>
 <tr><td>Competitividad</td><td>Caída del TCR (P*/P baja)</td><td>Alza del TCR (P*/P sube)</td></tr></table></div>
 <p class="hint">Las cadenas completas de cada determinante están en la rama «Diez cadenas del tipo de cambio».</p></section>
+<section><h3>Visual de cambios: oferta y demanda de dólares</h3><div data-vis="divisas"></div></section>
 <section><h3>Intervención con tipo de cambio fijo</h3><div class="tbl"><table><tr><th>E fijo por encima del equilibrio</th><th>E fijo por debajo del equilibrio</th></tr>
 <tr><td>\(X_1>Q_1\): EOD → el BC compra el exceso de dólares → ∆+RI ⟺ ∆+M (política monetaria expansiva, con costo cuasifiscal) → ∆-i → ∆+I → ∆+A → ∆+DA → ∆+Y → ∆+P</td><td>\(Q_1>X_1\): EDD → el BC vende dólares → ∆-RI ⟺ ∆-M → ∆+i → ∆-I → ∆-A → ∆-DA → ∆-Y → ∆-P</td></tr></table></div>
 <p>Con tipo fijo, las reservas y la oferta monetaria se vuelven endógenas: el banco renuncia a controlar M para controlar E. «TC fijo: intervenciones cambiarias → RI ⟹ M»; «TC flexible: el mercado de divisas determina E y TCR = TCR(E)».</p>
@@ -124,6 +125,7 @@ qs:[{q:"i = 9,25 %, i* = 4,5 %, Eₜ = 3.900. ¿Qué Eᵉ cumple la PNCI? Si el 
 <section><h3>Enfoque de activos (PNCI)</h3><p>Se mira solo el lado financiero: la rentabilidad interna \(RI=i\) es una recta vertical en el plano \((i,E)\) y la rentabilidad externa en pesos \(RE=i^*+(E^e_{t+1}-E_t)/E_t\) tiene pendiente negativa. El equilibrio es donde \(RI=RE\) (DR = 0).</p>
 <ul><li>A un \(E_1\) mayor que el de equilibrio, \(RI>RE\): DR > 0, entran capitales, EOD y \(\Delta^-E\).</li><li>\(\Delta i^*\) desplaza RE a la derecha: en el E inicial DR ˂ 0, salen capitales (EDD) y el peso se deprecia.</li></ul>
 <p>Con el mercado de dinero \((M/P=L(Y,i))\): un \(\Delta^+M\) → EOM → \(\Delta^-i\) (efecto liquidez) → \(\Delta^-RI\) dada la RE → DR ˂ 0 → salida de capitales → EDD → \(\Delta^+E\).</p></section>
+<section><h3>Visual de cambios: dinero y paridad de intereses</h3><div data-vis="activos"></div></section>
 <section><h3>Overshooting</h3><p>Tras una expansión monetaria, a corto plazo el tipo de cambio se deprecia de \(E_0\) a \(E_1\). A mediano plazo suben los precios, caen los saldos reales y sube \(i\): el peso se aprecia de \(E_1\) a \(E_2\). A largo plazo queda depreciado frente a \(E_0\), pero menos que en el corto plazo: \(\Delta^+E_{CP}>\Delta^+E_{LP}\).</p>
 <p>Ocurre porque los precios son rígidos y los activos no: todo el ajuste inicial recae en E. En clase: <b>overshooting</b> = la devaluación del corto plazo supera a la del largo plazo; <b>undershooting</b> = la revaluación del corto plazo supera a la del largo. En la literatura (Dornbusch, Krugman) overshooting es que la respuesta de corto plazo supere a la de largo en cualquier dirección, y undershooting que sea menor; usa la de clase y menciona la diferencia si preguntan por una revaluación excesiva.</p>
 <div class="tbl"><table><tr><th>Ajuste</th><th>M</th><th>i</th><th>E</th><th>P</th></tr><tr><td>Corto plazo</td><td>∆+</td><td>∆-</td><td>∆+</td><td>0</td></tr><tr><td>Mediano plazo</td><td>0</td><td>∆+</td><td>∆-</td><td>∆+</td></tr><tr><td>Largo plazo</td><td>0</td><td>∆-/∆+</td><td>∆-/∆+</td><td>∆+</td></tr></table></div></section>
@@ -151,6 +153,7 @@ qs:[{q:"Supletorio 2025-2: cae el precio del petróleo. ¿Qué curva se mueve y 
 <p><b>Truco del gráfico de cuatro cuadrantes (29-09):</b> el panel izquierdo está en espejo (y crece hacia la izquierda), por eso la EMA parece tener pendiente positiva allí. En el plano normal es negativa.</p></section>
 <section><h3>Caída de precios: se mueven las dos curvas</h3><p>P está en el TCR (EMB) y en M/P (EMA). ∆-P → ∆+TCR → ∆+XN → EDB: la EMB baja a la derecha. ∆-P → ∆+M/P → EOM → ∆-i → DR ˂ 0 → EDD: la EMA sube a la derecha. La producción sube con seguridad; E es ambiguo. Por eso la respuesta de la pregunta 15 del Parcial 1 es la gráfica que desplaza ambas curvas.</p></section>
 <section><h3>Pleno empleo y brechas (13-10)</h3><p>\(\bar y-y_0>0\): desempleo (la SA supera a la DA), hace falta política expansiva. \(y_0-\bar y>0\): sobreempleo. Con tipo flexible se puede llegar a \(\bar y\) por dos caminos: con política monetaria la EMA sube y E termina mayor (depreciación, más exportaciones); con política fiscal la EMB baja a la derecha y E termina menor (apreciación, más gasto interno). Misma producción, distinto tipo de cambio y distinta composición de la demanda.</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="krugman"></div></section>
 ${LAB}`,
 qs:[{q:"Sube la tasa de la FED. ¿Qué régimen protege mejor los precios? (Parcial 1, punto 4)",a:"Flexible: DR ˂ 0 → EDD → sube E → ∆+TCR → ∆+XN → ∆+y, pero entra inflación importada. Fijo: el BC vende divisas → ∆-RIN → ∆-M → EDM → sube i hasta i*: E y P quedan estables a costa de menos producción y menos reservas. El profesor pidió mostrar los dos regímenes con gráficas antes de elegir."},
  {q:"Con tipo de cambio flexible, ¿qué efecto tiene un aumento de la demanda de dinero en el modelo de Krugman?",a:"∆L dado (M/P) → EDM → ∆i → DR > 0 → entrada de capitales → EOD → ∆-E: la EMA se desplaza abajo y a la izquierda. La apreciación reduce las XN y la renta cae. Con tipo de cambio fijo, el BC compra dólares (∆M) y la EMA regresa: la renta no cambia."}]},
@@ -170,6 +173,7 @@ qs:[{q:"Sube la tasa de la FED. ¿Qué régimen protege mejor los precios? (Parc
 <tr><td>BP = 0</td><td>Arriba y a la izquierda: superávit (EOD)</td><td>Abajo y a la derecha: déficit (EDD)</td></tr></table></div></section>
 <section><h3>El proceso de ajuste</h3><ol class="steps"><li><b>Efecto impacto:</b> el choque mueve la EMB o la EMM y la economía llega a un nuevo equilibrio interno (punto 1).</li><li><b>Saldo de la BP en el punto 1:</b> \(\Delta Y\to\Delta Q\) mueve la balanza comercial y \(\Delta i\) mueve la cuenta financiera.</li><li><b>Tipo de cambio fijo:</b> el BC compra o vende reservas: la EMM se endogeniza (\(\Delta RI\to\Delta M\)).</li><li><b>Tipo de cambio flexible:</b> el EDD o EOD mueve E: se endogenizan la EMB y la BP vía TCR.</li></ol></section>
 <section><h3>Resumen con movilidad perfecta</h3><div class="tbl"><table><tr><th></th><th>Monetaria expansiva</th><th>Fiscal expansiva</th></tr><tr><td>Fijo</td><td>Ineficaz: el BC vende reservas</td><td>Máximo efecto: el BC compra reservas</td></tr><tr><td>Flexible</td><td>Máximo efecto: la depreciación refuerza</td><td>Ineficaz: la apreciación desplaza las XN</td></tr></table></div></section>
+<section><h3>Visual de cambios</h3><div data-vis="mf"></div></section>
 ${LAB}
 <p class="warn"><b>Error común:</b> en tipo de cambio flexible, mover la EMM durante el ajuste. La oferta monetaria no cambia: lo que se mueve con el tipo de cambio son la EMB y la BP.</p>`,
 qs:[{q:"Con movilidad imperfecta (BP menos inclinada que la EMM) y tipo de cambio fijo, ¿qué hace el BC si caen las exportaciones?",a:"Las exportaciones caen: la EMB y la BP se desplazan a la izquierda. En el nuevo equilibrio interno, la caída de i saca capitales y la BP queda en déficit (EDD). Para defender el tipo de cambio, el BC vende reservas internacionales (respuesta b). Compruébalo en el laboratorio."},
@@ -187,7 +191,8 @@ qs:[{q:"Con movilidad imperfecta (BP menos inclinada que la EMM) y tipo de cambi
 <tr><td>Política monetaria expansiva</td><td>Ningún efecto</td><td>DA a la derecha</td></tr>
 <tr><td>Política fiscal expansiva</td><td>DA a la derecha</td><td>Poco efecto (depende de la movilidad)</td></tr>
 <tr><td>Mayor entrada de capitales de corto plazo</td><td>DA a la derecha</td><td>DA a la izquierda</td></tr></table></div>
-<p>Cualquier choque del comercio exterior o de la cuenta corriente afecta la DA con tipo de cambio fijo, pero no con flexible (Appleyard y Field, 2014).</p></section>`,
+<p>Cualquier choque del comercio exterior o de la cuenta corriente afecta la DA con tipo de cambio fijo, pero no con flexible (Appleyard y Field, 2014).</p></section>
+<section><h3>Visual de cambios: desplaza la DA</h3><div data-vis="sada"></div></section>`,
 qs:[{q:"¿Por qué un alza de i* desplaza la DA a la derecha con tipo de cambio flexible?",a:"El alza de i* genera salida de capitales y déficit en BP; el peso se deprecia, sube el TCR y con él las XN y la DA."}]},
 
 {id:"sa", t:"Oferta agregada: clásicos y keynesianos", nuevo:true, html:String.raw`
@@ -209,6 +214,7 @@ qs:[{q:"¿Por qué en el modelo clásico tradicional un aumento de precios no ca
 <tr><td>Keynesiana tradicional</td><td>\(\Delta^+Y\) y \(\Delta^+N\) con precios fijos.</td></tr>
 <tr><td>Nueva macroeconomía keynesiana</td><td>\(\Delta^+P\) con \(\ddot W\) fijo: \(\Delta^-(\ddot W/P)\) → \(\Delta^+N\) → \(\Delta^+Y\). El efecto real persiste.</td></tr></table></div></section>
 <section><h3>Choque petrolero (insumo importado) con tipo de cambio flexible</h3><p>(i) \(\Delta^+P_{IQ}\) → \(\Delta^+Q\) en valor → \(\Delta^-XN\) → déficit en BP → EDD → \(\Delta^+E\) → \(\Delta^+TCR\) → \(\Delta^+DA\). (ii) \(\Delta^+P_{IQ}\) eleva los costos de producción: la SA de corto y de largo plazo se desplazan a la izquierda. El resultado es <b>estanflación</b>: inflación con recesión.</p></section>
+<section><h3>Visual de cambios</h3><div data-vis="sada"></div></section>
 ${LAB}`,
 qs:[{q:"¿Qué efecto tiene una caída del consumo nacional en la nueva macroeconomía keynesiana?",a:"∆-C → ∆-DA: la DA se desplaza a la izquierda, bajan los precios y, con el salario mínimo fijo, sube el salario real como costo (∆+W̄/P). Cae la demanda de trabajo, el empleo y la producción. Como hay rigidez salarial, el efecto persiste."},
  {q:"¿Y una política monetaria expansiva en la nueva macroeconomía clásica?",a:"Impacto: ∆M → EOM → ∆-i → ∆DA → ∆Y. Corto plazo: suben los precios y, con Pᵉ dado, cae el salario real como costo; las empresas contratan más (∆N, ∆Y). Largo plazo: los trabajadores corrigen expectativas y exigen ∆W; la economía vuelve a Ȳ con precios más altos."}]},
@@ -264,7 +270,12 @@ qs:[{q:"¿Cómo se financia en definitiva un déficit fiscal con tipo de cambio 
 ];
 
 const BRANCHES=[
-{g:"Repaso", from:"glosario", items:[
+{g:"Visuales y repaso", from:"glosario", items:[
+ {id:"visuales", t:"Visuales de cambios: todos los gráficos", html:String.raw`
+<section><h3>Para qué sirve</h3><p class="lead">Aquí están juntos los gráficos del curso en los que se estudian desplazamientos. Mueve una curva y el texto de abajo te dice qué cambió, qué pudo haberlo causado, el mecanismo con flechas y el resultado.</p>
+<ul><li><b>Línea punteada:</b> dónde estaba la curva al inicio. <b>Línea sólida:</b> dónde está ahora.</li><li><b>Punto 0:</b> equilibrio inicial; <b>0’:</b> efecto impacto; <b>1 y 2:</b> equilibrios tras el choque y tras el ajuste.</li><li><b>Rombo:</b> punto de prueba. Muévelo fuera del equilibrio para ver qué excesos hay (EOD, EDD, EOM, EDM, EOB, EDB).</li><li>Los choques de ejemplo cargan casos de los talleres; después puedes seguir moviendo las curvas a mano.</li></ul>
+<p class="hint">Los números son ilustrativos: sirven para ver direcciones y magnitudes relativas, no para calcular un ejercicio. Cada gráfico también aparece dentro de su estación.</p></section>
+<section><h3>Gráficos</h3><div data-vis="*"></div></section>`},
  {id:"errores", t:"Errores frecuentes y dudas de las notas", html:String.raw`
 <section><h3>Quince errores que cuestan puntos</h3><ol class="steps">
 <li><b>Leer al revés la cotización.</b> Si E sube, el peso se deprecia.</li>
@@ -330,6 +341,7 @@ const BRANCHES=[
 <tr><td>M10</td><td>∆+remesas, turismo, IEC (o ∆+ICE)</td><td>Entran dólares → EOD (salen dólares → EDD)</td><td>∆- (∆+)</td></tr></table></div></section>
 <section><h3>Dos canales para el ingreso</h3><p>En M7 un aumento de y deprecia el peso por la vía comercial (más importaciones). En el enfoque de activos (la pendiente de la EMA) lo aprecia: ∆+y → ∆+L frente a M̄/P̄ → EDM → ∆+i → DR > 0 → EOD → ∆-E. Con movilidad perfecta, el canal financiero suele dominar en el corto plazo.</p>
 <p><b>Expectativas de inflación (M3):</b> de \(E_t=E^e_{t+1}(1+\pi^{e*})/(1+\pi^e_{col})\), con \(E^e\) fijo, ∆+π*ᵉ sube E y ∆+πᵉ col lo baja. Si \(E^e\) se ajusta, una mayor inflación esperada en Colombia termina subiendo E.</p></section>
+<section><h3>Visual: prueba las cadenas en el gráfico</h3><div data-vis="divisas"></div></section>
 <section><h3>Laboratorio</h3><p>Prueba M4, M5 y M3 con la PNCI: cambia i, i* o el Eᵉ del mercado y mira el signo de DR.</p><div class="sim" id="sim"></div></section>`}]},
 {g:"Krugman", from:"krugman", items:[
  {id:"politicas", t:"Política y choques en EMB–EMA", sim:"krug", html:String.raw`
@@ -349,6 +361,7 @@ const BRANCHES=[
 <tr><td>∆+G con flexible y con fijo (M14)</td><td>Con fijo el BC compra los dólares que sobran y expande M</td><td>Parcial frente a completa</td></tr>
 <tr><td>∆+i por política monetaria (M18) y por fiscal (M14)</td><td>En M18 cae la DA; en M14 la DA sube y la tasa sube como consecuencia</td><td>Ambos aprecian; y baja en M18 y sube en M14</td></tr>
 <tr><td>∆+M en el corto y en el largo plazo</td><td>En el largo plazo suben los precios y la tasa regresa</td><td>E sube mucho y luego baja un poco (overshooting)</td></tr></table></div></section>
+<section><h3>Visual: prueba las cadenas en el gráfico</h3><div data-vis="krugman"></div></section>
 <section><h3>Laboratorio</h3><div class="sim" id="sim"></div></section>`}]},
 {g:"Mundell-Fleming", from:"mundell", items:[
  {id:"zonas", t:"Zonas de desequilibrio", sim:"mfz", html:String.raw`
