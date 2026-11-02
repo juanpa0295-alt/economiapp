@@ -24,14 +24,32 @@ function typeset(el){if(window.MathJax&&MathJax.typesetPromise){try{MathJax.type
 function renderMap(){
   trunkEl.innerHTML=TRUNK.map((s,i)=>`<li><button class="st ${done[s.id]?"done":""} ${cur===s.id?"on":""}" type="button" data-go="${s.id}">
     <span class="dot">${done[s.id]?"✓":i+1}</span><span class="nm">${s.t}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}</button></li>`).join("");
-  brEl.innerHTML=BRANCHES.map(b=>`<div class="bgrp"><h4>${b.g}</h4><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
-    b.items.map(it=>`<button class="chip ${cur===it.id?"on":""} ${done[it.id]?"done":""}" type="button" data-go="${it.id}">${it.t}${it.nuevo?'<span class="nwdot">nuevo</span>':""}</button>`).join("")}</div></div>`).join("");
-  $("talleres").innerHTML=`<div class="wsgrp"><small>Herramientas para practicar</small><div class="chips">${WORKSHOPS.map(w=>`<button class="chip ws-chip ${cur===w.id?"on":""}" type="button" data-go="${w.id}">${w.t}</button>`).join("")}</div></div>`;
+  brEl.innerHTML=BRANCHES.map((b,gi)=>{const has=b.items.some(it=>it.id===cur),op=has||OPENG.has(gi),nd=b.items.filter(it=>done[it.id]).length;
+    return `<details class="bgrp${has?" cur":""}" data-g="${gi}" ${op?"open":""}><summary><span class="bgt">${b.g}</span><span class="bgn">${nd?nd+"/":""}${b.items.length}</span></summary><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
+    b.items.map(it=>`<button class="chip ${cur===it.id?"on":""} ${done[it.id]?"done":""}" type="button" data-go="${it.id}">${it.t}${it.nuevo?'<span class="nwdot">nuevo</span>':""}</button>`).join("")}</div></details>`}).join("");
+  const wsHas=WORKSHOPS.some(w=>w.id===cur);
+  $("talleres").innerHTML=`<details class="wsgrp${wsHas?" cur":""}" ${wsHas||OPENG.has("w")?"open":""} data-g="w"><summary><span class="bgt">Herramientas para practicar</span><span class="bgn">${WORKSHOPS.length}</span></summary><div class="chips">${WORKSHOPS.map(w=>`<button class="chip ws-chip ${cur===w.id?"on":""}" type="button" data-go="${w.id}">${w.t}</button>`).join("")}</div></details>`;
+  const mt=$("maptg");if(mt){const s0=byId(cur),pos=s0?(s0.kind==="t"?`Estación ${TRUNK.indexOf(s0)+1} de ${TRUNK.length}`:s0.kind==="w"?"Taller":"Rama"):"";mt.querySelector(".t").textContent=MOBILE()?`Temas del curso · ${pos}`:(document.body.classList.contains("nomap")?"Mostrar temas":"Ocultar temas")}
   const n=LESSONS.filter(s=>done[s.id]).length;
   $("pbar").style.width=(n/LESSONS.length*100)+"%";
   $("ptxt").textContent=`${n} de ${LESSONS.length} temas dominados`;
   requestAnimationFrame(moveTrain);
 }
+const OPENG=new Set();
+const MOBILE=()=>window.matchMedia("(max-width:860px)").matches;
+document.addEventListener("toggle",e=>{const d=e.target;if(!d.matches||!d.matches("details[data-g]"))return;const g=d.dataset.g==="w"?"w":+d.dataset.g;if(d.open)OPENG.add(g);else OPENG.delete(g)},true);
+(function(){const mt=$("maptg");if(!mt)return;const nav=mt.closest("nav");try{if(localStorage.getItem("ruta-nomap")==="1")document.body.classList.add("nomap")}catch(e){}
+  mt.addEventListener("click",()=>{if(MOBILE()){nav.classList.toggle("open");mt.setAttribute("aria-expanded",nav.classList.contains("open"))}else{const on=document.body.classList.toggle("nomap");mt.setAttribute("aria-expanded",!on);try{localStorage.setItem("ruta-nomap",on?"1":"0")}catch(e){}}renderMap()});
+  nav.addEventListener("click",e=>{if(e.target.closest("[data-go]")&&MOBILE()){nav.classList.remove("open");mt.setAttribute("aria-expanded","false")}})})();
+// Código: separa los comentarios para que no queden partidos debajo del código
+function splitComment(line){let q=null;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c==="\\"){i++;continue}if(c===q)q=null;continue}if(c==='"'||c==="'"||c==="`"){q=c;continue}
+  if(c==="#"&&!/[A-Za-z0-9_]/.test(line[i-1]||""))return i;if(c==="/"&&line[i+1]==="/"&&line[i-1]!==":")return i}return -1}
+function prettyCode(root){(root||document).querySelectorAll("pre:not([data-pc])").forEach(pre=>{const t=pre.textContent;if(!/#|\/\//.test(t)||pre.closest(".nopc"))return;pre.dataset.pc="1";
+  pre.innerHTML=t.split("\n").map((ln,k,a)=>{const nl=k<a.length-1?'<span class="pc-nl">\n</span>':"";if(!ln.trim())return `<span class="pc-ln pc-bl">${esc(ln)}${nl}</span>`;
+    const j=/^\s*\*/.test(ln)?ln.search(/\*/):splitComment(ln);if(j<0)return `<span class="pc-ln"><span class="pc-cd">${esc(ln)}</span>${nl}</span>`;
+    const code=ln.slice(0,j),cm=ln.slice(j),body=code.replace(/\s+$/,""),sp=code.slice(body.length);
+    if(!body.trim())return `<span class="pc-ln"><span class="pc-cd">${esc(code)}</span><span class="pc-cm pc-full">${esc(cm)}</span>${nl}</span>`;
+    return `<span class="pc-ln"><span class="pc-cd">${esc(body)}</span><span class="pc-sp">${esc(sp)}</span><span class="pc-cm">${esc(cm)}</span>${nl}</span>`}).join("")})}
 function moveTrain(){
   const s=byId(cur); if(!s) return;
   const anchor=s.kind==="t"?s.id:s.kind==="b"?s.grp.from:s.anchor;
@@ -85,6 +103,7 @@ function show(id,scroll){
   if(s.sim) try{SIMS[s.sim]()}catch(err){const b=$("sim");if(b)b.innerHTML=`<p class="err">El laboratorio no pudo cargarse: ${esc(String(err.message||err))}</p>`}
   if(typeof VISUAL==="function") les.querySelectorAll("[data-vis]").forEach(el=>{try{VISUAL(el,el.dataset.vis)}catch(err){el.innerHTML=`<p class="err">El visual no pudo cargarse: ${esc(String(err.message||err))}</p>`}});
   renderMap();
+  prettyCode(les);
   typeset(les);
   if(scroll){ if(window.matchMedia("(max-width:860px)").matches) les.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}); else window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); }
 }
