@@ -725,3 +725,210 @@ sctest(y ~ ${xs2.join(" + ")}, data = datos, type = "Chow", point = n1)</pre>`);
   bindSeg("ce-m",v=>{["datos","mat","rss","coef","wlm"].forEach(k=>$("ce-"+k).hidden=k!==v)});
   $("ce-al").addEventListener("input",()=>{runD();runM();runR();runC();runW()});
   setD("ej8");setM("d41");setR("e6");runC();runW()};
+
+// ===================== LABORATORIO DE DATOS: subir una base, crear variables, estimar y probar =====================
+// Todo se calcula en el navegador; los datos no salen del equipo. Usa CE (ejercicios_labs.js) y estadistica.js.
+const DL={data:null,cols:[],name:"",model:null};
+DL.XLSX_URL="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+DL.loadXLSX=()=>new Promise((ok,ko)=>{if(window.XLSX)return ok();const s=document.createElement("script");s.src=DL.XLSX_URL;s.onload=()=>ok();s.onerror=()=>ko(new Error("no se pudo cargar el lector de Excel (revisa la conexión)."));document.head.appendChild(s)});
+DL.clean=s=>{let t=String(s==null?"":s).trim().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9_]+/g,"_").replace(/^_+|_+$/g,"");if(!t)t="v";if(/^\d/.test(t))t="v"+t;return t};
+DL.num=v=>{if(typeof v==="number")return v;if(v==null)return NaN;let s=String(v).trim();if(s===""||/^(na|nan|null|\.|-)$/i.test(s))return NaN;
+  if(/^-?[\d.]+,\d+$/.test(s))s=s.replace(/\./g,"").replace(",",".");else if(/^-?\d+,\d+$/.test(s))s=s.replace(",",".");else s=s.replace(/,(?=\d{3}(\D|$))/g,"");const x=Number(s);return isFinite(x)?x:NaN};
+// matriz de texto → base {cols, data: {col: Float64[]}}
+DL.fromRows=function(rows){rows=rows.filter(r=>r.some(c=>String(c==null?"":c).trim()!==""));if(rows.length<2)throw new Error("la base necesita al menos una fila de encabezados y una de datos.");
+  const w=Math.max(...rows.map(r=>r.length)),first=rows[0],hasHead=first.some(c=>String(c).trim()!==""&&!isFinite(DL.num(c)));
+  let heads=hasHead?first.map((c,j)=>DL.clean(c||("v"+(j+1)))):Array.from({length:w},(_,j)=>"v"+(j+1));const seen={};heads=heads.map(h=>{seen[h]=(seen[h]||0)+1;return seen[h]>1?h+"_"+seen[h]:h});
+  const body=hasHead?rows.slice(1):rows,data={},cols=[],text={};
+  for(let j=0;j<w;j++){const raw=body.map(r=>r[j]),nums=raw.map(DL.num),ok=nums.filter(isFinite).length;const h=heads[j]||("v"+(j+1));
+    if(ok>=Math.max(1,0.6*raw.filter(x=>String(x==null?"":x).trim()!=="").length)){data[h]=nums;cols.push(h)}else{text[h]=raw.map(x=>String(x==null?"":x))}}
+  // columnas de texto con pocas categorías → dummies
+  Object.entries(text).forEach(([h,vals])=>{const lv=[...new Set(vals.filter(v=>v.trim()!==""))];if(lv.length>=2&&lv.length<=12){lv.slice(1).forEach(l=>{const nm=DL.clean(h+"_"+l);data[nm]=vals.map(v=>v===l?1:v.trim()===""?NaN:0);cols.push(nm)})}});
+  if(!cols.length)throw new Error("no se encontraron columnas numéricas.");return{cols,data,n:body.length,text:Object.keys(text)}};
+DL.parseText=function(t){const lines=t.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");if(!lines.length)throw new Error("no hay datos.");
+  const cand=["\t",";",","],cnt=d=>lines.slice(0,10).map(l=>l.split(d).length),d=cand.find(c=>{const k=cnt(c);return k[0]>1&&k.every(x=>x===k[0])})||(lines[0].includes("\t")?"\t":/\s{1,}/);
+  const split=l=>{if(d===","){const o=[];let cur="",q=false;for(const ch of l){if(ch==='"'){q=!q;continue}if(ch===","&&!q){o.push(cur);cur=""}else cur+=ch}o.push(cur);return o}return typeof d==="string"?l.split(d).map(s=>s.replace(/^"|"$/g,"")):l.trim().split(d)};
+  return DL.fromRows(lines.map(split))};
+// ---------- estadística
+DL.stats=v=>{const x=v.filter(isFinite),n=x.length;if(!n)return{n:0};const m=x.reduce((a,b)=>a+b,0)/n,s=Math.sqrt(x.reduce((a,b)=>a+(b-m)**2,0)/Math.max(1,n-1)),o=[...x].sort((a,b)=>a-b);return{n,m,s,min:o[0],max:o[n-1],med:n%2?o[(n-1)/2]:(o[n/2-1]+o[n/2])/2,miss:v.length-n}};
+DL.pt=(t,v)=>2*(1-tcdf(Math.abs(t),v));
+DL.fit=function(yName,xNames,opt){const D=DL.data.data,N=DL.data.n,a=Math.max(1,opt.from||1)-1,b=Math.min(N,opt.to||N);const rows=[];
+  for(let i=a;i<b;i++){const y=D[yName][i],xs=xNames.map(x=>D[x][i]);if(isFinite(y)&&xs.every(isFinite))rows.push(i)}
+  const y=rows.map(i=>D[yName][i]),X=rows.map(i=>[...(opt.cte?[1]:[]),...xNames.map(x=>D[x][i])]),names=[...(opt.cte?["(Intercepto)"]:[]),...xNames];
+  if(rows.length<=names.length)throw new Error(`hay ${rows.length} observaciones completas y ${names.length} parámetros: se necesitan más observaciones que parámetros.`);
+  const R=CE.ols(X,y);if(!R)throw new Error("X′X no es invertible: hay colinealidad perfecta (una variable es combinación exacta de otras, o constante junto con el intercepto).");
+  const n=y.length,k=names.length,yh=X.map(r=>r.reduce((s,v,j)=>s+v*R.b[j],0)),ym=y.reduce((s,v)=>s+v,0)/n,tssC=y.reduce((s,v)=>s+(v-ym)**2,0),tss=opt.cte?tssC:y.reduce((s,v)=>s+v*v,0);
+  const r2=1-R.rss/tss,r2a=1-(1-r2)*(n-(opt.cte?1:0))/(n-k),ll=-n/2*(Math.log(2*Math.PI)+Math.log(R.rss/n)+1);
+  // errores robustos HC1
+  const meat=Array.from({length:k},()=>Array(k).fill(0));X.forEach((r,i)=>{const e2=R.e[i]**2;for(let p=0;p<k;p++)for(let q=0;q<k;q++)meat[p][q]+=e2*r[p]*r[q]});
+  const Vr=CE.mm(CE.mm(R.I,meat),R.I).map(r=>r.map(v=>v*n/(n-k)));
+  const q=opt.cte?k-1:k,F=q>0?((tss-R.rss)/q)/(R.rss/(n-k)):NaN;
+  return{...R,y,X,yh,rows,names,n,k,r2,r2a,ll,aic:-2*ll+2*(k+1),bic:-2*ll+(k+1)*Math.log(n),seR:Vr.map((r,i)=>Math.sqrt(r[i])),Vr,F,qF:q,tss,yName,xNames,opt}};
+DL.restr=(M,keep)=>{const X=M.X.map(r=>r.filter((_,j)=>keep.includes(j)));return keep.length?CE.ols(X,M.y):{rss:M.opt.cte?M.y.reduce((s,v)=>s+v*v,0):M.y.reduce((s,v)=>s+v*v,0)}};
+// ---------- gráficos
+DL.scatter=function({x,y,line,xl,yl,H=280,hz}){const W=600,xs=x.filter(isFinite),ys=[...y,...(line?line.map(p=>p[1]):[])].filter(isFinite);if(!xs.length)return"";let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  if(x0===x1){x0-=1;x1+=1}if(y0===y1){y0-=1;y1+=1}const px=(x1-x0)*.05,py=(y1-y0)*.08;x0-=px;x1+=px;y0-=py;y1+=py;const f=frame(W,H,[x0,x1],[y0,y1],ticks(x0,x1,nice((x1-x0)/5)),ticks(y0,y1,nice((y1-y0)/4)),xl,yl);
+  let g="";if(hz!=null)g+=`<line x1="${f.sx(x0)}" x2="${f.sx(x1)}" y1="${f.sy(hz)}" y2="${f.sy(hz)}" stroke="var(--muted)" stroke-dasharray="4 4"/>`;
+  const step=Math.max(1,Math.floor(x.length/1500));for(let i=0;i<x.length;i+=step)if(isFinite(x[i])&&isFinite(y[i]))g+=`<circle cx="${f.sx(x[i]).toFixed(1)}" cy="${f.sy(y[i]).toFixed(1)}" r="3" fill="var(--line)" opacity=".65"/>`;
+  if(line)g+=`<path d="${line.map((p,i)=>(i?"L":"M")+f.sx(p[0]).toFixed(1)+","+f.sy(p[1]).toFixed(1)).join("")}" fill="none" stroke="var(--exam)" stroke-width="2.4"/>`;
+  return`<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${yl} frente a ${xl}">${f.g}${g}</svg></div>`};
+DL.hist=function(v,xl){const x=v.filter(isFinite);if(x.length<3)return"";const W=600,H=230,n=x.length,k=Math.min(30,Math.max(5,Math.round(Math.sqrt(n)))),lo=Math.min(...x),hi=Math.max(...x),w=(hi-lo)/k||1,c=Array(k).fill(0);x.forEach(v=>c[Math.min(k-1,Math.floor((v-lo)/w))]++);
+  const mx=Math.max(...c),f=frame(W,H,[lo,hi],[0,mx*1.1],ticks(lo,hi,nice((hi-lo)/5)),ticks(0,mx*1.1,nice(mx/4)),xl,"frecuencia");let g="";c.forEach((h,i)=>{g+=`<rect x="${f.sx(lo+i*w)+1}" y="${f.sy(h)}" width="${Math.max(1,f.sx(lo+(i+1)*w)-f.sx(lo+i*w)-2)}" height="${f.sy(0)-f.sy(h)}" fill="var(--line)" opacity=".75"/>`});
+  const m=x.reduce((a,b)=>a+b,0)/n,s=Math.sqrt(x.reduce((a,b)=>a+(b-m)**2,0)/(n-1));if(s>0){let d="";for(let i=0;i<=80;i++){const t=lo+(hi-lo)*i/80,yv=n*w*Math.exp(-(((t-m)/s)**2)/2)/(s*Math.sqrt(2*Math.PI));d+=(i?"L":"M")+f.sx(t).toFixed(1)+","+f.sy(yv).toFixed(1)}g+=`<path d="${d}" fill="none" stroke="var(--exam)" stroke-width="2"/>`}
+  return`<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histograma">${f.g}${g}</svg></div>`};
+// ---------- variables nuevas con una expresión segura
+DL.FUN=["log","ln","exp","sqrt","abs","lag","dif","obs","si"];
+DL.newVar=function(name,expr){const D=DL.data;name=DL.clean(name);if(!name)throw new Error("ponle un nombre a la variable.");
+  const toks=expr.match(/\s+|[A-Za-z_][A-Za-z0-9_]*|\d+(?:[.,]\d+)?(?:e[+-]?\d+)?|>=|<=|==|!=|&&|\|\||[-+*/^(),<>!]/gi);if(!toks||toks.join("")!==expr)throw new Error("la expresión tiene caracteres no permitidos.");
+  let js="";for(let t=0;t<toks.length;t++){const k=toks[t];if(/^\s+$/.test(k))continue;
+    if(/^[A-Za-z_]/.test(k)){if(D.data[k]){js+=`C(i,"${k}")`;continue}const lk=k.toLowerCase();
+      if(lk==="lag"||lk==="dif"){const m=expr.slice(toks.slice(0,t).join("").length).match(/^(lag|dif)\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:,\s*(\d+))?\s*\)/i);if(!m||!D.data[m[2]])throw new Error(`${lk}() recibe el nombre de una variable, por ejemplo ${lk}(x) o lag(x, 2).`);
+        const p=+(m[3]||1);js+=lk==="lag"?`C(i-${p},"${m[2]}")`:`(C(i,"${m[2]}")-C(i-${p},"${m[2]}"))`;let consumed=m[0].length,acc=0;while(acc<consumed){acc+=toks[t].length;t++}t--;continue}
+      if(lk==="obs"){js+="(i+1)";continue}if(lk==="log"||lk==="ln"){js+="Math.log";continue}if(lk==="si"){js+="SI";continue}if(["exp","sqrt","abs"].includes(lk)){js+="Math."+lk;continue}
+      throw new Error(`«${k}» no es una variable de la base ni una función permitida.`)}
+    if(k==="^"){js+="**";continue}if(/^\d/.test(k)){js+=k.replace(",",".");continue}js+=k}
+  let f;try{f=new Function("C","SI","i",`return (${js});`)}catch(e){throw new Error("la expresión está incompleta o mal escrita.")}
+  const C=(i,c)=>i<0||i>=D.n?NaN:D.data[c][i],SI=(c,a,b)=>c?a:b,v=Array.from({length:D.n},(_,i)=>{const r=f(C,SI,i);return typeof r==="boolean"?(r?1:0):(isFinite(r)?r:NaN)});
+  if(v.every(x=>!isFinite(x)))throw new Error("la variable nueva no tiene ningún valor válido (¿logaritmo de valores no positivos?).");
+  if(!D.data[name])D.cols.push(name);D.data[name]=v;return name};
+// ---------- ejemplos
+DL.EJ={consumo:{t:"Consumo e ingreso (guerra y paz, ej. 8)",txt:"t\tY\tX\tpaz\n1\t1\t2\t0\n2\t2\t4\t0\n3\t2\t6\t0\n4\t4\t10\t0\n5\t6\t13\t0\n6\t1\t2\t1\n7\t3\t4\t1\n8\t3\t6\t1\n9\t5\t8\t1\n10\t6\t10\t1\n11\t6\t12\t1\n12\t7\t14\t1\n13\t9\t16\t1\n14\t9\t18\t1\n15\t11\t20\t1"},
+ salarios:{t:"Salarios y experiencia por género (ej. 5)",txt:"sueldo\texper\tmujer\n3.14\t13\t0\n3.32\t16\t0\n3.61\t30\t0\n1.65\t2\t0\n2.64\t8\t0\n3.64\t31\t0\n2.46\t10\t0\n1.69\t1\t0\n1.91\t6\t0\n3.10\t15\t1\n1.98\t4\t1\n2.14\t7\t1\n2.61\t13\t1\n3.60\t27\t1\n3.38\t19\t1\n3.50\t25\t1\n3.65\t20\t1"},
+ familias:{t:"Familias: consumo e ingreso (Dinardo 4.7)",txt:"Y,X,aumento\n70,80,0\n76,95,1\n91,105,0\n100,115,0\n105,125,1\n113,135,1\n122,145,0\n120,155,0\n146,165,1\n135,175,1\n147,185,1\n155,200,1"}};
+
+SIMS.datos=function(){
+  $("sim").innerHTML=`<div class="dl-load"><p class="hint">Sube un archivo <b>.csv</b>, <b>.txt</b>, <b>.xlsx</b> o <b>.xls</b>, o pega la tabla copiada de Excel con los nombres de las variables en la primera fila. Los datos se procesan solo en tu navegador: no se suben a ningún servidor.</p>
+  <div class="calcf"><label>Archivo<input type="file" id="dl-file" accept=".csv,.txt,.tsv,.xlsx,.xls"></label><label id="dl-sheetw" hidden>Hoja<select id="dl-sheet"></select></label></div>
+  <details class="dp-lite"><summary>Pegar datos o usar un ejemplo</summary><div class="chips pre" id="dl-ej" style="margin:8px 0">${Object.entries(DL.EJ).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div><textarea id="dl-paste" rows="6" class="ce-ta" spellcheck="false" placeholder="Y&#9;X1&#9;X2&#10;10&#9;3&#9;1&#10;…"></textarea><div class="chips pre" style="margin-top:6px"><button type="button" class="btn" id="dl-go">Cargar lo pegado</button></div></details>
+  <div id="dl-msg"></div></div><div id="dl-main"></div>`;
+  let wb=null;
+  const msg=h=>$("dl-msg").innerHTML=h;
+  const setData=(B,name)=>{DL.data=B;DL.name=name;DL.model=null;msg(`<p class="verdict ok">Base cargada: <b>${name}</b> · ${B.n} observaciones · ${B.cols.length} variables numéricas${B.text.length?` · columnas de texto convertidas en dummies o ignoradas: ${B.text.join(", ")}`:""}.</p>`);main()};
+  const readSheet=nm=>{const ws=wb.Sheets[nm],rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:""});setData(DL.fromRows(rows),DL.fileName+" · "+nm)};
+  $("dl-file").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;DL.fileName=f.name;msg(`<p class="hint">Leyendo ${f.name}…</p>`);$("dl-sheetw").hidden=true;
+    try{if(/\.(xlsx|xls)$/i.test(f.name)){await DL.loadXLSX();wb=XLSX.read(await f.arrayBuffer(),{type:"array"});const sh=wb.SheetNames;$("dl-sheet").innerHTML=sh.map(s=>`<option>${esc(s)}</option>`).join("");$("dl-sheetw").hidden=sh.length<2;readSheet(sh[0])}
+      else setData(DL.parseText(await f.text()),f.name)}catch(err2){msg(err(err2.message))}});
+  $("dl-sheet").addEventListener("change",()=>{try{readSheet($("dl-sheet").value)}catch(e2){msg(err(e2.message))}});
+  $("dl-go").onclick=()=>{try{setData(DL.parseText($("dl-paste").value),"datos pegados")}catch(e2){msg(err(e2.message))}};
+  $("dl-ej").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$("dl-paste").value=DL.EJ[b.dataset.k].txt;try{setData(DL.parseText(DL.EJ[b.dataset.k].txt),DL.EJ[b.dataset.k].t)}catch(e2){msg(err(e2.message))}});
+
+  function main(){const B=DL.data,C=B.cols;
+    $("dl-main").innerHTML=`${seg("dl-tab","Sección",[["base","1. La base"],["var","2. Crear variables"],["mod","3. Estimar"],["prue","4. Pruebas"],["dem","5. Demostraciones"],["graf","6. Gráficos"],["r","7. Código R"]],"base")}
+    <div id="dl-base"></div><div id="dl-var" hidden></div><div id="dl-mod" hidden></div><div id="dl-prue" hidden></div><div id="dl-dem" hidden></div><div id="dl-graf" hidden></div><div id="dl-r" hidden></div>`;
+    const tabs=["base","var","mod","prue","dem","graf","r"];let cur="base";
+    bindSeg("dl-tab",v=>{cur=v;tabs.forEach(t=>$("dl-"+t).hidden=t!==v);render(v)});
+    const sel=(id,lab,opts,v)=>`<label>${lab}<select id="${id}">${opts.map(o=>`<option value="${o}" ${o===v?"selected":""}>${o}</option>`).join("")}</select></label>`;
+    function needModel(){if(!DL.model){return`<p class="warn"><b>Primero estima un modelo</b> en la sección 3.</p>`}return""}
+    function render(v){
+      if(v==="base"){const st=C.map(c=>[c,DL.stats(B.data[c])]);
+        $("dl-base").innerHTML=`<h4 class="subh">Primeras filas</h4><div class="tbl"><table><tr><th>#</th>${C.map(c=>`<th>${c}</th>`).join("")}</tr>${Array.from({length:Math.min(8,B.n)},(_,i)=>`<tr><td>${i+1}</td>${C.map(c=>`<td class="num">${isFinite(B.data[c][i])?fm(B.data[c][i]):"NA"}</td>`).join("")}</tr>`).join("")}</table></div>
+        <h4 class="subh">Estadísticas descriptivas</h4><div class="tbl"><table><tr><th>Variable</th><th>n</th><th>Media</th><th>Desv. est.</th><th>Mín.</th><th>Mediana</th><th>Máx.</th><th>Faltantes</th></tr>${st.map(([c,s])=>`<tr><td>${c}</td><td class="num">${s.n}</td><td class="num">${f4(s.m)}</td><td class="num">${f4(s.s)}</td><td class="num">${fm(s.min)}</td><td class="num">${fm(s.med)}</td><td class="num">${fm(s.max)}</td><td class="num">${s.miss}</td></tr>`).join("")}</table></div>
+        ${C.length<=12?`<h4 class="subh">Matriz de correlaciones</h4><div class="tbl"><table><tr><th></th>${C.map(c=>`<th>${c}</th>`).join("")}</tr>${C.map(a=>`<tr><td>${a}</td>${C.map(b=>{const ok=B.data[a].map((v,i)=>isFinite(v)&&isFinite(B.data[b][i])?i:-1).filter(i=>i>=0),x=ok.map(i=>B.data[a][i]),y=ok.map(i=>B.data[b][i]),mx=x.reduce((s,v)=>s+v,0)/x.length,my=y.reduce((s,v)=>s+v,0)/y.length;let sxy=0,sxx=0,syy=0;x.forEach((v,i)=>{sxy+=(v-mx)*(y[i]-my);sxx+=(v-mx)**2;syy+=(y[i]-my)**2});return`<td class="num">${fmt(sxy/Math.sqrt(sxx*syy),3)}</td>`}).join("")}</tr>`).join("")}</table></div>`:""}`}
+      if(v==="var"){$("dl-var").innerHTML=`<p class="lead">Crea variables con una expresión. Usa los nombres de la base tal como aparecen.</p>
+        <div class="calcf">${txt("dv-n","Nombre","lny")}${txt("dv-e","Expresión",`log(${C[0]})`)}</div><div class="chips pre" style="margin:6px 0"><button type="button" class="btn" id="dv-go">Crear variable</button></div><div id="dv-out"></div>
+        <div class="tbl"><table><tr><th>Escribe</th><th>Obtienes</th></tr><tr><td><code>log(x)</code></td><td>logaritmo natural</td></tr><tr><td><code>x^2</code>, <code>x*z</code></td><td>cuadrado e interacción</td></tr><tr><td><code>lag(x)</code>, <code>lag(x, 4)</code>, <code>dif(x)</code></td><td>rezago y primera diferencia</td></tr><tr><td><code>obs</code></td><td>número de la observación (tendencia)</td></tr><tr><td><code>obs &gt;= 13</code></td><td>dummy de quiebre: 1 desde la observación 13</td></tr><tr><td><code>(x &gt; 100)*1</code>, <code>si(x &gt; 100, 1, 0)</code></td><td>dummy por condición</td></tr><tr><td><code>D*x</code></td><td>interacción de una dummy con x (cambio de pendiente)</td></tr></table></div>
+        <p class="hint">Las variables creadas viven mientras la página esté abierta.</p>`;
+        $("dv-go").onclick=()=>{try{const nm=DL.newVar($("dv-n").value,$("dv-e").value),s=DL.stats(B.data[nm]);$("dv-out").innerHTML=`<p class="verdict ok">Variable <b>${nm}</b> creada: ${s.n} valores válidos, media ${f4(s.m)}. En R: <code>datos$${nm} &lt;- ${DL.rExpr($("dv-e").value)}</code></p>`;DL.created=(DL.created||[]).filter(x=>x[0]!==nm).concat([[nm,$("dv-e").value]])}catch(e2){$("dv-out").innerHTML=err(e2.message)}}}
+      if(v==="mod"){const M=DL.model,y0=M?M.yName:C[0],xs0=M?M.xNames:C.slice(1,Math.min(C.length,3));
+        $("dl-mod").innerHTML=`<div class="calcf">${sel("dm-y","Variable dependiente (Y)",C,y0)}${num("dm-a","Desde la observación",M?M.opt.from:1,1)}${num("dm-b","Hasta la observación",M?M.opt.to:B.n,1)}<label class="chkl"><input type="checkbox" id="dm-c" ${!M||M.opt.cte?"checked":""}> Con intercepto</label><label class="chkl"><input type="checkbox" id="dm-r" ${M&&M.opt.rob?"checked":""}> Errores robustos (HC1)</label></div>
+        <p class="lbl" style="margin:10px 0 4px">Variables explicativas (X)</p><div class="chips" id="dm-x">${C.map(c=>`<label class="chkl"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}> ${c}</label>`).join("")}</div>
+        <div class="chips pre" style="margin:10px 0"><button type="button" class="btn" id="dm-go">Estimar por MCO</button></div><div id="dm-out"></div>`;
+        const go=()=>{const y=$("dm-y").value,xs=[...$("dm-x").querySelectorAll("input:checked")].map(i=>i.value).filter(x=>x!==y);
+          try{DL.model=DL.fit(y,xs,{cte:$("dm-c").checked,rob:$("dm-r").checked,from:V("dm-a"),to:V("dm-b")});$("dm-out").innerHTML=DL.out(DL.model)}catch(e2){DL.model=null;$("dm-out").innerHTML=err(e2.message)}};
+        $("dm-go").onclick=go;if(M)$("dm-out").innerHTML=DL.out(M)}
+      if(v==="prue"){const M=DL.model;if(!M){$("dl-prue").innerHTML=needModel();return}
+        $("dl-prue").innerHTML=`${seg("dp-t","Prueba",[["f","F de restricciones"],["chow","Cambio estructural"],["het","Heterocedasticidad"],["aut","Autocorrelación"],["norm","Normalidad"],["esp","Especificación"]],"f")}<div id="dp-out"></div>`;
+        const show=t=>{$("dp-out").innerHTML=DL.test(M,t);if(t==="f"){const run=()=>{const sel2=[...$("dpf-c").querySelectorAll("input:checked")].map(i=>+i.value);$("dpf-o").innerHTML=DL.ftest(M,sel2)};$("dpf-c").addEventListener("change",run);run()}
+          if(t==="chow"){const run=()=>{$("dpc-o").innerHTML=DL.chow(M,Math.round(V("dpc-n")))};$("dpc-n").addEventListener("input",run);run()}};
+        bindSeg("dp-t",show);show("f")}
+      if(v==="dem"){$("dl-dem").innerHTML=DL.model?DL.demo(DL.model):needModel();if(DL.model){const run=()=>{$("dd-fwl").innerHTML=DL.fwl(DL.model,+$("dd-x").value)};$("dd-x").addEventListener("change",run);run()}}
+      if(v==="graf"){const M=DL.model;$("dl-graf").innerHTML=`<div class="calcf">${sel("dg-x","Eje X",C,M&&M.xNames[0]||C[1]||C[0])}${sel("dg-y","Eje Y",C,M?M.yName:C[0])}</div><div id="dg-o"></div>${M?`<h4 class="subh">Residuos frente a valores ajustados</h4>${DL.scatter({x:M.yh,y:M.e,xl:"Ŷ",yl:"residuo",hz:0})}<h4 class="subh">Residuos en el orden de la base</h4>${DL.scatter({x:M.rows.map(i=>i+1),y:M.e,xl:"observación",yl:"residuo",hz:0})}<h4 class="subh">Histograma de los residuos con la normal</h4>${DL.hist(M.e,"residuo")}`:needModel()}`;
+        const run=()=>{const xa=$("dg-x").value,ya=$("dg-y").value,x=B.data[xa],y=B.data[ya],ok=x.map((v,i)=>isFinite(v)&&isFinite(y[i])?i:-1).filter(i=>i>=0);let line=null,txt2="";
+          if(ok.length>2){const R=CE.ols(ok.map(i=>[1,x[i]]),ok.map(i=>y[i]));if(R){const lo=Math.min(...ok.map(i=>x[i])),hi=Math.max(...ok.map(i=>x[i]));line=[[lo,R.b[0]+R.b[1]*lo],[hi,R.b[0]+R.b[1]*hi]];txt2=`<p class="hint">Recta de MCO simple: ${ya} = ${f4(R.b[0])} ${R.b[1]<0?"−":"+"} ${f4(Math.abs(R.b[1]))}·${xa} · R² = ${f4(R.r2)}</p>`}}
+          $("dg-o").innerHTML=DL.scatter({x,y,line,xl:xa,yl:ya})+txt2};$("dg-x").addEventListener("change",run);$("dg-y").addEventListener("change",run);run()}
+      if(v==="r")$("dl-r").innerHTML=DL.rcode()}
+    render(cur)}};
+
+DL.out=function(M){const se=M.opt.rob?M.seR:M.se,gl=M.n-M.k,tc=CE.tcrit(gl,0.05);
+  const eq=`${M.yName} = ${M.b.map((b,j)=>`${j?(b<0?"− ":"+ "):b<0?"−":""}${f4(Math.abs(b))}${M.names[j]==="(Intercepto)"?"":"·"+M.names[j]}`).join(" ")}`;
+  return`<div class="eq">${eq}</div><div class="tbl"><table><tr><th>Variable</th><th>Coeficiente</th><th>Error est.${M.opt.rob?" (robusto)":""}</th><th>t</th><th>p-valor</th><th>IC 95 %</th></tr>${M.b.map((b,j)=>{const t=b/se[j],p=DL.pt(t,gl);return`<tr><td>${M.names[j]}</td><td class="num">${f4(b)}</td><td class="num">${f4(se[j])}</td><td class="num">${fmt(t,3)}</td><td class="num">${p4(p)}${p<0.01?" ***":p<0.05?" **":p<0.1?" *":""}</td><td class="num">[${f4(b-tc*se[j])}; ${f4(b+tc*se[j])}]</td></tr>`}).join("")}</table></div>
+  <div class="res">${tiles([["n",String(M.n)],["k",String(M.k)],["R²",f4(M.r2)],["R² ajustado",f4(M.r2a)],["s (error est. de la regresión)",f4(Math.sqrt(M.s2))],["SCR",f4(M.rss)],[`F global (${M.qF}, ${gl})`,isFinite(M.F)?`${f4(M.F)} · p ${p4(CE.fp(M.F,M.qF,gl))}`:"—"],["AIC / BIC",`${fmt(M.aic,2)} / ${fmt(M.bic,2)}`]])}</div>
+  <p class="hint">*** p &lt; 0,01 · ** p &lt; 0,05 · * p &lt; 0,1. ${M.opt.cte?"":"Sin intercepto el R² se calcula sin centrar."}</p>
+  ${M.k<=6?`<details class="dp-lite"><summary>Ver las matrices: X′X, X′y y (X′X)⁻¹</summary>${[["X′X",M.XtX],["(X′X)⁻¹",M.I]].map(([t,A])=>`<p><b>${t}</b></p><div class="tbl"><table>${A.map(r=>`<tr>${r.map(v=>`<td class="num">${fmt(v,6)}</td>`).join("")}</tr>`).join("")}</table></div>`).join("")}<p><b>X′y</b> = [${M.Xty.map(v=>fmt(v,4)).join("; ")}] → b = (X′X)⁻¹X′y = [${M.b.map(f4).join("; ")}]</p></details>`:""}`};
+DL.test=function(M,t){const ix=M.names.map((n,j)=>[n,j]);
+  if(t==="f")return`<p>Marca los coeficientes que quieres probar conjuntamente iguales a cero (H₀: todos = 0).</p><div class="chips" id="dpf-c">${ix.map(([n,j])=>`<label class="chkl"><input type="checkbox" value="${j}" ${n!=="(Intercepto)"?"checked":""}> ${n}</label>`).join("")}</div><div id="dpf-o"></div>`;
+  if(t==="chow")return`<div class="calcf">${num("dpc-n","El segundo periodo empieza en la observación (del modelo)",Math.floor(M.n/2)+1,1)}</div><div id="dpc-o"></div>`;
+  const n=M.n,k=M.k,e=M.e,a=0.05;
+  if(t==="het"){const e2=e.map(v=>v*v),Z=M.X,Rb=CE.ols(Z,e2),bp=n*Rb.r2,qb=k-(M.opt.cte?1:0);
+    const xs=M.X.map(r=>r.slice(M.opt.cte?1:0)),m=xs[0].length;let wh="";if(m>=1&&m<=4){const pairs=[];for(let i=0;i<m;i++)for(let j=i;j<m;j++){const col=xs.map(r=>r[i]*r[j]);if(!(i===j&&xs.every((r,q)=>Math.abs(col[q]-r[i])<1e-12)))pairs.push(col)}const W2=xs.map((r,q)=>[1,...r,...pairs.map(c=>c[q])]),Rw=CE.ols(W2,e2);if(Rw){const qw=W2[0].length-1,lm=n*Rw.r2;wh=`<tr><td>White (niveles, cuadrados y productos cruzados)</td><td class="num">${f4(lm)}</td><td class="num">χ²(${qw}) = ${f4(CE.ccrit(qw,a))}</td><td class="num">${p4(1-chi2cdf(lm,qw))}</td></tr>`}}
+    return`<p>H₀: varianza constante (homocedasticidad). Se regresa e² sobre las variables y LM = n·R² de esa regresión auxiliar.</p><div class="tbl"><table><tr><th>Prueba</th><th>LM</th><th>Crítico al 5 %</th><th>p-valor</th></tr><tr><td>Breusch-Pagan (sobre las X del modelo)</td><td class="num">${f4(bp)}</td><td class="num">χ²(${qb}) = ${f4(CE.ccrit(qb,a))}</td><td class="num">${p4(1-chi2cdf(bp,qb))}</td></tr>${wh}</table></div><p>Si se rechaza H₀, los errores estándar de MCO no son válidos: usa errores robustos (HC1) en la sección 3.</p>`}
+  if(t==="aut"){let num2=0;for(let i=1;i<n;i++)num2+=(e[i]-e[i-1])**2;const dw=num2/M.rss,X1=M.X.map((r,i)=>[...r,i?e[i-1]:0]),Rg=CE.ols(X1,e),bg=Rg?n*Rg.r2:NaN;
+    return`<p>Tiene sentido con datos ordenados en el tiempo. H₀: no hay autocorrelación de orden 1.</p><div class="tbl"><table><tr><th>Prueba</th><th>Estadístico</th><th>Lectura</th></tr><tr><td>Durbin-Watson</td><td class="num">${f4(dw)}</td><td>${dw<1.5?"Cerca de 0: autocorrelación positiva probable":dw>2.5?"Cerca de 4: autocorrelación negativa probable":"Cerca de 2: sin evidencia fuerte"} (compara con d<sub>L</sub> y d<sub>U</sub> de la tabla para n = ${n} y k′ = ${k-(M.opt.cte?1:0)})</td></tr><tr><td>Breusch-Godfrey (orden 1)</td><td class="num">LM = ${f4(bg)}</td><td>χ²(1) = 3,8415 · p = ${p4(1-chi2cdf(bg,1))}</td></tr></table></div><p>ρ̂ ≈ 1 − DW/2 = ${f4(1-dw/2)}.</p>`}
+  if(t==="norm"){const m3=e.reduce((s,v)=>s+v**3,0)/n,m2=M.rss/n,m4=e.reduce((s,v)=>s+v**4,0)/n,S=m3/m2**1.5,K=m4/m2**2,jb=n/6*(S*S+(K-3)**2/4);
+    return`<p>H₀: los errores son normales. JB = n/6·[S² + (K − 3)²/4].</p><div class="res">${tiles([["Asimetría S",f4(S)],["Curtosis K",f4(K)],["Jarque-Bera",f4(jb)],["p-valor",p4(1-chi2cdf(jb,2))]])}</div><p>${jb>5.991?"Se rechaza la normalidad al 5 %: con muestras pequeñas, las pruebas t y F son solo aproximadas.":"No se rechaza la normalidad al 5 %."}</p>${DL.hist(e,"residuo")}`}
+  if(t==="esp"){const X2=M.X.map((r,i)=>[...r,M.yh[i]**2,M.yh[i]**3]),R2=CE.ols(X2,M.y);let reset="";if(R2){const F=((M.rss-R2.rss)/2)/(R2.rss/(n-k-2));reset=`<tr><td>RESET de Ramsey (Ŷ² y Ŷ³)</td><td class="num">F = ${f4(F)}</td><td class="num">F(2, ${n-k-2}) = ${f4(CE.fcrit(2,n-k-2,a))} · p = ${p4(CE.fp(F,2,n-k-2))}</td></tr>`}
+    const xs=M.names.map((nm,j)=>[nm,j]).filter(([nm])=>nm!=="(Intercepto)");let vif="";if(xs.length>=2){vif=xs.map(([nm,j])=>{const others=M.X.map(r=>r.filter((_,q)=>q!==j)),Rv=CE.ols(others.map(r=>M.opt.cte?r:[1,...r]),M.X.map(r=>r[j]));const v=Rv?1/(1-Rv.r2):NaN;return`<tr><td>${nm}</td><td class="num">${fmt(v,3)}</td><td>${v>10?"Multicolinealidad alta":v>5?"Moderada":"Baja"}</td></tr>`}).join("")}
+    return`<div class="tbl"><table><tr><th>Prueba</th><th>Estadístico</th><th>Crítico y p</th></tr>${reset}</table></div><p>H₀ de RESET: la forma funcional es correcta. Si se rechaza, prueba logaritmos, cuadrados o interacciones.</p>${vif?`<h4 class="subh">Factor de inflación de la varianza (VIF)</h4><div class="tbl"><table><tr><th>Variable</th><th>VIF</th><th>Lectura</th></tr>${vif}</table></div>`:""}`}
+  return""};
+DL.ftest=function(M,sel){if(!sel.length)return`<p class="hint">Marca al menos un coeficiente.</p>`;const keep=M.names.map((_,j)=>j).filter(j=>!sel.includes(j)),q=sel.length,n=M.n,k=M.k,a=0.05;
+  const Xr=M.X.map(r=>keep.map(j=>r[j])),rssR=keep.length?CE.ols(Xr,M.y).rss:M.y.reduce((s,v)=>s+v*v,0),F=((rssR-M.rss)/q)/(M.rss/(n-k)),cr=CE.fcrit(q,n-k,a),p=CE.fp(F,q,n-k);
+  const Rm=sel.map(j=>M.names.map((_,c)=>c===j?1:0)),Rb=sel.map(j=>M.b[j]),Vu=CE.inv(CE.mm(CE.mm(Rm,M.opt.rob?M.Vr.map(r=>r.map(v=>v/M.s2)):M.I),CE.T(Rm))),Fw=Rb.reduce((s,v,i)=>s+v*Vu[i].reduce((t,mm,j)=>t+mm*Rb[j],0),0)/(q*M.s2);
+  const W=n*(rssR-M.rss)/M.rss,LR=n*Math.log(rssR/M.rss),LM=n*(rssR-M.rss)/rssR;
+  return`<div class="eq">H₀: ${sel.map(j=>`β(${M.names[j]})`).join(" = ")} = 0</div><div class="eq al chain">F = [(SCR_R − SCR_NR)/q] / [SCR_NR/(n − k)] = [(${f4(rssR)} − ${f4(M.rss)})/${q}] / [${f4(M.rss)}/${n-k}] = <b>${f4(F)}</b><br>Forma matricial (Rb)′[R(X′X)⁻¹R′]⁻¹(Rb)/(q·s²) = ${f4(Fw)}${M.opt.rob?" (con la matriz robusta)":""}</div>
+  <div class="res">${tiles([["F",f4(F)],[`F crítico (${q}, ${n-k})`,f4(cr)],["p-valor",p4(p)]])}</div>${veredicto(F,cr,p,a,["las variables marcadas no son conjuntamente significativas.","al menos una de las variables marcadas es significativa."])}
+  <p>Asintóticas: W = ${f4(W)}, LR = ${f4(LR)}, LM = ${f4(LM)} frente a χ²(${q}) = ${f4(CE.ccrit(q,a))}.</p>`};
+DL.chow=function(M,s){const n=M.n,k=M.k,a=0.05;if(!(s>k+1&&s<=n-k)){return err(`el quiebre debe dejar más de ${k} observaciones en cada periodo (entre ${k+2} y ${n-k}).`)}
+  const n1=s-1,n2=n-n1,X1=M.X.slice(0,n1),X2=M.X.slice(n1),R1=CE.ols(X1,M.y.slice(0,n1)),R2=CE.ols(X2,M.y.slice(n1));if(!R1||!R2)return err("alguno de los periodos tiene X′X no invertible (por ejemplo, una dummy constante dentro del periodo).");
+  const F=((M.rss-R1.rss-R2.rss)/k)/((R1.rss+R2.rss)/(n-2*k)),cr=CE.fcrit(k,n-2*k,a),p=CE.fp(F,k,n-2*k),Fp=((M.rss-R1.rss)/n2)/(R1.rss/(n1-k)),crp=CE.fcrit(n2,n1-k,a),pp=CE.fp(Fp,n2,n1-k);
+  return`<p>Periodo 1: observaciones 1 a ${n1} del modelo (fila ${M.rows[0]+1} a ${M.rows[n1-1]+1} de la base). Periodo 2: ${n2} observaciones.</p>
+  <div class="tbl"><table><tr><th>Modelo</th><th>Coeficientes</th><th>SCR</th></tr><tr><td>Toda la muestra</td><td>${M.b.map(f4).join("; ")}</td><td class="num">${f4(M.rss)}</td></tr><tr><td>Periodo 1</td><td>${R1.b.map(f4).join("; ")}</td><td class="num">${f4(R1.rss)}</td></tr><tr><td>Periodo 2</td><td>${R2.b.map(f4).join("; ")}</td><td class="num">${f4(R2.rss)}</td></tr></table></div>
+  <div class="eq al chain">Chow: F = [(${f4(M.rss)} − ${f4(R1.rss)} − ${f4(R2.rss)})/${k}] / [${f4(R1.rss+R2.rss)}/${n-2*k}] = <b>${f4(F)}</b> &nbsp; F(${k}, ${n-2*k}) = ${f4(cr)} · p = ${p4(p)}<br>Pronósticos de Chow: F = [(${f4(M.rss)} − ${f4(R1.rss)})/${n2}] / [${f4(R1.rss)}/${n1-k}] = <b>${f4(Fp)}</b> &nbsp; F(${n2}, ${n1-k}) = ${f4(crp)} · p = ${p4(pp)}</div>
+  ${veredicto(F,cr,p,a,["no hay evidencia de cambio estructural en ese punto.","hay cambio estructural: los coeficientes no son los mismos en los dos periodos."])}
+  <p class="hint">Para la versión con dummies, crea en la sección 2 una dummy <code>obs &gt;= ${M.rows[n1]+1}</code> y sus interacciones, y prueba con la F de restricciones que todos sus coeficientes son cero: da el mismo F.</p>`};
+DL.demo=function(M){const n=M.n,se=M.e.reduce((s,v)=>s+v,0),Xe=M.names.map((_,j)=>M.X.reduce((s,r,i)=>s+r[j]*M.e[i],0)),ym=M.y.reduce((s,v)=>s+v,0)/n,yhm=M.yh.reduce((s,v)=>s+v,0)/n;
+  const cor=(a,b)=>{const ma=a.reduce((s,v)=>s+v,0)/a.length,mb=b.reduce((s,v)=>s+v,0)/b.length;let sab=0,saa=0,sbb=0;a.forEach((v,i)=>{sab+=(v-ma)*(b[i]-mb);saa+=(v-ma)**2;sbb+=(b[i]-mb)**2});return sab/Math.sqrt(saa*sbb)};
+  const sce=M.yh.reduce((s,v)=>s+(v-ym)**2,0),tss=M.y.reduce((s,v)=>s+(v-ym)**2,0),cy=cor(M.y,M.yh),ce=cor(M.yh,M.e),cte=M.opt.cte;
+  const xs=M.names.map((nm,j)=>[nm,j]).filter(([nm])=>nm!=="(Intercepto)");
+  return`<p class="lead">Propiedades algebraicas de MCO comprobadas con tus datos. Las diferencias del orden de 10⁻¹⁰ son errores de redondeo de la computadora: en teoría son cero.</p>
+  <div class="tbl"><table><tr><th>Propiedad</th><th>Por qué se cumple</th><th>Con tus datos</th></tr>
+  <tr><td>X′e = 0</td><td>Son las ecuaciones normales: X′(y − Xb) = 0</td><td class="num">${Xe.map(v=>fmt(v,10)).join("; ")}</td></tr>
+  <tr><td>Σeᵢ = 0</td><td>${cte?"La primera ecuación normal, porque hay intercepto":"Sin intercepto no tiene por qué cumplirse"}</td><td class="num">${fmt(se,10)}</td></tr>
+  <tr><td>Media de Ŷ = media de Y</td><td>${cte?"Porque Σe = 0":"Solo con intercepto"}</td><td class="num">${f4(yhm)} vs ${f4(ym)}</td></tr>
+  <tr><td>corr(Ŷ, e) = 0</td><td>Ŷ = Xb es combinación de las X, ortogonales a e</td><td class="num">${fmt(ce,10)}</td></tr>
+  <tr><td>STC = SCE + SCR</td><td>${cte?"Descomposición de la varianza con intercepto":"Solo vale con intercepto"}</td><td class="num">${f4(tss)} vs ${f4(sce)} + ${f4(M.rss)} = ${f4(sce+M.rss)}</td></tr>
+  <tr><td>R² = corr(Y, Ŷ)²</td><td>${cte?"Con intercepto, R² es la correlación al cuadrado":"Solo con intercepto"}</td><td class="num">${f4(M.r2)} vs ${f4(cy*cy)}</td></tr>
+  <tr><td>s² = SCR/(n − k)</td><td>Estimador insesgado de σ²</td><td class="num">${f4(M.rss)}/${n-M.k} = ${f4(M.s2)}</td></tr></table></div>
+  ${xs.length>=2?`<h4 class="subh">Teorema de Frisch-Waugh-Lovell</h4><p>El coeficiente de una variable en la regresión múltiple es igual al de regresar los residuos de Y (sobre las demás X) en los residuos de esa variable (sobre las demás X).</p><div class="calcf"><label>Variable<select id="dd-x">${xs.map(([nm,j])=>`<option value="${j}">${nm}</option>`).join("")}</select></label></div><div id="dd-fwl"></div>`:`<p class="hint">Con dos o más variables explicativas aparece aquí la demostración del teorema de Frisch-Waugh-Lovell.</p><select id="dd-x" hidden><option value="0">0</option></select><div id="dd-fwl"></div>`}`};
+DL.fwl=function(M,j){if(M.names.length<3||M.names[j]==="(Intercepto)")return"";const others=M.X.map(r=>r.filter((_,q)=>q!==j)),Ry=CE.ols(others,M.y),Rx=CE.ols(others,M.X.map(r=>r[j]));if(!Ry||!Rx)return"";
+  const ey=Ry.e,ex=Rx.e,b=ey.reduce((s,v,i)=>s+v*ex[i],0)/ex.reduce((s,v)=>s+v*v,0);
+  return`<div class="eq al chain">1) Y sobre las demás X → residuos ẽ<sub>y</sub> &nbsp; 2) ${M.names[j]} sobre las demás X → residuos ẽ<sub>x</sub><br>3) b = Σẽ<sub>x</sub>ẽ<sub>y</sub> / Σẽ<sub>x</sub>² = <b>${fmt(b,6)}</b> &nbsp; frente a la regresión múltiple: <b>${fmt(M.b[j],6)}</b></div><p>Coinciden: el coeficiente mide el efecto de ${M.names[j]} una vez «limpiado» del efecto de las demás variables. Por eso se interpreta como un efecto <i>ceteris paribus</i>.</p>`};
+DL.rExpr=e=>e.replace(/\bln\(/g,"log(").replace(/\bobs\b/g,"seq_len(nrow(datos))").replace(/\bsi\(/g,"ifelse(").replace(/\bdif\(\s*([A-Za-z_]\w*)\s*\)/g,"c(NA, diff(datos$$$1))").replace(/\blag\(\s*([A-Za-z_]\w*)\s*(?:,\s*(\d+))?\s*\)/g,(m,v,k)=>`dplyr::lag(datos$${v}, ${k||1})`).replace(/\b([A-Za-z_]\w*)\b(?!\s*\()/g,(m,v)=>DL.data&&DL.data.data[v]?`datos$${v}`:m).replace(/datos\$datos\$/g,"datos$");
+DL.rcode=function(){const M=DL.model,f=DL.fileName||"mis_datos.csv",xl=/\.(xlsx|xls)$/i.test(f);
+  const read=xl?`library(readxl)\ndatos <- read_excel("${f}")`:`datos <- read.csv("${f}")   # si usa ; y coma decimal: read.csv2("${f}")`;
+  const nv=(DL.created||[]).map(([n,e])=>`datos$${n} <- ${DL.rExpr(e)}`).join("\n");
+  if(!M)return`<pre class="ce-code">${esc(read)}\nnames(datos) &lt;- make.names(names(datos))\nsummary(datos)\n${esc(nv)}</pre><p class="hint">Estima un modelo en la sección 3 y aquí aparece el código completo.</p>`;
+  const fx=`${M.yName} ~ ${M.xNames.length?M.xNames.join(" + "):"1"}${M.opt.cte?"":" - 1"}`,sub=(M.opt.from>1||M.opt.to<DL.data.n)?`datos <- datos[${M.opt.from}:${M.opt.to}, ]\n`:"";
+  return`<p>Este script reproduce en R lo que hiciste aquí. Guárdalo junto al archivo de datos y ejecútalo en RStudio.</p><pre class="ce-code">${esc(`# Paquetes (una sola vez): install.packages(c("lmtest", "sandwich", "car", "strucchange", "tseries"${xl?', "readxl"':""}))
+${read}
+names(datos) <- make.names(names(datos))   # nombres sin espacios ni tildes
+summary(datos)
+${nv?nv+"\n":""}${sub}
+m <- lm(${fx}, data = datos)
+summary(m)                         # coeficientes, R², F global
+confint(m)                         # intervalos al 95 %
+library(lmtest); library(sandwich); library(car)
+coeftest(m, vcov = vcovHC(m, type = "HC1"))   # errores robustos
+linearHypothesis(m, c(${M.names.filter(n=>n!=="(Intercepto)").map(n=>`"${n} = 0"`).join(", ")}))   # F de restricciones
+bptest(m)                          # Breusch-Pagan
+dwtest(m); bgtest(m, order = 1)    # autocorrelación
+tseries::jarque.bera.test(resid(m))
+resettest(m, power = 2:3)          # RESET
+${M.xNames.length>=2?"vif(m)                             # multicolinealidad\n":""}
+# Cambio estructural en la observación n1 + 1
+library(strucchange)
+n1 <- ${Math.floor(M.n/2)}
+sctest(${fx}, data = datos, type = "Chow", point = n1)
+plot(efp(${fx}, data = datos, type = "Rec-CUSUM"))
+
+# Gráficos
+plot(fitted(m), resid(m)); abline(h = 0, lty = 2)
+hist(resid(m), freq = FALSE); curve(dnorm(x, 0, sd(resid(m))), add = TRUE)`)}</pre>`};
