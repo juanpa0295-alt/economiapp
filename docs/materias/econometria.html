@@ -40,7 +40,13 @@ canvas.c3{display:block;width:100%;height:min(440px,75vw);min-height:260px;touch
 canvas.c3:active{cursor:grabbing}
 .calcf input,.calcf select{font-family:var(--f-mono);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink)}
 </style>
-
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
 </head>
 <body>
 <div class="wrap">
