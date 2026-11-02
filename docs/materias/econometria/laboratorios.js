@@ -779,6 +779,34 @@ DL.hist=function(v,xl){const x=v.filter(isFinite);if(x.length<3)return"";const W
 DL.mk=(n,e)=>{const nm=DL.newVar(n,e);DL.created=(DL.created||[]).filter(x=>x[0]!==nm).concat([[nm,e]]);return nm};
 DL.isIndex=c=>{const v=DL.data.data[c];if(/^(t|obs|id|n|trimestre|periodo|time|tiempo|indice|index)$/i.test(c))return true;return v.length>2&&v.every((x,i)=>x===v[0]+i)};
 DL.guessY=C=>C.find(c=>/^(y|consumo|c|gasto|salario|wage|ventas|demanda)$/i.test(c))||C.find(c=>!DL.isIndex(c))||C[0];
+DL.expr=c=>{const r=(DL.created||[]).find(x=>x[0]===c);return r?r[1]:null};
+DL.isDummy=c=>{const v=DL.data.data[c].filter(isFinite);return v.length>0&&v.every(x=>x===0||x===1)};
+DL.describe=function(c){const e=DL.expr(c),st=DL.stats(DL.data.data[c]);let m;
+  if(e){if((m=e.match(/^obs\s*>=\s*(\d+)$/)))return`Dummy de quiebre: 0 hasta la fila ${m[1]-1} y 1 desde la fila ${m[1]}. Su coeficiente mide el cambio del intercepto.`;
+    if((m=e.match(/^([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)$/))&&DL.data.data[m[1]]&&DL.isDummy(m[1]))return`Interacción: vale ${m[2]} cuando ${m[1]} = 1 y 0 en otro caso. Su coeficiente mide el cambio de la pendiente de ${m[2]}.`;
+    if((m=e.match(/^\(obs [+-] \d+\) % (\d+) \+ 1 == (\d+)$/)))return`Dummy ${m[1]==="4"?"del trimestre":"del mes"} ${m[2]}: 1 en ese periodo y 0 en los demás.`;
+    if((m=e.match(/^log\(\s*(\w+)\s*\)$/)))return`Logaritmo natural de ${m[1]}. Con logaritmos, los coeficientes se leen en porcentajes (elasticidades).`;
+    if((m=e.match(/^lag\(\s*(\w+)\s*,\s*(\d+)\s*\)$/)))return`${m[1]} de ${m[2]==="1"?"la fila anterior":m[2]+" filas atrás"} (rezago). Las primeras filas quedan vacías.`;
+    if((m=e.match(/^dif\(\s*(\w+)\s*\)$/)))return`Cambio de ${m[1]} respecto a la fila anterior (primera diferencia).`;
+    if(e==="obs")return"Tendencia lineal: 1, 2, 3, … Controla el crecimiento en el tiempo.";if(e==="obs^2")return"Tendencia al cuadrado: permite que el crecimiento se acelere o se frene.";
+    if((m=e.match(/^(\w+)\^2$/)))return`${m[1]} al cuadrado: permite un efecto no lineal de ${m[1]}.`;
+    return`Creada con «${e}».`}
+  if(DL.isIndex(c))return`Número de fila (1, 2, 3, …). No es una variable económica: como X solo agrega una tendencia; no la uses como Y.`;
+  if(DL.isDummy(c))return`Dummy (0/1): vale 1 en ${DL.data.data[c].filter(x=>x===1).length} de ${st.n} filas.`;
+  return`Columna de la base · media ${fmt(st.m,3)} · de ${fm(st.min)} a ${fm(st.max)}${st.miss?` · ${st.miss} vacías`:""}.`};
+// ---- significado de cada coeficiente
+DL.interp=function(M,j){const nm=M.names[j],y=M.yName,xs=M.xNames,dum=xs.filter(x=>DL.isDummy(x)),e=DL.expr(nm);let m;
+  const logY=/^ln_|^l(og)?_?/i.test(y)&&DL.expr(y)&&/^log\(/.test(DL.expr(y));
+  if(nm==="(Intercepto)"){const d=dum.filter(x=>/^obs\s*>=/.test(DL.expr(x)||""));return d.length?`Valor esperado de ${y} cuando las X valen 0, en el periodo base (${d.join(", ")} = 0).`:`Valor esperado de ${y} cuando todas las X valen 0. A veces no tiene lectura económica directa.`}
+  if(e&&(m=e.match(/^obs\s*>=\s*(\d+)$/)))return`Cambio del intercepto desde la fila ${m[1]}: intercepto del segundo periodo = β₁ ${M.b[j]<0?"−":"+"} ${f4(Math.abs(M.b[j]))}.`;
+  if(e&&(m=e.match(/^([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)$/))&&DL.data.data[m[1]]&&DL.isDummy(m[1])){const k=M.names.indexOf(m[2]);return`Cambio de la pendiente de ${m[2]} cuando ${m[1]} = 1${k>=0?`: pendiente del segundo periodo = ${f4(M.b[k])} ${M.b[j]<0?"−":"+"} ${f4(Math.abs(M.b[j]))} = ${f4(M.b[k]+M.b[j])}`:""}.`}
+  if(DL.isDummy(nm))return`Diferencia promedio de ${y} cuando ${nm} = 1 frente a ${nm} = 0, con lo demás constante.`;
+  const lx=e&&/^log\(/.test(e);
+  if(logY&&lx)return`Elasticidad: si ${nm.replace(/^ln_/,"")} sube 1 %, ${y.replace(/^ln_/,"")} cambia ${f4(M.b[j])} %.`;
+  if(logY)return`Si ${nm} sube 1 unidad, ${y.replace(/^ln_/,"")} cambia aproximadamente ${fmt(100*M.b[j],2)} %.`;
+  if(lx)return`Si ${nm.replace(/^ln_/,"")} sube 1 %, ${y} cambia ${fmt(M.b[j]/100,4)} unidades.`;
+  if(DL.isIndex(nm))return`Tendencia: cada fila (periodo) ${y} cambia ${f4(M.b[j])}, con lo demás constante.`;
+  return`Si ${nm} aumenta 1 unidad, ${y} cambia ${f4(M.b[j])} unidades, con las demás X constantes (efecto marginal).`};
 DL.FUN=["log","ln","exp","sqrt","abs","lag","dif","obs","si"];
 DL.newVar=function(name,expr){const D=DL.data;name=DL.clean(name);if(!name)throw new Error("ponle un nombre a la variable.");
   const toks=expr.match(/\s+|[A-Za-z_][A-Za-z0-9_]*|\d+(?:[.,]\d+)?(?:e[+-]?\d+)?|>=|<=|==|!=|&&|\|\||[-+*/^(),<>!%]/gi);if(!toks||toks.join("")!==expr)throw new Error("la expresión tiene caracteres no permitidos.");
@@ -834,12 +862,12 @@ SIMS.datos=function(){
         $("dv-go").onclick=()=>{try{const nm=DL.mk($("dv-n").value,$("dv-e").value),s2=DL.stats(B.data[nm]);$("dv-out").innerHTML=`<p class="verdict ok">Variable <b>${nm}</b> creada: ${s2.n} valores válidos, media ${f4(s2.m)}. En R: <code>datos$${nm} &lt;- ${DL.rExpr($("dv-e").value)}</code></p>`}catch(e2){$("dv-out").innerHTML=err(e2.message)}}}
       if(v==="mod"){const M=DL.model,isIdx=c=>DL.isIndex(c),created=new Set((DL.created||[]).map(x=>x[0])),y0=M?M.yName:DL.guessY(C);
         const xs0=M?M.xNames:C.filter(c=>c!==y0&&!isIdx(c)&&!created.has(c)).slice(0,1);
-        const box=c=>`<label class="chkl dm-x" data-c="${c}"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}> ${c}${isIdx(c)?' <span class="tag br">índice de tiempo</span>':""}${created.has(c)?' <span class="tag nw">creada</span>':""}</label>`;
+        const box=c=>`<label class="dm-x vcard${isIdx(c)?" idx":""}" data-c="${c}" title="${esc(DL.describe(c))}"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}><span class="vc-b"><span class="vc-n">${c}${isIdx(c)?' <span class="tag br">índice</span>':""}${created.has(c)?' <span class="tag nw">creada</span>':""}${DL.isDummy(c)?' <span class="tag">0/1</span>':""}</span><span class="vc-d">${DL.describe(c)}</span></span></label>`;
         const orig=C.filter(c=>!created.has(c)),cre=C.filter(c=>created.has(c)),hasD=cre.filter(c=>/^D(_|$)/.test(c));
-        $("dl-mod").innerHTML=`<div class="stepc"><h4><span class="n">1</span>¿Qué quieres explicar? (variable dependiente Y)</h4><div class="calcf"><label>Y<select id="dm-y">${C.map(c=>`<option value="${c}" ${c===y0?"selected":""}>${c}</option>`).join("")}</select></label></div><p class="warn" id="dm-yw" hidden></p></div>
+        $("dl-mod").innerHTML=`<div class="stepc"><h4><span class="n">1</span>¿Qué quieres explicar? (variable dependiente Y)</h4><div class="calcf"><label>Y<select id="dm-y">${C.map(c=>`<option value="${c}" ${c===y0?"selected":""}>${c}</option>`).join("")}</select></label></div><p class="hint" id="dm-yd" style="margin:6px 0 0"></p><p class="warn" id="dm-yw" hidden></p></div>
         <div class="stepc"><h4><span class="n">2</span>¿Con qué la explicas? (variables explicativas X)</h4>
-          <p class="hint" style="margin:0 0 6px">De la base</p><div class="chips" id="dm-x">${orig.map(box).join("")}</div>
-          ${cre.length?`<p class="hint" style="margin:10px 0 6px">Creadas por ti</p><div class="chips" id="dm-x2">${cre.map(box).join("")}</div>`:`<p class="hint" style="margin:8px 0 0">¿Necesitas una dummy, un logaritmo o una interacción? Créala en <b>2. Crear variables</b> y aparecerá aquí.</p>`}
+          <p class="hint" style="margin:0 0 6px">De la base</p><div class="vcards" id="dm-x">${orig.map(box).join("")}</div>
+          ${cre.length?`<p class="hint" style="margin:10px 0 6px">Creadas por ti</p><div class="vcards" id="dm-x2">${cre.map(box).join("")}</div>`:`<p class="hint" style="margin:8px 0 0">¿Necesitas una dummy, un logaritmo o una interacción? Créala en <b>2. Crear variables</b> y aparecerá aquí.</p>`}
           ${hasD.length?`<div class="chips pre" style="margin-top:10px"><button type="button" class="btn" id="dm-dq">Modelo con dummies de quiebre: X + ${hasD.join(" + ")}</button><button type="button" class="btn" id="dm-r0">Modelo restringido: solo X</button></div>`:""}
           <p class="hint" id="dm-tw" hidden></p></div>
         <div class="stepc"><h4><span class="n">3</span>¿Con qué observaciones?</h4><div class="calcf">${num("dm-a","Desde la fila",M?M.opt.from:1,1)}${num("dm-b","Hasta la fila",M?M.opt.to:B.n,1)}</div><p class="hint" style="margin:6px 0 0">Toda la muestra es de la fila 1 a la ${B.n}. Para estimar un solo periodo (por ejemplo, antes del quiebre) cambia el rango.</p></div>
@@ -847,7 +875,7 @@ SIMS.datos=function(){
         <div class="eq" id="dm-eq"></div><div class="chips pre" style="margin:10px 0"><button type="button" class="btn solid" id="dm-go">Estimar por MCO</button></div><div id="dm-out"></div>`;
         const xsSel=()=>[...$("dl-mod").querySelectorAll(".dm-x input:checked")].map(i=>i.value);
         const upd=()=>{const y=$("dm-y").value;$("dl-mod").querySelectorAll(".dm-x").forEach(l=>{const me=l.dataset.c===y;l.hidden=me;if(me)l.querySelector("input").checked=false});
-          const yw=$("dm-yw");yw.hidden=!isIdx(y);yw.innerHTML=`<b>${y}</b> parece un número de observación o de periodo (1, 2, 3, …). Normalmente no es lo que se quiere explicar: escoge la variable de interés (por ejemplo, el consumo).`;
+          $("dm-yd").textContent=DL.describe(y);const yw=$("dm-yw");yw.hidden=!isIdx(y);yw.innerHTML=`<b>${y}</b> parece un número de observación o de periodo (1, 2, 3, …). Normalmente no es lo que se quiere explicar: escoge la variable de interés (por ejemplo, el consumo).`;
           const xs=xsSel(),tw=$("dm-tw"),ti=xs.filter(isIdx);tw.hidden=!ti.length;tw.innerHTML=`Marcaste <b>${ti.join(", ")}</b>, que es un índice de tiempo: el modelo incluirá una tendencia lineal. Déjalo solo si quieres controlar por tendencia; en el Trabajo 1 no va.`;
           const c=$("dm-c").checked,a=V("dm-a"),b=V("dm-b");let k=0;const terms=[...(c?["β₁"]:[]),...xs.map(x=>`β${SB((c?2:1)+(k++))}·${x}`)];
           $("dm-eq").innerHTML=`<b>Modelo:</b> ${y} = ${terms.length?terms.join(" + "):"0"} + u &nbsp; · &nbsp; filas ${fm(a)} a ${fm(b)}${xs.length?"":` <span class="hint">(marca al menos una X${c?" o deja solo el intercepto":""})</span>`}`};
@@ -874,12 +902,34 @@ SIMS.datos=function(){
       if(v==="r"){$("dl-r").innerHTML=DL.rcode();if(typeof prettyCode==="function")prettyCode($("dl-r"))}}
     render(cur)}};
 
-DL.out=function(M){const se=M.opt.rob?M.seR:M.se,gl=M.n-M.k,tc=CE.tcrit(gl,0.05);
+DL.out=function(M){const se=M.opt.rob?M.seR:M.se,gl=M.n-M.k,tc=CE.tcrit(gl,0.05),pF=CE.fp(M.F,M.qF,gl);
   const eq=`${M.yName} = ${M.b.map((b,j)=>`${j?(b<0?"− ":"+ "):b<0?"−":""}${f4(Math.abs(b))}${M.names[j]==="(Intercepto)"?"":"·"+M.names[j]}`).join(" ")}`;
-  return`<div class="eq">${eq}</div><div class="tbl"><table><tr><th>Variable</th><th>Coeficiente</th><th>Error est.${M.opt.rob?" (robusto)":""}</th><th>t</th><th>p-valor</th><th>IC 95 %</th></tr>${M.b.map((b,j)=>{const t=b/se[j],p=DL.pt(t,gl);return`<tr><td>${M.names[j]}</td><td class="num">${f4(b)}</td><td class="num">${f4(se[j])}</td><td class="num">${fmt(t,3)}</td><td class="num">${p4(p)}${p<0.01?" ***":p<0.05?" **":p<0.1?" *":""}</td><td class="num">[${f4(b-tc*se[j])}; ${f4(b+tc*se[j])}]</td></tr>`}).join("")}</table></div>
-  <div class="res">${tiles([["n",String(M.n)],["k",String(M.k)],["R²",f4(M.r2)],["R² ajustado",f4(M.r2a)],["s (error est. de la regresión)",f4(Math.sqrt(M.s2))],["SCR",f4(M.rss)],[`F global (${M.qF}, ${gl})`,isFinite(M.F)?`${f4(M.F)} · p ${p4(CE.fp(M.F,M.qF,gl))}`:"—"],["AIC / BIC",`${fmt(M.aic,2)} / ${fmt(M.bic,2)}`]])}</div>
-  <p class="hint">*** p &lt; 0,01 · ** p &lt; 0,05 · * p &lt; 0,1. ${M.opt.cte?"":"Sin intercepto el R² se calcula sin centrar."}</p>
-  ${M.k<=6?`<details class="dp-lite"><summary>Ver las matrices: X′X, X′y y (X′X)⁻¹</summary>${[["X′X",M.XtX],["(X′X)⁻¹",M.I]].map(([t,A])=>`<p><b>${t}</b></p><div class="tbl"><table>${A.map(r=>`<tr>${r.map(v=>`<td class="num">${fmt(v,6)}</td>`).join("")}</tr>`).join("")}</table></div>`).join("")}<p><b>X′y</b> = [${M.Xty.map(v=>fmt(v,4)).join("; ")}] → b = (X′X)⁻¹X′y = [${M.b.map(f4).join("; ")}]</p></details>`:""}`};
+  const rows=M.b.map((b,j)=>{const t=b/se[j],p=DL.pt(t,gl);return{b,t,p,se:se[j]}});
+  const brk=M.xNames.filter(x=>/^obs\s*>=\s*\d+$/.test(DL.expr(x)||""));let per="";
+  if(brk.length===1&&M.opt.cte){const D=brk[0],ia=M.names.indexOf(D),parts=[0,1].map(d=>{let txt2=`${M.yName} = ${f4(M.b[0]+(d?M.b[ia]:0))}`;M.names.forEach((nm,j)=>{if(j===0||nm===D)return;const e=DL.expr(nm),mm=e&&e.match(/^([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)$/);if(mm&&mm[1]===D)return;const ji=M.names.findIndex(q=>{const e2=DL.expr(q),m2=e2&&e2.match(/^([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)$/);return m2&&m2[1]===D&&m2[2]===nm}),v=M.b[j]+(d&&ji>=0?M.b[ji]:0);txt2+=` ${v<0?"−":"+"} ${f4(Math.abs(v))}·${nm}`});return txt2});
+    per=`<div class="link"><b>Las dos ecuaciones que salen de este modelo:</b><br>Antes del quiebre (${D} = 0): ${parts[0]}<br>Desde el quiebre (${D} = 1): ${parts[1]}</div>`}
+  const sig=rows.filter((r,j)=>M.names[j]!=="(Intercepto)"&&r.p<0.05).map((_,j)=>j),sigN=M.names.filter((nm,j)=>nm!=="(Intercepto)"&&rows[j].p<0.05),noN=M.names.filter((nm,j)=>nm!=="(Intercepto)"&&rows[j].p>=0.05);
+  return`<div class="eq">${eq}</div>
+  <div class="tbl"><table><tr><th>Variable</th><th class="num" title="Estimación MCO del coeficiente">Coeficiente</th><th class="num" title="Precisión de la estimación: cuanto menor, más precisa">Error est.${M.opt.rob?" (robusto)":""}</th><th class="num" title="t = coeficiente / error estándar. Si |t| > ${f4(tc)}, es significativo al 5 %">t</th><th class="num" title="Probabilidad de obtener un t así de grande si el coeficiente verdadero fuera 0">p-valor</th><th class="num" title="Rango de valores plausibles para el coeficiente con 95 % de confianza">IC 95 %</th><th>Qué significa</th></tr>
+  ${rows.map((r,j)=>`<tr><td><b>${M.names[j]}</b></td><td class="num">${f4(r.b)}</td><td class="num">${f4(r.se)}</td><td class="num">${fmt(r.t,3)}</td><td class="num">${p4(r.p)}${r.p<0.01?" ***":r.p<0.05?" **":r.p<0.1?" *":""}</td><td class="num">[${f4(r.b-tc*r.se)}; ${f4(r.b+tc*r.se)}]</td><td class="dl-mean">${DL.interp(M,j)} <span class="${r.p<0.05?"dl-si":"dl-no"}">${r.p<0.05?"Significativo al 5 %.":"No significativo al 5 %."}</span></td></tr>`).join("")}</table></div>
+  ${per}
+  <div class="res">${tiles([["n · observaciones",String(M.n)],["k · parámetros",String(M.k)],["R²",f4(M.r2)],["R² ajustado",f4(M.r2a)],["s · error est. de la regresión",f4(Math.sqrt(M.s2))],["SCR · suma de cuadrados de residuos",f4(M.rss)],[`F global (${M.qF}, ${gl})`,isFinite(M.F)?`${f4(M.F)} · p ${p4(pF)}`:"—"],["AIC / BIC",`${fmt(M.aic,2)} / ${fmt(M.bic,2)}`]])}</div>
+  <div class="stepc"><h4>Lectura de los resultados</h4><ul>
+   <li><b>Ajuste:</b> el modelo explica el ${fmt(100*M.r2,1)} % de la variación de ${M.yName} (R²)${M.k>2?`; ajustado por el número de variables, ${fmt(100*M.r2a,1)} %`:""}.</li>
+   ${isFinite(M.F)?`<li><b>Significancia conjunta:</b> F = ${f4(M.F)} con p ${p4(pF)}: ${pF<0.05?"las X, en conjunto, sí explican a "+M.yName+" (se rechaza que todas las pendientes sean 0).":"no hay evidencia de que las X, en conjunto, expliquen a "+M.yName+"."}</li>`:""}
+   <li><b>Individualmente:</b> ${sigN.length?`son significativas al 5 % ${sigN.join(", ")}`:"ninguna X es significativa al 5 %"}${noN.length?`; no lo son ${noN.join(", ")}`:""}.</li>
+   <li><b>Error típico:</b> en promedio, los valores observados de ${M.yName} se alejan unos ${f4(Math.sqrt(M.s2))} de la recta estimada (s).</li>
+   <li><b>SCR = ${f4(M.rss)}:</b> es el número que usan las pruebas F y de Chow (restringido frente a no restringido).</li></ul></div>
+  <details class="dp-lite"><summary>¿Qué es cada número?</summary><div class="tbl"><table>
+   <tr><td><b>Coeficiente</b></td><td>Estimación por MCO del efecto de cada variable; la columna «Qué significa» lo traduce.</td></tr>
+   <tr><td><b>Error estándar</b></td><td>Cuánto variaría el coeficiente de una muestra a otra. Se usa para la prueba t y el intervalo.</td></tr>
+   <tr><td><b>t y p-valor</b></td><td>Prueba H₀: coeficiente = 0. Si p &lt; 0,05 (o |t| &gt; ${f4(tc)} con ${gl} gl), la variable es significativa al 5 %. *** p &lt; 0,01 · ** p &lt; 0,05 · * p &lt; 0,1.</td></tr>
+   <tr><td><b>IC 95 %</b></td><td>Valores plausibles del coeficiente; si no incluye el 0, es significativo al 5 %.</td></tr>
+   <tr><td><b>R² y R² ajustado</b></td><td>Proporción de la variación de Y que explica el modelo; el ajustado penaliza agregar variables.${M.opt.cte?"":" Sin intercepto el R² se calcula sin centrar."}</td></tr>
+   <tr><td><b>F global</b></td><td>Prueba que todas las pendientes son 0 a la vez.</td></tr>
+   <tr><td><b>s y SCR</b></td><td>Tamaño típico de los residuos y su suma de cuadrados (base de las pruebas de restricciones).</td></tr>
+   <tr><td><b>AIC / BIC</b></td><td>Para comparar modelos con la misma Y: menor es mejor.</td></tr></table></div></details>
+  ${M.k<=6?`<details class="dp-lite"><summary>Ver las matrices: X′X, X′y y (X′X)⁻¹</summary>${[["X′X",M.XtX],["(X′X)⁻¹",M.I]].map(([t,A])=>`<p><b>${t}</b> (filas y columnas en el orden ${M.names.join(", ")})</p><div class="tbl"><table>${A.map(r=>`<tr>${r.map(v=>`<td class="num">${fmt(v,6)}</td>`).join("")}</tr>`).join("")}</table></div>`).join("")}<p><b>X′y</b> = [${M.Xty.map(v=>fmt(v,4)).join("; ")}] → b = (X′X)⁻¹X′y = [${M.b.map(f4).join("; ")}]</p></details>`:""}`};
 DL.test=function(M,t){const ix=M.names.map((n,j)=>[n,j]);
   if(t==="f")return`<p>Marca los coeficientes que quieres probar conjuntamente iguales a cero (H₀: todos = 0).</p><div class="chips" id="dpf-c">${ix.map(([n,j])=>`<label class="chkl"><input type="checkbox" value="${j}" ${n!=="(Intercepto)"?"checked":""}> ${n}</label>`).join("")}</div><div id="dpf-o"></div>`;
   if(t==="rec")return`<p>Se estima el modelo con las primeras t observaciones, para t = k + 1, …, n, y se predice la siguiente. Si la estructura es estable, los coeficientes se mantienen dentro de su banda y los errores de predicción dentro de ±2 desviaciones.</p><div class="calcf"><label>Coeficiente a seguir<select id="dpr-c">${M.names.map((nm,j)=>`<option value="${j}" ${j===(M.opt.cte&&M.k>1?1:0)?"selected":""}>${nm}</option>`).join("")}</select></label></div><div id="dpr-o"></div>`;
@@ -1030,12 +1080,23 @@ DL.recetasBind=function(C){const B=DL.data,ck=(id,list,on)=>`<div class="chips" 
       $("rc-o").innerHTML=`<p class="verdict ok">Variables creadas:</p><div class="tbl"><table><tr><th>Variable</th><th>Expresión</th><th>En R</th></tr>${made.map(([n,e])=>`<tr><td><b>${n}</b></td><td><code>${esc(e)}</code></td><td><code>datos$${n} &lt;- ${esc(DL.rExpr(e))}</code></td></tr>`).join("")}</table></div><p>${next}</p>`}
     catch(e2){$("rc-o").innerHTML=err(e2.message)}}};
 // ---------- guías paso a paso
-DL.GUIA=`<details class="dp-lite dl-guia"><summary><b>Guía paso a paso: punto 5 del Trabajo 1 (cambio estructural)</b></summary>
-<p>La base tiene una fila por trimestre desde 2005:1 hasta 2010:4 (24 filas): fila 1 = 2005:1, fila 13 = 2008:1, fila 15 = 2008:3 (quiebra de Lehman Brothers), fila 24 = 2010:4. Revisa en <b>1. La base</b> cómo se llaman las columnas (por ejemplo T, Y y X). La columna T es solo el número del trimestre: no la uses como variable explicativa.</p>
+DL.GUIA=`<details class="dp-lite dl-guia"><summary><b>Qué puedes hacer en cada pestaña</b></summary><div class="tbl"><table><tr><th>Pestaña</th><th>Para qué sirve</th><th>Qué obtienes</th></tr>
+<tr><td><b>1. La base</b></td><td>Revisar que los datos se leyeron bien antes de estimar.</td><td>Nombres de las columnas, primeras filas, estadísticas descriptivas (media, desviación, mínimo, máximo, vacíos) y correlaciones.</td></tr>
+<tr><td><b>2. Crear variables</b></td><td>Construir las variables que pide el modelo y que no vienen en la base.</td><td>Dummies de quiebre e interacciones, dummies de grupo o estacionales, logaritmos, rezagos, tendencias; cada una con su expresión en R.</td></tr>
+<tr><td><b>3. Estimar</b></td><td>Escoger Y, las X, las filas y estimar por MCO.</td><td>La ecuación estimada, coeficientes con su significado, errores estándar, t, p, intervalos, R², F global y una lectura de los resultados.</td></tr>
+<tr><td><b>4. Pruebas</b></td><td>Contrastar hipótesis sobre el modelo estimado en la pestaña 3.</td><td>F de restricciones (y Wald, LR, LM), cambio estructural (Chow y pronósticos), recursivos y CUSUM, heterocedasticidad, autocorrelación, normalidad, RESET y VIF.</td></tr>
+<tr><td><b>5. Demostraciones</b></td><td>Comprobar con tus datos las propiedades de MCO que se demuestran en clase.</td><td>X′e = 0, Σe = 0, STC = SCE + SCR, R² = corr(Y, Ŷ)² y el teorema de Frisch-Waugh-Lovell.</td></tr>
+<tr><td><b>6. Gráficos</b></td><td>Ver los datos y los residuos.</td><td>Dispersión con la recta de MCO, residuos frente a ajustados y en el tiempo, histograma con la normal.</td></tr>
+<tr><td><b>7. Código R</b></td><td>Llevar todo a RStudio para el informe.</td><td>Un script con la lectura de la base, las variables creadas, el modelo y las pruebas.</td></tr></table></div>
+<p class="hint">El orden habitual: 1 → 2 (si hace falta) → 3 → 4 → 7. Cada vez que cambies el modelo en la pestaña 3, las pruebas de la 4 se recalculan con el modelo nuevo.</p></details>
+<details class="dp-lite dl-guia"><summary><b>Guía paso a paso: punto 5 del Trabajo 1 (cambio estructural)</b></summary>
+<p>La base tiene una fila por trimestre desde 2005:1 hasta 2010:4 (24 filas): fila 1 = 2005:1, fila 13 = 2008:1, fila 15 = 2008:3 (quiebra de Lehman Brothers), fila 24 = 2010:4. La columna T solo numera los trimestres: no la uses en el modelo.</p>
 <ol class="steps">
-<li><b>El modelo (restringido).</b> En <b>3. Estimar</b>: Y como variable dependiente, marca solo X, con intercepto, de la fila 1 a la 24. Es Yₜ = β₁ + β₂Xₜ + μₜ. Anota la SCR.</li>
-<li><b>a) Pronósticos de Chow.</b> En <b>4. Pruebas → Cambio estructural</b>, escribe la fila donde empieza el segundo periodo (13 si el quiebre es 2008:1; justifica tu elección en el informe). El paso 4 trae la prueba con las ecuaciones (8) y (9): deben dar el mismo F.</li>
-<li><b>b) Coeficientes recursivos y errores de predicción un paso adelante.</b> En <b>4. Pruebas → Recursivos y CUSUM</b>, sigue el coeficiente de X (la propensión marginal a consumir). Describe si salta o se sale de la banda alrededor de 2008, si algún error de predicción se sale de ±2 desviaciones y si la CUSUM cruza las bandas.</li>
-<li><b>c) Cambio estructural antes y después de 2008.</b> En la misma pestaña <b>Cambio estructural</b>: el paso 1 da las tres regresiones, el paso 2 el modelo con dummies y la verificación de (27) y (28), y el paso 3 la F por todas las alternativas (SCR, R², dummies y forma matricial).</li>
-<li><b>Si quieres hacerlo a mano con dummies:</b> en <b>2. Crear variables</b>, objetivo «Cambio estructural en una fecha», fila 13 y marca X: se crean D y D_X. Estima Y con X, D y D_X y, en <b>Pruebas → F de restricciones</b>, marca D y D_X: da el mismo F. Para cada periodo por separado, estima con «Desde la observación» 1 a 12 y 13 a 24.</li>
-<li><b>Para el informe:</b> en <b>7. Código R</b> está el script que reproduce todo en RStudio, con las variables que creaste.</li></ol></details>`;
+<li><b>Revisa la base</b> (pestaña 1): deben salir 24 filas y las columnas T, Y y X sin vacíos. Y es el consumo y X el ingreso disponible, en billones de dólares.</li>
+<li><b>Escoge el quiebre:</b> 2008:1 (fila 13) es la elección más simple; 2008:3 (fila 15) coincide con la quiebra de Lehman Brothers. Justifícalo en el informe y usa el mismo en todos los literales.</li>
+<li><b>Estima el modelo restringido</b> (pestaña 3): Y como dependiente, solo X marcada, filas 1 a 24, con intercepto. Anota la ecuación, el R² y la SCR (es la SCR<sub>R</sub>). Interpreta β₂ como la propensión marginal a consumir.</li>
+<li><b>a) Pronósticos de Chow</b> (pestaña 4 → Cambio estructural, escribe 13): el paso 4 da F con la ecuación (8) y con la (9). Copia el F, sus grados de libertad, el crítico y el p-valor, y la tabla de errores de pronóstico. Concluye si el modelo estimado antes de 2008 predice bien el consumo después.</li>
+<li><b>b) Recursivos</b> (pestaña 4 → Recursivos y CUSUM, coeficiente X): describe la trayectoria de la propensión marginal, en qué trimestres se sale de la banda, qué errores de predicción un paso adelante quedan fuera de ±2 desviaciones y si la CUSUM cruza las bandas. Concluye si hay cambio estructural y cuándo.</li>
+<li><b>c) Prueba de cambio estructural</b> (misma pestaña Cambio estructural): reporta las tres regresiones (paso 1), el modelo con dummies y la verificación de las ecuaciones (27) y (28) (paso 2), y la F por las cuatro alternativas (paso 3): deben coincidir. Indica si el cambio está en el intercepto, en la pendiente o en ambos.</li>
+<li><b>Opcional, para mostrar el modelo con dummies:</b> pestaña 2 → «Cambio estructural en una fecha», fila 13, marca X → crea D y D_X. En la pestaña 3, botón «Modelo con dummies de quiebre» y Estimar: la tabla dice qué significa cada coeficiente y escribe las ecuaciones antes y después del quiebre. En la pestaña 4 → F de restricciones, marca solo D y D_X: da el mismo F del literal c.</li>
+<li><b>El informe:</b> pestaña 7 → copia el script, ejecútalo en RStudio con tu archivo y pega las salidas y los gráficos con tu análisis.</li></ol></details>`;
