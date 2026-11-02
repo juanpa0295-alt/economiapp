@@ -346,6 +346,9 @@ article .rm>li{max-width:none}
 .pc-cm{color:var(--muted);font-style:italic;white-space:pre-wrap;word-break:break-word;flex:1 1 14ch;min-width:0}
 .pc-cm.pc-full{flex-basis:100%}
 pre .pc-cd:empty{display:none}
+.tbl th.num{text-align:right}
+details.dl-guia{margin:10px 0}
+details.dl-guia ol{margin-top:8px}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
