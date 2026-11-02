@@ -362,6 +362,8 @@ details.dl-guia ol{margin-top:8px}
 td.dl-mean{font-size:12.5px;line-height:1.4;min-width:220px;color:var(--ink)}
 .dl-si{color:var(--good);font-weight:600}
 .dl-no{color:var(--muted);font-weight:600}
+.basebox{border:1px solid var(--rule);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--paper);margin:4px 0 12px;display:flex;flex-direction:column;gap:6px}
+.basebox .tbl{margin:4px 0}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
