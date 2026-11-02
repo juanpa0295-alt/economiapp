@@ -1016,3 +1016,148 @@ adf.test(resid(r))      # ojo: los críticos correctos son los de Engle-Granger`
   const all=[...TRUNK,...BRANCHES.flatMap(g=>g.items)];
   for(const s of all)if(RM[s.id])s.html+=block(s.id,RM[s.id]);
 })();
+
+
+// =====================================================================
+// EJERCICIOS DE CAMBIO ESTRUCTURAL Y VARIABLES DICÓTOMAS (Econometría I, prof. Sergio Iván Restrepo)
+// Taller «Ejercicios propuestos 3», Dinardo cap. 4 y la guía del Trabajo 1, punto 5.
+// =====================================================================
+const CEBOX=`<section><h3>Resolvedor</h3><div class="sim" id="sim"></div></section>`;
+BRANCHES.push({g:"Ejercicios de cambio estructural", from:"chow", items:[
+{id:"ce-metodo", t:"Cómo resolver cualquier ejercicio de cambio estructural", sim:"cambio", html:String.raw`
+<section><h3>Primero: ¿qué te dan?</h3>
+<p class="lead">Todos los ejercicios del taller se resuelven con la misma prueba F; lo que cambia es cómo se obtienen las SCR. Identifica qué datos trae el enunciado y escoge el modo del resolvedor.</p>
+<div class="tbl"><table><tr><th>El ejercicio da…</th><th>Ejemplos</th><th>Qué haces</th><th>Modo</th></tr>
+<tr><td>La tabla de datos</td><td>Ej. 3, 5, 7c, 8 · Dinardo 4.7 · Trabajo 1</td><td>Estimas el restringido, las submuestras y el modelo con dummies</td><td>Datos (tabla)</td></tr>
+<tr><td>X′X, X′y y y′y</td><td>Dinardo 4.1 y 4.9</td><td>b = (X′X)⁻¹X′y y SCR = y′y − b′X′y en cada muestra; el restringido suma las matrices</td><td>X′X, X′y, y′y</td></tr>
+<tr><td>Las SCR, o s, o R² con TSS</td><td>Ej. 6 · Dinardo 4.2, 4.8, 4.10</td><td>SCR = s²(n − k) o (1 − R²)·TSS, y la F con m submuestras</td><td>Solo SCR o R²</td></tr>
+<tr><td>Un modelo con dummies ya estimado</td><td>Ej. 2, 15</td><td>Escribes una ecuación por grupo e interpretas δ; pruebas t</td><td>Modelo ya estimado</td></tr>
+<tr><td>Un modelo restringido y uno no restringido</td><td>Ej. 12 (Nerlove)</td><td>W, LR y LM con las dos SCR</td><td>Wald, LR y LM</td></tr></table></div></section>
+<section><h3>Las fórmulas que usa el curso</h3>
+<div class="tbl"><table><tr><th>Prueba</th><th>Estadístico</th><th>Distribución</th></tr>
+<tr><td>Chow (dos submuestras)</td><td>\(F=\dfrac{(SCR_R-SCR_1-SCR_2)/k}{(SCR_1+SCR_2)/(n-2k)}\)</td><td>\(F(k,\,n-2k)\)</td></tr>
+<tr><td>Chow con m submuestras</td><td>\(F=\dfrac{(SCR_R-\sum SCR_j)/[(m-1)k]}{\sum SCR_j/(n-mk)}\)</td><td>\(F((m-1)k,\,n-mk)\)</td></tr>
+<tr><td>Pronósticos de Chow</td><td>\(F=\dfrac{(SCR_R-SCR_1)/n_2}{SCR_1/(n_1-k)}\)</td><td>\(F(n_2,\,n_1-k)\)</td></tr>
+<tr><td>Con R² (misma Y)</td><td>\(F=\dfrac{(R^2_{NR}-R^2_R)/q}{(1-R^2_{NR})/(n-k_{NR})}\)</td><td>\(F(q,\,n-k_{NR})\)</td></tr>
+<tr><td>Forma matricial</td><td>\(F=\dfrac{(R\mathbf b-\mathbf r)'[R(X'X)^{-1}R']^{-1}(R\mathbf b-\mathbf r)}{q\,s^2}\)</td><td>\(F(q,\,n-k_{NR})\)</td></tr></table></div>
+<p class="warn"><b>k cuenta el intercepto.</b> En un modelo simple k = 2, así que con dos submuestras los grados de libertad son (2, n − 4).</p></section>
+<section><h3>La redacción que piden</h3>
+<ol class="steps"><li><b>Modelo no restringido</b> (con dummies o una ecuación por submuestra) y <b>restringido</b> (una sola ecuación).</li><li><b>Hipótesis:</b> H₀: δ₁ = δ₂ = 0 (no hay cambio estructural) frente a H₁: algún δ ≠ 0.</li><li><b>Estadístico</b> con los números sustituidos y su distribución.</li><li><b>Valor crítico</b> o p-valor al nivel pedido.</li><li><b>Decisión y lectura económica:</b> qué significa que la función cambie (o no) entre los periodos o grupos.</li></ol></section>
+${CEBOX}`},
+{id:"ce-pronosticos", t:"Prueba de pronósticos de Chow (ejercicio 1 y Dinardo 4.1)", sim:"cambio", html:String.raw`
+<section><h3>Cuándo se usa</h3>
+<p class="lead">Cuando la segunda submuestra es muy pequeña para estimarla por separado (n₂ ≤ k), o cuando la pregunta es si el modelo estimado con los datos anteriores <b>predice bien</b> los posteriores.</p></section>
+<section><h3>Ejercicio 1: la demostración</h3>
+<p>Con \(\mathbf b_1=(X_1'X_1)^{-1}X_1'\mathbf y_1\) y \(\mathbf y_2=X_2\boldsymbol\beta+\boldsymbol\mu_2\), el error de pronóstico es</p>
+<div class="mj">\[\mathbf d=\mathbf y_2-X_2\mathbf b_1=X_2\boldsymbol\beta+\boldsymbol\mu_2-X_2\mathbf b_1=\boldsymbol\mu_2-X_2(\mathbf b_1-\boldsymbol\beta),\qquad \mathbf b_1-\boldsymbol\beta=(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\]</div>
+<p><b>a)</b> \(E(\mathbf d)=E(\boldsymbol\mu_2)-X_2(X_1'X_1)^{-1}X_1'E(\boldsymbol\mu_1)=\mathbf 0\), porque los errores tienen media cero.</p>
+<p><b>b)</b> Como \(E(\mathbf d)=\mathbf 0\), \(\operatorname{var}(\mathbf d)=E(\mathbf d\mathbf d')\):</p>
+<div class="mj">\[E(\mathbf d\mathbf d')=E(\boldsymbol\mu_2\boldsymbol\mu_2')-E(\boldsymbol\mu_2\boldsymbol\mu_1')X_1(X_1'X_1)^{-1}X_2'-X_2(X_1'X_1)^{-1}X_1'E(\boldsymbol\mu_1\boldsymbol\mu_2')+X_2(X_1'X_1)^{-1}X_1'E(\boldsymbol\mu_1\boldsymbol\mu_1')X_1(X_1'X_1)^{-1}X_2'\]</div>
+<p>Los términos cruzados son cero porque \(E(\boldsymbol\mu_1\boldsymbol\mu_2')=0\) (errores no correlacionados entre muestras). Con \(E(\boldsymbol\mu_j\boldsymbol\mu_j')=\sigma^2 I\):</p>
+<div class="mj">\[\operatorname{var}(\mathbf d)=\sigma^2I_{n_2}+\sigma^2X_2(X_1'X_1)^{-1}X_1'X_1(X_1'X_1)^{-1}X_2'=\sigma^2\left[I_{n_2}+X_2(X_1'X_1)^{-1}X_2'\right]\]</div>
+<p>De ahí sale el estadístico: \(F=\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/(n_2s_1^2)\sim F(n_2,n_1-k)\), que es numéricamente igual a \([(SCR_R-SCR_1)/n_2]/[SCR_1/(n_1-k)]\).</p></section>
+<section><h3>Dinardo 4.1 resuelto</h3>
+<p>Con \(X'X=\begin{bmatrix}20&10\\10&30\end{bmatrix}\), \(X'y=\begin{bmatrix}30\\40\end{bmatrix}\), \(y'y=75\) y n = 20:</p>
+<div class="mj">\[(X'X)^{-1}=\frac{1}{500}\begin{bmatrix}30&-10\\-10&20\end{bmatrix},\quad \mathbf b=\begin{bmatrix}1\\1\end{bmatrix},\quad SCR=75-(30+40)=5,\quad s^2=\frac{5}{18}=0{,}2778\]</div>
+<p>La observación nueva X = 2 se pronostica en Ŷ = 1 + 1·2 = 3, y Y = 4, así que d = 1. El factor es \(1+[1\;2](X'X)^{-1}[1\;2]'=1+70/500=1{,}14\).</p>
+<div class="mj">\[F=\frac{1^2}{0{,}2778\times1{,}14}=3{,}158\;\sim F(1,18),\qquad F_{0{,}05}=4{,}41\]</div>
+<p>No se rechaza H₀: la observación nueva es compatible con la relación estimada.</p></section>
+<section><h3>Trabajo 1, literal a</h3>
+<p>Estima con los trimestres anteriores a la crisis (n₁) y predice los posteriores (n₂). La ecuación (8) del curso es la forma con SCR y la (9) la forma con el vector d y su varianza: el resolvedor calcula las dos y deben dar el mismo número. Pega los datos del Excel en el modo «Datos (tabla)» con «las primeras n₁ observaciones son el grupo 1». Justifica en el informe dónde pones el quiebre (2008:1, o 2008:3 con la quiebra de Lehman Brothers).</p></section>
+${CEBOX}`},
+{id:"ce-recursivos", t:"Coeficientes recursivos y errores de predicción un paso adelante", sim:"cambio", html:String.raw`
+<section><h3>La idea</h3>
+<p class="lead">En vez de escoger un punto de quiebre, se estima el modelo una y otra vez agregando una observación cada vez: con las primeras k, luego k + 1, y así hasta n. Si los coeficientes cambian, se nota en la trayectoria.</p></section>
+<section><h3>Los tres gráficos</h3>
+<ol class="steps"><li><b>Coeficientes recursivos:</b> \(\mathbf b_t=(X_t'X_t)^{-1}X_t'\mathbf y_t\) con las primeras t observaciones, con bandas de ±2 errores estándar. Un salto fuera de la banda indica cambio.</li>
+<li><b>Errores de predicción un paso adelante:</b> \(e_{t+1}=y_{t+1}-\mathbf x_{t+1}'\mathbf b_t\), con varianza \(\sigma^2[1+\mathbf x_{t+1}'(X_t'X_t)^{-1}\mathbf x_{t+1}]\). Si un error queda fuera de ±2 desviaciones, el modelo no anticipó esa observación.</li>
+<li><b>Residuos recursivos y CUSUM:</b> \(w_t=e_t/\sqrt{1+\mathbf x_t'(X_{t-1}'X_{t-1})^{-1}\mathbf x_t}\). La suma acumulada \(W_t=\sum w_j/\hat\sigma\) debe quedar dentro de las bandas \(\pm0{,}948\sqrt{T}\,(1+2t/T)\) al 5 %.</li></ol></section>
+<section><h3>En R (Trabajo 1, literal b)</h3>
+<pre class="ce-code">library(readxl); library(strucchange)
+datos &lt;- read_excel("Datos_E5_T1_Consumo_Ingreso_Q_2005_2010_2026_2.xls")
+names(datos)          # revisa cómo se llaman las columnas
+m &lt;- lm(Y ~ X, data = datos)
+n &lt;- nrow(datos); k &lt;- 2
+# coeficientes recursivos
+b &lt;- t(sapply((k + 1):n, function(t) coef(lm(Y ~ X, data = datos[1:t, ]))))
+se &lt;- t(sapply((k + 1):n, function(t) coef(summary(lm(Y ~ X, data = datos[1:t, ])))[, 2]))
+plot((k + 1):n, b[, 2], type = "b", ylim = range(b[, 2] - 2 * se[, 2], b[, 2] + 2 * se[, 2]))
+lines((k + 1):n, b[, 2] + 2 * se[, 2], lty = 2); lines((k + 1):n, b[, 2] - 2 * se[, 2], lty = 2)
+# errores de predicción un paso adelante
+rr &lt;- recresid(m)                       # residuos recursivos
+plot(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))
+sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre>
+<p>El resolvedor hace lo mismo con los datos pegados y dibuja los tres gráficos (paso 7).</p></section>
+${CEBOX}`},
+{id:"ce-dummies", t:"Cambio estructural con dummies: forma matricial (ejercicios 8 a 11)", sim:"cambio", html:String.raw`
+<section><h3>Ejercicio 9: el modelo en forma matricial</h3>
+<p>Con \(D_t=0\) en las primeras \(n_1\) observaciones y 1 en las demás:</p>
+<div class="mj">\[\mathbf y=X_{NR\_D}\boldsymbol\beta_{NR\_D}+\boldsymbol\mu,\qquad X_{NR\_D}=\begin{bmatrix}\mathbf 1_{n_1}&\mathbf 0&X_{1}&\mathbf 0\\ \mathbf 1_{n_2}&\mathbf 1_{n_2}&X_{2}&X_{2}\end{bmatrix},\qquad \boldsymbol\beta_{NR\_D}=(\beta_1,\delta_1,\beta_2,\delta_2,\dots,\beta_k,\delta_k)'\]</div>
+<p>Cada fila tiene \(1, D_t, X_{2t}, D_tX_{2t},\dots\). La prueba de cambio estructural es \(H_0:\delta_1=\dots=\delta_k=0\), es decir \(R\boldsymbol\beta_{NR\_D}=\mathbf r\) con \(\mathbf r=\mathbf 0_{k}\) y R de orden \(k\times2k\) que tiene un 1 en la posición de cada δ:</p>
+<div class="mj">\[R=\begin{bmatrix}0&1&0&0&\cdots&0&0\\0&0&0&1&\cdots&0&0\\ \vdots&&&&\ddots&&\vdots\\0&0&0&0&\cdots&0&1\end{bmatrix}\]</div>
+<p><b>Ejercicio 10 (solo cambia el intercepto):</b> R = [0 1 0 0 … 0] de orden 1 × 2k y r = 0: una restricción, \(H_0:\delta_1=0\).</p>
+<p><b>Ejercicio 11 (solo cambian las pendientes):</b> R tiene k − 1 filas con un 1 en las posiciones de \(\delta_2,\dots,\delta_k\) y r = 0.</p>
+<p class="link">Si ordenas los parámetros como \((\beta_1,\dots,\beta_k,\delta_1,\dots,\delta_k)\), entonces \(R=[\,0_{k\times k}\;|\;I_k\,]\). Es la forma que usa el resolvedor en la alternativa d.</p></section>
+<section><h3>Por qué SCR_NR = SCR₁ + SCR₂ (ecuaciones 27 y 28)</h3>
+<p>El modelo con todas las interacciones permite intercepto y pendientes distintas en cada grupo. Para las observaciones con D = 0 la ecuación es \(\beta_1+\beta_2X\); para D = 1 es \((\beta_1+\delta_1)+(\beta_2+\delta_2)X\). Minimizar la SCR total equivale a minimizar por separado la de cada grupo, porque ningún parámetro se comparte. Por eso los β son los de la regresión del grupo 1, los β + δ los del grupo 2 y la SCR es la suma.</p></section>
+<section><h3>Ejercicio 8 resuelto (guerra y paz)</h3>
+<p>Restringido: \(Y_t=\beta_1+\beta_2X_t+\mu_t\) con las 15 observaciones. No restringido: \(Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2D_tX_t+\mu_t\), D = 1 en la paz.</p>
+<div class="tbl"><table><tr><th>Modelo</th><th>Estimación</th><th>SCR</th></tr>
+<tr><td>Guerra (n₁ = 5)</td><td>Ŷ = −0,0625 + 0,4375X</td><td class="num">0,6875</td></tr>
+<tr><td>Paz (n₂ = 10)</td><td>Ŷ = 0,4000 + 0,5091X</td><td class="num">2,4727</td></tr>
+<tr><td>Con dummies</td><td>Ŷ = −0,0625 + 0,4625D + 0,4375X + 0,0716DX</td><td class="num">3,1602 = 0,6875 + 2,4727</td></tr>
+<tr><td>Restringido</td><td>una sola recta</td><td class="num">6,5561</td></tr></table></div>
+<div class="mj">\[F=\frac{(6{,}5561-3{,}1602)/2}{3{,}1602/11}=5{,}910\;\sim F(2,11),\qquad F_{0{,}05}=3{,}98,\quad p=0{,}018\]</div>
+<p>Se rechaza H₀: la función de consumo es distinta en la guerra y en la paz. En la paz la propensión marginal a consumir es mayor (0,509 frente a 0,438).</p></section>
+${CEBOX}`},
+{id:"ce-interpretar", t:"Interpretar dummies (ejercicios 2, 4, 7, 13 a 16 y Dinardo 4.3 y 4.4)", sim:"cambio", html:String.raw`
+<section><h3>La regla general</h3>
+<p class="lead">Con \(Y=\beta_1+\delta_1D+\beta_2X+\delta_2DX+\mu\): β₁ y β₂ son el intercepto y la pendiente del grupo base (D = 0); δ₁ es cuánto cambia el intercepto y δ₂ cuánto cambia la pendiente para el grupo D = 1.</p></section>
+<section><h3>Ejercicio 2 (cerveza por género)</h3>
+<p><b>a)</b> Hombres: Ŷ = 186,47 + 0,23X. Mujeres: Ŷ = (186,47 − 126) + (0,23 − 0,13)X = 60,47 + 0,10X. El consumo autónomo de las mujeres es 126 menor y su propensión marginal a consumir cerveza 0,13 menor.</p>
+<p><b>b)</b> Con la misma renta, la diferencia es \(\delta_1+\delta_2X=-126-0{,}13X\): las mujeres consumen menos, y la brecha crece con la renta.</p>
+<p><b>c)</b> Con gl = 34 − 4 = 30 y \(t_{0{,}025}=2{,}042\): para δ₂, t = −0,13/0,10 = −1,30 → no se rechaza que la propensión marginal sea igual. Para δ₁, t = −126/57,01 = −2,21 → se rechaza que el consumo autónomo sea igual.</p></section>
+<section><h3>Ejercicio 4 (salarios por titulación)</h3>
+<p><b>a)</b> MCO con una dummy y n₁ = 300 licenciados: \(\hat\beta_1=\bar W_A\) (media de los D = 0) y \(\hat\beta_1+\hat\beta_2=\bar W_L\), porque las ecuaciones normales igualan los residuos a cero dentro de cada grupo. <b>b)</b> \(\hat\beta_1=150\), \(\hat\beta_2=100\).</p>
+<p><b>c)</b> Con \(SCR=299\cdot50^2+199\cdot30^2=926.600\) y \(s^2=926.600/498=1.860{,}6\): \(se(\hat\beta_1)=\sqrt{s^2/200}=3{,}05\) y \(se(\hat\beta_2)=\sqrt{s^2(1/300+1/200)}=3{,}94\). <b>d)</b> \(SCE=\frac{300\cdot200}{500}(250-150)^2=1.200.000\), \(TSS=2.126.600\), \(R^2=0{,}564\). <b>e)</b> t = 100/3,94 = 25,4: hay diferencia salarial.</p>
+<p class="hint">Se usó la desviación típica con n − 1; si tu profesor la define con n, cambia ligeramente la SCR.</p></section>
+<section><h3>Ejercicio 7 (horas de lectura)</h3>
+<p><b>a)</b> Sin intercepto y con las tres dummies, X′X es diagonal con \(n_1,n_2,n_3\) y X′y tiene las sumas de cada clase: \(\hat\delta_j=\sum_{j}Y/n_j=\bar Y_j\). <b>b)</b> Con intercepto y clase 1 como base: \(\hat\beta_1=\bar Y_1\), \(\hat\beta_2=\bar Y_2-\bar Y_1\), \(\hat\beta_3=\bar Y_3-\bar Y_1\).</p>
+<p><b>c)</b> Con los 10 datos: \(\hat Y=6{,}324+3{,}592E_2+12{,}113E_3+3{,}127S_1\).</p>
+<div class="tbl"><table><tr><th></th><th>Superiores</th><th>Media</th><th>Media incompleta</th></tr><tr><td>Hombre</td><td class="num">6,32</td><td class="num">9,92</td><td class="num">18,44</td></tr><tr><td>Mujer</td><td class="num">9,45</td><td class="num">13,04</td><td class="num">21,56</td></tr></table></div></section>
+<section><h3>Ejercicios 13 a 15</h3>
+<p><b>13.</b> \(D_t=1\) si t ≥ 2020 y 0 antes. \(Y_t=\beta_1+\delta D_t+\beta_2X_t+\mu_t\): δ es el cambio del salario medio, para la misma experiencia, después de la reforma.</p>
+<p><b>14.</b> \(D_t=1\) si t ≥ t*. \(Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2D_tX_t+\mu_t\): δ₁ cambia el intercepto y δ₂ la pendiente después del evento.</p>
+<p><b>15.</b> Antes: Ŷ = 2 + 0,5X. Después: Ŷ = 4,5 + 0,25X. El consumo autónomo sube 2,5 y la propensión marginal a consumir cae a la mitad (de 0,5 a 0,25). Para rentas mayores que 10 (donde las rectas se cortan, 2,5 = 0,25X) el consumo es menor después de la reforma.</p></section>
+<section><h3>Ejercicio 16 y Dinardo 4.3 (dummies estacionales)</h3>
+<p><b>Modelo (1)</b> sin intercepto: \(\delta_j\) es la demanda media del trimestre j. No lleva intercepto porque \(S_1+S_2+S_3+S_4=1\) (trampa de las dummies). <b>Modelo (2):</b> \(\beta_1=\delta_1\) y \(\theta_j=\delta_j-\delta_1\). <b>Modelo (3):</b> intercepto común y una pendiente de X por trimestre; no se puede incluir X porque \(S_1X+S_2X+S_3X+S_4X=X\).</p>
+<p><b>Dinardo 4.3:</b> con P y Y del año siguiente, Q̂ = 87,40; 92,84; 94,28 y 89,46 en los trimestres 1 a 4. Si otra investigadora usa \(S_2,S_3,S_4\): Q̂ = 68,5 − 0,01P + 0,2Y + 5,1S₂ + 6,2S₃ + 1,5S₄. Sin intercepto y con las cuatro: interceptos 68,5; 73,6; 74,7 y 70 para cada trimestre. Las predicciones son las mismas en las tres versiones.</p>
+<p><b>Dinardo 4.4:</b> es el ejercicio 7b con tres clases: el intercepto es la media de la clase base y cada γ la diferencia de medias.</p></section>
+${CEBOX}`},
+{id:"ce-resueltos", t:"Ejercicios con números resueltos (3, 5, 6, 12 y Dinardo)", sim:"cambio", html:String.raw`
+<section><h3>Ejercicio 3 (educación urbana y rural)</h3>
+<p><b>a)</b> β₁ y β₃ son los años de educación de un joven urbano y uno rural con renta 0; β₂ y β₄ cuánto aumentan los años de educación por unidad de renta en cada zona (signo esperado positivo).</p>
+<p><b>b)</b> Urbana: Ŷ = 9,706 + 0,647X. Rural: Ŷ = 7,980 + 0,580X. SCR = 4,222 y R² = 0,935 (como D₁ + D₂ = 1, el modelo tiene intercepto implícito y el R² centrado es el que se interpreta): el 93,5 % de la variación de los años de educación se explica por la renta y la zona.</p>
+<p><b>c)</b> H₀: β₁ = β₃ y β₂ = β₄. SCR_R = 10,385, F = [(10,385 − 4,222)/2]/[4,222/4] = 2,919 ~ F(2, 4), crítico 6,94: no se rechaza. Con 8 datos la prueba tiene poco poder.</p>
+<p><b>d)</b> Urbano con renta 10,5: Ŷ = 16,5 años; IC del 95 % para la media [15,07; 17,93] y para un joven individual [13,31; 19,69].</p></section>
+<section><h3>Ejercicio 5 (salarios por género)</h3>
+<p><b>a)</b> Hombres: Ŵ = 1,809 + 0,0665X. Mujeres: Ŵ = 1,731 + 0,0778X. β₁ y β′₁ son los salarios de entrada; β₂ y β′₂ lo que aumenta el salario por año de experiencia.</p>
+<p><b>b)</b> H₀: β₁ = β′₁ y β₂ = β′₂. SCR_R = 1,2087, SCR_NR = 1,1324, F = [(1,2087 − 1,1324)/2]/[1,1324/13] = 0,438 ~ F(2, 13), crítico 3,81, p = 0,65: el género no es un factor significativo.</p></section>
+<section><h3>Ejercicio 6 (tres periodos)</h3>
+<p><b>a)</b> Hay cambio estructural cuando los parámetros de la relación no son los mismos en todo el periodo: un evento (crisis, cambio de política) modifica la propensión a consumir o el consumo autónomo.</p>
+<p><b>b)</b> n = 8 + 12 + 7 = 27, k = 2, m = 3. SCR_R = (1 − 0,9974)·6.403.270 = 16.648,50 y SCR_NR = 2.379,315 + 3.679,020 + 1.295,861 = 7.354,196.</p>
+<div class="mj">\[F=\frac{(16.648{,}50-7.354{,}20)/4}{7.354{,}20/21}=6{,}635\;\sim F(4,21),\quad F_{0{,}05}=2{,}84\]</div>
+<p>Se rechaza la consistencia de los parámetros: la función de consumo cambió entre los tres periodos (la propensión marginal pasa de 0,37 a 0,88 y a 1,61).</p></section>
+<section><h3>Ejercicio 12 (Nerlove)</h3>
+<p><b>a)</b> Modelo 1: elasticidad del costo al producto 0,94 (economías de escala leves) y elasticidades precio 0,31, −0,26 (signo no esperado) y 0,44; suman 0,49. Modelo 2: con la restricción, 0,91 respecto al producto y 0,51, 0,09 y 1 − 0,51 − 0,09 = 0,40 para el combustible.</p>
+<p><b>b)</b> Con n = 29, SCR_R = 0,364, SCR_NR = 0,336 y q = 1: W = 2,417, LR = 2,321, LM = 2,231, todos menores que χ²(1) = 3,84; F = 2,00 &lt; F(1, 24) = 4,26. No se rechaza que las elasticidades precio sumen 1 (homogeneidad de grado uno en precios).</p></section>
+<section><h3>Dinardo</h3>
+<p><b>4.2:</b> n = 76, k = 4. Estacionalidad: la SCE sube de 109,6 a 114,8 con la misma TSS = 128,08, así que la SCR baja de 18,48 a 13,28: F = (5,2/3)/(13,28/69) = 9,01 &gt; F(3, 69) = 2,74 → hay estacionalidad. Estabilidad: F = [(18,48 − 16,78)/4]/(16,78/68) = 1,72 &lt; F(4, 68) = 2,51 → relación estable.</p>
+<p><b>4.5 y 4.6</b> usan los datos de la tabla 4.4 del libro: pégalos en el modo «Datos (tabla)».</p>
+<p><b>4.7:</b> F de Chow = 0,077 ~ F(2, 8), p = 0,93: las familias con aumento de ingreso no se comportan distinto. Solo intercepto: F = 0,009.</p>
+<p><b>4.8:</b> SCR = s²(n − k): 0,050760 (completo), 0,035551 (1929-1948) y 0,007639 (1949-1967). F = [(0,050760 − 0,043190)/3]/(0,043190/33) = 1,93 &lt; F(3, 33) = 2,89 → función estable.</p>
+<p><b>4.9:</b> urbano b = (−1,5; 2), SCR₁ = 5; rural b = (−0,4; 1,2), SCR₂ = 3,2; sumando matrices, SCR_R = 10,933. F = [(10,933 − 8,2)/2]/(8,2/16) = 2,67 &lt; F(2, 16) = 3,63 → la misma relación.</p>
+<p><b>4.10:</b> SCR = s²(n − 2): 26, 42, 15 y 96,52. F = [(96,52 − 83)/4]/(83/250) = 10,18 &gt; F(4, 250) = 2,41 → la función no es la misma. Para la elasticidad común hace falta la varianza de log ingreso en cada grupo; con la de la muestra completa (24), se(b) = √(0,38/(256·24)) = 0,0079 y t = (0,07 − 0,10)/0,0079 = −3,81 → se rechaza que la elasticidad sea 0,10.</p></section>
+${CEBOX}`}]});
+WORKSHOPS.push({id:"t-cambio",t:"Resolvedor de cambio estructural y dummies",anchor:"chow",links:["dicotomicas","chow","ce-metodo","ce-pronosticos"],sim:"cambio",html:`<div class="sim" id="sim"></div>`,
+ d:"Pega los datos del ejercicio, las matrices X′X, X′y y y′y, o solo las SCR, y obtén todas las versiones de la prueba de Chow con los números sustituidos: con SCR, con R², con dummies y en forma matricial, más la prueba de pronósticos, los coeficientes recursivos, el CUSUM, el pronóstico con intervalos y el código R."});
