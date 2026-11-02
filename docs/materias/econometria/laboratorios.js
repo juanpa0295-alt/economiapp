@@ -777,6 +777,8 @@ DL.hist=function(v,xl){const x=v.filter(isFinite);if(x.length<3)return"";const W
   return`<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histograma">${f.g}${g}</svg></div>`};
 // ---------- variables nuevas con una expresión segura
 DL.mk=(n,e)=>{const nm=DL.newVar(n,e);DL.created=(DL.created||[]).filter(x=>x[0]!==nm).concat([[nm,e]]);return nm};
+DL.isIndex=c=>{const v=DL.data.data[c];if(/^(t|obs|id|n|trimestre|periodo|time|tiempo|indice|index)$/i.test(c))return true;return v.length>2&&v.every((x,i)=>x===v[0]+i)};
+DL.guessY=C=>C.find(c=>/^(y|consumo|c|gasto|salario|wage|ventas|demanda)$/i.test(c))||C.find(c=>!DL.isIndex(c))||C[0];
 DL.FUN=["log","ln","exp","sqrt","abs","lag","dif","obs","si"];
 DL.newVar=function(name,expr){const D=DL.data;name=DL.clean(name);if(!name)throw new Error("ponle un nombre a la variable.");
   const toks=expr.match(/\s+|[A-Za-z_][A-Za-z0-9_]*|\d+(?:[.,]\d+)?(?:e[+-]?\d+)?|>=|<=|==|!=|&&|\|\||[-+*/^(),<>!%]/gi);if(!toks||toks.join("")!==expr)throw new Error("la expresión tiene caracteres no permitidos.");
@@ -830,12 +832,33 @@ SIMS.datos=function(){
         <p class="hint">Las variables creadas viven mientras la página esté abierta; el código R de la sección 7 las vuelve a crear.</p>`;
         DL.recetasBind(C,()=>render("var"));
         $("dv-go").onclick=()=>{try{const nm=DL.mk($("dv-n").value,$("dv-e").value),s2=DL.stats(B.data[nm]);$("dv-out").innerHTML=`<p class="verdict ok">Variable <b>${nm}</b> creada: ${s2.n} valores válidos, media ${f4(s2.m)}. En R: <code>datos$${nm} &lt;- ${DL.rExpr($("dv-e").value)}</code></p>`}catch(e2){$("dv-out").innerHTML=err(e2.message)}}}
-      if(v==="mod"){const M=DL.model,y0=M?M.yName:C[0],xs0=M?M.xNames:C.slice(1,Math.min(C.length,3));
-        $("dl-mod").innerHTML=`<div class="calcf">${sel("dm-y","Variable dependiente (Y)",C,y0)}${num("dm-a","Desde la observación",M?M.opt.from:1,1)}${num("dm-b","Hasta la observación",M?M.opt.to:B.n,1)}<label class="chkl"><input type="checkbox" id="dm-c" ${!M||M.opt.cte?"checked":""}> Con intercepto</label><label class="chkl"><input type="checkbox" id="dm-r" ${M&&M.opt.rob?"checked":""}> Errores robustos (HC1)</label></div>
-        <p class="lbl" style="margin:10px 0 4px">Variables explicativas (X)</p><div class="chips" id="dm-x">${C.map(c=>`<label class="chkl"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}> ${c}</label>`).join("")}</div>
-        <div class="chips pre" style="margin:10px 0"><button type="button" class="btn" id="dm-go">Estimar por MCO</button></div><div id="dm-out"></div>`;
-        const go=()=>{const y=$("dm-y").value,xs=[...$("dm-x").querySelectorAll("input:checked")].map(i=>i.value).filter(x=>x!==y);
-          try{DL.model=DL.fit(y,xs,{cte:$("dm-c").checked,rob:$("dm-r").checked,from:V("dm-a"),to:V("dm-b")});$("dm-out").innerHTML=DL.out(DL.model)}catch(e2){DL.model=null;$("dm-out").innerHTML=err(e2.message)}};
+      if(v==="mod"){const M=DL.model,isIdx=c=>DL.isIndex(c),created=new Set((DL.created||[]).map(x=>x[0])),y0=M?M.yName:DL.guessY(C);
+        const xs0=M?M.xNames:C.filter(c=>c!==y0&&!isIdx(c)&&!created.has(c)).slice(0,1);
+        const box=c=>`<label class="chkl dm-x" data-c="${c}"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}> ${c}${isIdx(c)?' <span class="tag br">índice de tiempo</span>':""}${created.has(c)?' <span class="tag nw">creada</span>':""}</label>`;
+        const orig=C.filter(c=>!created.has(c)),cre=C.filter(c=>created.has(c)),hasD=cre.filter(c=>/^D(_|$)/.test(c));
+        $("dl-mod").innerHTML=`<div class="stepc"><h4><span class="n">1</span>¿Qué quieres explicar? (variable dependiente Y)</h4><div class="calcf"><label>Y<select id="dm-y">${C.map(c=>`<option value="${c}" ${c===y0?"selected":""}>${c}</option>`).join("")}</select></label></div><p class="warn" id="dm-yw" hidden></p></div>
+        <div class="stepc"><h4><span class="n">2</span>¿Con qué la explicas? (variables explicativas X)</h4>
+          <p class="hint" style="margin:0 0 6px">De la base</p><div class="chips" id="dm-x">${orig.map(box).join("")}</div>
+          ${cre.length?`<p class="hint" style="margin:10px 0 6px">Creadas por ti</p><div class="chips" id="dm-x2">${cre.map(box).join("")}</div>`:`<p class="hint" style="margin:8px 0 0">¿Necesitas una dummy, un logaritmo o una interacción? Créala en <b>2. Crear variables</b> y aparecerá aquí.</p>`}
+          ${hasD.length?`<div class="chips pre" style="margin-top:10px"><button type="button" class="btn" id="dm-dq">Modelo con dummies de quiebre: X + ${hasD.join(" + ")}</button><button type="button" class="btn" id="dm-r0">Modelo restringido: solo X</button></div>`:""}
+          <p class="hint" id="dm-tw" hidden></p></div>
+        <div class="stepc"><h4><span class="n">3</span>¿Con qué observaciones?</h4><div class="calcf">${num("dm-a","Desde la fila",M?M.opt.from:1,1)}${num("dm-b","Hasta la fila",M?M.opt.to:B.n,1)}</div><p class="hint" style="margin:6px 0 0">Toda la muestra es de la fila 1 a la ${B.n}. Para estimar un solo periodo (por ejemplo, antes del quiebre) cambia el rango.</p></div>
+        <div class="stepc"><h4><span class="n">4</span>Opciones</h4><div class="chips"><label class="chkl"><input type="checkbox" id="dm-c" ${!M||M.opt.cte?"checked":""}> Con intercepto (β₁)</label><label class="chkl"><input type="checkbox" id="dm-r" ${M&&M.opt.rob?"checked":""}> Errores estándar robustos (HC1), si hay heterocedasticidad</label></div></div>
+        <div class="eq" id="dm-eq"></div><div class="chips pre" style="margin:10px 0"><button type="button" class="btn solid" id="dm-go">Estimar por MCO</button></div><div id="dm-out"></div>`;
+        const xsSel=()=>[...$("dl-mod").querySelectorAll(".dm-x input:checked")].map(i=>i.value);
+        const upd=()=>{const y=$("dm-y").value;$("dl-mod").querySelectorAll(".dm-x").forEach(l=>{const me=l.dataset.c===y;l.hidden=me;if(me)l.querySelector("input").checked=false});
+          const yw=$("dm-yw");yw.hidden=!isIdx(y);yw.innerHTML=`<b>${y}</b> parece un número de observación o de periodo (1, 2, 3, …). Normalmente no es lo que se quiere explicar: escoge la variable de interés (por ejemplo, el consumo).`;
+          const xs=xsSel(),tw=$("dm-tw"),ti=xs.filter(isIdx);tw.hidden=!ti.length;tw.innerHTML=`Marcaste <b>${ti.join(", ")}</b>, que es un índice de tiempo: el modelo incluirá una tendencia lineal. Déjalo solo si quieres controlar por tendencia; en el Trabajo 1 no va.`;
+          const c=$("dm-c").checked,a=V("dm-a"),b=V("dm-b");let k=0;const terms=[...(c?["β₁"]:[]),...xs.map(x=>`β${SB((c?2:1)+(k++))}·${x}`)];
+          $("dm-eq").innerHTML=`<b>Modelo:</b> ${y} = ${terms.length?terms.join(" + "):"0"} + u &nbsp; · &nbsp; filas ${fm(a)} a ${fm(b)}${xs.length?"":` <span class="hint">(marca al menos una X${c?" o deja solo el intercepto":""})</span>`}`};
+        $("dl-mod").querySelectorAll("select,input").forEach(el=>el.addEventListener("input",upd));$("dl-mod").addEventListener("change",upd);
+        const setX=list=>{$("dl-mod").querySelectorAll(".dm-x input").forEach(i=>i.checked=list.includes(i.value));upd()};
+        const baseX=()=>xsSel().filter(x=>!created.has(x)&&!isIdx(x));
+        if($("dm-dq"))$("dm-dq").onclick=()=>setX([...(baseX().length?baseX():orig.filter(c=>c!==$("dm-y").value&&!isIdx(c)).slice(0,1)),...hasD]);
+        if($("dm-r0"))$("dm-r0").onclick=()=>setX(baseX().length?baseX():orig.filter(c=>c!==$("dm-y").value&&!isIdx(c)).slice(0,1));
+        upd();
+        const go=()=>{const y=$("dm-y").value,xs=xsSel().filter(x=>x!==y);
+          try{DL.model=DL.fit(y,xs,{cte:$("dm-c").checked,rob:$("dm-r").checked,from:V("dm-a"),to:V("dm-b")});$("dm-out").innerHTML=DL.out(DL.model)+`<p class="hint">Siguiente paso: <b>4. Pruebas</b> para contrastar hipótesis sobre este modelo.</p>`}catch(e2){DL.model=null;$("dm-out").innerHTML=err(e2.message)}};
         $("dm-go").onclick=go;if(M)$("dm-out").innerHTML=DL.out(M)}
       if(v==="prue"){const M=DL.model;if(!M){$("dl-prue").innerHTML=needModel();return}
         $("dl-prue").innerHTML=`${seg("dp-t","Prueba",[["f","F de restricciones"],["chow","Cambio estructural"],["rec","Recursivos y CUSUM"],["het","Heterocedasticidad"],["aut","Autocorrelación"],["norm","Normalidad"],["esp","Especificación"]],"f")}<div id="dp-out"></div>`;
