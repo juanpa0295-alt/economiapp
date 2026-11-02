@@ -349,6 +349,19 @@ pre .pc-cd:empty{display:none}
 .tbl th.num{text-align:right}
 details.dl-guia{margin:10px 0}
 details.dl-guia ol{margin-top:8px}
+/* --- Laboratorio de datos: tarjetas de variables y significado de los resultados --- */
+.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.vcard{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:9px 11px;background:var(--card);cursor:pointer}
+.vcard:has(input:checked){border-color:var(--line);background:var(--line-soft)}
+.vcard.idx{border-style:dashed}
+.vcard input{width:17px;height:17px;margin-top:2px;accent-color:var(--line);flex:0 0 auto}
+.vc-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+.vc-n{font-weight:600;font-size:14px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.vc-n .tag{margin-left:0}
+.vc-d{font-size:12px;color:var(--muted);line-height:1.4}
+td.dl-mean{font-size:12.5px;line-height:1.4;min-width:220px;color:var(--ink)}
+.dl-si{color:var(--good);font-weight:600}
+.dl-no{color:var(--muted);font-weight:600}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
