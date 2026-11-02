@@ -563,12 +563,44 @@ SIMS.cambio=function(){
   <div id="ce-datos"></div><div id="ce-mat" hidden></div><div id="ce-rss" hidden></div><div id="ce-coef" hidden></div><div id="ce-wlm" hidden></div>`;
   const al=()=>+$("ce-al").value;
   // ======== modo datos
-  $("ce-datos").innerHTML=`<div class="chips pre" id="cd-pre">${Object.entries(CE_DATA).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div>
+  $("ce-datos").innerHTML=`<div class="stepc"><h4><span class="n">↑</span>Sube tu base (CSV, TXT, XLSX o XLS)</h4>
+  <div class="calcf"><label>Archivo<input type="file" id="cd-file" accept=".csv,.txt,.tsv,.xlsx,.xls"></label><label id="cd-shw" hidden>Hoja<select id="cd-sh"></select></label></div>
+  <div id="cd-cols"></div><p class="hint" style="margin:6px 0 0">La base se lee solo en tu navegador. Al escoger las columnas, los datos pasan a la tabla de abajo y el resolvedor hace todo el análisis.</p></div>
+  <details class="dp-lite"><summary><b>Punto 5 del Trabajo 1: dónde está cada literal</b></summary><ol class="steps">
+  <li>Sube el archivo, escoge <b>Y</b> (consumo) como dependiente y <b>X</b> (ingreso) como explicativa. La columna T (número del trimestre) no va.</li>
+  <li>Escribe el año y el trimestre del quiebre (por ejemplo 2008:1) y pulsa «Usar»: n₁ queda en los trimestres anteriores a la crisis.</li>
+  <li><b>a) Pronósticos de Chow:</b> paso 6, con las ecuaciones (8) y (9) y la tabla de errores de pronóstico.</li>
+  <li><b>b) Coeficientes recursivos y errores un paso adelante:</b> paso 7, con los gráficos y la CUSUM.</li>
+  <li><b>c) Cambio estructural antes y después de 2008:</b> pasos 2 y 3 (cada periodo y el modelo con dummies, con la verificación de las ecuaciones 27 y 28) y paso 4 (la F por todas las alternativas y dónde está el cambio).</li>
+  <li>El paso 8 trae el código R para el informe.</li></ol></details>
+  <p class="hint" style="margin:10px 0 4px">O usa un ejemplo de los ejercicios:</p><div class="chips pre" id="cd-pre">${Object.entries(CE_DATA).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div>
   <p class="hint">Pega los datos tal como salen de Excel: una fila por observación, primero Y y luego las X (separadas por espacio o tabulación). Si los grupos vienen en una columna 0/1, ponla al final.</p>
   <div class="calcf"><label style="grid-column:1/-1">Datos<textarea id="cd-txt" rows="8" class="ce-ta" spellcheck="false"></textarea></label>
   <label>Cómo se definen los dos grupos<select id="cd-by"><option value="n1">Las primeras n₁ observaciones son el grupo 1</option><option value="dum">La última columna es la dummy (0 = grupo 1, 1 = grupo 2)</option></select></label>
   ${num("cd-n1","n₁: observaciones del grupo 1 (o antes del quiebre)",5)}${num("cd-x0","Pronóstico: valor de X (primera regresora)",10)}<label>Pronóstico para el grupo<select id="cd-g0"><option value="0">Grupo 1 (D = 0)</option><option value="1">Grupo 2 (D = 1)</option></select></label></div>
   <p class="hint" id="cd-nota"></p><div id="cd-out"></div>`;
+  // ---- carga de archivo
+  let CB=null,cwb=null;
+  const isIdxC=(n,v)=>/^(t|obs|id|n|trimestre|periodo|time|tiempo|indice|index)$/i.test(n)||(v.length>2&&v.every((x,i)=>x===v[0]+i));
+  const showCols=()=>{const C=CB.cols,gy=C.find(c=>/^(y|consumo|c|gasto)$/i.test(c))||C.find(c=>!isIdxC(c,CB.data[c]))||C[0],gx=C.filter(c=>c!==gy&&!isIdxC(c,CB.data[c])).slice(0,1);
+    $("cd-cols").innerHTML=`<p class="verdict ok">Base leída: ${CB.n} filas · columnas ${C.join(", ")}.</p>
+    <div class="calcf"><label>Variable dependiente Y<select id="cd-cy">${C.filter(c=>!isIdxC(c,CB.data[c])).map(c=>`<option ${c===gy?"selected":""}>${c}</option>`).join("")}</select></label></div>
+    <p class="lbl" style="margin:8px 0 4px">Variables explicativas X</p><div class="chips" id="cd-cx">${C.filter(c=>!isIdxC(c,CB.data[c])).map(c=>`<label class="chkl"><input type="checkbox" value="${c}" ${gx.includes(c)?"checked":""}> ${c}</label>`).join("")}</div>
+    ${C.some(c=>isIdxC(c,CB.data[c]))?`<p class="hint">No se muestran ${C.filter(c=>isIdxC(c,CB.data[c])).join(", ")}: ${C.filter(c=>isIdxC(c,CB.data[c])).length>1?"son índices":"es un índice"} de tiempo (1, 2, 3, …), no una variable del modelo.</p>`:""}
+    <div class="calcf">${num("cd-a0","Año de la primera fila",2005,1)}${num("cd-p0","Trimestre o mes de la primera fila",1,1)}${num("cd-a1","Año del quiebre",2008,1)}${num("cd-p1","Trimestre o mes del quiebre",1,1)}<label>Frecuencia<select id="cd-fr"><option value="4">Trimestral</option><option value="12">Mensual</option><option value="1">Anual</option></select></label></div>
+    <p class="hint" id="cd-fo"></p><div class="chips pre"><button type="button" class="btn solid" id="cd-use">Pasar estos datos al resolvedor</button></div>`;
+    const fo=()=>{const fr=+$("cd-fr").value,row=fr===1?V("cd-a1")-V("cd-a0")+1:(V("cd-a1")-V("cd-a0"))*fr+(V("cd-p1")-V("cd-p0"))+1;$("cd-fo").innerHTML=isFinite(row)?`El quiebre cae en la fila <b>${row}</b>: el grupo 1 son las filas 1 a ${row-1} (n₁ = ${row-1}) y el grupo 2 desde la fila ${row}.`:"";return row};
+    ["cd-a0","cd-p0","cd-a1","cd-p1","cd-fr"].forEach(i=>$(i).addEventListener("input",fo));fo();
+    $("cd-use").onclick=()=>{const y=$("cd-cy").value,xs=[...$("cd-cx").querySelectorAll("input:checked")].map(i=>i.value).filter(x=>x!==y);if(!xs.length){$("cd-fo").innerHTML=err("marca al menos una X.");return}
+      const ok=[...Array(CB.n).keys()].filter(i=>[y,...xs].every(c=>isFinite(CB.data[c][i])));
+      $("cd-txt").value=ok.map(i=>[y,...xs].map(c=>CB.data[c][i]).join(" ")).join("\n");$("cd-by").value="n1";
+      const row=fo();$("cd-n1").value=Math.max(1,row-1);const xm=ok.reduce((a,i)=>a+CB.data[xs[0]][i],0)/ok.length;$("cd-x0").value=+xm.toFixed(3);$("cd-g0").value="1";
+      $("cd-nota").textContent=`Datos de ${CB.name}: ${y} explicada por ${xs.join(", ")}, ${ok.length} filas${ok.length<CB.n?` (se omitieron ${CB.n-ok.length} con vacíos)`:""}. El pronóstico del paso 5 usa la media de ${xs[0]} en el grupo 2.`;runD();$("cd-out").scrollIntoView({behavior:"smooth",block:"start"})}};
+  const loadSheet=nm=>{CB=DL.fromRows(XLSX.utils.sheet_to_json(cwb.Sheets[nm],{header:1,raw:true,defval:""}));CB.name=$("cd-file").files[0].name+" · "+nm;showCols()};
+  $("cd-file").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;$("cd-cols").innerHTML=`<p class="hint">Leyendo ${esc(f.name)}…</p>`;$("cd-shw").hidden=true;
+    try{if(/\.(xlsx|xls)$/i.test(f.name)){await DL.loadXLSX();cwb=XLSX.read(await f.arrayBuffer(),{type:"array"});$("cd-sh").innerHTML=cwb.SheetNames.map(x=>`<option>${esc(x)}</option>`).join("");$("cd-shw").hidden=cwb.SheetNames.length<2;loadSheet(cwb.SheetNames[0])}
+      else{CB=DL.parseText(await f.text());CB.name=f.name;showCols()}}catch(e2){$("cd-cols").innerHTML=err(e2.message)}});
+  $("cd-sh").addEventListener("change",()=>{try{loadSheet($("cd-sh").value)}catch(e2){$("cd-cols").innerHTML=err(e2.message)}});
   const setD=k=>{const d=CE_DATA[k];$("cd-txt").value=d.txt;$("cd-by").value=d.by;$("cd-n1").value=d.n1;$("cd-x0").value=d.x0;$("cd-g0").value=d.g0;$("cd-nota").textContent=d.nota||"";runD()};
   const runD=()=>{const rows=$("cd-txt").value.trim().split(/\n+/).map(r=>r.trim().replace(/,/g,".").split(/[\s;]+/).map(Number)).filter(r=>r.length&&r.every(isFinite));
     const out=$("cd-out");if(rows.length<5){out.innerHTML=err("Pega al menos 5 filas con números.");return}const w=rows[0].length;if(rows.some(r=>r.length!==w)){out.innerHTML=err("Todas las filas deben tener el mismo número de columnas.");return}
@@ -650,7 +682,7 @@ plot(efp(y ~ ${xs2.join(" + ")}, data = datos, type = "Rec-CUSUM"))
 sctest(y ~ ${xs2.join(" + ")}, data = datos, type = "Chow", point = n1)</pre>`);
     out.innerHTML=h;if(typeof prettyCode==="function")prettyCode(out)};
   $("cd-pre").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setD(b.dataset.k)});
-  $("ce-datos").querySelectorAll("textarea,input,select").forEach(el=>el.addEventListener("input",runD));
+  ["cd-txt","cd-by","cd-n1","cd-x0","cd-g0"].forEach(id=>$(id).addEventListener("input",runD));
   // ======== modo matrices
   $("ce-mat").innerHTML=`<div class="chips pre" id="cm-pre"><button type="button" data-k="d41">Dinardo 4.1 (una observación nueva)</button><button type="button" data-k="d49">Dinardo 4.9 (urbano y rural)</button></div>
   <p class="hint">Escribe las matrices por filas separadas con punto y coma: «20 10; 10 30».</p>
@@ -864,9 +896,10 @@ SIMS.datos=function(){
         const xs0=M?M.xNames:C.filter(c=>c!==y0&&!isIdx(c)&&!created.has(c)).slice(0,1);
         const box=c=>`<label class="dm-x vcard${isIdx(c)?" idx":""}" data-c="${c}" title="${esc(DL.describe(c))}"><input type="checkbox" value="${c}" ${xs0.includes(c)?"checked":""}><span class="vc-b"><span class="vc-n">${c}${isIdx(c)?' <span class="tag br">índice</span>':""}${created.has(c)?' <span class="tag nw">creada</span>':""}${DL.isDummy(c)?' <span class="tag">0/1</span>':""}</span><span class="vc-d">${DL.describe(c)}</span></span></label>`;
         const orig=C.filter(c=>!created.has(c)),cre=C.filter(c=>created.has(c)),hasD=cre.filter(c=>/^D(_|$)/.test(c));
-        $("dl-mod").innerHTML=`<div class="stepc"><h4><span class="n">1</span>¿Qué quieres explicar? (variable dependiente Y)</h4><div class="calcf"><label>Y<select id="dm-y">${C.map(c=>`<option value="${c}" ${c===y0?"selected":""}>${c}</option>`).join("")}</select></label></div><p class="hint" id="dm-yd" style="margin:6px 0 0"></p><p class="warn" id="dm-yw" hidden></p></div>
+        $("dl-mod").innerHTML=`<div class="stepc"><h4><span class="n">1</span>¿Qué quieres explicar? (variable dependiente Y)</h4><div class="calcf"><label>Y<select id="dm-y">${C.filter(c=>!isIdx(c)||c===y0).map(c=>`<option value="${c}" ${c===y0?"selected":""}>${c}</option>`).join("")}</select></label></div><p class="hint" id="dm-yd" style="margin:6px 0 0"></p><p class="warn" id="dm-yw" hidden></p></div>
         <div class="stepc"><h4><span class="n">2</span>¿Con qué la explicas? (variables explicativas X)</h4>
-          <p class="hint" style="margin:0 0 6px">De la base</p><div class="vcards" id="dm-x">${orig.map(box).join("")}</div>
+          <p class="hint" style="margin:0 0 6px">De la base</p><div class="vcards" id="dm-x">${orig.filter(c=>!isIdx(c)).map(box).join("")}</div>
+          ${orig.some(isIdx)?`<details class="dp-lite" style="margin-top:8px" ${xs0.some(isIdx)?"open":""}><summary>Mostrar índices de tiempo (${orig.filter(isIdx).join(", ")}), para usarlos como tendencia</summary><p class="hint" style="margin:6px 0">Son números de fila o de periodo (1, 2, 3, …). No van en la mayoría de los modelos; márcalos solo si quieres controlar por una tendencia lineal.</p><div class="vcards">${orig.filter(isIdx).map(box).join("")}</div></details>`:""}
           ${cre.length?`<p class="hint" style="margin:10px 0 6px">Creadas por ti</p><div class="vcards" id="dm-x2">${cre.map(box).join("")}</div>`:`<p class="hint" style="margin:8px 0 0">¿Necesitas una dummy, un logaritmo o una interacción? Créala en <b>2. Crear variables</b> y aparecerá aquí.</p>`}
           ${hasD.length?`<div class="chips pre" style="margin-top:10px"><button type="button" class="btn" id="dm-dq">Modelo con dummies de quiebre: X + ${hasD.join(" + ")}</button><button type="button" class="btn" id="dm-r0">Modelo restringido: solo X</button></div>`:""}
           <p class="hint" id="dm-tw" hidden></p></div>
