@@ -648,7 +648,7 @@ c(Fp = Fp, p = pf(Fp, n2, n1 - k, lower.tail = FALSE))
 library(strucchange)
 plot(efp(y ~ ${xs2.join(" + ")}, data = datos, type = "Rec-CUSUM"))
 sctest(y ~ ${xs2.join(" + ")}, data = datos, type = "Chow", point = n1)</pre>`);
-    out.innerHTML=h};
+    out.innerHTML=h;if(typeof prettyCode==="function")prettyCode(out)};
   $("cd-pre").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setD(b.dataset.k)});
   $("ce-datos").querySelectorAll("textarea,input,select").forEach(el=>el.addEventListener("input",runD));
   // ======== modo matrices
@@ -845,7 +845,7 @@ SIMS.datos=function(){
         const run=()=>{const xa=$("dg-x").value,ya=$("dg-y").value,x=B.data[xa],y=B.data[ya],ok=x.map((v,i)=>isFinite(v)&&isFinite(y[i])?i:-1).filter(i=>i>=0);let line=null,txt2="";
           if(ok.length>2){const R=CE.ols(ok.map(i=>[1,x[i]]),ok.map(i=>y[i]));if(R){const lo=Math.min(...ok.map(i=>x[i])),hi=Math.max(...ok.map(i=>x[i]));line=[[lo,R.b[0]+R.b[1]*lo],[hi,R.b[0]+R.b[1]*hi]];txt2=`<p class="hint">Recta de MCO simple: ${ya} = ${f4(R.b[0])} ${R.b[1]<0?"−":"+"} ${f4(Math.abs(R.b[1]))}·${xa} · R² = ${f4(R.r2)}</p>`}}
           $("dg-o").innerHTML=DL.scatter({x,y,line,xl:xa,yl:ya})+txt2};$("dg-x").addEventListener("change",run);$("dg-y").addEventListener("change",run);run()}
-      if(v==="r")$("dl-r").innerHTML=DL.rcode()}
+      if(v==="r"){$("dl-r").innerHTML=DL.rcode();if(typeof prettyCode==="function")prettyCode($("dl-r"))}}
     render(cur)}};
 
 DL.out=function(M){const se=M.opt.rob?M.seR:M.se,gl=M.n-M.k,tc=CE.tcrit(gl,0.05);
