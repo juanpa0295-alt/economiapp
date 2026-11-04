@@ -47,8 +47,8 @@ SIMS.ind=function(){
     if(!(sal>0)||!des||(tipo==="indef"&&(!ini||LAB.cmp(ini,des)>0))||(tipo!=="indef"&&(!fin||LAB.cmp(fin,des)<0))){$("i-res").innerHTML=err("revisa el salario y que las fechas estén en orden.");$("i-steps").innerHTML="";return}
     const R=LAB.indemnizacion({tipo,salario:sal,inicio:ini,despido:des,finPactado:fin,smmlv});
     if(tipo==="indef"){
-      $("i-res").innerHTML=tiles([["Tiempo de servicio",`${R.servicio.toLocaleString("es-CO")} días (${fmt(R.anios,3)} años)`],["Días de indemnización",fmt(R.dias,2)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
-      $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Salario ${R.alto?"≥":"<"} 10 SMMLV (${$p(10*smmlv)}) ⇒ ${R.p1} días por el primer año y ${R.pn} por cada año siguiente<br>Días de servicio = días360(${dt(ini)}, ${dt(des)}) + 1 = ${R.servicio}<br>Años = ${R.servicio} / 360 = ${fmt(R.anios,4)}<br>${R.anios<=1?`Trabajó un año o menos ⇒ ${R.p1} días completos`:`Días = ${R.p1} + ${R.pn} × (${fmt(R.anios,4)} − 1) = ${fmt(R.dias,4)}`}<br>Indemnización = ${fmt(R.dias,4)} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>`)}
+      $("i-res").innerHTML=tiles([["Tiempo de servicio",`${R.servicio.toLocaleString("es-CO")} días (${R.completos} año${R.completos===1?"":"s"}${R.frac?` y ${R.frac} días`:""})`],["Días de indemnización",String(R.dias)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
+      $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Salario ${R.alto?"≥":"<"} 10 SMMLV (${$p(10*smmlv)}) ⇒ ${R.p1} días por el primer año y ${R.pn} por cada año siguiente<br>Días de servicio = días360(${dt(ini)}, ${dt(des)}) + 1 = ${R.servicio}<br>${R.servicio<=360?`Trabajó un año o menos ⇒ ${R.p1} días completos`:`${R.servicio} días = ${R.completos} año${R.completos>1?"s":""} completo${R.completos>1?"s":""}${R.frac?` y ${R.frac} días`:""}<br>Primer año: ${R.p1} días${R.completos>1?`<br>Años siguientes completos: ${R.pn} × ${R.completos-1} = ${R.pn*(R.completos-1)} días`:""}${R.frac?`<br>Fracción: ${R.pn} × ${R.frac} / 360 = ${fmt(R.fracExacta,2)} ⇒ <b>${R.diasFrac}</b> días (los días no llevan decimales: se redondea)`:""}<br>Días = ${R.p1}${R.completos>1?` + ${R.pn*(R.completos-1)}`:""}${R.frac?` + ${R.diasFrac}`:""} = <b>${R.dias}</b>`}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>`)}
     else{
       $("i-res").innerHTML=tiles([["Tiempo que faltaba",`${R.falta.toLocaleString("es-CO")} días`],["Días a pagar",String(R.dias)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
       $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Días que faltaban = días360(${dt(des)}, ${dt(fin)}) = ${R.falta}${R.minimo15?"<br>Es menor que 15 ⇒ se paga el mínimo de 15 días (obra o labor)":""}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>${tipo==="fijo"?`<p class="hint" style="margin:0">Usa como vencimiento el fin del período o de la prórroga que estaba corriendo. La estación de prórrogas te da esa fecha.</p>`:""}`)}};
@@ -98,7 +98,7 @@ SIMS.nom=function(){
   <h4 class="subh">Horas del mes</h4><div class="calcf">${Object.keys(KEYS).filter(k=>k!=="ord").map(k=>numIn("n-"+k,KEYS[k],0,"0.5")).join("")}</div>
   <div class="res" id="n-res"></div><div class="tbl"><table id="n-tab"></table></div><div id="n-emp"></div>`;
   const ks=Object.keys(KEYS).filter(k=>k!=="ord");
-  const run=()=>{const sal=N("n-sal"),dias=N("n-dias"),f=D("n-fec")||HOY,V_=LAB.valores(f);
+  const run=()=>{const sal=N("n-sal"),dias=Math.round(N("n-dias")),f=D("n-fec")||HOY,V_=LAB.valores(f);
     if(!(sal>0)||!(dias>=0&&dias<=30)){$("n-res").innerHTML=err("revisa el salario y que los días estén entre 0 y 30.");return}
     const H={};ks.forEach(k=>{const v=N("n-"+k);H[k]=isFinite(v)&&v>0?v:0});
     const hora=LAB.horaOrdinaria(sal,V_.horasMes),X=LAB.valorHoras(H,hora,V_.dominical),R=LAB.nomina({salario:sal,dias,extras:X.total,smmlv:V_.smmlv,aux:V_.aux,auxDerecho:$("n-aux").value==="si"});
@@ -211,7 +211,7 @@ SIMS.prima=function(){
     for(let i=0;i<6;i++){$("pr-m"+i).addEventListener("input",run)}};
   const run=()=>{const sem=+$("pr-sem").value,anio=Math.round(N("pr-an")),meses=Array.from({length:6},(_,i)=>N("pr-m"+i)),av=$("pr-aux").value;
     if(!(anio>=2025&&anio<=2030)||meses.some(v=>!(v>0))){$("pr-res").innerHTML=err("escribe un año entre 2025 y 2030 y un salario positivo en cada mes.");$("pr-steps").innerHTML="";return}
-    const R=LAB.prima({anio,sem,ingreso:D("pr-ing"),retiro:D("pr-ret"),meses,aux:av==="auto"?"auto":av==="1",ausencias:Math.max(0,N("pr-aus")||0),pago:D("pr-pago"),basicoMora:N("pr-bm")});
+    const R=LAB.prima({anio,sem,ingreso:D("pr-ing"),retiro:D("pr-ret"),meses,aux:av==="auto"?"auto":av==="1",ausencias:Math.max(0,Math.round(N("pr-aus")||0)),pago:D("pr-pago"),basicoMora:N("pr-bm")});
     if(R.error){$("pr-res").innerHTML=err(R.error);$("pr-steps").innerHTML="";return}
     const nm=R.idx.map(i=>MES[R.S.m0-1+i]),ultNm=nm.slice(-3).map(x=>x.toLowerCase());
     $("pr-res").innerHTML=tiles([["Días trabajados",String(R.dias)],["Base mensual",$p(R.base)],["Prima del semestre",$p(R.valor),"okt"],...(R.mora?[["Mora ("+R.mora.dias+" días)",$p(R.mora.valor)]]:[])]);
@@ -244,7 +244,7 @@ SIMS.liq=function(){
   <div class="res" id="lq-res"></div><div id="lq-out"></div>`;
   let vals={};
   const months=()=>{const a=D("lq-ini"),b=D("lq-ret");if(!a||!b||LAB.cmp(a,b)>0)return null;const o=[];let y=a.y,m=a.m;while(y*12+m<=b.y*12+b.m&&o.length<120){o.push([y,m]);m++;if(m>12){m=1;y++}}return o};
-  const read=()=>{$("lq-m").querySelectorAll("tr[data-k]").forEach(tr=>{const q=tr.querySelectorAll("input");vals[tr.dataset.k]=[+q[0].value||0,+q[1].value||0,+q[2].value||0,q[3].value]})};
+  const read=()=>{$("lq-m").querySelectorAll("tr[data-k]").forEach(tr=>{const q=tr.querySelectorAll("input");vals[tr.dataset.k]=[+q[0].value||0,+q[1].value||0,Math.round(+q[2].value||0),q[3].value]})};
   const draw=()=>{read();const ms=months();if(!ms){$("lq-m").innerHTML="";return}let last=[1750905,0,0,""];
     $("lq-m").innerHTML=`<tr><th>Mes</th><th class="num">Básico</th><th class="num">Extras</th><th class="num">Art. 51 (días)</th><th>Nota</th></tr>`+ms.map(([y,m])=>{const k=y+"-"+m,v=vals[k]||[last[0],0,0,""];last=v;vals[k]=v;
       return`<tr data-k="${k}"><td>${Cap(MES[m-1])} ${y}</td><td><input type="number" step="1000" value="${v[0]}" aria-label="Básico ${MES[m-1]} ${y}"></td><td><input type="number" step="1000" value="${v[1]}" aria-label="Extras"></td><td><input type="number" min="0" max="30" value="${v[2]}" aria-label="Días art. 51"></td><td><input type="text" value="${v[3]}" aria-label="Nota"></td></tr>`}).join("");

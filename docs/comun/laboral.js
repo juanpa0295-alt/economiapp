@@ -49,8 +49,10 @@ LAB.indemnizacion=function({tipo,salario,inicio,despido,finPactado,smmlv}){
   if(tipo==="fijo"||tipo==="obra"){const falta=Math.max(0,LAB.days360(despido,finPactado)),dias=tipo==="obra"?Math.max(15,falta):falta;
     return{diario,falta,dias,valor:dias*diario,minimo15:tipo==="obra"&&falta<15}}
   const servicio=LAB.days360(inicio,despido)+1,anios=servicio/360,alto=salario>=10*smmlv,p1=alto?20:30,pn=alto?15:20;
-  const dias=anios<=1?p1:p1+pn*(anios-1);
-  return{diario,servicio,anios,alto,p1,pn,dias,valor:dias*diario}};
+  // en derecho los días no llevan decimales: la fracción de año da días proporcionales redondeados al entero
+  const completos=Math.floor(servicio/360),frac=servicio-360*completos,fracExacta=pn*frac/360,diasFrac=Math.round(fracExacta);
+  const dias=servicio<=360?p1:p1+pn*(completos-1)+diasFrac;
+  return{diario,servicio,anios,alto,p1,pn,completos,frac,fracExacta,diasFrac,dias,valor:dias*diario}};
 // ---------- art. 65: indemnización moratoria
 LAB.moratoria=function({salario,diasRetardo,smmlv}){const diario=salario/30,minimo=salario<=smmlv,tope=minimo?Infinity:720,dias=Math.min(diasRetardo,tope);
   return{diario,minimo,dias,valor:dias*diario,intereses:!minimo&&diasRetardo>720,diasInteres:Math.max(0,diasRetardo-720)}};
