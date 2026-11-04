@@ -59,11 +59,11 @@ qs:[{q:"Un contrato de 6 meses empezó el 1 de febrero de 2026. ¿Hasta cuándo 
 <p>La Ley 2466 de 2025 no modificó este artículo.</p></section>
 <section><h3>Cómo se calcula a mano (indefinido)</h3><ol class="steps">
 <li>Cuenta los días de servicio con año de 360 días (cada mes vale 30): \(\text{días}=\text{días360}(\text{inicio},\text{despido})+1\).</li>
-<li>Pasa a años: \(\text{años}=\text{días}/360\).</li>
+<li>Separa los años completos y los días que sobran (la fracción): 490 días son 1 año y 130 días.</li>
 <li>Si trabajó un año o menos, le corresponden 30 días completos (20 si gana 10 SMMLV o más).</li>
-<li>Si trabajó más: \(\text{días de indemnización}=30+20\,(\text{años}-1)\).</li>
+<li>Si trabajó más: 30 días por el primer año, 20 por cada año completo siguiente y, por la fracción, \(20\times\text{días que sobran}/360\). <b>Los días no llevan decimales</b>: ese resultado se redondea al entero.</li>
 <li>Multiplica por el salario diario: \(\text{salario}/30\).</li></ol>
-<p><b>Ejemplo:</b> salario de $3.000.000, del 1 de enero de 2025 al 10 de mayo de 2026: 490 días = 1,361 años. Indemnización: \(30+20\cdot0{,}361=37{,}22\) días \(\times\$100.000=\$3.722.222\).</p></section>
+<p><b>Ejemplo:</b> salario de $3.000.000, del 1 de enero de 2025 al 10 de mayo de 2026: 490 días = 1 año y 130 días. Fracción: \(20\times130/360=7{,}22\), que se redondea a 7 días. Indemnización: \((30+7)=37\) días \(\times\$100.000=\$3.700.000\).</p></section>
 <section><h3>Cuándo aplica</h3><ul><li>Despido sin justa causa.</li><li>Renuncia del trabajador por una justa causa imputable al empleador (art. 62, literal B), el llamado despido indirecto.</li></ul>
 <p>No aplica cuando el contrato a término fijo termina por vencimiento del plazo con preaviso, ni cuando el trabajador renuncia voluntariamente.</p></section>
 ${LAB_}${AVISO}`,
