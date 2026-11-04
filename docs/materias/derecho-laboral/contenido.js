@@ -131,13 +131,40 @@ qs:[{q:"Un trabajador gana el salario mínimo de 2026 y trabajó el mes completo
 <tr><td>Salario mínimo con 10 días de licencia no remunerada</td><td>2.000.000</td><td class="num">170</td><td class="num">$944.444</td></tr>
 <tr><td>Salario de $4.000.000 (más de 2 SMMLV, sin auxilio)</td><td>4.000.000</td><td class="num">180</td><td class="num">$2.000.000</td></tr></table></div>
 <p><b>Días del segundo caso:</b> del 15 de marzo al 30 de junio son (6 − 3) × 30 + (30 − 15) + 1 = 106 días.</p>
+<p class="link">Para liquidar todas las primas de un contrato, con sus moras, en el formato del tablero, usa la <button class="btn" type="button" data-go="liquidacion">Liquidación de prestaciones (formato de clase)</button>.</p>
 <p><b>Mora:</b> si al trabajador de salario mínimo le pagan la prima de junio el 15 de julio, son 15 días de mora: 1.750.905 / 30 × 15 = <b>$875.452,50</b>. Si le pagan la de diciembre el 28, son 8 días: <b>$466.908</b>.</p></section>
 ${LAB_}${AVISO}`,
 deep:[{k:"Quién",t:"Quién tiene derecho y quién no",html:String.raw`<ul><li><b>Sí:</b> todos los trabajadores con contrato de trabajo, sin importar el tipo de contrato (término fijo, indefinido, obra o labor), incluidos, desde la Ley 1788 de 2016, los trabajadores del servicio doméstico, los choferes de servicio familiar y los trabajadores por días.</li><li><b>No:</b> quien gana salario integral, porque su factor prestacional ya incluye la prima (art. 132); los aprendices SENA, porque el contrato de aprendizaje no es un contrato de trabajo; y los contratistas por prestación de servicios.</li><li>La prima no es salario: no entra en la base de aportes a salud y pensión.</li></ul>`},
  {k:"Excel",t:"Cómo montarla en una hoja de cálculo",html:String.raw`<ol><li>En B2:G2, el salario devengado de cada mes.</li><li>¿Son iguales los últimos tres? <code>=Y(E2=F2;F2=G2)</code>.</li><li>Base: <code>=SI(Y(E2=F2;F2=G2);G2;PROMEDIO(B2:G2))+auxilio</code>.</li><li>Días: <code>=DIAS360(ingreso;fin;VERDADERO)+1-ausencias</code>. El VERDADERO usa el método europeo, que cuenta cada mes como 30 días.</li><li>Prima: <code>=base*días/360</code>.</li></ol>`}],
 qs:[{q:"Un trabajador gana $1.750.905 y trabajó todo el primer semestre de 2026. ¿Cuánto le corresponde y hasta cuándo se paga?",a:"(1.750.905 + 249.095) × 180 / 360 = $1.000.000, a más tardar el 30 de junio."},
  {q:"¿Por qué en un caso se usa el salario actual y en otro el promedio?",a:"Si los últimos tres meses del semestre son iguales, el salario actual representa bien lo devengado. Si cambió (horas extra, comisiones, aumento), se usa el promedio del semestre."},
- {q:"La prima de diciembre se pagó el 23 de diciembre a quien gana $3.000.000. ¿Cuánto es la mora?",a:"La mora corre desde el 21 de diciembre: 3 días × 3.000.000 / 30 = $300.000, con el salario básico sin auxilio de transporte."}]}
+ {q:"La prima de diciembre se pagó el 23 de diciembre a quien gana $3.000.000. ¿Cuánto es la mora?",a:"La mora corre desde el 21 de diciembre: 3 días × 3.000.000 / 30 = $300.000, con el salario básico sin auxilio de transporte."}]},
+{id:"cesantias", t:"Cesantías e intereses sobre las cesantías", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Las cesantías son un ahorro obligatorio para cuando el trabajador quede cesante: <b>un mes de salario por cada año trabajado</b>, del 1 de enero al 31 de diciembre, y proporcional si trabajó menos (art. 249 del CST). Sobre ese saldo, el empleador paga además unos <b>intereses del 12 % anual</b> (Ley 52 de 1975).</p></section>
+<section><h3>Los dos regímenes</h3><div class="tbl"><table><tr><th>Régimen</th><th>A quién aplica</th><th>Cómo funciona</th></tr>
+<tr><td>Tradicional (retroactivo)</td><td>Contratos anteriores a la Ley 50 de 1990 que no se cambiaron al nuevo régimen</td><td>Las guarda el empleador y se liquidan al final con el último salario, por todo el tiempo servido.</td></tr>
+<tr><td>Liquidación anual (Ley 50 de 1990)</td><td>Contratos firmados desde el 1 de enero de 1991</td><td>Se liquidan cada 31 de diciembre y se consignan en el <b>fondo de cesantías</b> que elija el trabajador a más tardar el <b>14 de febrero</b> del año siguiente.</td></tr></table></div></section>
+<section><h3>Plazos y sanciones</h3><div class="tbl"><table><tr><th>Qué</th><th>A quién se paga</th><th>Plazo</th><th>Si no se paga</th></tr>
+<tr><td>Cesantías del año</td><td>Al fondo</td><td>14 de febrero del año siguiente</td><td>Desde el <b>15 de febrero</b>, un día de salario por cada día de retraso (art. 99 de la Ley 50 de 1990)</td></tr>
+<tr><td>Intereses sobre las cesantías</td><td>Directamente al trabajador</td><td>31 de enero del año siguiente</td><td>Un valor adicional igual a los intereses: se pagan dobles (Ley 52 de 1975)</td></tr>
+<tr><td>Cesantías e intereses del año del retiro</td><td>Directamente al trabajador</td><td>Con la liquidación final</td><td>Indemnización moratoria (art. 65)</td></tr></table></div></section>
+<section><h3>La base y las fórmulas</h3><p>La base es la misma de la prima: si el salario devengado de los últimos tres meses es igual, el salario actual; si no, el promedio del año (o de lo trabajado, si es menos). Se le suma el auxilio de transporte para quienes ganan hasta 2 SMMLV, y se restan los días de suspensión del artículo 51.</p>
+<div class="mj">\[\text{Cesantías}=\frac{(\text{salario}+\text{auxilio})\times(\text{días}-\text{días art. 51})}{360}\qquad\qquad\text{Intereses}=\frac{\text{cesantías}\times\text{días}\times12\,\%}{360}\]</div>
+<p>Con el año completo, las cesantías son un mes de base y los intereses el 12 % de ellas.</p></section>
+<section><h3>Salario integral</h3><p>Quien gana salario integral <b>no tiene derecho</b> a cesantías ni a prima (art. 132). Del 100 % del salario integral, el 70 % es la base de la seguridad social (IBC) y el 30 % es el factor prestacional que ya paga esas prestaciones.</p></section>
+<section><h3>¿Cuándo se pueden retirar?</h3><ul><li>Al terminar el contrato.</li><li>Para comprar vivienda.</li><li>Para reformar o mejorar la vivienda.</li><li>Para pagar estudios del trabajador, su cónyuge o sus hijos.</li></ul></section>
+<section><h3>El ejercicio de clase</h3><p>Ingresó el 20 de septiembre de 2025 con $2.000.000 (auxilio 2025: $200.000). En 2026 gana $2.900.000 (auxilio $249.095); en mayo estuvo suspendido 30 días (art. 51), en julio devengó $2.950.000 con horas extra y de agosto a octubre $3.300.000 con recargos. Se retiró el 3 de noviembre de 2026.</p>
+<div class="eq al">2025: 20/9/25 – 31/12/25 = 101<br>(2.000.000 + 200.000) × (101 − 0) / 360 = <b>617.222</b><br>Mora: 15/2/26 – 3/11/26 = 259 × 66.666 = <b>17.266.494</b><br><br>2026: 1/1/26 – 3/11/26 = 303<br>(3.300.000 + 249.095) × (303 − 30) / 360 = <b>2.691.397</b></div>
+<ol class="steps"><li><b>Cesantías de 2025:</b> 101 días con el año de 360 (del 20 de septiembre al 30 de diciembre son 100, más el día de inicio). Los tres últimos meses son iguales, así que la base es 2.000.000 más el auxilio de 2025.</li>
+<li><b>Mora:</b> no se consignaron el 14 de febrero de 2026, así que desde el 15 de febrero hasta el retiro corre un día de salario por día. 2.000.000 / 30 = 66.666 (truncado), por 259 días.</li>
+<li><b>Cesantías de 2026:</b> se pagan en la liquidación. Los últimos tres meses (agosto a octubre) son iguales, así que la base es 3.300.000 más el auxilio de 2026, y se restan los 30 días de mayo.</li>
+<li><b>Intereses:</b> 617.222 × 101 × 12 % / 360 = 20.780 por 2025, que debían pagarse el 31 de enero; como no se pagaron, la sanción es otro tanto. Por 2026: 2.691.397 × 273 × 12 % / 360 = 244.917, con la liquidación.</li></ol>
+<p>La <button class="btn" type="button" data-go="liquidacion">Liquidación de prestaciones (formato de clase)</button> trae este ejercicio cargado, con las primas, las cesantías, los intereses y todas las moras, escrito como en el tablero.</p>
+<p class="hint">Como en clase, el salario diario de la mora se trunca a pesos y se toma el básico del año que se debe. Algunas sentencias liquidan la mora del artículo 99 con el salario vigente en cada año de retraso.</p>
+${AVISO}`,
+qs:[{q:"Un trabajador con salario mínimo de 2026 trabaja todo el año. ¿Cuánto son sus cesantías y sus intereses, y cuándo se pagan?",a:"Cesantías: 2.000.000 × 360 / 360 = $2.000.000, al fondo a más tardar el 14 de febrero de 2027. Intereses: 2.000.000 × 360 × 12 % / 360 = $240.000, al trabajador a más tardar el 31 de enero de 2027."},
+ {q:"Si el empleador no paga los intereses a tiempo, ¿cuál es la sanción?",a:"Un valor adicional igual a los intereses: los paga dobles."},
+ {q:"¿Por qué en 2026 se resta 30 a los 303 días?",a:"Porque en mayo hubo una suspensión del contrato de 30 días (art. 51): esos días no cuentan para las prestaciones."}]}
 ];
 
 const BRANCHES=[
@@ -151,6 +178,16 @@ const BRANCHES=[
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
+ {id:"liquidacion",t:"Liquidación de prestaciones (formato de clase)",anchor:"cesantias",links:["prima","cesantias","moratoria"],sim:"liq",html:String.raw`
+<details class="pdet"><summary><b>Reglas que aplica (las de clase)</b></summary><ol class="steps">
+<li><b>Días:</b> año comercial de 360 días, contando el primer y el último día. Se restan los días de suspensión del artículo 51.</li>
+<li><b>Base:</b> si los tres últimos meses del periodo (sin contar los suspendidos) son iguales, el salario de ese mes; si no, el promedio de lo devengado en el periodo. Más el auxilio de transporte del año, si el básico es de hasta 2 SMMLV.</li>
+<li><b>Primas:</b> por semestre; plazo el 30 de junio y el 20 de diciembre; mora desde el 1 de julio y el 21 de diciembre.</li>
+<li><b>Cesantías:</b> por año calendario; consignación hasta el 14 de febrero; mora desde el 15 de febrero.</li>
+<li><b>Intereses:</b> 12 % anual proporcional a los días; se pagan al trabajador hasta el 31 de enero; si no, se pagan dobles.</li>
+<li><b>Mora:</b> hasta la fecha de retiro, con el salario básico del periodo que se debe / 30, truncado a pesos. Lo del periodo del retiro se paga con la liquidación.</li></ol></details>
+<div class="sim" id="sim"></div>`,
+  d:"Escribe la fecha de inicio, la de retiro y el salario de cada mes (con extras y días del artículo 51). Calcula las primas, las cesantías y sus intereses de todo el contrato, con las moras y sanciones si no se pagaron, escrito como en el tablero. Trae cargado el ejercicio de clase."},
  {id:"planilla",t:"Resolvedor del taller de horas extras",anchor:"jornada",links:["jornada","nomina"],sim:"planilla",html:String.raw`
 <details class="pdet" open><summary><b>Reglas que aplica el resolvedor</b></summary>
 <ol class="steps">

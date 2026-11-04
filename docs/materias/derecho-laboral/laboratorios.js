@@ -230,3 +230,44 @@ SIMS.prima=function(){
   watch(["pr-an","pr-ing","pr-ret","pr-aux","pr-aus","pr-pago","pr-bm"],run);
   drawM();run();
 };
+
+// ---- Liquidación de prestaciones con el formato de clase (primas, cesantías e intereses)
+SIMS.liq=function(){
+  const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],Cap=s=>s[0].toUpperCase()+s.slice(1);
+  const f2=d=>`${d.d}/${d.m}/${String(d.y).slice(2)}`,n=v=>Math.round(v).toLocaleString("es-CO");
+  const CLASE={ini:"2025-09-20",ret:"2026-11-03",m:{"2025-9":[2000000,0,0,""],"2025-10":[2000000,0,0,""],"2025-11":[2000000,0,0,""],"2025-12":[2000000,0,0,""],"2026-1":[2900000,0,0,""],"2026-2":[2900000,0,0,""],"2026-3":[2900000,0,0,""],"2026-4":[2900000,0,0,""],"2026-5":[2900000,0,30,"Art. 51"],"2026-6":[2900000,0,0,""],"2026-7":[2900000,50000,0,"Horas extra"],"2026-8":[2900000,400000,0,"Recargos"],"2026-9":[2900000,400000,0,"Recargos"],"2026-10":[2900000,400000,0,"Recargos"],"2026-11":[2900000,400000,0,"Recargos"]},pagos:{prima:false,ces:false,int:false}};
+  $("sim").innerHTML=`<div class="chips pre" id="lq-ej"><button type="button" data-k="clase">Ejercicio de clase: 20 sep 2025 a 3 nov 2026, no le han pagado primas</button><button type="button" data-k="limpio">Empezar uno nuevo</button></div>
+  <div class="calcf">${dateIn("lq-ini","Fecha de inicio","2025-09-20")}${dateIn("lq-ret","Fecha de retiro (o de corte)","2026-11-03")}</div>
+  <p class="hint">Un renglón por mes. <b>Básico</b>: el salario mensual del contrato. <b>Extras</b>: horas extra, recargos y comisiones de ese mes. <b>Art. 51</b>: días de suspensión (licencia no remunerada, sanción), que se restan de los días. Si entró o salió a mitad de mes, escribe el salario del mes completo.</p>
+  <div class="tbl"><table id="lq-m"></table></div>
+  <div class="chips" style="margin:8px 0"><label class="chkl"><input type="checkbox" id="lq-pp"> Las primas se pagaron a tiempo</label><label class="chkl"><input type="checkbox" id="lq-pc"> Las cesantías se consignaron a tiempo</label><label class="chkl"><input type="checkbox" id="lq-pi"> Los intereses se pagaron a tiempo</label></div>
+  <div class="res" id="lq-res"></div><div id="lq-out"></div>`;
+  let vals={};
+  const months=()=>{const a=D("lq-ini"),b=D("lq-ret");if(!a||!b||LAB.cmp(a,b)>0)return null;const o=[];let y=a.y,m=a.m;while(y*12+m<=b.y*12+b.m&&o.length<120){o.push([y,m]);m++;if(m>12){m=1;y++}}return o};
+  const read=()=>{$("lq-m").querySelectorAll("tr[data-k]").forEach(tr=>{const q=tr.querySelectorAll("input");vals[tr.dataset.k]=[+q[0].value||0,+q[1].value||0,+q[2].value||0,q[3].value]})};
+  const draw=()=>{read();const ms=months();if(!ms){$("lq-m").innerHTML="";return}let last=[1750905,0,0,""];
+    $("lq-m").innerHTML=`<tr><th>Mes</th><th class="num">Básico</th><th class="num">Extras</th><th class="num">Art. 51 (días)</th><th>Nota</th></tr>`+ms.map(([y,m])=>{const k=y+"-"+m,v=vals[k]||[last[0],0,0,""];last=v;vals[k]=v;
+      return`<tr data-k="${k}"><td>${Cap(MES[m-1])} ${y}</td><td><input type="number" step="1000" value="${v[0]}" aria-label="Básico ${MES[m-1]} ${y}"></td><td><input type="number" step="1000" value="${v[1]}" aria-label="Extras"></td><td><input type="number" min="0" max="30" value="${v[2]}" aria-label="Días art. 51"></td><td><input type="text" value="${v[3]}" aria-label="Nota"></td></tr>`}).join("");
+    $("lq-m").querySelectorAll("input").forEach(i=>i.addEventListener("input",run));run()};
+  const fila=(nombre,r,extra)=>`<div class="lq-b"><div class="lq-h">${nombre}</div><div class="eq al">${f2(r.ini)} – ${f2(r.fin)} = ${r.dias360}<br>(${n(r.B.sal)} + ${n(r.B.aux)}) × (${r.dias360} − ${r.aus}) / 360 = <b class="lq-box">${n(r.valor)}</b>${r.mora?`<br>Mora: ${f2(r.mora.desde)} – ${f2(D("lq-ret"))} = ${r.mora.dias} × ${n(r.mora.diario)} = <b class="lq-box">${n(r.mora.valor)}</b>`:""}</div>
+    <p class="hint">${r.B.iguales?`Los últimos tres meses (${r.B.ult.map(x=>MES[x.m-1]).join(", ")}) son iguales: base = ${n(r.B.sal)}`:`Los últimos tres meses no son iguales: base = promedio de ${r.B.vivos.length} meses = ${n(r.B.prom)}`}${r.B.aux?` + auxilio de transporte ${n(r.B.aux)}`:", sin auxilio (más de 2 SMMLV)"}${r.aus?`; se restan ${r.aus} días del art. 51`:""}. ${r.enLiquidacion?"Se paga con la liquidación final.":r.mora?`Plazo: ${dt(r.limite)}; la mora corre hasta el retiro con el básico / 30, truncado.`:`Plazo: ${dt(r.limite)}.`}${extra||""}</p></div>`;
+  const run=()=>{read();const a=D("lq-ini"),b=D("lq-ret"),ms=months();if(!ms){$("lq-res").innerHTML=err("la fecha de retiro debe ser posterior a la de inicio.");$("lq-out").innerHTML="";return}
+    const meses=ms.map(([y,m])=>{const v=vals[y+"-"+m];return{y,m,basico:v[0],extra:v[1],art51:v[2]}});if(meses.some(r=>!(r.basico>0))){$("lq-res").innerHTML=err("escribe el salario básico de cada mes.");return}
+    const pagos={prima:$("lq-pp").checked,ces:$("lq-pc").checked,int:$("lq-pi").checked},R=LAB.liquidacion({inicio:a,retiro:b,meses,pagos}),T=R.tot;
+    // datos agrupados como en el tablero
+    const g=[];ms.forEach(([y,m])=>{const v=vals[y+"-"+m],sig=v.slice(0,3).join("|"),l=g[g.length-1];if(l&&l.sig===sig&&l.y===y&&l.nota===v[3])l.m2=m;else g.push({y,m1:m,m2:m,sig,v,nota:v[3]})});
+    let yy=null;const datos=g.map(x=>{const per=x.m1===x.m2?Cap(MES[x.m1-1]):`${Cap(MES[x.m1-1])} – ${MES[x.m2-1]}`,hd=x.y!==yy?`<b>${x.y}</b> · auxilio de transporte ${n(LAB.valores({y:x.y,m:12,d:1}).aux)}<br>`:"";yy=x.y;
+      return hd+(x.v[2]>=30?`${per}: art. 51, ${x.v[2]} días`:`${per}: ${n(x.v[0]+x.v[1])}${x.v[1]?` (${x.nota||"con extras"})`:""} · ${n(x.v[0])} / 30 = ${n(Math.floor(x.v[0]/30))}${x.v[2]?` · art. 51: ${x.v[2]} días`:""}`)}).join("<br>");
+    $("lq-res").innerHTML=tiles([["Primas",$p(T.primas)],["Cesantías",$p(T.ces)],["Intereses",$p(T.ints)],["Moras y sanciones",$p(T.moraPrimas+T.moraCes+T.sancionInt)],["Total a pagar",$p(T.total),"okt"]]);
+    $("lq-out").innerHTML=stp(1,"Datos",`<div class="eq al">F. inicio ${f2(a)}<br>${datos}<br>F. retiro ${f2(b)}</div>`)
+      +stp(2,"Primas de servicios (art. 306)",R.primas.map(r=>fila(r.nombre,r,pagos.prima&&!r.enLiquidacion?" Ya se pagó.":"")).join(""))
+      +stp(3,"Cesantías (art. 249)",R.ces.map(r=>fila(r.nombre,r,pagos.ces&&!r.enLiquidacion?" Ya se consignó.":"")).join(""))
+      +stp(4,"Intereses sobre las cesantías (12 % anual)",R.ints.map(r=>`<div class="lq-b"><div class="lq-h">${r.nombre}</div><div class="eq al">${n(r.ces)} × ${r.dias} × 12 % / 360 = <b class="lq-box">${n(r.valor)}</b>${r.sancion?`<br>Sanción por no pagarlos antes del ${dt(r.limite)}: otro tanto = <b class="lq-box">${n(r.sancion)}</b>`:""}</div><p class="hint">${r.enLiquidacion?"Se pagan con la liquidación final, directamente al trabajador.":`Se pagan directamente al trabajador a más tardar el ${dt(r.limite)}.${pagos.int?" Ya se pagaron.":""}`}</p></div>`).join(""))
+      +stp(5,"Total de la liquidación",`<div class="tbl"><table><tr><td>Primas adeudadas</td><td class="num">${$p(T.primas)}</td></tr><tr><td>Mora de las primas</td><td class="num">${$p(T.moraPrimas)}</td></tr><tr><td>Cesantías adeudadas</td><td class="num">${$p(T.ces)}</td></tr><tr><td>Mora por no consignar las cesantías</td><td class="num">${$p(T.moraCes)}</td></tr><tr><td>Intereses sobre las cesantías</td><td class="num">${$p(T.ints)}</td></tr><tr><td>Sanción por no pagar los intereses</td><td class="num">${$p(T.sancionInt)}</td></tr><tr><td><b>Total</b></td><td class="num"><b>${$p(T.total)}</b></td></tr></table></div>
+        <p class="hint">No incluye vacaciones, salarios pendientes ni indemnización. Si después del retiro no se paga esta liquidación, corre la <button class="btn" type="button" data-go="moratoria">indemnización moratoria (art. 65)</button>.</p>`)};
+  const load=k=>{if(k==="clase"){$("lq-ini").value=CLASE.ini;$("lq-ret").value=CLASE.ret;vals=JSON.parse(JSON.stringify(CLASE.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false}
+    else{vals={};$("lq-ini").value=di(HOY).slice(0,4)+"-01-01";$("lq-ret").value=di(HOY)}$("lq-m").innerHTML="";draw()};
+  $("lq-ej").addEventListener("click",e=>{const bt=e.target.closest("button");if(bt)load(bt.dataset.k)});
+  ["lq-ini","lq-ret"].forEach(i=>$(i).addEventListener("change",draw));["lq-pp","lq-pc","lq-pi"].forEach(i=>$(i).addEventListener("change",run));
+  load("clase");
+};

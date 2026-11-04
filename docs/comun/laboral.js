@@ -69,6 +69,32 @@ LAB.prima=function({anio,sem,ingreso,retiro,meses,aux="auto",ausencias=0,pago,ba
   let mora=null;if(pago&&!retiroAntes){const d=Math.max(0,LAB.diasCal(S.limite,pago)),bm=basicoMora>0?basicoMora:sal[sal.length-1];mora={dias:d,diario:bm/30,valor:d*bm/30,basico:bm,desde:LAB.addDays(S.limite,1)}}
   return{S,a,b,diasPer,dias,ausencias,idx,sal,ult,iguales,promedio,basico,recibeAux,auxV,smmlv:V.smmlv,base,valor,retiroAntes,mora}};
 
+// ---------- liquidación de prestaciones con el formato de clase: primas, cesantías (art. 249, Ley 50 de 1990) e intereses (Ley 52 de 1975)
+// meses: [{y,m,basico,extra,art51}] desde el mes de ingreso hasta el de retiro. pagos: {prima,ces,int} = true si se pagaron a tiempo.
+// Convenciones de clase: días de 360 contando ambos extremos, salario diario truncado a pesos, mora con el salario básico.
+LAB.basePeriodo=function(meses,fin){const vivos=meses.filter(r=>r.art51<30),ult=vivos.slice(-3),dev=r=>r.basico+r.extra;
+  if(!vivos.length)return null;const iguales=ult.every(r=>Math.abs(dev(r)-dev(ult[0]))<0.5),prom=vivos.reduce((x,r)=>x+dev(r),0)/vivos.length;
+  const V=LAB.valores(fin),ultimo=vivos[vivos.length-1],aux=ultimo.basico<=2*V.smmlv?V.aux:0,sal=iguales?dev(ultimo):prom;
+  return{vivos,ult,iguales,prom,sal,aux,base:sal+aux,basico:ultimo.basico,diario:Math.floor(ultimo.basico/30)}};
+LAB.liquidacion=function({inicio,retiro,meses,pagos={}}){
+  const key=(y,m)=>y*12+m,get=(a,b)=>meses.filter(r=>key(r.y,r.m)>=key(a.y,a.m)&&key(r.y,r.m)<=key(b.y,b.m));
+  const per=(a,b,lim,moraDesde,pagado,tipo)=>{const ini=LAB.cmp(inicio,a)>0?inicio:a,fin=LAB.cmp(retiro,b)<0?retiro:b;if(LAB.cmp(ini,fin)>0)return null;
+    const ms=get(ini,fin),aus=ms.reduce((x,r)=>x+Math.min(30,r.art51||0),0),dias360=LAB.days360(ini,fin)+1,dias=Math.max(0,dias360-aus),B=LAB.basePeriodo(ms,fin);if(!B)return null;
+    const valor=Math.round(B.base*dias/360),cierra=LAB.cmp(retiro,b)>=0&&LAB.cmp(retiro,moraDesde)>=0;
+    let mora=null;if(cierra&&!pagado){const d=LAB.days360(moraDesde,retiro)+1;mora={desde:moraDesde,dias:d,diario:B.diario,valor:d*B.diario}}
+    return{tipo,ini,fin,dias360,aus,dias,B,valor,limite:lim,enLiquidacion:!cierra,mora}};
+  const primas=[],ces=[],ints=[];
+  for(let y=inicio.y;y<=retiro.y;y++){
+    const p1=per({y,m:1,d:1},{y,m:6,d:30},{y,m:6,d:30},{y,m:7,d:1},pagos.prima,"prima");if(p1)primas.push(Object.assign(p1,{nombre:`Prima 1 de ${y}`}));
+    const p2=per({y,m:7,d:1},{y,m:12,d:31},{y,m:12,d:20},{y,m:12,d:21},pagos.prima,"prima");if(p2)primas.push(Object.assign(p2,{nombre:`Prima 2 de ${y}`}));
+    const c=per({y,m:1,d:1},{y,m:12,d:31},{y:y+1,m:2,d:14},{y:y+1,m:2,d:15},pagos.ces,"ces");
+    if(c){ces.push(Object.assign(c,{nombre:`Cesantías de ${y}`}));const iv=Math.round(c.valor*c.dias*0.12/360),cerrado=!c.enLiquidacion,limI={y:y+1,m:1,d:31};
+      ints.push({nombre:`Intereses de ${y}`,ces:c.valor,dias:c.dias,valor:iv,limite:limI,enLiquidacion:c.enLiquidacion,sancion:cerrado&&!pagos.int&&LAB.cmp(retiro,limI)>0?iv:0})}}
+  const sum=a=>a.reduce((x,v)=>x+v,0),deb=(arr,pag)=>sum(arr.filter(r=>r.enLiquidacion||!pag).map(r=>r.valor));
+  const tot={primas:deb(primas,pagos.prima),moraPrimas:sum(primas.map(r=>r.mora?r.mora.valor:0)),ces:deb(ces,pagos.ces),moraCes:sum(ces.map(r=>r.mora?r.mora.valor:0)),
+    ints:deb(ints,pagos.int),sancionInt:sum(ints.map(r=>r.sancion))};tot.total=Object.values(tot).reduce((x,v)=>x+v,0);
+  return{primas,ces,ints,tot}};
+
 // ---------- jornada, recargos y horas extras
 // factor del pago ADICIONAL al salario mensual: las horas ordinarias diurnas ya están pagadas (0) y la nocturna ordinaria solo lleva el recargo
 LAB.factores=dom=>({ord:0,recN:LEY.pct.recN,extraD:1+LEY.pct.extraD,extraN:1+LEY.pct.extraN,domD:1+dom,domN:1+dom+LEY.pct.recN,extraDomD:1+LEY.pct.extraD+dom,extraDomN:1+LEY.pct.extraN+dom});

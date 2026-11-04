@@ -447,6 +447,12 @@ input.rc-in:disabled,select.rc-in:disabled{opacity:.85}
 @media (max-width:560px){.tl-idx,.tl-enl{grid-template-columns:1fr}.pto>summary{padding:10px 12px;gap:10px}.pto-b{padding:0 12px 14px}}
 .pto mjx-container:not([display="true"]),.tl-en mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle;padding-bottom:2px}
 .pto-b li,.pto-b p{min-width:0;overflow-wrap:anywhere}
+/* Liquidación con formato de pizarra (Derecho Laboral) */
+.lq-b{margin:0 0 12px}
+.lq-h{font-weight:600;margin:0 0 4px}
+.lq-box{display:inline-block;border:1.5px solid currentColor;border-radius:4px;padding:0 6px;margin-left:2px}
+#lq-m input{width:100%;min-width:90px;font:inherit;padding:4px 6px}
+#lq-m td:first-child{white-space:nowrap}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
