@@ -4,10 +4,15 @@
 const ALL=[]; TRUNK.forEach(s=>ALL.push(Object.assign(s,{kind:"t"})));
 BRANCHES.forEach(g=>g.items.forEach(it=>ALL.push(Object.assign(it,{kind:"b",grp:g}))));
 WORKSHOPS.forEach(w=>ALL.push(Object.assign(w,{kind:"w"})));
+// Talleres resueltos (opcional por materia): cada punto se escribe una vez y aparece en su taller y en las lecciones de su tema
+const TLS=typeof TALLERES!=="undefined"?TALLERES:[];
+TLS.forEach(t=>ALL.push(Object.assign(t,{kind:"k"})));
+const PTS={};TLS.forEach(t=>t.puntos.forEach(p=>PTS[p.id]=Object.assign(p,{tl:t})));
+const ALIASES=typeof ALIAS!=="undefined"?ALIAS:{};
 ALL.forEach(s=>{if(s.q&&!s.qs)s.qs=[{q:s.q,a:s.a}]});
-const LESSONS=ALL.filter(s=>s.kind!=="w");
+const LESSONS=ALL.filter(s=>s.kind==="t"||s.kind==="b");
 const EXAM=window.RUTA_EXAM||"",TNOTE=window.RUTA_TRUNK_NOTE===undefined?"<span>· módulo de Economiapp</span>":window.RUTA_TRUNK_NOTE;
-const byId=id=>ALL.find(s=>s.id===id);
+const byId=id=>ALL.find(s=>s.id===(ALIASES[id]||id));
 const KEY=window.RUTA_KEY||"ruta-done";
 let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){done={}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
@@ -27,9 +32,12 @@ function renderMap(){
   brEl.innerHTML=BRANCHES.map((b,gi)=>{const has=b.items.some(it=>it.id===cur),op=has||OPENG.has(gi),nd=b.items.filter(it=>done[it.id]).length;
     return `<details class="bgrp${has?" cur":""}" data-g="${gi}" ${op?"open":""}><summary><span class="bgt">${b.g}</span><span class="bgn">${nd?nd+"/":""}${b.items.length}</span></summary><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
     b.items.map(it=>`<button class="chip ${cur===it.id?"on":""} ${done[it.id]?"done":""}" type="button" data-go="${it.id}">${it.t}${it.nuevo?'<span class="nwdot">nuevo</span>':""}</button>`).join("")}</div></details>`}).join("");
-  const wsHas=WORKSHOPS.some(w=>w.id===cur);
-  $("talleres").innerHTML=`<details class="wsgrp${wsHas?" cur":""}" ${wsHas||OPENG.has("w")?"open":""} data-g="w"><summary><span class="bgt">Herramientas para practicar</span><span class="bgn">${WORKSHOPS.length}</span></summary><div class="chips">${WORKSHOPS.map(w=>`<button class="chip ws-chip ${cur===w.id?"on":""}" type="button" data-go="${w.id}">${w.t}</button>`).join("")}</div></details>`;
-  const mt=$("maptg");if(mt){const s0=byId(cur),pos=s0?(s0.kind==="t"?`Estación ${TRUNK.indexOf(s0)+1} de ${TRUNK.length}`:s0.kind==="w"?"Taller":"Rama"):"";mt.querySelector(".t").textContent=MOBILE()?`Temas del curso · ${pos}`:(document.body.classList.contains("nomap")?"Mostrar temas":"Ocultar temas")}
+  const wgrp=(g,title,list,cls)=>{if(!list.length)return"";const has=list.some(w=>w.id===cur);return `<details class="wsgrp${has?" cur":""}" ${has||OPENG.has(g)?"open":""} data-g="${g}"><summary><span class="bgt">${title}</span><span class="bgn">${list.length}</span></summary><div class="chips">${list.map(w=>`<button class="chip ${cls} ${cur===w.id?"on":""}" type="button" data-go="${w.id}">${w.t}</button>`).join("")}</div></details>`};
+  const W2=WORKSHOPS.filter(w=>w.grp==="ver"),W1=WORKSHOPS.filter(w=>w.grp!=="ver");
+  let tlh="";if(TLS.length){const has=TLS.some(t=>t.id===cur),all=Object.values(PTS),nd=all.filter(p=>done["p:"+p.id]).length;
+    tlh=`<details class="wsgrp tlgrp${has?" cur":""}" ${has||OPENG.has("k")?"open":""} data-g="k"><summary><span class="bgt">Talleres resueltos</span><span class="bgn">${nd?nd+"/":""}${all.length}</span></summary><small>Cada punto paso a paso, con las propiedades que usa</small><div class="chips">${TLS.map(t=>{const d=t.puntos.filter(p=>done["p:"+p.id]).length;return `<button class="chip tl-chip ${cur===t.id?"on":""}" type="button" data-go="${t.id}">${t.t}<span class="nwdot">${d}/${t.puntos.length}</span></button>`}).join("")}</div></details>`}
+  $("talleres").innerHTML=tlh+wgrp("w",W2.length?"Herramientas para resolver":"Herramientas para practicar",W1,"ws-chip")+wgrp("v","Para entender (visualizaciones)",W2,"ws-chip");
+  const mt=$("maptg");if(mt){const s0=byId(cur),pos=s0?(s0.kind==="t"?`Estación ${TRUNK.indexOf(s0)+1} de ${TRUNK.length}`:s0.kind==="w"?"Herramienta":s0.kind==="k"?"Taller":"Rama"):"";mt.querySelector(".t").textContent=MOBILE()?`Temas del curso · ${pos}`:(document.body.classList.contains("nomap")?"Mostrar temas":"Ocultar temas")}
   const n=LESSONS.filter(s=>done[s.id]).length;
   $("pbar").style.width=(n/LESSONS.length*100)+"%";
   $("ptxt").textContent=`${n} de ${LESSONS.length} temas dominados`;
@@ -37,7 +45,7 @@ function renderMap(){
 }
 const OPENG=new Set();
 const MOBILE=()=>window.matchMedia("(max-width:860px)").matches;
-document.addEventListener("toggle",e=>{const d=e.target;if(!d.matches||!d.matches("details[data-g]"))return;const g=d.dataset.g==="w"?"w":+d.dataset.g;if(d.open)OPENG.add(g);else OPENG.delete(g)},true);
+document.addEventListener("toggle",e=>{const d=e.target;if(!d.matches||!d.matches("details[data-g]"))return;const g=/^\d+$/.test(d.dataset.g)?+d.dataset.g:d.dataset.g;if(d.open)OPENG.add(g);else OPENG.delete(g)},true);
 (function(){const mt=$("maptg");if(!mt)return;const nav=mt.closest("nav");try{if(localStorage.getItem("ruta-nomap")==="1")document.body.classList.add("nomap")}catch(e){}
   mt.addEventListener("click",()=>{if(MOBILE()){nav.classList.toggle("open");mt.setAttribute("aria-expanded",nav.classList.contains("open"))}else{const on=document.body.classList.toggle("nomap");mt.setAttribute("aria-expanded",!on);try{localStorage.setItem("ruta-nomap",on?"1":"0")}catch(e){}}renderMap()});
   nav.addEventListener("click",e=>{if(e.target.closest("[data-go]")&&MOBILE()){nav.classList.remove("open");mt.setAttribute("aria-expanded","false")}})})();
@@ -74,24 +82,48 @@ function quizBlock(s){
   return `<div class="quiz"><div class="lbl" style="margin-bottom:6px">Ponte a prueba</div>${s.qs.map((x,j)=>`<div class="qa"><p style="margin:0 0 8px">${x.q}</p>
     <button type="button" data-rev="${j}">Ver respuesta</button><div class="ans" id="ans-${j}" hidden>${x.a}</div></div>`).join("")}</div>`;
 }
+let TLHIDE=false;try{TLHIDE=localStorage.getItem("ruta-tl-hide")==="1"}catch(e){}
+function ptoBody(p,inLesson){const temas=(p.temas||[]).map(byId).filter(Boolean);
+  return `<div class="pto-meta">${p.tipo?`<span class="tag">${p.tipo}</span>`:""}${temas.length?`<span class="lbl">Teoría</span>${temas.map(l=>`<button class="chip" type="button" data-go="${l.id}">${l.t}</button>`).join("")}`:""}</div>
+  <div class="pto-s"><h4>Qué pide</h4>${p.enun}</div>
+  ${p.saber&&p.saber.length?`<div class="pto-s pto-saber"><h4>Lo que necesitas saber</h4><ul>${p.saber.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
+  ${inLesson?"":`<button class="btn pto-ver" type="button" data-ver>Ya lo intenté: ver la solución</button>`}
+  <div class="pto-s pto-sol"><h4>Paso a paso</h4>${p.sol}</div>
+  <div class="pto-s pto-res"><h4>Respuesta</h4>${p.res}</div>
+  <div class="pto-f">${p.tool?`<button class="btn" type="button" data-tool="${p.tool.id}" data-pre="${p.tool.pre||""}">${p.tool.lbl} →</button>`:""}${inLesson?`<button class="btn" type="button" data-go="${p.tl.id}~${p.id}">Ver en el taller →</button>`:`<label class="pto-ok"><input type="checkbox" data-pdone="${p.id}" ${done["p:"+p.id]?"checked":""}> Ya lo resolví</label>`}</div>`}
+function tallerHTML(s){const n=s.puntos.length,d=s.puntos.filter(p=>done["p:"+p.id]).length;
+  return `<p class="lead" style="margin:0">${s.intro}</p>
+  <div class="tl-bar"><div class="tl-prog"><div class="tl-pb"><i id="tl-pbi" style="width:${d/n*100}%"></i></div><span id="tl-pt">${d} de ${n} puntos resueltos</span></div>
+    <label class="chkl"><input type="checkbox" id="tl-hide" ${TLHIDE?"checked":""}> Intentar primero: ocultar las soluciones</label></div>
+  <div class="tl-idx" role="list">${s.puntos.map(p=>`<button type="button" role="listitem" class="tl-i${done["p:"+p.id]?" done":""}" data-pi="${p.id}"><b>${p.n}</b><span>${p.t}</span></button>`).join("")}</div>
+  <div class="tl-list">${s.puntos.map(p=>`<details class="pto" id="pto-${p.id}"><summary><span class="pn">${p.n}</span><span class="pt">${p.t}${p.tipo?`<small>${p.tipo}</small>`:""}</span><span class="pk">${done["p:"+p.id]?"✓":""}</span></summary><div class="pto-b">${ptoBody(p)}</div></details>`).join("")}</div>`}
+function enTalleres(s){const ps=Object.values(PTS).filter(p=>(p.temas||[]).includes(s.id));if(!ps.length)return"";const ej=ps.find(p=>p.ej===s.id);
+  const grupos=TLS.map(t=>[t,ps.filter(p=>p.tl===t)]).filter(g=>g[1].length);
+  return `<section class="tl-en"><h3>En los talleres</h3><p class="hint" style="margin:0 0 8px">Estos puntos se resuelven con lo de esta lección${ej?"; abajo está resuelto uno como ejemplo":""}.</p>
+  ${grupos.map(([t,l])=>`<div class="tl-g"><span class="lbl">${t.t}</span><div class="tl-enl">${l.map(p=>`<button class="tl-ref${p===ej?" ej":""}" type="button" data-go="${t.id}~${p.id}"><b>${p.n}</b><span>${p.t}</span></button>`).join("")}</div></div>`).join("")}
+  ${ej?`<details class="pto tl-ej" open><summary><span class="pn">${ej.n}</span><span class="pt"><small>Ejemplo resuelto · ${ej.tl.t}, ${ej.tl.nl||"punto"} ${ej.n}</small>${ej.t}</span></summary><div class="pto-b">${ptoBody(ej,true)}</div></details>`:""}</section>`}
+function openPto(pid,smooth){const d=$("pto-"+pid);if(!d)return;d.open=true;requestAnimationFrame(()=>d.scrollIntoView({behavior:smooth&&!reduce?"smooth":"auto",block:"start"}))}
 function show(id,scroll){
+  let sub=null;id=id||"";if(id.includes("~")){[id,sub]=id.split("~")}else if(PTS[id]){sub=id;id=PTS[id].tl.id}
   const s=byId(id)||TRUNK[0]; const prevIdx=ALL.findIndex(x=>x.id===cur); cur=s.id; remember(s.id);
   const i=ALL.indexOf(s), prev=ALL[i-1], next=ALL[i+1];
   const eyebrow=s.kind==="t"
     ? `<span>Estación ${i+1} de ${TRUNK.length}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}${s.nuevo?NW:TNOTE}`
     : s.kind==="b" ? `<span class="tag br">Rama</span>${s.nuevo?NW:""}<span>${s.grp.g} · sale de ${byId(s.grp.from).t}</span>`
-    : `<span class="tag ws">Taller</span>${NW}<span>Herramienta interactiva</span>`;
+    : s.kind==="k" ? `<span class="tag ws">Taller resuelto</span><span>${s.sub||""} · ${s.puntos.length} puntos</span>`
+    : `<span class="tag ws">Herramienta</span><span>${s.grp==="ver"?"Para entender":"Para resolver ejercicios"}</span>`;
   const rel=WORKSHOPS.filter(w=>w.links.includes(s.id));
-  const relHtml=s.kind==="w"
+  const relHtml=s.kind==="k"?"":s.kind==="w"
     ? `<div class="relws"><span class="lbl">Lecciones relacionadas</span>${s.links.map(l=>`<button class="btn" type="button" data-go="${l}">${byId(l).t}</button>`).join("")}</div>`
     : rel.length?`<div class="relws"><span class="lbl">Practica en</span>${rel.map(w=>`<button class="btn" type="button" data-go="${w.id}">${w.t} →</button>`).join("")}</div>`:"";
   les.innerHTML=`<div><div class="eyebrow">${eyebrow}</div><h2>${s.t}</h2></div>
     ${s.kind==="w"?`<p class="lead" style="margin:0">${s.d}</p>`:""}
-    ${s.html}
+    ${s.kind==="k"?tallerHTML(s):s.html}
+    ${s.kind==="t"||s.kind==="b"?enTalleres(s):""}
     ${relHtml}
     ${deepBlock(s)}
     ${quizBlock(s)}
-    <div class="foot">${s.kind!=="w"?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya lo domino</label>`:"<span></span>"}
+    <div class="foot">${s.kind==="t"||s.kind==="b"?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya lo domino</label>`:"<span></span>"}
       <div class="row">${prev?`<button class="btn" type="button" data-go="${prev.id}">← ${prev.t}</button>`:""}${next?`<button class="btn solid" type="button" data-go="${next.id}">${next.t} →</button>`:""}</div></div>`;
   [...les.children].forEach((c,k)=>c.style.setProperty("--i",k));
   if(!reduce && prevIdx>=0 && les.animate){
@@ -102,12 +134,20 @@ function show(id,scroll){
   if(ck) ck.onchange=e=>{done[s.id]=e.target.checked;save();renderMap()};
   if(s.sim) try{SIMS[s.sim]()}catch(err){const b=$("sim");if(b)b.innerHTML=`<p class="err">El laboratorio no pudo cargarse: ${esc(String(err.message||err))}</p>`}
   if(typeof VISUAL==="function") les.querySelectorAll("[data-vis]").forEach(el=>{try{VISUAL(el,el.dataset.vis)}catch(err){el.innerHTML=`<p class="err">El visual no pudo cargarse: ${esc(String(err.message||err))}</p>`}});
+  les.classList.toggle("tl-page",s.kind==="k");
   renderMap();
   prettyCode(les);
   typeset(les);
+  if(sub&&s.kind==="k"){openPto(sub,false);return}
   if(scroll){ if(window.matchMedia("(max-width:860px)").matches) les.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}); else window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); }
 }
 document.addEventListener("click",e=>{
+  const tlb=e.target.closest("[data-tool]");
+  if(tlb){window.TOOL_PRE=tlb.dataset.pre||null;location.hash=tlb.dataset.tool;return}
+  const pi=e.target.closest("[data-pi]");
+  if(pi){const id=pi.dataset.pi;try{history.replaceState(null,"","#"+cur+"~"+id)}catch(er){}openPto(id,true);return}
+  const vr=e.target.closest("[data-ver]");
+  if(vr){vr.closest(".pto").classList.add("rev");return}
   const g=e.target.closest("[data-go]");
   if(g){const id=g.dataset.go; if(location.hash==="#"+id) show(id,true); else location.hash=id; return;}
   const tb=e.target.closest("[data-tab]");
@@ -129,6 +169,13 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight"&&ALL[i+1]) location.hash=ALL[i+1].id;
   if(e.key==="ArrowLeft"&&ALL[i-1]) location.hash=ALL[i-1].id;
 });
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.id==="tl-hide"){TLHIDE=t.checked;document.body.classList.toggle("tl-hide",TLHIDE);try{localStorage.setItem("ruta-tl-hide",TLHIDE?"1":"0")}catch(er){}return}
+  if(t.dataset&&t.dataset.pdone){const id=t.dataset.pdone;done["p:"+id]=t.checked;save();const s=byId(cur);
+    const d=$("pto-"+id);if(d)d.querySelector(".pk").textContent=t.checked?"✓":"";const ix=les.querySelector(`[data-pi="${id}"]`);if(ix)ix.classList.toggle("done",t.checked);
+    if(s&&s.kind==="k"){const n=s.puntos.length,k=s.puntos.filter(p=>done["p:"+p.id]).length;$("tl-pt").textContent=`${k} de ${n} puntos resueltos`;$("tl-pbi").style.width=(k/n*100)+"%"}
+    renderMap()}});
+document.body.classList.toggle("tl-hide",TLHIDE);
 window.addEventListener("hashchange",()=>show(location.hash.slice(1)||TRUNK[0].id,true));
 window.addEventListener("resize",()=>moveTrain());
 

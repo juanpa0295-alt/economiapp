@@ -239,7 +239,7 @@ SIMS.wsMat=function(){
     const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
     if(a==="next"&&step<7){step++;jump=true}if(a==="all"){step=7;jump=true}if(a==="reset"){step=1;shown=0}
     if(a==="k1")k1=+b.dataset.val;
-    if(a==="calc"){CALC_PREFILL=mem.chow;location.hash="t-calc";return}
+    if(a==="calc"){window.CALC_PRE=mem.chow;location.hash="t-calc";return}
     render()});
   ws.addEventListener("input",e=>{if(e.target.id==="rsl"){rs=+e.target.value;render()}});
   drawTable();render();
@@ -307,7 +307,7 @@ SIMS.wsMat=function(){
     if(!r)ch=SING;
     else if(ra&&rb){const nr=ra.scr+rb.scr,d2=n-2*k;
       if(nr<1e-12)ch=`<p class="warn"><b>SCR₁ + SCR₂ = 0.</b> Cada periodo se ajusta perfecto; agrega meses o cambia el punto de corte.</p>`;
-      else{const F=((r.scr-nr)/k)/(nr/d2),c=fcrit(k,d2),p=fp(F,k,d2);mem.chow={scrR:r.scr,scr1:ra.scr,scr2:rb.scr,n,k};
+      else{const F=((r.scr-nr)/k)/(nr/d2),c=fcrit(k,d2),p=fp(F,k,d2);mem.chow={scrR:r.scr,scr1:ra.scr,scr2:rb.scr,n,k,n1:rs};
         ch=`<div class="eq">F = <span class="frac"><span>(${fm(r.scr)} − ${fm(nr)}) / ${k}</span><span>${fm(nr)} / ${d2}</span></span> = ${fm(F)} &nbsp;&nbsp; F crítico 5 % (${k}, ${d2}) = ${fm(c)}</div>
         <div class="verdict ${p<.05?"rej":"acc"}">${p<.05?`Se rechaza H₀ (p = ${pf(p)}): hay evidencia de cambio estructural entre los dos periodos.`:`No se rechaza H₀ (p = ${pf(p)}): no hay evidencia de cambio estructural.`}</div>
         <div class="row"><button class="btn solid" type="button" data-act="calc">Ver el procedimiento en la calculadora →</button></div>`}}
@@ -550,141 +550,12 @@ function miniPlot({xs,series,band,xl,yl,H=240,zero}){const W=600,all=[...series.
   series.forEach(s=>{g+=path(s.y,s.c,2.4);xs.forEach((x,i)=>{if(isFinite(s.y[i]))g+=`<circle cx="${f.sx(x)}" cy="${f.sy(s.y[i])}" r="2.8" fill="var(${s.c})"/>`})});
   return`<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${yl}">${f.g}${g}</svg></div>`}
 
-// ---------- ejemplos de los ejercicios
-const CE_DATA={
- ej8:{t:"Ejercicio 8: guerra y paz",col:"Y X",by:"n1",n1:5,txt:"1 2\n2 4\n2 6\n4 10\n6 13\n1 2\n3 4\n3 6\n5 8\n6 10\n6 12\n7 14\n9 16\n9 18\n11 20",x0:10,g0:1},
- ej3:{t:"Ejercicio 3: educación urbana y rural",col:"Y X",by:"n1",n1:4,txt:"16 8\n18 13\n14 9\n18 12\n12 7\n10 3\n11 6\n14 10",x0:10.5,g0:0,nota:"Aquí el grupo 1 (primeras 4) es la zona urbana. El pronóstico del literal d es para la zona urbana: escoge el grupo 1."},
- ej5:{t:"Ejercicio 5: salarios por género",col:"W X",by:"n1",n1:9,txt:"3.14 13\n3.32 16\n3.61 30\n1.65 2\n2.64 8\n3.64 31\n2.46 10\n1.69 1\n1.91 6\n3.10 15\n1.98 4\n2.14 7\n2.61 13\n3.60 27\n3.38 19\n3.50 25\n3.65 20",x0:10,g0:0},
- d47:{t:"Dinardo 4.7: familias con aumento de ingreso",col:"Y X D",by:"dum",n1:0,txt:"70 80 0\n76 95 1\n91 105 0\n100 115 0\n105 125 1\n113 135 1\n122 145 0\n120 155 0\n146 165 1\n135 175 1\n147 185 1\n155 200 1",x0:150,g0:1}};
-
-SIMS.cambio=function(){
-  $("sim").innerHTML=`${seg("ce-m","Qué datos trae el ejercicio",[["datos","Datos (tabla)"],["mat","X′X, X′y, y′y"],["rss","Solo SCR o R²"],["coef","Modelo ya estimado"],["wlm","Wald, LR y LM"]],"datos")}
+SIMS.calc=function(){
+  $("sim").innerHTML=`<p class="hint" style="margin:0 0 8px">¿El ejercicio trae la tabla de datos? Entonces usa el <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button>. Aquí van los que traen resultados ya calculados.</p>
+  ${seg("ce-m","Qué te da el enunciado",[["mat","X′X, X′y, y′y"],["rss","SCR, s o R²"],["coef","Modelo con dummies estimado"],["wlm","Wald, LR y LM"],["otras","Otras pruebas"]],"mat")}
   <div class="calcf" style="margin-top:8px"><label>Nivel de significancia α<select id="ce-al"><option value="0.01">1 %</option><option value="0.05" selected>5 %</option><option value="0.1">10 %</option></select></label></div>
-  <div id="ce-datos"></div><div id="ce-mat" hidden></div><div id="ce-rss" hidden></div><div id="ce-coef" hidden></div><div id="ce-wlm" hidden></div>`;
+  <div id="ce-mat"></div><div id="ce-rss" hidden></div><div id="ce-coef" hidden></div><div id="ce-wlm" hidden></div><div id="ce-otras" hidden><p class="hint">F general con SCR, igualdad de varianzas (Goldfeld-Quandt), Breusch-Pagan con el R² de la regresión auxiliar y Durbin-Watson con d<sub>L</sub> y d<sub>U</sub> de la tabla.</p><div id="ws"></div></div>`;
   const al=()=>+$("ce-al").value;
-  // ======== modo datos
-  $("ce-datos").innerHTML=`<div class="stepc"><h4><span class="n">↑</span>Sube tu base (CSV, TXT, XLSX o XLS)</h4>
-  <div class="calcf"><label>Archivo<input type="file" id="cd-file" accept=".csv,.txt,.tsv,.xlsx,.xls"></label><label id="cd-shw" hidden>Hoja<select id="cd-sh"></select></label></div>
-  <div id="cd-cols"></div><p class="hint" style="margin:6px 0 0">La base se lee solo en tu navegador. Al escoger las columnas, los datos pasan a la tabla de abajo y el resolvedor hace todo el análisis.</p></div>
-  <details class="dp-lite"><summary><b>Punto 5 del Trabajo 1: dónde está cada literal</b></summary><ol class="steps">
-  <li>Sube el archivo, escoge <b>Y</b> (consumo) como dependiente y <b>X</b> (ingreso) como explicativa. La columna T (número del trimestre) no va.</li>
-  <li>Escribe el año y el trimestre del quiebre (por ejemplo 2008:1) y pulsa «Usar»: n₁ queda en los trimestres anteriores a la crisis.</li>
-  <li><b>a) Pronósticos de Chow:</b> paso 6, con las ecuaciones (8) y (9) y la tabla de errores de pronóstico.</li>
-  <li><b>b) Coeficientes recursivos y errores un paso adelante:</b> paso 7, con los gráficos y la CUSUM.</li>
-  <li><b>c) Cambio estructural antes y después de 2008:</b> pasos 2 y 3 (cada periodo y el modelo con dummies, con la verificación de las ecuaciones 27 y 28) y paso 4 (la F por todas las alternativas y dónde está el cambio).</li>
-  <li>El paso 8 trae el código R para el informe.</li>
-  <li><b>✍ Modo práctica:</b> el botón sobre los resultados oculta la solución y te pide cada cálculo de la prueba de Chow en orden; cada paso se desbloquea cuando aciertas los que necesita.</li></ol></details>
-  <p class="hint" style="margin:10px 0 4px">O usa un ejemplo de los ejercicios:</p><div class="chips pre" id="cd-pre">${Object.entries(CE_DATA).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div>
-  <p class="hint">Pega los datos tal como salen de Excel: una fila por observación, primero Y y luego las X (separadas por espacio o tabulación). Si los grupos vienen en una columna 0/1, ponla al final.</p>
-  <div class="calcf"><label style="grid-column:1/-1">Datos<textarea id="cd-txt" rows="8" class="ce-ta" spellcheck="false"></textarea></label>
-  <label>Cómo se definen los dos grupos<select id="cd-by"><option value="n1">Las primeras n₁ observaciones son el grupo 1</option><option value="dum">La última columna es la dummy (0 = grupo 1, 1 = grupo 2)</option></select></label>
-  ${num("cd-n1","n₁: observaciones del grupo 1 (o antes del quiebre)",5)}${num("cd-x0","Pronóstico: valor de X (primera regresora)",10)}<label>Pronóstico para el grupo<select id="cd-g0"><option value="0">Grupo 1 (D = 0)</option><option value="1">Grupo 2 (D = 1)</option></select></label></div>
-  <p class="hint" id="cd-nota"></p><div id="cd-out"></div>`;
-  // ---- carga de archivo
-  let CB=null,cwb=null;
-  const isIdxC=(n,v)=>/^(t|obs|id|n|trimestre|periodo|time|tiempo|indice|index)$/i.test(n)||(v.length>2&&v.every((x,i)=>x===v[0]+i));
-  const showCols=()=>{const C=CB.cols,gy=C.find(c=>/^(y|consumo|c|gasto)$/i.test(c))||C.find(c=>!isIdxC(c,CB.data[c]))||C[0],gx=C.filter(c=>c!==gy&&!isIdxC(c,CB.data[c])).slice(0,1);
-    $("cd-cols").innerHTML=`<p class="verdict ok">Base leída: ${CB.n} filas · columnas ${C.join(", ")}.</p>
-    <div class="calcf"><label>Variable dependiente Y<select id="cd-cy">${C.filter(c=>!isIdxC(c,CB.data[c])).map(c=>`<option ${c===gy?"selected":""}>${c}</option>`).join("")}</select></label></div>
-    <p class="lbl" style="margin:8px 0 4px">Variables explicativas X</p><div class="chips" id="cd-cx">${C.filter(c=>!isIdxC(c,CB.data[c])).map(c=>`<label class="chkl"><input type="checkbox" value="${c}" ${gx.includes(c)?"checked":""}> ${c}</label>`).join("")}</div>
-    ${C.some(c=>isIdxC(c,CB.data[c]))?`<p class="hint">No se muestran ${C.filter(c=>isIdxC(c,CB.data[c])).join(", ")}: ${C.filter(c=>isIdxC(c,CB.data[c])).length>1?"son índices":"es un índice"} de tiempo (1, 2, 3, …), no una variable del modelo.</p>`:""}
-    <div class="calcf">${num("cd-a0","Año de la primera fila",2005,1)}${num("cd-p0","Trimestre o mes de la primera fila",1,1)}${num("cd-a1","Año del quiebre",2008,1)}${num("cd-p1","Trimestre o mes del quiebre",1,1)}<label>Frecuencia<select id="cd-fr"><option value="4">Trimestral</option><option value="12">Mensual</option><option value="1">Anual</option></select></label></div>
-    <p class="hint" id="cd-fo"></p><div class="chips pre"><button type="button" class="btn solid" id="cd-use">Pasar estos datos al resolvedor</button></div>`;
-    const fo=()=>{const fr=+$("cd-fr").value,row=fr===1?V("cd-a1")-V("cd-a0")+1:(V("cd-a1")-V("cd-a0"))*fr+(V("cd-p1")-V("cd-p0"))+1;$("cd-fo").innerHTML=isFinite(row)?`El quiebre cae en la fila <b>${row}</b>: el grupo 1 son las filas 1 a ${row-1} (n₁ = ${row-1}) y el grupo 2 desde la fila ${row}.`:"";return row};
-    ["cd-a0","cd-p0","cd-a1","cd-p1","cd-fr"].forEach(i=>$(i).addEventListener("input",fo));fo();
-    $("cd-use").onclick=()=>{const y=$("cd-cy").value,xs=[...$("cd-cx").querySelectorAll("input:checked")].map(i=>i.value).filter(x=>x!==y);if(!xs.length){$("cd-fo").innerHTML=err("marca al menos una X.");return}
-      const ok=[...Array(CB.n).keys()].filter(i=>[y,...xs].every(c=>isFinite(CB.data[c][i])));
-      $("cd-txt").value=ok.map(i=>[y,...xs].map(c=>CB.data[c][i]).join(" ")).join("\n");$("cd-by").value="n1";
-      const row=fo();$("cd-n1").value=Math.max(1,row-1);const xm=ok.reduce((a,i)=>a+CB.data[xs[0]][i],0)/ok.length;$("cd-x0").value=+xm.toFixed(3);$("cd-g0").value="1";
-      $("cd-nota").textContent=`Datos de ${CB.name}: ${y} explicada por ${xs.join(", ")}, ${ok.length} filas${ok.length<CB.n?` (se omitieron ${CB.n-ok.length} con vacíos)`:""}. El pronóstico del paso 5 usa la media de ${xs[0]} en el grupo 2.`;runD();$("cd-out").scrollIntoView({behavior:"smooth",block:"start"})}};
-  const loadSheet=nm=>{CB=DL.fromRows(XLSX.utils.sheet_to_json(cwb.Sheets[nm],{header:1,raw:true,defval:""}));CB.name=$("cd-file").files[0].name+" · "+nm;showCols()};
-  $("cd-file").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;$("cd-cols").innerHTML=`<p class="hint">Leyendo ${esc(f.name)}…</p>`;$("cd-shw").hidden=true;
-    try{if(/\.(xlsx|xls)$/i.test(f.name)){await DL.loadXLSX();cwb=XLSX.read(await f.arrayBuffer(),{type:"array"});$("cd-sh").innerHTML=cwb.SheetNames.map(x=>`<option>${esc(x)}</option>`).join("");$("cd-shw").hidden=cwb.SheetNames.length<2;loadSheet(cwb.SheetNames[0])}
-      else{CB=DL.parseText(await f.text());CB.name=f.name;showCols()}}catch(e2){$("cd-cols").innerHTML=err(e2.message)}});
-  $("cd-sh").addEventListener("change",()=>{try{loadSheet($("cd-sh").value)}catch(e2){$("cd-cols").innerHTML=err(e2.message)}});
-  const setD=k=>{const d=CE_DATA[k];$("cd-txt").value=d.txt;$("cd-by").value=d.by;$("cd-n1").value=d.n1;$("cd-x0").value=d.x0;$("cd-g0").value=d.g0;$("cd-nota").textContent=d.nota||"";runD()};
-  const runD=()=>{const rows=$("cd-txt").value.trim().split(/\n+/).map(r=>r.trim().replace(/,/g,".").split(/[\s;]+/).map(Number)).filter(r=>r.length&&r.every(isFinite));
-    const out=$("cd-out");if(rows.length<5){out.innerHTML=err("Pega al menos 5 filas con números.");return}const w=rows[0].length;if(rows.some(r=>r.length!==w)){out.innerHTML=err("Todas las filas deben tener el mismo número de columnas.");return}
-    const byD=$("cd-by").value==="dum",n=rows.length,n1i=Math.round(V("cd-n1"));let D;
-    if(byD){if(w<3){out.innerHTML=err("Con la dummy en la última columna se necesitan al menos 3 columnas: Y, X y D.");return}D=rows.map(r=>r[w-1]);if(D.some(d=>d!==0&&d!==1)){out.innerHTML=err("La última columna debe tener solo 0 y 1.");return}}
-    else{if(!(n1i>=1&&n1i<n)){out.innerHTML=err(`n₁ debe estar entre 1 y ${n-1}.`);return}D=rows.map((_,i)=>i<n1i?0:1)}
-    const y=rows.map(r=>r[0]),xs=rows.map(r=>r.slice(1,byD?w-1:w)),m=xs[0].length,k=m+1;if(m<1){out.innerHTML=err("Falta al menos una columna X.");return}
-    const xn=m===1?["X"]:xs[0].map((_,j)=>"X"+(j+1)),names=["Intercepto",...xn];
-    const X=xs.map(r=>[1,...r]),i1=D.map((d,i)=>d===0?i:-1).filter(i=>i>=0),i2=D.map((d,i)=>d===1?i:-1).filter(i=>i>=0),n1=i1.length,n2=i2.length;
-    const R=CE.ols(X,y);if(!R){out.innerHTML=err("X′X no es invertible: revisa que las X no sean constantes ni colineales.");return}
-    const R1=n1>k?CE.ols(i1.map(i=>X[i]),i1.map(i=>y[i])):null,R2=n2>k?CE.ols(i2.map(i=>X[i]),i2.map(i=>y[i])):null;
-    const XU=X.map((r,i)=>[...r,...r.map(v=>v*D[i])]),RU=CE.ols(XU,y);
-    const a=al();let h="";
-    h+=stp(1,"Modelo restringido: una sola ecuación para toda la muestra",`<div class="eq">Y<sub>t</sub> = β₁ + ${xn.map((x,j)=>`β${SB(j+2)}${x}<sub>t</sub>`).join(" + ")} + μ<sub>t</sub>, &nbsp; t = 1, …, ${n}</div>${coefTab(names,R)}<div class="res">${tiles([["SCR_R (RSS restringido)",f4(R.rss)],["R²",f4(R.r2)],["n",String(n)],["k (con intercepto)",String(k)]])}</div>`);
-    const sep=(lab,Rg,ng)=>Rg?`<p><b>${lab}</b> (n = ${ng}): ${names.map((nm,j)=>`${nm} ${f4(Rg.b[j])}`).join(", ")} · SCR = <b>${f4(Rg.rss)}</b></p>`:`<p><b>${lab}</b> (n = ${ng}): no se puede estimar por separado porque n ≤ k. Usa la prueba de pronósticos de Chow.</p>`;
-    h+=stp(2,"Cada submuestra por separado",sep("Grupo 1",R1,n1)+sep("Grupo 2",R2,n2));
-    if(RU){const dn=names.map(nm=>"δ: D·"+nm).map((s,j)=>j===0?"δ₁: D (intercepto)":`δ${SB(j+1)}: D·${xn[j-1]}`),un=[...names.map((nm,j)=>j===0?"β₁: intercepto":`β${SB(j+1)}: ${xn[j-1]}`),...dn];
-      let ver="";if(R1&&R2){const ok=RU.b.slice(0,k).every((b,j)=>Math.abs(b-R1.b[j])<1e-6*Math.max(1,Math.abs(b)))&&RU.b.slice(k).every((d,j)=>Math.abs(RU.b[j]+d-R2.b[j])<1e-6*Math.max(1,Math.abs(R2.b[j])));
-        ver=`<p class="link"><b>Verificación (ecuaciones 27 y 28 del curso):</b> los β del modelo no restringido son los del grupo 1 (${ok?"coinciden":"revisa"}) y β + δ son los del grupo 2. Además SCR<sub>NR</sub> = ${f4(RU.rss)} = SCR₁ + SCR₂ = ${f4(R1.rss)} + ${f4(R2.rss)} = ${f4(R1.rss+R2.rss)}.</p>`}
-      h+=stp(3,"Modelo no restringido con dummies (todas las interacciones)",`<div class="eq">Y<sub>t</sub> = β₁ + δ₁D<sub>t</sub> + ${xn.map((x,j)=>`β${SB(j+2)}${x}<sub>t</sub> + δ${SB(j+2)}D<sub>t</sub>${x}<sub>t</sub>`).join(" + ")} + μ<sub>t</sub></div>${coefTab(un,RU)}<div class="res">${tiles([["SCR_NR",f4(RU.rss)],["gl = n − 2k",String(n-2*k)]])}</div>${ver}
-        <p>Ecuación del grupo 1 (D = 0): Ŷ = ${f4(RU.b[0])}${xn.map((x,j)=>` ${RU.b[j+1]<0?"−":"+"} ${f4(Math.abs(RU.b[j+1]))}${x}`).join("")}. Grupo 2 (D = 1): Ŷ = ${f4(RU.b[0]+RU.b[k])}${xn.map((x,j)=>{const v=RU.b[j+1]+RU.b[k+j+1];return` ${v<0?"−":"+"} ${f4(Math.abs(v))}${x}`}).join("")}.</p>`);
-      if(n-2*k>0){const q=k,F=((R.rss-RU.rss)/q)/(RU.rss/(n-2*k)),cr=CE.fcrit(q,n-2*k,a),p=CE.fp(F,q,n-2*k);
-        const Fr2=((RU.r2-R.r2)/q)/((1-RU.r2)/(n-2*k));
-        // Wald matricial: R = [0 | I]
-        const Rm=Array.from({length:k},(_,i)=>Array.from({length:2*k},(_,j)=>j===k+i?1:0)),Rb=CE.mv(Rm,RU.b),M=CE.inv(CE.mm(CE.mm(Rm,RU.I),CE.T(Rm))),Fw=Rb.reduce((s,v,i)=>s+v*M[i].reduce((t,mm,j)=>t+mm*Rb[j],0),0)/(q*RU.s2);
-        const sub=(idx,lab)=>{const Xr=XU.map(r=>r.filter((_,j)=>!idx.includes(j))),Rr=CE.ols(Xr,y),qq=idx.length,FF=((Rr.rss-RU.rss)/qq)/(RU.rss/(n-2*k)),cc=CE.fcrit(qq,n-2*k,a),pp=CE.fp(FF,qq,n-2*k);return`<tr><td>${lab}</td><td class="num">${qq}</td><td class="num">${f4(Rr.rss)}</td><td class="num">${f4(FF)}</td><td class="num">${f4(cc)}</td><td class="num">${p4(pp)}</td><td>${FF>cc?"Rechaza":"No rechaza"}</td></tr>`};
-        h+=stp(4,"Prueba de cambio estructural de Chow: todas las alternativas",`<div class="eq">H₀: δ₁ = ${xn.map((_,j)=>"δ"+SB(j+2)).join(" = ")} = 0 (la función es la misma en los dos grupos) &nbsp; vs &nbsp; H₁: algún δ ≠ 0</div>
-          <div class="tbl"><table><tr><th>Alternativa</th><th>Cálculo</th><th>F</th></tr>
-          <tr><td>a) Con las SCR</td><td>[(SCR_R − SCR_NR)/k] / [SCR_NR/(n − 2k)] = [(${f4(R.rss)} − ${f4(RU.rss)})/${k}] / [${f4(RU.rss)}/${n-2*k}]</td><td class="num">${f4(F)}</td></tr>
-          ${R1&&R2?`<tr><td>b) Con las submuestras</td><td>[(SCR_R − SCR₁ − SCR₂)/k] / [(SCR₁ + SCR₂)/(n − 2k)]</td><td class="num">${f4(((R.rss-R1.rss-R2.rss)/k)/((R1.rss+R2.rss)/(n-2*k)))}</td></tr>`:""}
-          <tr><td>c) Con los R² (misma Y)</td><td>[(R²_NR − R²_R)/k] / [(1 − R²_NR)/(n − 2k)] = [(${f4(RU.r2)} − ${f4(R.r2)})/${k}] / [(1 − ${f4(RU.r2)})/${n-2*k}]</td><td class="num">${f4(Fr2)}</td></tr>
-          <tr><td>d) Wald matricial: Rβ = r</td><td>(Rb − r)′[R(X′X)⁻¹R′]⁻¹(Rb − r) / (q·s²), con R = [0 | I<sub>${k}</sub>] y r = 0</td><td class="num">${f4(Fw)}</td></tr></table></div>
-          <div class="res">${tiles([["F",f4(F)],[`F crítico (${k}, ${n-2*k}) al ${a*100} %`,f4(cr)],["p-valor",p4(p)]])}</div>
-          ${veredicto(F,cr,p,a,["los datos no muestran cambio estructural; una sola función describe los dos grupos.","hay cambio estructural; la función no es la misma en los dos grupos."])}
-          <h4 class="subh">¿Dónde está el cambio?</h4><div class="tbl"><table><tr><th>H₀</th><th>q</th><th>SCR restringida</th><th>F</th><th>F crítico</th><th>p</th><th>Decisión</th></tr>${sub([k],"Solo cambia el intercepto (δ₁ = 0)")}${sub(xn.map((_,j)=>k+1+j),"Solo cambian las pendientes ("+xn.map((_,j)=>"δ"+SB(j+2)).join(" = ")+" = 0)")}</table></div>`);}
-      // pronóstico
-      const x0=V("cd-x0"),g0=+$("cd-g0").value;if(isFinite(x0)){const xr=[1,x0,...Array(m-1).fill(0)],c=[...xr,...xr.map(v=>v*g0)],yh=c.reduce((s,v,j)=>s+v*RU.b[j],0),q0=c.reduce((s,v,i)=>s+v*RU.I[i].reduce((t,mm,j)=>t+mm*c[j],0),0),tc=CE.tcrit(n-2*k,a);
-        if(n-2*k>0)h+=stp(5,`Pronóstico para X = ${fm(x0)} en el grupo ${g0+1}`,`<div class="eq al chain">Ŷ₀ = x₀′b = <b>${f4(yh)}</b><br>Var(Ŷ₀) = s²·x₀′(X′X)⁻¹x₀ = ${f4(RU.s2)}·${f4(q0)} &nbsp;·&nbsp; t(${n-2*k}) = ${f4(tc)}<br>IC para la media: ${f4(yh)} ± ${f4(tc)}·${f4(Math.sqrt(RU.s2*q0))} = [${f4(yh-tc*Math.sqrt(RU.s2*q0))}, ${f4(yh+tc*Math.sqrt(RU.s2*q0))}]<br>IC para un valor individual: ${f4(yh)} ± ${f4(tc)}·${f4(Math.sqrt(RU.s2*(1+q0)))} = [${f4(yh-tc*Math.sqrt(RU.s2*(1+q0)))}, ${f4(yh+tc*Math.sqrt(RU.s2*(1+q0)))}]</div>${m>1?`<p class="hint">Las demás regresoras se toman en 0; para otro punto usa el código R.</p>`:""}`)}}
-    // Chow de pronósticos y recursivos (solo si el grupo 1 es el comienzo de la muestra)
-    const ordered=D.every((d,i)=>i===0||d>=D[i-1]);
-    if(ordered&&n1>k){const X1=X.slice(0,n1),y1=y.slice(0,n1),X2=X.slice(n1),y2=y.slice(n1),Q=CE.ols(X1,y1),dd=y2.map((v,i)=>v-X2[i].reduce((s,a2,j)=>s+a2*Q.b[j],0));
-      const Fp=((R.rss-Q.rss)/n2)/(Q.rss/(n1-k)),Vd=X2.map((r,i)=>X2.map((r2,j)=>(i===j?1:0)+r.reduce((s,v,a2)=>s+v*Q.I[a2].reduce((t,mm,b2)=>t+mm*r2[b2],0),0))),Vi=CE.inv(Vd);
-      const Fd=Vi?dd.reduce((s,v,i)=>s+v*Vi[i].reduce((t,mm,j)=>t+mm*dd[j],0),0)/(n2*Q.s2):NaN,cr=CE.fcrit(n2,n1-k,a),p=CE.fp(Fp,n2,n1-k);
-      h+=stp(6,"Prueba de pronósticos de Chow (estima con el grupo 1 y predice el grupo 2)",`<div class="eq al chain">(8) F = [(SCR_R − SCR₁)/n₂] / [SCR₁/(n₁ − k)] = [(${f4(R.rss)} − ${f4(Q.rss)})/${n2}] / [${f4(Q.rss)}/${n1-k}] = <b>${f4(Fp)}</b><br>(9) F = d′[I + X₂(X₁′X₁)⁻¹X₂′]⁻¹d / (n₂·s₁²) = <b>${f4(Fd)}</b> &nbsp; con d = y₂ − X₂b₁</div>
-        <div class="tbl"><table><tr><th>t</th><th>Y observado</th><th>Ŷ con b₁</th><th>Error de pronóstico d</th></tr>${dd.slice(0,15).map((v,i)=>`<tr><td>${n1+i+1}</td><td class="num">${f4(y2[i])}</td><td class="num">${f4(y2[i]-v)}</td><td class="num">${f4(v)}</td></tr>`).join("")}</table></div>
-        <div class="res">${tiles([["F",f4(Fp)],[`F crítico (${n2}, ${n1-k})`,f4(cr)],["p-valor",p4(p)]])}</div>${veredicto(Fp,cr,p,a,["los errores de pronóstico son compatibles con el modelo del grupo 1: no hay evidencia de cambio.","el modelo estimado antes del quiebre no predice bien después: hay evidencia de cambio estructural."])}`)}
-    if(ordered&&n>k+2){// residuos recursivos
-      const ts=[],w=[],bs=[],bse=[],pe=[],peb=[];for(let t=k;t<n;t++){const Rt=CE.ols(X.slice(0,t),y.slice(0,t));if(!Rt)continue;const xt=X[t],f=y[t]-xt.reduce((s,v,j)=>s+v*Rt.b[j],0),h2=1+xt.reduce((s,v,i)=>s+v*Rt.I[i].reduce((u,mm,j)=>u+mm*xt[j],0),0);
-        ts.push(t+1);w.push(f/Math.sqrt(h2));pe.push(f);peb.push(t>k?2*Math.sqrt(Rt.s2*h2):NaN);const Rt1=CE.ols(X.slice(0,t+1),y.slice(0,t+1));bs.push(Rt1?Rt1.b[1]:NaN);bse.push(Rt1&&t+1>k?2*Rt1.se[1]:NaN)}
-      const sw=Math.sqrt(w.reduce((s,v)=>s+v*v,0)/(w.length-1)),mw=w.reduce((s,v)=>s+v,0)/w.length,sd=Math.sqrt(w.reduce((s,v)=>s+(v-mw)**2,0)/(w.length-1)),cus=[];let acc=0;w.forEach(v=>{acc+=v/sd;cus.push(acc)});
-      const T=w.length,bandU=ts.map((_,i)=>0.948*Math.sqrt(T)*(1+2*(i+1)/T)),bandL=bandU.map(v=>-v),out1=cus.some((c,i)=>Math.abs(c)>bandU[i]),out2=pe.some((v,i)=>isFinite(peb[i])&&Math.abs(v)>peb[i]);
-      const css=[];let a2=0;const S=w.reduce((s,v)=>s+v*v,0);w.forEach(v=>{a2+=v*v;css.push(a2/S)});
-      h+=stp(7,"Coeficientes recursivos, errores de predicción un paso adelante y CUSUM",`<p>Se estima el modelo con las primeras t observaciones (t = k, k + 1, …) y se predice la siguiente. Si la estructura es estable, los coeficientes recursivos se mantienen dentro de su banda de ±2 errores estándar y los errores de predicción dentro de ±2 desviaciones.</p>
-        <h4 class="subh">Pendiente recursiva b₂(t) con ±2 e.e.</h4>${miniPlot({xs:ts,series:[{y:bs,c:"--line"}],band:[bs.map((b,i)=>b+bse[i]),bs.map((b,i)=>b-bse[i])],xl:"t",yl:"b₂"})}
-        <h4 class="subh">Errores de predicción un paso adelante con ±2 desviaciones</h4>${miniPlot({xs:ts,series:[{y:pe,c:"--line"}],band:[peb,peb.map(v=>-v)],xl:"t",yl:"error",zero:1})}
-        <p>${out2?"Algún error de predicción se sale de la banda: el modelo con los datos anteriores no anticipa esa observación, señal de cambio.":"Todos los errores de predicción quedan dentro de la banda."}</p>
-        <h4 class="subh">CUSUM de los residuos recursivos (bandas al 5 %)</h4>${miniPlot({xs:ts,series:[{y:cus,c:"--exam"}],band:[bandU,bandL],xl:"t",yl:"CUSUM",zero:1})}
-        <p>${out1?"La CUSUM cruza las bandas: hay evidencia de inestabilidad en los coeficientes.":"La CUSUM no cruza las bandas: no hay evidencia de inestabilidad con esta prueba."}</p><p class="hint">Con pocas observaciones estas pruebas tienen poco poder. En R: <code>rr &lt;- recresid(m)</code>, <code>plot(efp(y ~ x, type = "Rec-CUSUM"))</code> (paquete strucchange).</p>`)}
-    // código R
-    const cn=["y",...xn.map(x=>x.toLowerCase())],xs2=xn.map(x=>x.toLowerCase());
-    h+=stp(8,"El mismo ejercicio en R",`<pre class="ce-code">datos &lt;- read.table(text = "\n${rows.map(r=>r.join(" ")).join("\n")}", col.names = c(${[...cn,...(byD?["D"]:[])].map(c=>`"${c}"`).join(", ")}))
-${byD?"":`datos$D &lt;- c(rep(0, ${n1}), rep(1, ${n2}))   # 0 = grupo 1, 1 = grupo 2\n`}k &lt;- ${k}; n &lt;- nrow(datos)
-mR  &lt;- lm(y ~ ${xs2.join(" + ")}, data = datos)              # restringido
-mNR &lt;- lm(y ~ (${xs2.join(" + ")}) * D, data = datos)        # no restringido (dummies)
-m1  &lt;- lm(y ~ ${xs2.join(" + ")}, data = subset(datos, D == 0))
-m2  &lt;- lm(y ~ ${xs2.join(" + ")}, data = subset(datos, D == 1))
-RSS &lt;- function(m) sum(resid(m)^2)
-c(RSS(mNR), RSS(m1) + RSS(m2))                 # deben ser iguales
-F &lt;- ((RSS(mR) - RSS(mNR)) / k) / (RSS(mNR) / (n - 2 * k))
-c(F = F, p = pf(F, k, n - 2 * k, lower.tail = FALSE))
-anova(mR, mNR)                                  # el mismo F
-# Chow de pronósticos (estima con el grupo 1)
-n1 &lt;- sum(datos$D == 0); n2 &lt;- n - n1
-Fp &lt;- ((RSS(mR) - RSS(m1)) / n2) / (RSS(m1) / (n1 - k))
-c(Fp = Fp, p = pf(Fp, n2, n1 - k, lower.tail = FALSE))
-# recursivos (paquete strucchange)
-library(strucchange)
-plot(efp(y ~ ${xs2.join(" + ")}, data = datos, type = "Rec-CUSUM"))
-sctest(y ~ ${xs2.join(" + ")}, data = datos, type = "Chow", point = n1)</pre>`);
-    if(ordered&&n1>k&&n2>k){const sol=RC.wrap(out,h,"calcula tú la prueba de Chow",box=>RC.chow(box,X,y,n1,names));if(typeof prettyCode==="function")prettyCode(sol)}
-    else{out.innerHTML=h;if(typeof prettyCode==="function")prettyCode(out)}};
-  $("cd-pre").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setD(b.dataset.k)});
-  ["cd-txt","cd-by","cd-n1","cd-x0","cd-g0"].forEach(id=>$(id).addEventListener("input",runD));
   // ======== modo matrices
   $("ce-mat").innerHTML=`<div class="chips pre" id="cm-pre"><button type="button" data-k="d41">Dinardo 4.1 (una observación nueva)</button><button type="button" data-k="d49">Dinardo 4.9 (urbano y rural)</button></div>
   <p class="hint">Escribe las matrices por filas separadas con punto y coma: «20 10; 10 30».</p>
@@ -757,9 +628,18 @@ sctest(y ~ ${xs2.join(" + ")}, data = datos, type = "Chow", point = n1)</pre>`);
       <p>Se cumple la desigualdad W ≥ LR ≥ LM (${f4(W)} ≥ ${f4(LR)} ≥ ${f4(LM)}): con muestras pequeñas pueden llevar a decisiones distintas, y el Wald es el que más rechaza.</p>`};
   $("cw-pre").onclick=()=>{[["cw-n",29],["cw-rr",0.364],["cw-ru",0.336],["cw-q",1],["cw-k",5]].forEach(([i,v])=>$(i).value=v);runW()};
   $("ce-wlm").querySelectorAll("input").forEach(el=>el.addEventListener("input",runW));
-  bindSeg("ce-m",v=>{["datos","mat","rss","coef","wlm"].forEach(k=>$("ce-"+k).hidden=k!==v)});
-  $("ce-al").addEventListener("input",()=>{runD();runM();runR();runC();runW()});
-  setD("ej8");setM("d41");setR("e6");runC();runW()};
+  const MODES=["mat","rss","coef","wlm","otras"],mode=v=>{MODES.forEach(k=>$("ce-"+k).hidden=k!==v);$("ce-m").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v))};
+  bindSeg("ce-m",mode);
+  $("ce-al").addEventListener("input",()=>{runM();runR();runC();runW()});
+  // Otras pruebas: la antigua Calculadora de pruebas, sin su pestaña de Chow (Chow está en «SCR, s o R²»)
+  const pf0=window.CALC_PRE;window.CALC_PRE=null;
+  try{SIMS.wsCalc();const cb=$("ws").querySelector('[data-ct="chow"]');if(cb){cb.remove();const f=$("ws").querySelector('[data-ct="f"]');if(f)f.click()}}catch(e){$("ws").innerHTML=err(e.message)}
+  setM("d41");setR("e6");runC();runW();
+  // Llegadas con datos: desde un punto de un taller (TOOL_PRE = "modo:ejemplo") o desde las matrices paso a paso
+  const pre=window.TOOL_PRE;window.TOOL_PRE=null;
+  if(pf0&&isFinite(pf0.scrR)){mode("rss");const n1=pf0.n1||Math.floor(pf0.n/2);$("cr-sub").value=`${n1}, ${+pf0.scr1.toFixed(6)}\n${pf0.n-n1}, ${+pf0.scr2.toFixed(6)}`;$("cr-r").value=String(+pf0.scrR.toFixed(6));$("cr-k").value=pf0.k;runR()}
+  else if(pre&&/^\w+:\w+$/.test(pre)){const[m,k]=pre.split(":");if(MODES.includes(m)){mode(m);
+    if(m==="mat"&&PM[k])setM(k);if(m==="rss"&&PR[k])setR(k);if(m==="coef"&&PC[k]){PC[k].forEach((v,i)=>$(ids[i]).value=v);runC()}if(m==="wlm")$("cw-pre").click()}}};
 
 // ===================== LABORATORIO DE DATOS: subir una base, crear variables, estimar y probar =====================
 // Todo se calcula en el navegador; los datos no salen del equipo. Usa CE (ejercicios_labs.js) y estadistica.js.
@@ -857,14 +737,16 @@ DL.newVar=function(name,expr){const D=DL.data;name=DL.clean(name);if(!name)throw
   if(v.every(x=>!isFinite(x)))throw new Error("la variable nueva no tiene ningún valor válido (¿logaritmo de valores no positivos?).");
   if(!D.data[name])D.cols.push(name);D.data[name]=v;return name};
 // ---------- ejemplos
-DL.EJ={consumo:{t:"Consumo e ingreso (guerra y paz, ej. 8)",txt:"t\tY\tX\tpaz\n1\t1\t2\t0\n2\t2\t4\t0\n3\t2\t6\t0\n4\t4\t10\t0\n5\t6\t13\t0\n6\t1\t2\t1\n7\t3\t4\t1\n8\t3\t6\t1\n9\t5\t8\t1\n10\t6\t10\t1\n11\t6\t12\t1\n12\t7\t14\t1\n13\t9\t16\t1\n14\t9\t18\t1\n15\t11\t20\t1"},
- salarios:{t:"Salarios y experiencia por género (ej. 5)",txt:"sueldo\texper\tmujer\n3.14\t13\t0\n3.32\t16\t0\n3.61\t30\t0\n1.65\t2\t0\n2.64\t8\t0\n3.64\t31\t0\n2.46\t10\t0\n1.69\t1\t0\n1.91\t6\t0\n3.10\t15\t1\n1.98\t4\t1\n2.14\t7\t1\n2.61\t13\t1\n3.60\t27\t1\n3.38\t19\t1\n3.50\t25\t1\n3.65\t20\t1"},
- familias:{t:"Familias: consumo e ingreso (Dinardo 4.7)",txt:"Y,X,aumento\n70,80,0\n76,95,1\n91,105,0\n100,115,0\n105,125,1\n113,135,1\n122,145,0\n120,155,0\n146,165,1\n135,175,1\n147,185,1\n155,200,1"}};
+DL.EJ={consumo:{t:"Ej. propuestos 3, punto 8: guerra y paz",txt:"t\tY\tX\tpaz\n1\t1\t2\t0\n2\t2\t4\t0\n3\t2\t6\t0\n4\t4\t10\t0\n5\t6\t13\t0\n6\t1\t2\t1\n7\t3\t4\t1\n8\t3\t6\t1\n9\t5\t8\t1\n10\t6\t10\t1\n11\t6\t12\t1\n12\t7\t14\t1\n13\t9\t16\t1\n14\t9\t18\t1\n15\t11\t20\t1"},
+ salarios:{t:"Ej. propuestos 3, punto 5: salarios por género",txt:"sueldo\texper\tmujer\n3.14\t13\t0\n3.32\t16\t0\n3.61\t30\t0\n1.65\t2\t0\n2.64\t8\t0\n3.64\t31\t0\n2.46\t10\t0\n1.69\t1\t0\n1.91\t6\t0\n3.10\t15\t1\n1.98\t4\t1\n2.14\t7\t1\n2.61\t13\t1\n3.60\t27\t1\n3.38\t19\t1\n3.50\t25\t1\n3.65\t20\t1"},
+ educacion:{t:"Ej. propuestos 3, punto 3: educación urbana y rural",txt:"anos\trenta\turbana\n16\t8\t1\n18\t13\t1\n14\t9\t1\n18\t12\t1\n12\t7\t0\n10\t3\t0\n11\t6\t0\n14\t10\t0"},
+ lectura:{t:"Ej. propuestos 3, punto 7c: horas de lectura",txt:"horas\tE2\tE3\tS1\n8\t0\t0\t1\n10\t0\t0\t1\n12\t0\t0\t1\n12\t1\t0\t1\n14\t1\t0\t1\n20\t0\t1\t1\n5\t0\t0\t0\n6\t0\t0\t0\n10\t1\t0\t0\n20\t0\t1\t0"},
+ familias:{t:"Dinardo 4.7: familias con aumento de ingreso",txt:"Y,X,aumento\n70,80,0\n76,95,1\n91,105,0\n100,115,0\n105,125,1\n113,135,1\n122,145,0\n120,155,0\n146,165,1\n135,175,1\n147,185,1\n155,200,1"}};
 
 SIMS.datos=function(){
   $("sim").innerHTML=`<div class="dl-load"><p class="hint">Sube un archivo <b>.csv</b>, <b>.txt</b>, <b>.xlsx</b> o <b>.xls</b>, o pega la tabla copiada de Excel con los nombres de las variables en la primera fila. Los datos se procesan solo en tu navegador: no se suben a ningún servidor.</p>
   <div class="calcf"><label>Archivo<input type="file" id="dl-file" accept=".csv,.txt,.tsv,.xlsx,.xls"></label><label id="dl-sheetw" hidden>Hoja<select id="dl-sheet"></select></label></div>
-  <details class="dp-lite"><summary>Pegar datos o usar un ejemplo</summary><div class="chips pre" id="dl-ej" style="margin:8px 0">${Object.entries(DL.EJ).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div><textarea id="dl-paste" rows="6" class="ce-ta" spellcheck="false" placeholder="Y&#9;X1&#9;X2&#10;10&#9;3&#9;1&#10;…"></textarea><div class="chips pre" style="margin-top:6px"><button type="button" class="btn" id="dl-go">Cargar lo pegado</button></div></details>
+  <details class="dp-lite"><summary>Pegar datos o cargar una base de los talleres</summary><div class="chips pre" id="dl-ej" style="margin:8px 0">${Object.entries(DL.EJ).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div><textarea id="dl-paste" rows="6" class="ce-ta" spellcheck="false" placeholder="Y&#9;X1&#9;X2&#10;10&#9;3&#9;1&#10;…"></textarea><div class="chips pre" style="margin-top:6px"><button type="button" class="btn" id="dl-go">Cargar lo pegado</button></div></details>
   <div id="dl-msg"></div></div><div id="dl-main"></div>`;
   let wb=null;
   const msg=h=>$("dl-msg").innerHTML=h;
@@ -875,7 +757,9 @@ SIMS.datos=function(){
       else setData(DL.parseText(await f.text()),f.name)}catch(err2){msg(err(err2.message))}});
   $("dl-sheet").addEventListener("change",()=>{try{readSheet($("dl-sheet").value)}catch(e2){msg(err(e2.message))}});
   $("dl-go").onclick=()=>{try{setData(DL.parseText($("dl-paste").value),"datos pegados")}catch(e2){msg(err(e2.message))}};
-  $("dl-ej").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$("dl-paste").value=DL.EJ[b.dataset.k].txt;try{setData(DL.parseText(DL.EJ[b.dataset.k].txt),DL.EJ[b.dataset.k].t)}catch(e2){msg(err(e2.message))}});
+  const loadEJ=k=>{$("dl-paste").value=DL.EJ[k].txt;try{setData(DL.parseText(DL.EJ[k].txt),DL.EJ[k].t)}catch(e2){msg(err(e2.message))}};
+  $("dl-ej").addEventListener("click",e=>{const b=e.target.closest("button");if(b)loadEJ(b.dataset.k)});
+  setTimeout(()=>{const pre=window.TOOL_PRE;window.TOOL_PRE=null;if(pre&&DL.EJ[pre])loadEJ(pre)},0);
 
   function main(){const B=DL.data,C=B.cols;
     $("dl-main").innerHTML=`${DL.GUIA}${seg("dl-tab","Sección",[["base","1. La base"],["var","2. Crear variables"],["mod","3. Estimar"],["prue","4. Pruebas"],["dem","5. Demostraciones"],["graf","6. Gráficos"],["r","7. Código R"]],"base")}
@@ -925,9 +809,10 @@ SIMS.datos=function(){
           try{DL.model=DL.fit(y,xs,{cte:$("dm-c").checked,rob:$("dm-r").checked,from:V("dm-a"),to:V("dm-b")});{const M2=DL.model;RC.wrap($("dm-out"),DL.out(M2)+`<p class="hint">Siguiente paso: <b>4. Pruebas</b> para contrastar hipótesis sobre este modelo.</p>`,"calcula tú esta estimación",box=>RC.mco(box,M2))}}catch(e2){DL.model=null;$("dm-out").innerHTML=err(e2.message)}};
         $("dm-go").onclick=go;if(M)$("dm-out").innerHTML=DL.out(M)}
       if(v==="prue"){const M=DL.model;if(!M){$("dl-prue").innerHTML=needModel();return}
-        $("dl-prue").innerHTML=`${seg("dp-t","Prueba",[["f","F de restricciones"],["chow","Cambio estructural"],["rec","Recursivos y CUSUM"],["het","Heterocedasticidad"],["aut","Autocorrelación"],["norm","Normalidad"],["esp","Especificación"]],"f")}<div id="dp-out"></div>`;
+        $("dl-prue").innerHTML=`${seg("dp-t","Prueba",[["f","F de restricciones"],["chow","Cambio estructural"],["rec","Recursivos y CUSUM"],["het","Heterocedasticidad"],["aut","Autocorrelación"],["norm","Normalidad"],["esp","Especificación"],["pron","Pronóstico"]],"f")}<div id="dp-out"></div>`;
         const show=t=>{$("dp-out").innerHTML=DL.test(M,t);if(t==="f"){const run=()=>{const sel2=[...$("dpf-c").querySelectorAll("input:checked")].map(i=>+i.value);$("dpf-o").innerHTML=DL.ftest(M,sel2)};$("dpf-c").addEventListener("change",run);run()}
-          if(t==="chow"){const run=()=>{const sN=Math.round(V("dpc-n")),html=DL.chow(M,sN),cm=DL._chowM;if(cm&&cm.n1)RC.wrap($("dpc-o"),html,"calcula tú la prueba de Chow",box=>RC.chow(box,cm.M.X,cm.M.y,cm.n1,cm.M.names));else $("dpc-o").innerHTML=html};$("dpc-n").addEventListener("input",run);run()}
+          if(t==="pron"){const run=()=>{$("dpp-o").innerHTML=DL.pron(M)};$("dpp-x").addEventListener("input",run);run()}
+          if(t==="chow"){const run=()=>{const by=$("dpc-by").value;$("dpc-nw").hidden=by!=="";const sN=by?{dum:by}:Math.round(V("dpc-n")),html=DL.chow(M,sN),cm=DL._chowM;if(cm&&cm.n1)RC.wrap($("dpc-o"),html,"calcula tú la prueba de Chow",box=>RC.chow(box,cm.M.X,cm.M.y,cm.n1,cm.M.names));else $("dpc-o").innerHTML=html};$("dpc-n").addEventListener("input",run);$("dpc-by").addEventListener("change",run);run()}
           if(t==="rec"){const run=()=>{$("dpr-o").innerHTML=DL.recur(M,+$("dpr-c").value)};$("dpr-c").addEventListener("change",run);run()}};
         bindSeg("dp-t",show);show("f")}
       if(v==="dem"){$("dl-dem").innerHTML=DL.model?DL.demo(DL.model):needModel();if(DL.model){const run=()=>{$("dd-fwl").innerHTML=DL.fwl(DL.model,+$("dd-x").value)};$("dd-x").addEventListener("change",run);run()}}
@@ -969,7 +854,9 @@ DL.out=function(M){const se=M.opt.rob?M.seR:M.se,gl=M.n-M.k,tc=CE.tcrit(gl,0.05)
 DL.test=function(M,t){const ix=M.names.map((n,j)=>[n,j]);
   if(t==="f")return`<p>Marca los coeficientes que quieres probar conjuntamente iguales a cero (H₀: todos = 0).</p><div class="chips" id="dpf-c">${ix.map(([n,j])=>`<label class="chkl"><input type="checkbox" value="${j}" ${n!=="(Intercepto)"?"checked":""}> ${n}</label>`).join("")}</div><div id="dpf-o"></div>`;
   if(t==="rec")return`<p>Se estima el modelo con las primeras t observaciones, para t = k + 1, …, n, y se predice la siguiente. Si la estructura es estable, los coeficientes se mantienen dentro de su banda y los errores de predicción dentro de ±2 desviaciones.</p><div class="calcf"><label>Coeficiente a seguir<select id="dpr-c">${M.names.map((nm,j)=>`<option value="${j}" ${j===(M.opt.cte&&M.k>1?1:0)?"selected":""}>${nm}</option>`).join("")}</select></label></div><div id="dpr-o"></div>`;
-  if(t==="chow")return`<div class="calcf">${num("dpc-n","El segundo periodo empieza en la fila (observación del modelo)",Math.floor(M.n/2)+1,1)}</div><div id="dpc-o"></div>`;
+  if(t==="chow"){const dums=DL.data.cols.filter(c=>DL.isDummy(c)&&!DL.isBreakVar(c));
+    return`<div class="calcf"><label>Cómo se separan los dos periodos o grupos<select id="dpc-by"><option value="">Por fila: un periodo antes y otro después</option>${dums.map(c=>`<option value="${c}">Por la variable ${c} (0 = grupo 1, 1 = grupo 2)</option>`).join("")}</select></label><span id="dpc-nw">${num("dpc-n","El segundo periodo empieza en la fila (observación del modelo)",Math.floor(M.n/2)+1,1)}</span></div><div id="dpc-o"></div>`}
+  if(t==="pron")return`<p>Valor esperado de ${M.yName} para unos valores dados de las X, con intervalos del 95 %. Para la media: ŷ₀ ± t·s·√(x₀′(X′X)⁻¹x₀). Para una observación individual: ŷ₀ ± t·s·√(1 + x₀′(X′X)⁻¹x₀). Los valores iniciales son las medias de la muestra.</p><div class="calcf" id="dpp-x">${M.names.map((nm,j)=>nm==="(Intercepto)"?"":num("dpp-"+j,nm,+(M.X.reduce((a,r)=>a+r[j],0)/M.n).toFixed(4))).join("")}</div><div id="dpp-o"></div>`;
   const n=M.n,k=M.k,e=M.e,a=0.05;
   if(t==="het"){const e2=e.map(v=>v*v),Z=M.X,Rb=CE.ols(Z,e2),bp=n*Rb.r2,qb=k-(M.opt.cte?1:0);
     const xs=M.X.map(r=>r.slice(M.opt.cte?1:0)),m=xs[0].length;let wh="";if(m>=1&&m<=4){const pairs=[];for(let i=0;i<m;i++)for(let j=i;j<m;j++){const col=xs.map(r=>r[i]*r[j]);if(!(i===j&&xs.every((r,q)=>Math.abs(col[q]-r[i])<1e-12)))pairs.push(col)}const W2=xs.map((r,q)=>[1,...r,...pairs.map(c=>c[q])]),Rw=CE.ols(W2,e2);if(Rw){const qw=W2[0].length-1,lm=n*Rw.r2;wh=`<tr><td>White (niveles, cuadrados y productos cruzados)</td><td class="num">${f4(lm)}</td><td class="num">χ²(${qw}) = ${f4(CE.ccrit(qw,a))}</td><td class="num">${p4(1-chi2cdf(lm,qw))}</td></tr>`}}
@@ -990,10 +877,17 @@ DL.ftest=function(M,sel){if(!sel.length)return`<p class="hint">Marca al menos un
   <div class="res">${tiles([["F",f4(F)],[`F crítico (${q}, ${n-k})`,f4(cr)],["p-valor",p4(p)]])}</div>${veredicto(F,cr,p,a,["las variables marcadas no son conjuntamente significativas.","al menos una de las variables marcadas es significativa."])}
   <p>Asintóticas: W = ${f4(W)}, LR = ${f4(LR)}, LM = ${f4(LM)} frente a χ²(${q}) = ${f4(CE.ccrit(q,a))}.</p>`};
 DL.isBreakVar=x=>{const e=DL.expr(x)||"";if(/^obs\s*>=\s*\d+$/.test(e))return true;const m=e.match(/^([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)$/);return!!(m&&/^obs\s*>=\s*\d+$/.test(DL.expr(m[1])||""))};
-DL.chow=function(M0,s){let M=M0,note="";
-  if(M0.opt.cte&&s>1&&s<=M0.n){const n1=s-1,drop=M0.xNames.filter((x,q)=>{const j=M0.names.indexOf(x),c1=M0.X.slice(0,n1).map(r=>r[j]),c2=M0.X.slice(n1).map(r=>r[j]),cst=v=>v.length>0&&v.every(z=>Math.abs(z-v[0])<1e-12);return DL.isBreakVar(x)||cst(c1)||cst(c2)});
+DL.pron=function(M){const x0=M.names.map((nm,j)=>nm==="(Intercepto)"?1:V("dpp-"+j));if(x0.some(v=>!isFinite(v)))return err("escribe un valor para cada X.");
+  const yh=x0.reduce((a,v,j)=>a+v*M.b[j],0),h=x0.reduce((a,v,i)=>a+v*M.I[i].reduce((u,mm,j)=>u+mm*x0[j],0),0),gl=M.n-M.k,tc=CE.tcrit(gl,0.05),sm=Math.sqrt(M.s2*h),si=Math.sqrt(M.s2*(1+h));
+  return`<div class="eq al chain">ŷ₀ = x₀′b = ${M.names.map((nm,j)=>`${f4(M.b[j])}·${fm(x0[j])}`).join(" + ")} = <b>${f4(yh)}</b><br>x₀′(X′X)⁻¹x₀ = ${f4(h)} &nbsp; s² = ${f4(M.s2)} &nbsp; t<sub>0,025</sub>(${gl}) = ${f4(tc)}<br>ee(media) = √(s²·${f4(h)}) = ${f4(sm)} &nbsp; ee(individual) = √(s²·(1 + ${f4(h)})) = ${f4(si)}</div>
+  <div class="tbl"><table><tr><th>Intervalo del 95 %</th><th class="num">Inferior</th><th class="num">Superior</th></tr><tr><td>Para la media E(${M.yName} | x₀)</td><td class="num">${f4(yh-tc*sm)}</td><td class="num">${f4(yh+tc*sm)}</td></tr><tr><td>Para una observación individual</td><td class="num">${f4(yh-tc*si)}</td><td class="num">${f4(yh+tc*si)}</td></tr></table></div>${M.opt.rob?'<p class="hint">Los intervalos usan s²(X′X)⁻¹, la fórmula del curso, aunque marcaste errores robustos.</p>':""}`};
+DL.chow=function(M0,s){let M=M0,note="",col=null,gname="";
+  if(s&&typeof s==="object"){gname=s.dum;col=DL.data.data[gname];if(!col)return err(`no encuentro la variable ${gname}.`);const g=M0.rows.map(r=>col[r]);if(g.some(v=>v!==0&&v!==1))return err(`${gname} debe valer 0 o 1 en todas las observaciones del modelo.`);s=g.filter(v=>v===0).length+1}
+  const P=Mx=>{if(!col)return Mx;const g=Mx.rows.map(r=>col[r]),idx=g.map((_,i)=>i).sort((a,b)=>g[a]-g[b]||a-b),pk=v=>v&&idx.map(i=>v[i]);return Object.assign({},Mx,{X:pk(Mx.X),y:pk(Mx.y),rows:pk(Mx.rows),e:pk(Mx.e),yh:pk(Mx.yh)})};
+  M=P(M0);const MP=M;
+  if(M0.opt.cte&&s>1&&s<=M0.n){const n1=s-1,drop=M0.xNames.filter((x,q)=>{const j=M0.names.indexOf(x),c1=MP.X.slice(0,n1).map(r=>r[j]),c2=MP.X.slice(n1).map(r=>r[j]),cst=v=>v.length>0&&v.every(z=>Math.abs(z-v[0])<1e-12);return DL.isBreakVar(x)||cst(c1)||cst(c2)});
     if(drop.length){const keep=M0.xNames.filter(x=>!drop.includes(x));if(!keep.length)return err(`al quitar ${drop.join(", ")} no queda ninguna X para la prueba.`);
-      try{M=DL.fit(M0.yName,keep,M0.opt)}catch(e){return err(e.message)}
+      try{M=P(DL.fit(M0.yName,keep,M0.opt))}catch(e){return err(e.message)}
       note=`<p class="warn"><b>Se quitó ${drop.join(" y ")} para esta prueba.</b> ${drop.length>1?"Son variables":"Es una variable"} constante${drop.length>1?"s":""} dentro de alguno de los dos periodos (como la dummy de quiebre y su interacción, que valen 0 antes del quiebre). La prueba de Chow parte del modelo sin dummies (${M.yName} ~ ${keep.join(" + ")}) y ella misma construye el modelo con dummies en el paso 2. Tu modelo con ${drop.join(" y ")} es justamente el no restringido: su F de restricciones sobre ${drop.join(" y ")} da el mismo resultado que el paso 3.</p>`}}
   DL._chowM=null;const n=M.n,k=M.k,a=0.05;if(!(s>k+1&&s<=n-k)){return err(`el quiebre debe dejar más de ${k} observaciones en cada periodo (entre ${k+2} y ${n-k}).`)}
   if(!M.opt.cte)return err("para la prueba de Chow estima el modelo con intercepto.");
@@ -1006,9 +900,9 @@ DL.chow=function(M0,s){let M=M0,note="";
   const Vd=X2.map((r,i)=>X2.map((r2,j)=>(i===j?1:0)+r.reduce((s2,v,q)=>s2+v*R1.I[q].reduce((t,mm,w)=>t+mm*r2[w],0),0))),Vi=CE.inv(Vd),Fd=Vi?dd.reduce((s2,v,i)=>s2+v*Vi[i].reduce((t,mm,j)=>t+mm*dd[j],0),0)/(n2*R1.s2):NaN;
   const ok=RU&&RU.b.slice(0,k).every((b,j)=>Math.abs(b-R1.b[j])<1e-6*Math.max(1,Math.abs(b)))&&RU.b.slice(k).every((d,j)=>Math.abs(RU.b[j]+d-R2.b[j])<1e-6*Math.max(1,Math.abs(R2.b[j])));
   const sub=(idx,lab)=>{const Xr=XU.map(r=>r.filter((_,j)=>!idx.includes(j))),Rr=CE.ols(Xr,M.y);if(!Rr)return"";const qq=idx.length,FF=((Rr.rss-RU.rss)/qq)/(RU.rss/(n-2*k)),cc=CE.fcrit(qq,n-2*k,a),pq=CE.fp(FF,qq,n-2*k);return`<tr><td>${lab}</td><td class="num">${qq}</td><td class="num">${f4(FF)}</td><td class="num">${f4(cc)}</td><td class="num">${p4(pq)}</td><td>${FF>cc?"Rechaza":"No rechaza"}</td></tr>`};
-  return`${note}<p>Periodo 1: observaciones 1 a ${n1} del modelo (filas ${M.rows[0]+1} a ${M.rows[n1-1]+1} de la base). Periodo 2: ${n2} observaciones (filas ${M.rows[n1]+1} a ${M.rows[n-1]+1}).</p>
+  return`${note}${col?`<p>Grupo 1 (${gname} = 0): ${n1} observaciones (filas ${M.rows.slice(0,n1).map(r=>r+1).join(", ")}). Grupo 2 (${gname} = 1): ${n2} observaciones (filas ${M.rows.slice(n1).map(r=>r+1).join(", ")}). Se reordenan para que el grupo 1 quede primero; en las tablas, «periodo» quiere decir «grupo».</p>`:`<p>Periodo 1: observaciones 1 a ${n1} del modelo (filas ${M.rows[0]+1} a ${M.rows[n1-1]+1} de la base). Periodo 2: ${n2} observaciones (filas ${M.rows[n1]+1} a ${M.rows[n-1]+1}).</p>`}
   ${stp(1,"Las tres regresiones",`<div class="tbl"><table><tr><th>Modelo</th><th>n</th><th>Coeficientes (${M.names.join(", ")})</th><th class="num">SCR</th></tr><tr><td>Restringido: toda la muestra</td><td>${n}</td><td>${M.b.map(f4).join("; ")}</td><td class="num">${f4(M.rss)}</td></tr><tr><td>Periodo 1</td><td>${n1}</td><td>${R1.b.map(f4).join("; ")}</td><td class="num">${f4(R1.rss)}</td></tr><tr><td>Periodo 2</td><td>${n2}</td><td>${R2.b.map(f4).join("; ")}</td><td class="num">${f4(R2.rss)}</td></tr></table></div>`)}
-  ${RU?stp(2,"Modelo no restringido con dummies y verificación (ecuaciones 27 y 28)",`<div class="eq">${M.yName} = β₁ + δ₁D + ${xn.map((x,j)=>`β${SB(j+2)}${x} + δ${SB(j+2)}D·${x}`).join(" + ")} + u, &nbsp; D = 1 desde la fila ${M.rows[n1]+1}</div>
+  ${RU?stp(2,"Modelo no restringido con dummies y verificación (ecuaciones 27 y 28)",`<div class="eq">${M.yName} = β₁ + δ₁D + ${xn.map((x,j)=>`β${SB(j+2)}${x} + δ${SB(j+2)}D·${x}`).join(" + ")} + u, &nbsp; ${col?`D = ${gname}`:`D = 1 desde la fila ${M.rows[n1]+1}`}</div>
     <div class="tbl"><table><tr><th>Coeficiente</th><th class="num">Estimación</th><th>Comprobación</th></tr>${M.names.map((nm,j)=>`<tr><td>β${SB(j+1)} (${nm})</td><td class="num">${f4(RU.b[j])}</td><td>= periodo 1: ${f4(R1.b[j])}</td></tr>`).join("")}${M.names.map((nm,j)=>`<tr><td>δ${SB(j+1)} (D${j?"·"+nm:""})</td><td class="num">${f4(RU.b[k+j])}</td><td>β + δ = ${f4(RU.b[j]+RU.b[k+j])} = periodo 2: ${f4(R2.b[j])}</td></tr>`).join("")}</table></div>
     <p class="link"><b>${ok?"Se verifica":"Revisa"}:</b> estimar el modelo con dummies equivale a estimar cada periodo por separado (27), y SCR<sub>NR</sub> = ${f4(RU.rss)} = SCR₁ + SCR₂ = ${f4(R1.rss)} + ${f4(R2.rss)} = ${f4(rssNR)} (28).</p>`):""}
   ${stp(3,"Prueba de cambio estructural: todas las alternativas",`<div class="eq">H₀: δ₁ = ${xn.map((_,j)=>"δ"+SB(j+2)).join(" = ")} = 0 (la función es la misma en los dos periodos)</div><div class="tbl"><table><tr><th>Alternativa</th><th>Cálculo</th><th class="num">F</th></tr>
