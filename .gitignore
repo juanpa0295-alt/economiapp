@@ -1,0 +1,17 @@
+# Claves y credenciales: nunca subirlas al repositorio
+.streamlit/secrets.toml
+.env
+.env.*
+*.pem
+*.key
+credenciales*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,28 @@
+Copyright (c) 2026 juanpa0295-alt, autor y titular de economiapp.
+Todos los derechos reservados.
+
+Este repositorio contiene el software «economiapp» (la aplicación en Streamlit,
+el sitio web de la carpeta docs/ y los archivos de datos de la carpeta datos/),
+junto con sus contenidos educativos, textos, ejercicios, laboratorios y diseño.
+
+Este NO es software de código abierto. Salvo autorización previa y por escrito
+del titular, queda prohibido:
+
+  1. Copiar, reproducir o distribuir total o parcialmente el código o los contenidos.
+  2. Modificar el software o crear obras derivadas a partir de él.
+  3. Publicar, alojar o ofrecer el software o sus contenidos a terceros,
+     con o sin ánimo de lucro.
+  4. Usarlo con fines comerciales.
+
+El uso de la aplicación publicada por el titular se rige por los Términos de Uso
+(ver TERMINOS.md).
+
+Las bibliotecas de terceros que usa este proyecto (por ejemplo Streamlit, Pandas,
+NumPy, SciPy, SymPy y Pyodide) conservan sus propias licencias; esta licencia
+cubre únicamente el código y los contenidos originales de economiapp.
+
+Protección legal: Ley 23 de 1982 y Decreto 1360 de 1989 de Colombia (el software
+se protege como obra literaria por derecho de autor), Decisión Andina 351 de 1993
+y Convenio de Berna.
+
+Solicitudes de permiso: juanpa0295@gmail.com
