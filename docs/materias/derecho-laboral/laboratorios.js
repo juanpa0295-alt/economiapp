@@ -188,3 +188,45 @@ SIMS.planilla=function(){
   load("ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
   watch(["pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"],run);run()};
+
+// ---- Prima de servicios (art. 306)
+SIMS.prima=function(){
+  const MES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const EJ={min:{t:"Salario mínimo, semestre completo",sem:"1",ing:"",ret:"",m:Array(6).fill(1750905),aux:"auto",aus:0,pago:"",bm:""},
+    ing:{t:"Ingresó el 15 de marzo",sem:"1",ing:"2026-03-15",ret:"",m:Array(6).fill(2500000),aux:"auto",aus:0,pago:"",bm:""},
+    var:{t:"Salario variable (horas extra)",sem:"1",ing:"",ret:"",m:[2000000,2000000,2000000,2200000,2350000,2150000],aux:"auto",aus:0,pago:"",bm:"2000000"},
+    mora1:{t:"Pagó la prima de junio el 15 de julio",sem:"1",ing:"",ret:"",m:Array(6).fill(1750905),aux:"auto",aus:0,pago:"2026-07-15",bm:""},
+    mora2:{t:"Pagó la de diciembre el 28",sem:"2",ing:"",ret:"",m:Array(6).fill(1750905),aux:"auto",aus:0,pago:"2026-12-28",bm:""},
+    aus:{t:"10 días de licencia no remunerada",sem:"1",ing:"",ret:"",m:Array(6).fill(1750905),aux:"auto",aus:10,pago:"",bm:""}};
+  $("sim").innerHTML=`<p class="hint" style="margin-top:0">Ejemplos:</p><div class="chips pre" id="pr-ej">${Object.entries(EJ).map(([k,v])=>`<button type="button" data-k="${k}">${v.t}</button>`).join("")}</div>
+  <div class="calcf">${selIn("pr-sem","Semestre",[["1","Primer semestre: 1 de enero a 30 de junio"],["2","Segundo semestre: 1 de julio a 31 de diciembre"]],"1")}${numIn("pr-an","Año",2026)}
+  ${dateIn("pr-ing","Fecha de ingreso (vacía si ya trabajaba)","")}${dateIn("pr-ret","Fecha de retiro (vacía si sigue)","")}</div>
+  <p class="hint">Salario devengado de cada mes: el salario mensual más horas extra, recargos y comisiones de ese mes, sin el auxilio de transporte. Si entró a mitad de mes, escribe el salario del mes completo; los días se ajustan solos.</p>
+  <div class="calcf" id="pr-m"></div>
+  <div class="calcf">${selIn("pr-aux","Auxilio de transporte",[["auto","Automático: si el salario es de hasta 2 SMMLV"],["1","Sí lo recibe"],["0","No lo recibe"]],"auto")}${numIn("pr-aus","Días no laborados (licencias no remuneradas, suspensiones)",0)}
+  ${dateIn("pr-pago","Fecha en que pagó la prima (para la mora)","")}${numIn("pr-bm","Salario básico para la mora (vacío = el del último mes)","","1000")}</div>
+  <div class="res" id="pr-res"></div><div id="pr-steps"></div>`;
+  const drawM=()=>{const s=+$("pr-sem").value,old=[...$("pr-m").querySelectorAll("input")].map(i=>i.value);
+    $("pr-m").innerHTML=Array.from({length:6},(_,i)=>numIn("pr-m"+i,MES[(s===1?0:6)+i],old[i]||1750905,"1000")).join("");
+    for(let i=0;i<6;i++){$("pr-m"+i).addEventListener("input",run)}};
+  const run=()=>{const sem=+$("pr-sem").value,anio=Math.round(N("pr-an")),meses=Array.from({length:6},(_,i)=>N("pr-m"+i)),av=$("pr-aux").value;
+    if(!(anio>=2025&&anio<=2030)||meses.some(v=>!(v>0))){$("pr-res").innerHTML=err("escribe un año entre 2025 y 2030 y un salario positivo en cada mes.");$("pr-steps").innerHTML="";return}
+    const R=LAB.prima({anio,sem,ingreso:D("pr-ing"),retiro:D("pr-ret"),meses,aux:av==="auto"?"auto":av==="1",ausencias:Math.max(0,N("pr-aus")||0),pago:D("pr-pago"),basicoMora:N("pr-bm")});
+    if(R.error){$("pr-res").innerHTML=err(R.error);$("pr-steps").innerHTML="";return}
+    const nm=R.idx.map(i=>MES[R.S.m0-1+i]),ultNm=nm.slice(-3).map(x=>x.toLowerCase());
+    $("pr-res").innerHTML=tiles([["Días trabajados",String(R.dias)],["Base mensual",$p(R.base)],["Prima del semestre",$p(R.valor),"okt"],...(R.mora?[["Mora ("+R.mora.dias+" días)",$p(R.mora.valor)]]:[])]);
+    let h=stp(1,"Periodo y días (año de 360 días)",`<div class="eq al">Del ${dt(R.a)} al ${dt(R.b)}: ${R.diasPer} días${R.ausencias?` − ${R.ausencias} días no laborados = <b>${R.dias}</b>`:""}${R.diasPer===180&&!R.ausencias?" (el semestre completo)":""}</div><p class="hint">Cada mes cuenta 30 días, aunque tenga 31 o 28.</p>`);
+    h+=stp(2,"Salario base",`<div class="tbl"><table><tr>${nm.map(x=>`<th class="num">${x}</th>`).join("")}</tr><tr>${R.sal.map(v=>`<td class="num">${$p(v)}</td>`).join("")}</tr></table></div>
+      <div class="eq al">${R.iguales?`Los últimos ${R.ult.length===3?"tres":R.ult.length} meses (${ultNm.join(", ")}) son iguales ⇒ base = salario actual = <b>${$p(R.basico)}</b>`:`Los últimos tres meses (${ultNm.join(", ")}) no son iguales ⇒ base = promedio de lo devengado en ${nm.length===6?"el semestre":"lo trabajado del semestre"} = (${R.sal.map($p).join(" + ")}) / ${R.sal.length} = <b>${$c(R.basico)}</b>`}<br>
+      Auxilio de transporte: ${R.recibeAux?`sí, porque ${av==="auto"?`el salario es de hasta 2 SMMLV (${$p(2*R.smmlv)})`:"lo recibe"} ⇒ + ${$p(R.auxV)}`:`no${av==="auto"?`, porque el salario supera 2 SMMLV (${$p(2*R.smmlv)})`:""}`}<br>
+      Base para la prima = ${$c(R.basico)} + ${$p(R.auxV)} = <b>${$c(R.base)}</b></div>`);
+    h+=stp(3,"Prima",`<div class="eq al">Prima = base × días / 360 = ${$c(R.base)} × ${R.dias} / 360 = <b>${$c(R.valor)}</b></div><p class="hint">En Excel, con la base en la celda B1: <code>=B1*${R.dias}/360</code>. Un semestre completo da medio mes de base (15 días de salario).</p>`);
+    h+=stp(4,"Plazo y mora",R.retiroAntes?`<p>El contrato terminó el ${dt(R.b)}, antes del fin del semestre: esta prima proporcional se paga con la liquidación final. Si no se paga, aplica la <button class="btn" type="button" data-go="moratoria">indemnización moratoria (art. 65)</button>.</p>`
+      :`<p>Se paga a más tardar el <b>${dt(R.S.limite)}</b>. Desde el ${dt(LAB.addDays(R.S.limite,1))} el empleador está en mora.</p>${R.mora?`<div class="eq al">Días de mora: del ${dt(R.mora.desde)} al ${dt(D("pr-pago"))} = <b>${R.mora.dias}</b><br>Mora = salario básico / 30 × días = ${$p(R.mora.basico)} / 30 × ${R.mora.dias} = ${$c(R.mora.diario)} × ${R.mora.dias} = <b>${$c(R.mora.valor)}</b></div><p class="hint">Con el salario básico, sin auxilio de transporte, como se vio en clase. Total a pagar: prima ${$p(R.valor)} + mora ${$p(R.mora.valor)} = ${$p(R.valor+R.mora.valor)}.</p>`:`<p class="hint">Escribe la fecha en que pagó para calcular la mora.</p>`}`);
+    $("pr-steps").innerHTML=h};
+  const setEJ=k=>{const e=EJ[k];$("pr-sem").value=e.sem;drawM();e.m.forEach((v,i)=>$("pr-m"+i).value=v);$("pr-an").value=2026;$("pr-ing").value=e.ing;$("pr-ret").value=e.ret;$("pr-aux").value=e.aux;$("pr-aus").value=e.aus;$("pr-pago").value=e.pago;$("pr-bm").value=e.bm;run()};
+  $("pr-ej").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setEJ(b.dataset.k)});
+  $("pr-sem").addEventListener("change",()=>{drawM();run()});
+  watch(["pr-an","pr-ing","pr-ret","pr-aux","pr-aus","pr-pago","pr-bm"],run);
+  drawM();run();
+};

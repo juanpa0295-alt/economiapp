@@ -1,6 +1,6 @@
 // Derecho Laboral y Comercial · contenido de la ruta
 // =====================================================================
-// CONTENIDO: Derecho Laboral y Comercial. Temas del curso: prórrogas, indemnizaciones y nómina/horas extras (CST).
+// CONTENIDO: Derecho Laboral y Comercial. Temas del curso: prórrogas, indemnizaciones, nómina/horas extras y prima de servicios (CST).
 // Normas verificadas a octubre de 2026: CST con la Ley 2466 de 2025, Ley 2101 de 2021, Decretos 1469 y 1470 de 2025.
 // =====================================================================
 const LAB_=`<section><h3>Calculadora</h3><div class="sim" id="sim"></div></section>`;
@@ -105,7 +105,39 @@ qs:[{q:"Con un salario de $2.100.000 y jornada de 42 horas, ¿cuánto vale una h
 <section><h3>Neto a pagar</h3><div class="mj">\[\text{Neto}=\underbrace{\text{básico}+\text{extras}+\text{auxilio}}_{\text{devengado}}-\underbrace{(\text{salud}+\text{pensión}+\text{FSP})}_{\text{deducciones}}\]</div></section>
 ${LAB_}${AVISO}`,
 deep:[{k:"Empleador",t:"Lo que paga el empleador además del salario",html:String.raw`<div class="tbl"><table><tr><th>Concepto</th><th>Porcentaje</th></tr><tr><td>Pensión</td><td class="num">12 % del IBC</td></tr><tr><td>Caja de compensación</td><td class="num">4 % del IBC</td></tr><tr><td>ARL (riesgo I)</td><td class="num">0,522 % del IBC</td></tr><tr><td>Salud, ICBF y SENA</td><td>8,5 %, 3 % y 2 %; el empleador está exonerado por los trabajadores que ganan menos de 10 SMMLV</td></tr><tr><td>Cesantías y prima</td><td class="num">8,33 % cada una</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">12 % anual de las cesantías</td></tr><tr><td>Vacaciones</td><td class="num">4,17 % del salario básico</td></tr></table></div><p>Las cesantías, la prima y sus intereses se calculan incluyendo el auxilio de transporte; las vacaciones, no.</p>`}],
-qs:[{q:"Un trabajador gana el salario mínimo de 2026 y trabajó el mes completo sin extras. ¿Cuál es su neto?",a:"Devengado: 1.750.905 + 249.095 = $2.000.000. Deducciones: 8 % de 1.750.905 = $140.072,40. Neto: $1.859.927,60."}]}
+qs:[{q:"Un trabajador gana el salario mínimo de 2026 y trabajó el mes completo sin extras. ¿Cuál es su neto?",a:"Devengado: 1.750.905 + 249.095 = $2.000.000. Deducciones: 8 % de 1.750.905 = $140.072,40. Neto: $1.859.927,60."}]},
+{id:"prima", t:"Prima de servicios", sim:"prima", html:String.raw`
+<section><h3>La idea</h3><p class="lead">La prima de servicios es una prestación social: <b>un mes de salario por cada año trabajado</b> (30 días), que se paga en dos mitades, una por semestre (art. 306 del CST, modificado por la Ley 1788 de 2016). Si se trabajó solo una parte del semestre, se paga en proporción a los días.</p></section>
+<section><h3>Los dos pagos</h3><div class="tbl"><table><tr><th>Pago</th><th>Periodo que cubre</th><th>Valor (semestre completo)</th><th>Plazo</th><th>Mora desde</th></tr>
+<tr><td>Prima 1</td><td>1 de enero a 30 de junio</td><td>15 días de salario</td><td>30 de junio</td><td>1 de julio</td></tr>
+<tr><td>Prima 2</td><td>1 de julio a 31 de diciembre</td><td>15 días de salario</td><td>20 de diciembre</td><td>21 de diciembre</td></tr></table></div>
+<p>Si el contrato termina antes, la prima del semestre en curso se paga proporcional con la liquidación final.</p></section>
+<section><h3>La base: ¿qué salario se usa?</h3><ol class="steps">
+<li><b>Salario devengado:</b> el salario más lo que se paga como retribución del trabajo, como horas extra, recargos y comisiones.</li>
+<li><b>Si los últimos tres meses del semestre son iguales</b> (abril, mayo y junio en la prima 1; octubre, noviembre y diciembre en la prima 2), la base es el salario actual.</li>
+<li><b>Si no son iguales</b> (hubo horas extra, comisiones o un aumento), la base es el <b>promedio</b> de lo devengado en el semestre (enero a junio, o julio a diciembre).</li>
+<li>A la base se le suma el <b>auxilio de transporte</b> ($249.095 en 2026), para quienes ganan hasta 2 SMMLV. Para las prestaciones sociales, el auxilio se trata como salario (art. 7 de la Ley 1 de 1963).</li></ol></section>
+<section><h3>La fórmula</h3>
+<div class="mj">\[\text{Prima}=\frac{(\text{salario base}+\text{auxilio de transporte})\times\text{días laborados}}{360}\]</div>
+<p>Los días se cuentan con el año comercial: cada mes tiene 30 días y el semestre completo, 180. Se descuentan los días no laborados que suspenden el contrato, como las licencias no remuneradas y las sanciones (art. 51). Con el semestre completo, la prima es la mitad de la base.</p></section>
+<section><h3>Mora en el pago</h3><p>Si el empleador no paga a tiempo, desde el día siguiente al plazo (1 de julio o 21 de diciembre) y hasta que pague, debe <b>un día de salario por cada día de retraso</b>. Ese día se calcula con el <b>salario básico, sin el auxilio de transporte</b>:</p>
+<div class="mj">\[\text{Mora}=\frac{\text{salario básico}}{30}\times\text{días de retraso}\]</div>
+<p class="hint">Así se vio en clase. Ten en cuenta que el artículo 65 del CST prevé esta sanción cuando, <b>al terminar el contrato</b>, no se pagan salarios y prestaciones, y que la Corte Suprema exige analizar si el empleador actuó de buena fe. Mientras el contrato sigue vigente, el retraso también puede reclamarse ante el Ministerio de Trabajo, que puede imponer multas.</p></section>
+<section><h3>Ejemplos resueltos (2026)</h3>
+<div class="tbl"><table><tr><th>Caso</th><th>Base</th><th class="num">Días</th><th class="num">Prima</th></tr>
+<tr><td>Salario mínimo, prima 1 completa</td><td>1.750.905 + 249.095 = 2.000.000</td><td class="num">180</td><td class="num">$1.000.000</td></tr>
+<tr><td>Salario de $2.500.000, ingresó el 15 de marzo</td><td>2.500.000 + 249.095 = 2.749.095</td><td class="num">106</td><td class="num">$809.456</td></tr>
+<tr><td>Básico de $2.000.000 con horas extra: devengó 2,0; 2,0; 2,0; 2,2; 2,35 y 2,15 millones</td><td>Abril, mayo y junio difieren: promedio 2.116.667 + 249.095 = 2.365.762</td><td class="num">180</td><td class="num">$1.182.881</td></tr>
+<tr><td>Salario mínimo con 10 días de licencia no remunerada</td><td>2.000.000</td><td class="num">170</td><td class="num">$944.444</td></tr>
+<tr><td>Salario de $4.000.000 (más de 2 SMMLV, sin auxilio)</td><td>4.000.000</td><td class="num">180</td><td class="num">$2.000.000</td></tr></table></div>
+<p><b>Días del segundo caso:</b> del 15 de marzo al 30 de junio son (6 − 3) × 30 + (30 − 15) + 1 = 106 días.</p>
+<p><b>Mora:</b> si al trabajador de salario mínimo le pagan la prima de junio el 15 de julio, son 15 días de mora: 1.750.905 / 30 × 15 = <b>$875.452,50</b>. Si le pagan la de diciembre el 28, son 8 días: <b>$466.908</b>.</p></section>
+${LAB_}${AVISO}`,
+deep:[{k:"Quién",t:"Quién tiene derecho y quién no",html:String.raw`<ul><li><b>Sí:</b> todos los trabajadores con contrato de trabajo, sin importar el tipo de contrato (término fijo, indefinido, obra o labor), incluidos, desde la Ley 1788 de 2016, los trabajadores del servicio doméstico, los choferes de servicio familiar y los trabajadores por días.</li><li><b>No:</b> quien gana salario integral, porque su factor prestacional ya incluye la prima (art. 132); los aprendices SENA, porque el contrato de aprendizaje no es un contrato de trabajo; y los contratistas por prestación de servicios.</li><li>La prima no es salario: no entra en la base de aportes a salud y pensión.</li></ul>`},
+ {k:"Excel",t:"Cómo montarla en una hoja de cálculo",html:String.raw`<ol><li>En B2:G2, el salario devengado de cada mes.</li><li>¿Son iguales los últimos tres? <code>=Y(E2=F2;F2=G2)</code>.</li><li>Base: <code>=SI(Y(E2=F2;F2=G2);G2;PROMEDIO(B2:G2))+auxilio</code>.</li><li>Días: <code>=DIAS360(ingreso;fin;VERDADERO)+1-ausencias</code>. El VERDADERO usa el método europeo, que cuenta cada mes como 30 días.</li><li>Prima: <code>=base*días/360</code>.</li></ol>`}],
+qs:[{q:"Un trabajador gana $1.750.905 y trabajó todo el primer semestre de 2026. ¿Cuánto le corresponde y hasta cuándo se paga?",a:"(1.750.905 + 249.095) × 180 / 360 = $1.000.000, a más tardar el 30 de junio."},
+ {q:"¿Por qué en un caso se usa el salario actual y en otro el promedio?",a:"Si los últimos tres meses del semestre son iguales, el salario actual representa bien lo devengado. Si cambió (horas extra, comisiones, aumento), se usa el promedio del semestre."},
+ {q:"La prima de diciembre se pagó el 23 de diciembre a quien gana $3.000.000. ¿Cuánto es la mora?",a:"La mora corre desde el 21 de diciembre: 3 días × 3.000.000 / 30 = $300.000, con el salario básico sin auxilio de transporte."}]}
 ];
 
 const BRANCHES=[

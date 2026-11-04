@@ -55,6 +55,20 @@ LAB.indemnizacion=function({tipo,salario,inicio,despido,finPactado,smmlv}){
 LAB.moratoria=function({salario,diasRetardo,smmlv}){const diario=salario/30,minimo=salario<=smmlv,tope=minimo?Infinity:720,dias=Math.min(diasRetardo,tope);
   return{diario,minimo,dias,valor:dias*diario,intereses:!minimo&&diasRetardo>720,diasInteres:Math.max(0,diasRetardo-720)}};
 
+// ---------- art. 306: prima de servicios (30 días de salario por año, la mitad por semestre)
+LAB.semestre=(anio,sem)=>sem===1?{ini:{y:anio,m:1,d:1},fin:{y:anio,m:6,d:30},limite:{y:anio,m:6,d:30},m0:1}:{ini:{y:anio,m:7,d:1},fin:{y:anio,m:12,d:31},limite:{y:anio,m:12,d:20},m0:7};
+LAB.diasCal=(a,b)=>Math.round((Date.UTC(b.y,b.m-1,b.d)-Date.UTC(a.y,a.m-1,a.d))/864e5);
+// meses: salario devengado de cada mes del semestre (6 valores); aux: true/false/"auto"; ausencias: días no laborados (licencias no remuneradas, suspensiones)
+LAB.prima=function({anio,sem,ingreso,retiro,meses,aux="auto",ausencias=0,pago,basicoMora}){
+  const S=LAB.semestre(anio,sem),a=ingreso&&LAB.cmp(ingreso,S.ini)>0?ingreso:S.ini,b=retiro&&LAB.cmp(retiro,S.fin)<0?retiro:S.fin;
+  if(LAB.cmp(a,b)>0)return{error:"el trabajador no laboró en este semestre (revisa las fechas de ingreso y retiro)."};
+  const diasPer=LAB.days360(a,b)+1,dias=Math.max(0,diasPer-ausencias),idx=[];for(let m=a.m;m<=b.m;m++)idx.push(m-S.m0);
+  const sal=idx.map(i=>meses[i]),ult=sal.slice(-3),iguales=ult.every(v=>Math.abs(v-ult[0])<0.5),promedio=sal.reduce((x,v)=>x+v,0)/sal.length;
+  const V=LAB.valores(b),basico=iguales?sal[sal.length-1]:promedio,recibeAux=aux==="auto"?sal[sal.length-1]<=2*V.smmlv:!!aux,auxV=recibeAux?V.aux:0;
+  const base=basico+auxV,valor=base*dias/360,retiroAntes=retiro&&LAB.cmp(retiro,S.fin)<0;
+  let mora=null;if(pago&&!retiroAntes){const d=Math.max(0,LAB.diasCal(S.limite,pago)),bm=basicoMora>0?basicoMora:sal[sal.length-1];mora={dias:d,diario:bm/30,valor:d*bm/30,basico:bm,desde:LAB.addDays(S.limite,1)}}
+  return{S,a,b,diasPer,dias,ausencias,idx,sal,ult,iguales,promedio,basico,recibeAux,auxV,smmlv:V.smmlv,base,valor,retiroAntes,mora}};
+
 // ---------- jornada, recargos y horas extras
 // factor del pago ADICIONAL al salario mensual: las horas ordinarias diurnas ya están pagadas (0) y la nocturna ordinaria solo lleva el recargo
 LAB.factores=dom=>({ord:0,recN:LEY.pct.recN,extraD:1+LEY.pct.extraD,extraN:1+LEY.pct.extraN,domD:1+dom,domN:1+dom+LEY.pct.recN,extraDomD:1+LEY.pct.extraD+dom,extraDomN:1+LEY.pct.extraN+dom});
