@@ -1089,7 +1089,20 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <ol class="steps"><li><b>Coeficientes recursivos:</b> \(\mathbf b_t=(X_t'X_t)^{-1}X_t'\mathbf y_t\) con las primeras t observaciones, con bandas de ±2 errores estándar. Un salto fuera de la banda indica cambio.</li>
 <li><b>Errores de predicción un paso adelante:</b> \(e_{t+1}=y_{t+1}-\mathbf x_{t+1}'\mathbf b_t\), con varianza \(\sigma^2[1+\mathbf x_{t+1}'(X_t'X_t)^{-1}\mathbf x_{t+1}]\). Si un error queda fuera de ±2 desviaciones, el modelo no anticipó esa observación.</li>
 <li><b>Residuos recursivos y CUSUM:</b> \(w_t=e_t/\sqrt{1+\mathbf x_t'(X_{t-1}'X_{t-1})^{-1}\mathbf x_t}\). La suma acumulada \(W_t=\sum w_j/\hat\sigma\) debe quedar dentro de las bandas \(\pm0{,}948\sqrt{T}\,(1+2t/T)\) al 5 %.</li></ol>
-<p>El <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos) y el ejemplo de abajo trae el código R.</p></section>`},
+<p>El <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos).</p></section>
+<section><h3>En R</h3>
+<pre class="ce-code">library(readxl); library(strucchange)
+datos &lt;- read_excel("mis_datos.xlsx")   # o read.csv("mis_datos.csv")
+m &lt;- lm(Y ~ X, data = datos)
+n &lt;- nrow(datos); k &lt;- 2
+# coeficientes recursivos con bandas de ±2 errores estándar
+b  &lt;- t(sapply((k + 1):n, function(t) coef(lm(Y ~ X, data = datos[1:t, ]))))
+se &lt;- t(sapply((k + 1):n, function(t) coef(summary(lm(Y ~ X, data = datos[1:t, ])))[, 2]))
+plot((k + 1):n, b[, 2], type = "b", ylim = range(b[, 2] - 2 * se[, 2], b[, 2] + 2 * se[, 2]))
+lines((k + 1):n, b[, 2] + 2 * se[, 2], lty = 2); lines((k + 1):n, b[, 2] - 2 * se[, 2], lty = 2)
+rr &lt;- recresid(m)                                   # residuos recursivos
+plot(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))    # CUSUM con bandas
+sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre></section>`},
 {id:"ce-dummies", t:"Forma matricial del cambio estructural y ecuaciones (27) y (28)", html:String.raw`
 <section><h3>El modelo con dummies en matrices</h3>
 <p>Con \(D_t=0\) en las primeras \(n_1\) observaciones y 1 en las demás, el modelo no restringido \(Y_t=\beta_1+\delta_1D_t+\beta_2X_{2t}+\delta_2D_tX_{2t}+\dots+\mu_t\) en bloques es</p>
@@ -1112,7 +1125,7 @@ WORKSHOPS.splice(0,WORKSHOPS.length,...(function(){
 Object.assign(WORKSHOPS.find(w=>w.id==="t-datos"),{t:"Laboratorio de datos",
   d:"Para los ejercicios que traen una tabla de datos o un archivo (CSV o Excel). Estadísticas y correlaciones, variables nuevas (logaritmos, rezagos, dummies de quiebre, interacciones), MCO con errores robustos y pronóstico con intervalos, y pruebas: F, Chow por fila o por grupo con todas sus alternativas y los pronósticos de Chow, coeficientes recursivos y CUSUM, heterocedasticidad, autocorrelación, normalidad, RESET y VIF. También las demostraciones con tus números y el código R. Trae cargadas las bases de los talleres, y los datos no salen de tu navegador."});
 // Enlaces viejos que apuntaban a lo que se reorganizó
-const ALIAS={"t-cambio":"t-calc","ce-resueltos":"tl-ep3","ce-interpretar":"tl-ep3"};
+const ALIAS={"t-cambio":"t-calc","ce-resueltos":"tl-ep3","ce-interpretar":"tl-ep3","tl-t1":"tl-ep3"};
 
 
 // =====================================================================
@@ -1134,7 +1147,7 @@ enun:String.raw`<p>En la prueba de pronósticos de Chow el vector de errores de 
 <li>Si fuera el ajustado de la muestra 2 (\(X_2\mathbf b_2\)), d sería el vector de residuos \(\mathbf e_2\). Su media también es cero, pero su varianza es \(\sigma^2[I-X_2(X_2'X_2)^{-1}X_2']\), con signo menos y la matriz de la muestra 2. Por eso el resultado b) solo sale con \(\mathbf b_1\).</li>
 <li>La igualdad \(X_2\boldsymbol\beta+\boldsymbol\mu_2-X_2\mathbf b_1=\boldsymbol\mu_2-X_2(\mathbf b_1-\boldsymbol\beta)\) es correcta: solo se agrupan los términos con X₂.</li>
 <li>Lo que el enunciado no dice explícitamente, y hace falta para b), es que los errores de las dos muestras son independientes, \(E(\boldsymbol\mu_1\boldsymbol\mu_2')=0\). Está implícito en el modelo clásico, que supone \(\boldsymbol\mu\sim N(\mathbf 0,\sigma^2I_n)\) para toda la muestra, pero conviene escribirlo al demostrar.</li></ul>
-<p style="margin:6px 0 0">En el PDF del taller las ecuaciones se ven montadas unas sobre otras (es un problema de cómo se exportaron); arriba están reconstruidas. Es la misma expresión de Johnston y Dinardo, cap. 4: \(\mathbf d=\mathbf y_2-X_2\mathbf b_1\).</p></div>`,
+<p style="margin:6px 0 0">Es la misma expresión de Johnston y Dinardo, cap. 4: \(\mathbf d=\mathbf y_2-X_2\mathbf b_1\).</p></div>`,
 saber:[String.raw`<b>Error de muestreo de MCO:</b> como \(\mathbf y_1=X_1\boldsymbol\beta+\boldsymbol\mu_1\), se tiene \(\mathbf b_1=\boldsymbol\beta+(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\), es decir \(\mathbf b_1-\boldsymbol\beta=(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\).`,
 String.raw`<b>Supuestos:</b> X no es aleatoria; \(E(\boldsymbol\mu_j)=\mathbf 0\); \(E(\boldsymbol\mu_j\boldsymbol\mu_j')=\sigma^2I\) (homocedasticidad y no autocorrelación); los errores de las dos muestras no están correlacionados: \(E(\boldsymbol\mu_1\boldsymbol\mu_2')=0\).`,
 String.raw`<b>Linealidad de la esperanza:</b> \(E(A\mathbf z)=A\,E(\mathbf z)\) si A no es aleatoria.`,
@@ -1534,75 +1547,3 @@ sol:String.raw`<h5>¿La misma función?</h5><ol class="steps">
 <li>\(\sum(x-\bar x)^2=256(24)=6.144\), así que \(ee(b)=\sqrt{0{,}38/6.144}=0{,}00786\).</li>
 <li>H₀: β = 0,10. \(t=\dfrac{0{,}07-0{,}10}{0{,}00786}=-3{,}81\), y \(|t|>1{,}97\), así que se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 10,18 &gt; 2,41: la función de gasto difiere entre grupos de ingreso. La elasticidad conjunta 0,07 es significativamente distinta de 0,10 (t = −3,81).</p>`}]});
-
-TALLERES.push({id:"tl-t1", t:"Trabajo 1, punto 5", nl:"literal", sub:"Consumo e ingreso en EE. UU., 2005-2010 (crisis de 2008)", anchor:"chow",
-intro:`El punto 5 del Trabajo 1 se resuelve con tus datos (el archivo Excel del profesor), así que aquí está el método completo: qué hacer en el Laboratorio de datos, el código R para el informe y cómo redactar cada literal. Los números los obtienes tú al cargar el archivo.`,
-puntos:[
-{id:"t1-a", n:"a", t:"Prueba de pronósticos de Chow con las ecuaciones (8) y (9)", tipo:"Con tu base de datos", temas:["ce-pronosticos"], tool:{id:"t-datos",lbl:"Abrir el Laboratorio de datos"},
-enun:String.raw`<p>Datos trimestrales de 2005:1 a 2010:4 (n = 24) del gasto de consumo Y y el ingreso disponible X, con el modelo \(Y_t=\beta_1+\beta_2X_t+\mu_t\). Use la prueba de pronósticos de Chow para determinar si la crisis de 2008 cambió la función de consumo, con las estadísticas de las ecuaciones (8) y (9).</p>`,
-saber:[String.raw`<b>Ecuación (8):</b> \(F=\dfrac{(SCR_R-SCR_1)/n_2}{SCR_1/(n_1-k)}\sim F(n_2,\,n_1-k)\). <b>Ecuación (9):</b> \(F=\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/(n_2s_1^2)\). Las dos dan el mismo número (punto 1 de los Ejercicios propuestos 3).`,
-String.raw`<b>Dónde partir:</b> 2005:1 es la fila 1, así que 2008:1 es la fila 13 (n₁ = 12, n₂ = 12). Si se toma la quiebra de Lehman Brothers (2008:3), es la fila 15 (n₁ = 14, n₂ = 10). Justifica la elección en el informe.`],
-sol:String.raw`<ol class="steps">
-<li>En el Laboratorio, sube el Excel. En <b>3. Estimar</b>, escoge Y (consumo) como dependiente y X (ingreso) como explicativa. La columna del periodo no va. Estima con toda la muestra.</li>
-<li>Ve a <b>4. Pruebas → Cambio estructural</b> y escribe la fila donde empieza el periodo 2 (13 para 2008:1).</li>
-<li>El paso 4 del resultado trae la <b>ecuación (8)</b> con las SCR sustituidas y la <b>ecuación (9)</b> con el vector d. Verifica que den lo mismo y copia la tabla de errores de pronóstico.</li>
-<li>Decisión: si F &gt; F(n₂, n₁ − k), el modelo estimado antes de la crisis no pronostica bien después, así que hay evidencia de cambio.</li>
-<li>Con el botón «✍ Modo práctica» puedes hacer tú cada cálculo en orden.</li></ol>
-<pre class="ce-code">library(readxl)
-datos &lt;- read_excel("Datos_E5_T1_Consumo_Ingreso_Q_2005_2010_2026_2.xls")
-n &lt;- nrow(datos); n1 &lt;- 12; n2 &lt;- n - n1; k &lt;- 2
-mR &lt;- lm(Y ~ X, data = datos)                 # toda la muestra
-m1 &lt;- lm(Y ~ X, data = datos[1:n1, ])         # antes de la crisis
-SCR_R &lt;- sum(resid(mR)^2); SCR_1 &lt;- sum(resid(m1)^2)
-F8 &lt;- ((SCR_R - SCR_1) / n2) / (SCR_1 / (n1 - k))   # ecuación (8)
-X1 &lt;- model.matrix(m1); X2 &lt;- cbind(1, datos$X[(n1 + 1):n])
-d &lt;- datos$Y[(n1 + 1):n] - X2 %*% coef(m1)
-s2 &lt;- SCR_1 / (n1 - k)
-F9 &lt;- t(d) %*% solve(diag(n2) + X2 %*% solve(t(X1) %*% X1) %*% t(X2)) %*% d / (n2 * s2)  # ecuación (9)
-c(F8 = F8, F9 = F9, critico = qf(0.95, n2, n1 - k), p = 1 - pf(F8, n2, n1 - k))</pre>`,
-res:String.raw`<p><b>Para el informe:</b> «Con n₁ = 12 trimestres antes de 2008 y n₂ = 12 después, F = … ~ F(12, 10), con valor crítico … al 5 %. Las ecuaciones (8) y (9) dan el mismo valor. Se [rechaza / no se rechaza] la hipótesis de estabilidad: el modelo estimado antes de la crisis [no] pronostica adecuadamente el consumo posterior».</p>`},
-
-{id:"t1-b", n:"b", t:"Coeficientes recursivos y errores de predicción un paso adelante", tipo:"Con tu base de datos", temas:["ce-recursivos"], ej:"ce-recursivos", tool:{id:"t-datos",lbl:"Abrir el Laboratorio de datos"},
-enun:String.raw`<p>Construya las pruebas de coeficientes recursivos y de errores de predicción un paso adelante y determine si hay cambio estructural.</p>`,
-saber:[String.raw`<b>Coeficientes recursivos:</b> \(\mathbf b_t\) se estima con las primeras t observaciones, para t = k + 1, …, n, con bandas de ±2 errores estándar.`,
-String.raw`<b>Error un paso adelante:</b> \(e_{t+1}=y_{t+1}-\mathbf x_{t+1}'\mathbf b_t\), con desviación \(s_t\sqrt{1+\mathbf x_{t+1}'(X_t'X_t)^{-1}\mathbf x_{t+1}}\). Si cae fuera de ±2 desviaciones, el modelo no anticipó esa observación.`,
-String.raw`<b>CUSUM:</b> la suma acumulada de los residuos recursivos estandarizados debe quedar dentro de \(\pm0{,}948\sqrt{T}(1+2t/T)\).`],
-sol:String.raw`<ol class="steps">
-<li>Con el modelo Y ~ X estimado, ve a <b>4. Pruebas → Recursivos</b> y escoge seguir la pendiente X (la propensión marginal a consumir).</li>
-<li>Gráfico 1: si la pendiente recursiva salta fuera de su banda alrededor de 2008, indica cambio.</li>
-<li>Gráfico 2: identifica los trimestres cuyo error de predicción sale de la banda de ±2 desviaciones. Si se concentran en 2008-2009, apuntan a la crisis.</li>
-<li>Gráficos 3 y 4: la CUSUM y la CUSUM de cuadrados confirman o no la inestabilidad.</li>
-<li>Copia los gráficos al informe con una frase de lectura cada uno (la herramienta la propone debajo de cada gráfico).</li></ol>
-<pre class="ce-code">library(strucchange)
-m &lt;- lm(Y ~ X, data = datos); k &lt;- 2
-b &lt;- t(sapply((k + 1):n, function(t) coef(lm(Y ~ X, data = datos[1:t, ]))))
-se &lt;- t(sapply((k + 1):n, function(t) coef(summary(lm(Y ~ X, data = datos[1:t, ])))[, 2]))
-plot((k + 1):n, b[, 2], type = "b", ylim = range(b[, 2] - 2 * se[, 2], b[, 2] + 2 * se[, 2]),
-     xlab = "t", ylab = "pendiente recursiva")
-lines((k + 1):n, b[, 2] + 2 * se[, 2], lty = 2); lines((k + 1):n, b[, 2] - 2 * se[, 2], lty = 2)
-rr &lt;- recresid(m)                                  # residuos recursivos
-plot(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))   # CUSUM con bandas
-sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre>`,
-res:String.raw`<p><b>Para el informe:</b> «La pendiente recursiva [se mantiene / sale] de su banda en …; los errores un paso adelante de los trimestres … superan las dos desviaciones; la CUSUM [cruza / no cruza] las bandas al 5 %. En conjunto, [hay / no hay] evidencia de cambio estructural alrededor de 2008».</p>`},
-
-{id:"t1-c", n:"c", t:"Cambio estructural antes y después de 2008, con todas las alternativas", tipo:"Con tu base de datos", temas:["chow","ce-dummies"], tool:{id:"t-datos",lbl:"Abrir el Laboratorio de datos"},
-enun:String.raw`<p>Haga la prueba de cambio estructural para determinar si la función de consumo es la misma antes y después de 2008. Use todas las alternativas posibles para el estadístico y verifique las ecuaciones (27) y (28): que la estimación del modelo no restringido equivale a estimar el modelo en cada periodo y que la SCR del no restringido es la suma de las SCR de las dos muestras.</p>`,
-saber:[String.raw`<b>Alternativas:</b> (a) con las SCR; (b) con los R² del restringido y el no restringido; (c) la F conjunta de las dummies δ₁ = δ₂ = 0; (d) la forma matricial \((R\mathbf b-\mathbf r)'[R(X'X)^{-1}R']^{-1}(R\mathbf b-\mathbf r)/(q\,s^2)\). Las cuatro dan el mismo número.`,
-String.raw`<b>(27) y (28):</b> en \(Y=\beta_1+\delta_1D+\beta_2X+\delta_2DX+u\), los β son los coeficientes del periodo 1, los β + δ los del periodo 2, y \(SCR_{NR}=SCR_1+SCR_2\) (punto 8 de los Ejercicios propuestos 3).`],
-sol:String.raw`<ol class="steps">
-<li>En <b>4. Pruebas → Cambio estructural</b>, con la fila 13 (2008:1), el paso 1 trae las tres regresiones: toda la muestra, el periodo 1 y el periodo 2, con sus SCR.</li>
-<li>El paso 2 estima el modelo con dummies y muestra la tabla de verificación: β = periodo 1 y β + δ = periodo 2 (ecuación 27), y SCR_NR = SCR₁ + SCR₂ (ecuación 28).</li>
-<li>El paso 3 trae las cuatro alternativas del estadístico con los números sustituidos, la decisión y la tabla «¿Dónde está el cambio?» (solo intercepto o solo pendiente).</li>
-<li>Si prefieres crear tú las dummies: en <b>2. Crear variables</b>, la receta «Dummy de quiebre» crea D = (obs ≥ 13) y D·X. Al estimar Y ~ X + D + D·X obtienes el modelo no restringido directamente.</li></ol>
-<pre class="ce-code">datos$D &lt;- as.numeric(1:n &gt;= 13)               # 1 desde 2008:1
-mNR &lt;- lm(Y ~ X + D + I(D * X), data = datos)   # no restringido con dummies
-m1 &lt;- lm(Y ~ X, data = datos[1:12, ]); m2 &lt;- lm(Y ~ X, data = datos[13:n, ])
-coef(mNR); coef(m1); coef(m2)                    # (27): beta = m1, beta + delta = m2
-c(sum(resid(mNR)^2), sum(resid(m1)^2) + sum(resid(m2)^2))  # (28)
-anova(mR, mNR)                                    # F de Chow (alternativas a y c)
-R &lt;- rbind(c(0, 0, 1, 0), c(0, 0, 0, 1)); b &lt;- coef(mNR)    # alternativa d
-Fw &lt;- t(R %*% b) %*% solve(R %*% vcov(mNR) %*% t(R)) %*% (R %*% b) / 2
-r2R &lt;- summary(mR)$r.squared; r2U &lt;- summary(mNR)$r.squared
-Fr2 &lt;- ((r2U - r2R) / 2) / ((1 - r2U) / (n - 4))  # alternativa b
-c(Fw = Fw, Fr2 = Fr2)</pre>`,
-res:String.raw`<p><b>Para el informe:</b> «Modelo restringido: \(Y=\beta_1+\beta_2X+u\); no restringido: \(Y=\beta_1+\delta_1D+\beta_2X+\delta_2DX+u\), con D = 1 desde 2008:1. H₀: δ₁ = δ₂ = 0. Las cuatro formas del estadístico dan F = … ~ F(2, 20), con valor crítico 3,49 al 5 %. Se verifica (27): … y (28): SCR_NR = … = SCR₁ + SCR₂. Se [rechaza / no se rechaza] H₀ …».</p>`}]});
