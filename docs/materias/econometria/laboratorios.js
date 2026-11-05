@@ -796,7 +796,7 @@ SIMS.datos=function(){
         const xsSel=()=>[...$("dl-mod").querySelectorAll(".dm-x input:checked")].map(i=>i.value);
         const upd=()=>{const y=$("dm-y").value;$("dl-mod").querySelectorAll(".dm-x").forEach(l=>{const me=l.dataset.c===y;l.hidden=me;if(me)l.querySelector("input").checked=false});
           $("dm-yd").textContent=DL.describe(y);const yw=$("dm-yw");yw.hidden=!isIdx(y);yw.innerHTML=`<b>${y}</b> parece un número de observación o de periodo (1, 2, 3, …). Normalmente no es lo que se quiere explicar: escoge la variable de interés (por ejemplo, el consumo).`;
-          const xs=xsSel(),tw=$("dm-tw"),ti=xs.filter(isIdx);tw.hidden=!ti.length;tw.innerHTML=`Marcaste <b>${ti.join(", ")}</b>, que es un índice de tiempo: el modelo incluirá una tendencia lineal. Déjalo solo si quieres controlar por tendencia; en el Trabajo 1 no va.`;
+          const xs=xsSel(),tw=$("dm-tw"),ti=xs.filter(isIdx);tw.hidden=!ti.length;tw.innerHTML=`Marcaste <b>${ti.join(", ")}</b>, que es un índice de tiempo: el modelo incluirá una tendencia lineal. Déjalo solo si quieres controlar por tendencia.`;
           const c=$("dm-c").checked,a=V("dm-a"),b=V("dm-b");let k=0;const terms=[...(c?["β₁"]:[]),...xs.map(x=>`β${SB((c?2:1)+(k++))}·${x}`)];
           $("dm-eq").innerHTML=`<b>Modelo:</b> ${y} = ${terms.length?terms.join(" + "):"0"} + u &nbsp; · &nbsp; filas ${fm(a)} a ${fm(b)}${xs.length?"":` <span class="hint">(marca al menos una X${c?" o deja solo el intercepto":""})</span>`}`};
         $("dl-mod").querySelectorAll("select,input").forEach(el=>el.addEventListener("input",upd));$("dl-mod").addEventListener("change",upd);
@@ -1029,17 +1029,16 @@ DL.GUIA=`<details class="dp-lite dl-guia"><summary><b>Qué puedes hacer en cada 
 <tr><td><b>6. Gráficos</b></td><td>Ver los datos y los residuos.</td><td>Dispersión con la recta de MCO, residuos frente a ajustados y en el tiempo, histograma con la normal.</td></tr>
 <tr><td><b>7. Código R</b></td><td>Llevar todo a RStudio para el informe.</td><td>Un script con la lectura de la base, las variables creadas, el modelo y las pruebas.</td></tr></table></div>
 <p class="hint">El orden habitual: 1 → 2 (si hace falta) → 3 → 4 → 7. Cada vez que cambies el modelo en la pestaña 3, las pruebas de la 4 se recalculan con el modelo nuevo.</p><p class="hint"><b>✍ Modo práctica:</b> en Estimar y en Pruebas → Cambio estructural hay un botón que oculta la solución y te pide cada cálculo en orden (X′X, X′y, b, SCR, F…). Cada paso dice qué necesita antes y se desbloquea cuando aciertas los anteriores.</p></details>
-<details class="dp-lite dl-guia"><summary><b>Guía paso a paso: punto 5 del Trabajo 1 (cambio estructural)</b></summary>
-<p>La base tiene una fila por trimestre desde 2005:1 hasta 2010:4 (24 filas): fila 1 = 2005:1, fila 13 = 2008:1, fila 15 = 2008:3 (quiebra de Lehman Brothers), fila 24 = 2010:4. La columna T solo numera los trimestres: no la uses en el modelo.</p>
+<details class="dp-lite dl-guia"><summary><b>Guía paso a paso: cambio estructural con una base de datos</b></summary>
 <ol class="steps">
-<li><b>Revisa la base</b> (pestaña 1): deben salir 24 filas y las columnas T, Y y X sin vacíos. Y es el consumo y X el ingreso disponible, en billones de dólares.</li>
-<li><b>Escoge el quiebre:</b> 2008:1 (fila 13) es la elección más simple; 2008:3 (fila 15) coincide con la quiebra de Lehman Brothers. Justifícalo en el informe y usa el mismo en todos los literales.</li>
-<li><b>Estima el modelo restringido</b> (pestaña 3): Y como dependiente, solo X marcada, filas 1 a 24, con intercepto. Anota la ecuación, el R² y la SCR (es la SCR<sub>R</sub>). Interpreta β₂ como la propensión marginal a consumir.</li>
-<li><b>a) Pronósticos de Chow</b> (pestaña 4 → Cambio estructural, escribe 13): el paso 4 da F con la ecuación (8) y con la (9). Copia el F, sus grados de libertad, el crítico y el p-valor, y la tabla de errores de pronóstico. Concluye si el modelo estimado antes de 2008 predice bien el consumo después.</li>
-<li><b>b) Recursivos</b> (pestaña 4 → Recursivos y CUSUM, coeficiente X): describe la trayectoria de la propensión marginal, en qué trimestres se sale de la banda, qué errores de predicción un paso adelante quedan fuera de ±2 desviaciones y si la CUSUM cruza las bandas. Concluye si hay cambio estructural y cuándo.</li>
-<li><b>c) Prueba de cambio estructural</b> (misma pestaña Cambio estructural): reporta las tres regresiones (paso 1), el modelo con dummies y la verificación de las ecuaciones (27) y (28) (paso 2), y la F por las cuatro alternativas (paso 3): deben coincidir. Indica si el cambio está en el intercepto, en la pendiente o en ambos.</li>
-<li><b>Opcional, para mostrar el modelo con dummies:</b> pestaña 2 → «Cambio estructural en una fecha», fila 13, marca X → crea D y D_X. En la pestaña 3, botón «Modelo con dummies de quiebre» y Estimar: la tabla dice qué significa cada coeficiente y escribe las ecuaciones antes y después del quiebre. En la pestaña 4 → F de restricciones, marca solo D y D_X: da el mismo F del literal c.</li>
-<li><b>El informe:</b> pestaña 7 → copia el script, ejecútalo en RStudio con tu archivo y pega las salidas y los gráficos con tu análisis.</li></ol></details>`;
+<li><b>Revisa la base</b> (pestaña 1): que el número de filas y las columnas sean los esperados y que no haya vacíos. Si hay una columna que solo numera los periodos (t, T, trimestre), no la uses como X.</li>
+<li><b>Ubica el quiebre:</b> la fila donde empieza el segundo periodo. Con datos trimestrales o mensuales, el cuadro «¿En qué fila cae una fecha?» de la pestaña 2 te la da. Si los grupos no son periodos sino categorías (hombres y mujeres, urbano y rural), basta una columna 0/1.</li>
+<li><b>Estima el modelo restringido</b> (pestaña 3): Y, sus X, toda la muestra, con intercepto. Anota la ecuación, el R² y la SCR (es la SCR<sub>R</sub>).</li>
+<li><b>Prueba de Chow</b> (pestaña 4 → Cambio estructural): escoge la fila del quiebre o la variable 0/1. El paso 1 trae las tres regresiones, el paso 2 el modelo con dummies y la verificación SCR<sub>NR</sub> = SCR₁ + SCR₂, y el paso 3 la F por las cuatro alternativas, que deben coincidir, y dónde está el cambio (intercepto o pendiente).</li>
+<li><b>Pronósticos de Chow:</b> en la misma pestaña, el paso 4 da la F con las SCR y con el vector d de errores de pronóstico, y la tabla de errores.</li>
+<li><b>Recursivos</b> (pestaña 4 → Recursivos y CUSUM): la trayectoria del coeficiente con su banda, los errores un paso adelante con ±2 desviaciones y la CUSUM.</li>
+<li><b>Modelo con dummies explícito</b> (opcional): pestaña 2 → «Cambio estructural en una fecha» crea D y D·X. En la pestaña 3, «Modelo con dummies de quiebre» y Estimar; en la 4 → F de restricciones, marca solo las dummies: da la misma F de Chow.</li>
+<li><b>El informe:</b> pestaña 7 → copia el script, ejecútalo en RStudio con tu archivo y pega las salidas con tu análisis.</li></ol></details>`;
 
 // ===================== MODO PRÁCTICA: RUTA DE CÁLCULOS CON PASOS BLOQUEADOS =====================
 // Cada paso dice qué se calcula, para qué sirve, qué necesita antes y con qué fórmula. Se desbloquea
