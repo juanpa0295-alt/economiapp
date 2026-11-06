@@ -52,6 +52,7 @@ SIMS.ind=function(){
     else{
       $("i-res").innerHTML=tiles([["Tiempo que faltaba",`${R.falta.toLocaleString("es-CO")} días`],["Días a pagar",String(R.dias)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
       $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Días que faltaban = días360(${dt(des)}, ${dt(fin)}) = ${R.falta}${R.minimo15?"<br>Es menor que 15 ⇒ se paga el mínimo de 15 días (obra o labor)":""}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>${tipo==="fijo"?`<p class="hint" style="margin:0">Usa como vencimiento el fin del período o de la prórroga que estaba corriendo. La estación de prórrogas te da esa fecha.</p>`:""}`)}};
+  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;const P={pedro:{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31"}}[pre];if(P){$("i-tipo").value=P.tipo;$("i-sal").value=P.sal;$("i-ini").value=P.ini;$("i-des").value=P.des}}
   watch(["i-tipo","i-sal","i-ini","i-des","i-fin"],run);run();
 };
 
@@ -125,6 +126,7 @@ SIMS.val=function(){
 const PLAP={
   ej1:{t:"Taller · Ejercicio 1 (ingresó por primera vez)",ingreso:2,venia:false,salario:2940000,x:"2-4: 8am-5pm\n5: 10pm-7am\n6: descanso\n7-11: 6pm-4am\n12: 1pm-8pm\n13: 2pm-11pm\n14-15: 2pm-11pm\n16-19: 8am-12m, 2pm-7pm\n20-21: 5am-3pm\n22-24: 11am-9pm\n25: permiso remunerado\n26: descanso\n27-28: 10pm-7am\n29-30: incapacidad\n31: 9pm-7am"},
   ej2:{t:"Taller · Ejercicio 2 (venía laborando)",ingreso:1,venia:true,salario:2850000,x:"1-4: 2pm-11pm\n5-6: descanso\n7-9: 9pm-7am\n10-12: sancion\n13-15: 7pm-4am\n16-19: 8am-12m, 2pm-8pm\n20-21: 10am-7pm\n22-23: 10pm-8am\n24: licencia no remunerada\n25: 10pm-8am\n26: incapacidad\n27-28: 2pm-11pm\n29: descanso\n30-31: licencia no remunerada"},
+  pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",ingreso:1,venia:true,salario:4250000,n:30,w:"1",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-6: 2pm-10pm\n8-11: 2pm-10pm\n12-14: licencia no remunerada\n15-20: 2pm-10pm\n22-27: 2pm-10pm\n29-30: 2pm-10pm"},
   vacio:{t:"Empezar en blanco",ingreso:1,venia:true,salario:2000000,x:"1-3: 6am-2pm\n"}};
 const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],DI1="DLMMJVS";
 const hh=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mi=m%60,ap=h<12?"a. m.":"p. m.",h12=h%12===0?12:h%12;return `${h12}:${String(mi).padStart(2,"0")} ${ap}`};
@@ -135,7 +137,7 @@ SIMS.planilla=function(){
   ${numIn("pl-n","Días del mes",31)}${selIn("pl-w","El día 1 es",DIAS.map((d,i)=>[String(i),d]),"2")}<label for="pl-f">Festivos (días)<input id="pl-f" value="1, 14, 21"></label>
   ${selIn("pl-v","El trabajador",[["v","venía laborando"],["n","ingresó por primera vez"]],"n")}${numIn("pl-i","Día de ingreso",2)}
   ${numIn("pl-s","Salario mensual",2940000,"1000")}${numIn("pl-j","Jornada diaria (h, lunes a sábado)",7,"0.5")}
-  ${selIn("pl-d","Recargo dominical y festivo",[["0.8","80 % (desde 1-jul-2025)"],["0.9","90 % (desde 1-jul-2026)"],["1","100 % (desde 1-jul-2027)"]],"0.9")}
+  ${selIn("pl-d","Recargo dominical y festivo",[["0.75","75 % (tabla del taller 2026-2)"],["0.8","80 % (desde 1-jul-2025)"],["0.9","90 % (desde 1-jul-2026)"],["1","100 % (desde 1-jul-2027)"]],"0.9")}
   ${selIn("pl-no","Jornada nocturna desde",[["19","7:00 p. m. (desde 25-dic-2025)"],["21","9:00 p. m. (antes)"]],"19")}
   ${selIn("pl-pd","Sanción o licencia en la semana",[["1","pierde el dominical (art. 173)"],["0","no afecta el dominical"]],"1")}
   ${selIn("pl-dt","Domingo trabajado",[["auto","R si descansa la semana siguiente, si no H"],["H","siempre H (7 h + 90 %)"],["R","siempre R (solo el 90 %)"]],"auto")}
@@ -145,7 +147,7 @@ SIMS.planilla=function(){
   ${selIn("pl-de","Deducciones",[["0","no descontar"],["1","salud 4 % y pensión 4 %"]],"0")}</div></details>
   <label for="pl-tx" style="display:block;font-size:13px;margin-top:6px"><b>Novedades del mes</b>, una por línea: «días: horario» o «días: novedad». Horarios: <code>8am-5pm</code>, <code>10:00pm-7:00am</code>, <code>8am-12m, 2pm-7pm</code>. Novedades: <code>descanso</code>, <code>permiso remunerado</code>, <code>incapacidad</code>, <code>sancion</code>, <code>licencia no remunerada</code>, <code>vacaciones</code>. Los domingos y festivos que no escribas se toman como descanso.</label>
   <textarea id="pl-tx" class="pltx" rows="10" spellcheck="false"></textarea><div id="pl-out" class="slv-out"></div>`;
-  const load=k=>{const p=PLAP[k];$("pl-tx").value=p.x;$("pl-s").value=p.salario;$("pl-v").value=p.venia?"v":"n";$("pl-i").value=p.ingreso;$("pl-n").value=31;$("pl-w").value="2";$("pl-f").value="1, 14, 21"};
+  const load=k=>{const p=PLAP[k];$("pl-pre").value=k;$("pl-tx").value=p.x;$("pl-s").value=p.salario;$("pl-v").value=p.venia?"v":"n";$("pl-i").value=p.ingreso;$("pl-n").value=p.n||31;$("pl-w").value=p.w||"2";$("pl-f").value=p.f||"1, 14, 21";$("pl-j").value=p.j||7;$("pl-d").value=p.d||"0.9";$("pl-no").value=p.no||"19"};
   const run=()=>{const out=$("pl-out");const n=Math.round(N("pl-n")),w=+$("pl-w").value,sal=N("pl-s"),J=N("pl-j"),venia=$("pl-v").value==="v",ing=venia?1:Math.round(N("pl-i"));
     $("pl-i").disabled=venia;
     if(!(n>=28&&n<=31)||!(sal>0)||!(J>0&&J<=10)||!(ing>=1&&ing<=n)){out.innerHTML=`<p class="err">Revisa los datos: días del mes entre 28 y 31, salario positivo, jornada entre 0 y 10 horas y día de ingreso dentro del mes.</p>`;return}
@@ -185,7 +187,7 @@ SIMS.planilla=function(){
     <div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
     <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>
     <div class="stepc"><h4><span class="n">5</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
-  load("ej1");
+  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre&&PLAP[pre]?pre:"ej1")}
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
   watch(["pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"],run);run()};
 
@@ -236,7 +238,7 @@ SIMS.liq=function(){
   const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],Cap=s=>s[0].toUpperCase()+s.slice(1);
   const f2=d=>`${d.d}/${d.m}/${String(d.y).slice(2)}`,n=v=>Math.round(v).toLocaleString("es-CO");
   const CLASE={ini:"2025-09-20",ret:"2026-11-03",m:{"2025-9":[2000000,0,0,""],"2025-10":[2000000,0,0,""],"2025-11":[2000000,0,0,""],"2025-12":[2000000,0,0,""],"2026-1":[2900000,0,0,""],"2026-2":[2900000,0,0,""],"2026-3":[2900000,0,0,""],"2026-4":[2900000,0,0,""],"2026-5":[2900000,0,30,"Art. 51"],"2026-6":[2900000,0,0,""],"2026-7":[2900000,50000,0,"Horas extra"],"2026-8":[2900000,400000,0,"Recargos"],"2026-9":[2900000,400000,0,"Recargos"],"2026-10":[2900000,400000,0,"Recargos"],"2026-11":[2900000,400000,0,"Recargos"]},pagos:{prima:false,ces:false,int:false}};
-  $("sim").innerHTML=`<div class="chips pre" id="lq-ej"><button type="button" data-k="clase">Ejercicio de clase: 20 sep 2025 a 3 nov 2026, no le han pagado primas</button><button type="button" data-k="limpio">Empezar uno nuevo</button></div>
+  $("sim").innerHTML=`<div class="chips pre" id="lq-ej"><button type="button" data-k="clase">Ejercicio de clase: 20 sep 2025 a 3 nov 2026, no le han pagado primas</button><button type="button" data-k="pedro">Taller 2026-2: Pedro (2025 y 2026)</button><button type="button" data-k="limpio">Empezar uno nuevo</button></div>
   <div class="calcf">${dateIn("lq-ini","Fecha de inicio","2025-09-20")}${dateIn("lq-ret","Fecha de retiro (o de corte)","2026-11-03")}</div>
   <p class="hint">Un renglón por mes. <b>Básico</b>: el salario mensual del contrato. <b>Extras</b>: horas extra, recargos y comisiones de ese mes. <b>Art. 51</b>: días de suspensión (licencia no remunerada, sanción), que se restan de los días. Si entró o salió a mitad de mes, escribe el salario del mes completo.</p>
   <div class="tbl"><table id="lq-m"></table></div>
@@ -265,9 +267,14 @@ SIMS.liq=function(){
       +stp(4,"Intereses sobre las cesantías (12 % anual)",R.ints.map(r=>`<div class="lq-b"><div class="lq-h">${r.nombre}</div><div class="eq al">${n(r.ces)} × ${r.dias} × 12 % / 360 = <b class="lq-box">${n(r.valor)}</b>${r.sancion?`<br>Sanción por no pagarlos antes del ${dt(r.limite)}: otro tanto = <b class="lq-box">${n(r.sancion)}</b>`:""}</div><p class="hint">${r.enLiquidacion?"Se pagan con la liquidación final, directamente al trabajador.":`Se pagan directamente al trabajador a más tardar el ${dt(r.limite)}.${pagos.int?" Ya se pagaron.":""}`}</p></div>`).join(""))
       +stp(5,"Total de la liquidación",`<div class="tbl"><table><tr><td>Primas adeudadas</td><td class="num">${$p(T.primas)}</td></tr><tr><td>Mora de las primas</td><td class="num">${$p(T.moraPrimas)}</td></tr><tr><td>Cesantías adeudadas</td><td class="num">${$p(T.ces)}</td></tr><tr><td>Mora por no consignar las cesantías</td><td class="num">${$p(T.moraCes)}</td></tr><tr><td>Intereses sobre las cesantías</td><td class="num">${$p(T.ints)}</td></tr><tr><td>Sanción por no pagar los intereses</td><td class="num">${$p(T.sancionInt)}</td></tr><tr><td><b>Total</b></td><td class="num"><b>${$p(T.total)}</b></td></tr></table></div>
         <p class="hint">No incluye vacaciones, salarios pendientes ni indemnización. Si después del retiro no se paga esta liquidación, corre la <button class="btn" type="button" data-go="moratoria">indemnización moratoria (art. 65)</button>.</p>`)};
-  const load=k=>{if(k==="clase"){$("lq-ini").value=CLASE.ini;$("lq-ret").value=CLASE.ret;vals=JSON.parse(JSON.stringify(CLASE.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false}
+  const PEDRO={ini:"2025-01-01",ret:"2026-08-31",m:{}};
+  [1,2,3,4].forEach(m=>PEDRO.m["2025-"+m]=[1835000,2000000,0,"Comisiones"]);PEDRO.m["2025-5"]=[1835000,4000000,0,"Comisiones"];PEDRO.m["2025-6"]=[1835000,0,30,"Suspensión"];PEDRO.m["2025-7"]=[1835000,0,30,"Suspensión"];
+  [8,9,10,11,12].forEach(m=>PEDRO.m["2025-"+m]=[1835000,2000000,0,"Comisiones"]);[1,2,3,5,7].forEach(m=>PEDRO.m["2026-"+m]=[4250000,0,0,""]);PEDRO.m["2026-4"]=[4250000,0,30,"Suspensión"];
+  PEDRO.m["2026-6"]=[4250000,1554286,3,"Turno 2pm-10pm; licencia 12-14"];PEDRO.m["2026-8"]=[4250000,0,30,"Licencia no remunerada"];
+  const load=k=>{if(k==="pedro"){$("lq-ini").value=PEDRO.ini;$("lq-ret").value=PEDRO.ret;vals=JSON.parse(JSON.stringify(PEDRO.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false;$("lq-m").innerHTML="";draw();return}
+    if(k==="clase"){$("lq-ini").value=CLASE.ini;$("lq-ret").value=CLASE.ret;vals=JSON.parse(JSON.stringify(CLASE.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false}
     else{vals={};$("lq-ini").value=di(HOY).slice(0,4)+"-01-01";$("lq-ret").value=di(HOY)}$("lq-m").innerHTML="";draw()};
   $("lq-ej").addEventListener("click",e=>{const bt=e.target.closest("button");if(bt)load(bt.dataset.k)});
   ["lq-ini","lq-ret"].forEach(i=>$(i).addEventListener("change",draw));["lq-pp","lq-pc","lq-pi"].forEach(i=>$(i).addEventListener("change",run));
-  load("clase");
+  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre==="pedro"?"pedro":"clase")}
 };
