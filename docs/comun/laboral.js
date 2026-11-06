@@ -44,15 +44,15 @@ LAB.prorrogas=function(inicio,meses,corte){
   return{periodos:per,ref,tope,conversion:conv,actual,antesReforma:LAB.cmp(inicio,LAB.parse(LEY.reforma))<0,indefinidoEnCorte:conv&&corte&&LAB.cmp(corte,conv)>=0}};
 
 // ---------- art. 64: indemnización por despido sin justa causa
-LAB.indemnizacion=function({tipo,salario,inicio,despido,finPactado,smmlv}){
+LAB.indemnizacion=function({tipo,salario,inicio,despido,finPactado,smmlv,art51=0}){
   const diario=salario/30;
   if(tipo==="fijo"||tipo==="obra"){const falta=Math.max(0,LAB.days360(despido,finPactado)),dias=tipo==="obra"?Math.max(15,falta):falta;
     return{diario,falta,dias,valor:dias*diario,minimo15:tipo==="obra"&&falta<15}}
-  const servicio=LAB.days360(inicio,despido)+1,anios=servicio/360,alto=salario>=10*smmlv,p1=alto?20:30,pn=alto?15:20;
+  const servicioTotal=LAB.days360(inicio,despido)+1,servicio=Math.max(0,servicioTotal-Math.max(0,Math.round(art51||0))),anios=servicio/360,alto=salario>=10*smmlv,p1=alto?20:30,pn=alto?15:20;
   // en derecho los días no llevan decimales: la fracción de año da días proporcionales redondeados al entero
   const completos=Math.floor(servicio/360),frac=servicio-360*completos,fracExacta=pn*frac/360,diasFrac=Math.round(fracExacta);
   const dias=servicio<=360?p1:p1+pn*(completos-1)+diasFrac;
-  return{diario,servicio,anios,alto,p1,pn,completos,frac,fracExacta,diasFrac,dias,valor:dias*diario}};
+  return{diario,servicio,servicioTotal,art51:servicioTotal-servicio,anios,alto,p1,pn,completos,frac,fracExacta,diasFrac,dias,valor:dias*diario}};
 // ---------- art. 65: indemnización moratoria
 LAB.moratoria=function({salario,diasRetardo,smmlv}){const diario=salario/30,minimo=salario<=smmlv,tope=minimo?Infinity:720,dias=Math.min(diasRetardo,tope);
   return{diario,minimo,dias,valor:dias*diario,intereses:!minimo&&diasRetardo>720,diasInteres:Math.max(0,diasRetardo-720)}};
@@ -74,10 +74,11 @@ LAB.prima=function({anio,sem,ingreso,retiro,meses,aux="auto",ausencias=0,pago,ba
 // ---------- liquidación de prestaciones con el formato de clase: primas, cesantías (art. 249, Ley 50 de 1990) e intereses (Ley 52 de 1975)
 // meses: [{y,m,basico,extra,art51}] desde el mes de ingreso hasta el de retiro. pagos: {prima,ces,int} = true si se pagaron a tiempo.
 // Convenciones de clase: días de 360 contando ambos extremos, salario diario truncado a pesos, mora con el salario básico.
-LAB.basePeriodo=function(meses,fin){const vivos=meses.filter(r=>r.art51<30),ult=vivos.slice(-3),dev=r=>r.basico+r.extra;
-  if(!vivos.length)return null;const iguales=ult.every(r=>Math.abs(dev(r)-dev(ult[0]))<0.5),prom=vivos.reduce((x,r)=>x+dev(r),0)/vivos.length;
-  const V=LAB.valores(fin),ultimo=vivos[vivos.length-1],aux=ultimo.basico<=2*V.smmlv?V.aux:0,sal=iguales?dev(ultimo):prom;
-  return{vivos,ult,iguales,prom,sal,aux,base:sal+aux,basico:ultimo.basico,diario:Math.floor(ultimo.basico/30)}};
+// Como en clase: los meses suspendidos todo el mes (art. 51) cuentan con devengado 0 en la comparación y en el promedio
+LAB.basePeriodo=function(meses,fin){if(!meses.length)return null;const dev=r=>r.art51>=30?0:r.basico+r.extra,ult=meses.slice(-3);
+  const iguales=ult.every(r=>Math.abs(dev(r)-dev(ult[0]))<0.5),prom=meses.reduce((x,r)=>x+dev(r),0)/meses.length;
+  const V=LAB.valores(fin),ultimo=meses[meses.length-1],aux=ultimo.basico<=2*V.smmlv?V.aux:0,sal=iguales?dev(ultimo):prom;
+  return{vivos:meses,ult,iguales,prom,sal,aux,base:sal+aux,basico:ultimo.basico,diario:Math.floor(ultimo.basico/30),devs:meses.map(dev),susp:meses.filter(r=>r.art51>=30).length}};
 LAB.liquidacion=function({inicio,retiro,meses,pagos={}}){
   const key=(y,m)=>y*12+m,get=(a,b)=>meses.filter(r=>key(r.y,r.m)>=key(a.y,a.m)&&key(r.y,r.m)<=key(b.y,b.m));
   const per=(a,b,lim,moraDesde,pagado,tipo)=>{const ini=LAB.cmp(inicio,a)>0?inicio:a,fin=LAB.cmp(retiro,b)<0?retiro:b;if(LAB.cmp(ini,fin)>0)return null;
