@@ -467,6 +467,11 @@ input.rc-in:disabled,select.rc-in:disabled{opacity:.85}
 .gb-l li small{display:block;color:var(--muted);font-size:12px}
 .gb-l li>span:last-child{display:flex;gap:6px}
 .gb-m{margin:0;font-size:13px;color:var(--good,var(--line))}
+.lq-fs{display:flex;flex-direction:column;gap:3px;font-size:14.5px;line-height:1.45;border-left:3px solid var(--line-soft);padding:2px 0 2px 10px}
+.lq-fn{font-weight:700;color:var(--line)}
+.lq-sub{padding-left:1.2em;font-variant-numeric:tabular-nums}
+.lq-ftab small{color:var(--muted)}
+.lq-ftab{margin-bottom:10px}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
