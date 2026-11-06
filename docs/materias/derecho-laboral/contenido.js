@@ -218,49 +218,50 @@ intro:`Pedro ingresó el 8 de mayo de 2021 con contrato indefinido y fue despedi
 puntos:[
 {id:"lab26-1",n:"1",t:"Salario de junio de 2026 (turno de 2 pm a 10 pm)",tipo:"Planilla de horas",temas:["jornada","nomina"],tool:{id:"planilla",pre:"pedro",lbl:"Abrir junio en el Resolvedor de horas extras"},
 enun:String.raw`<p>En junio de 2026 el horario de Pedro cambió a 2:00 pm – 10:00 pm de lunes a sábado, <b>incluidos los festivos</b>; descansa los domingos. Tuvo licencia no remunerada los días 12, 13 y 14. Su salario es $4.250.000. ¿Cuál es el salario que le corresponde por junio?</p>`,
-saber:[String.raw`<b>Calendario:</b> el 1 de junio de 2026 es lunes. Festivos: 8 (Corpus Christi), 15 (Sagrado Corazón) y 29 (San Pedro y San Pablo), los tres lunes. Domingos: 7, 14, 21 y 28.`,
+saber:[String.raw`<b>Calendario del taller:</b> el 1 de junio cae <b>martes</b> (así viene en la hoja del taller). Domingos: 6, 13, 20 y 27. Festivos: 8 (Corpus Christi), 15 (Sagrado Corazón) y 29 (San Pedro y San Pablo), las fechas legales de 2026; en este calendario caen martes. La licencia cae sábado 12, domingo 13 y lunes 14.`,
 String.raw`<b>Tabla del taller:</b> HN 1,35 · RN 0,35 · HED 1,25 · HEN 1,75 · HDD 1,75 · RD 0,75 · HND 2,10 · RND 1,10 · HEDD 2 · HEND 2,50. Usa un recargo dominical del <b>75 %</b>.`,
 String.raw`<b>Jornada:</b> 7 horas diarias, como en el taller de horas extras; lo que pase de 7 es extra. <b>Nocturna:</b> desde las 7:00 pm (Ley 2466 de 2025, vigente desde el 25 de diciembre de 2025).`,
-String.raw`<b>Valor de la hora:</b> \(4.250.000/(7\times30)=20.238{,}10\). La licencia no remunerada suspende el contrato (art. 51): esos días no se pagan, y el domingo 14 cae dentro de ella.`],
+String.raw`<b>Valor de la hora:</b> \(4.250.000/(7\times30)=20.238{,}10\). La licencia no remunerada suspende el contrato (art. 51): esos días no se pagan.`,
+String.raw`<b>Dominical (art. 173):</b> el descanso del domingo se paga si trabajó toda la semana. La licencia del lunes 14 cae en la semana del domingo 20, así que pierde ese dominical (como en el taller de horas extras).`],
 sol:String.raw`<ol class="steps"><li><b>Un día normal</b> (2 pm – 10 pm, 8 horas): de 2 a 7 pm son 5 HD; de 7 a 9 pm, 2 horas ordinarias nocturnas (HN); de 9 a 10 pm se pasa de 7 horas, así que es 1 HEN.</li>
 <li><b>Un festivo trabajado</b> (8, 15 y 29): el festivo ya se paga como descanso (7 HD, art. 177) y además las horas trabajadas se pagan con el recargo: 5 HDD, 2 HND y 1 HEND.</li>
-<li><b>Domingos 7, 21 y 28:</b> descanso remunerado, 7 HD cada uno, porque cumplió la semana. <b>Días 12, 13 y 14:</b> licencia, no suman.</li>
-<li><b>Totales del mes</b> (21 días normales trabajados, 3 festivos trabajados, 3 domingos de descanso):
+<li><b>Domingos 6 y 27:</b> descanso remunerado, 7 HD cada uno, porque cumplió la semana. <b>Domingo 20:</b> no se paga, por la licencia del lunes 14. <b>Días 12, 13 y 14:</b> licencia, no suman.</li>
+<li><b>Totales del mes</b> (21 días normales trabajados, 3 festivos trabajados, 2 domingos de descanso):
 <div class="tbl"><table><tr><th>Columna</th><th class="num">Horas</th><th class="num">Factor</th><th class="num">Valor</th></tr>
-<tr><td>HD</td><td class="num">147</td><td class="num">1</td><td class="num">2.975.000,00</td></tr>
+<tr><td>HD</td><td class="num">140</td><td class="num">1</td><td class="num">2.833.333,33</td></tr>
 <tr><td>HN</td><td class="num">42</td><td class="num">1,35</td><td class="num">1.147.500,00</td></tr>
 <tr><td>HEN</td><td class="num">21</td><td class="num">1,75</td><td class="num">743.750,00</td></tr>
 <tr><td>HDD</td><td class="num">15</td><td class="num">1,75</td><td class="num">531.250,00</td></tr>
 <tr><td>HND</td><td class="num">6</td><td class="num">2,10</td><td class="num">255.000,00</td></tr>
 <tr><td>HEND</td><td class="num">3</td><td class="num">2,50</td><td class="num">151.785,71</td></tr>
-<tr><td><b>Total</b></td><td></td><td></td><td class="num"><b>5.804.285,71</b></td></tr></table></div></li>
-<li><b>Comprobación:</b> las horas base son 147 HD + 42 HN = 189 = 27 días × 7 (los 30 días menos los 3 de licencia). Sin recargos ni extras habría ganado 4.250.000 × 27/30 = 3.825.000.</li></ol>
-<p class="hint">Si en clase se toma la jornada legal de junio de 2026 (44 horas semanales, 7,33 diarias, hasta el 14 de julio) o la nocturna desde las 9 pm, el resultado cambia. En el resolvedor puedes cambiar esos datos y ver el efecto al instante.</p>`,
-res:String.raw`<p>Salario de junio de 2026: <b>$5.804.285,71</b>, con el recargo del 75 % de la tabla del taller, jornada de 7 horas y nocturna desde las 7 pm. Pedro no tiene auxilio de transporte porque gana más de 2 SMMLV.</p>`},
+<tr><td><b>Total</b></td><td></td><td></td><td class="num"><b>5.662.619,05</b></td></tr></table></div></li>
+<li><b>Comprobación:</b> las horas base son 140 HD + 42 HN = 182 = 26 días × 7 (los 30 días menos los 3 de licencia y el domingo 20). Sin recargos ni extras habría ganado 4.250.000 × 26/30 = 3.683.333,33.</li></ol>
+<p class="hint">Si la licencia no le quitara el dominical, el domingo 20 se pagaría proporcional (5,83 h) y el mes daría $5.780.674,60. Si en clase se toma la jornada legal de junio de 2026 (44 horas semanales, 7,33 diarias, hasta el 14 de julio) o la nocturna desde las 9 pm, el resultado cambia. En el resolvedor puedes cambiar esos datos y ver el efecto al instante.</p>`,
+res:String.raw`<p>Salario de junio de 2026: <b>$5.662.619,05</b>, con el recargo del 75 % de la tabla del taller, jornada de 7 horas y nocturna desde las 7 pm. Pedro no tiene auxilio de transporte porque gana más de 2 SMMLV.</p>`},
 
 {id:"lab26-2",n:"2",t:"Liquidación de las prestaciones sociales desde 2025",tipo:"Liquidación",temas:["prima","cesantias","liquidacion"],tool:{id:"liquidacion",pre:"pedro",lbl:"Abrir la liquidación de Pedro"},
 enun:String.raw`<p>Liquide las prestaciones sociales a que tiene derecho Pedro, teniendo en cuenta que al momento del retiro le adeudan todas las prestaciones desde 2025.</p>`,
 saber:[String.raw`<b>Base:</b> si los tres últimos meses del periodo son iguales, el salario de ese mes; si no, el promedio de lo devengado (sin contar los meses suspendidos). Más el auxilio de transporte si el básico es de hasta 2 SMMLV.`,
 String.raw`<b>Fórmulas:</b> prima y cesantías = base × (días − días art. 51) / 360; intereses = cesantías × días × 12 % / 360.`,
 String.raw`<b>Moras (convención de clase):</b> un día de salario básico (truncado) por cada día de retraso hasta el retiro. Prima: desde el 1 de julio y el 21 de diciembre. Cesantías: desde el 15 de febrero. Intereses no pagados al 31 de enero: se pagan dobles.`,
-String.raw`<b>Datos:</b> 2025, básico 1.835.000 (auxilio 200.000); devengó 3.835.000 de enero a abril y de agosto a diciembre, 5.835.000 en mayo; suspendido junio y julio. 2026, básico 4.250.000 (sin auxilio, porque supera 2 SMMLV); suspendido abril; junio, 5.804.285,71 con 3 días de licencia (punto 1); licencia todo agosto.`],
+String.raw`<b>Datos:</b> 2025, básico 1.835.000 (auxilio 200.000); devengó 3.835.000 de enero a abril y de agosto a diciembre, 5.835.000 en mayo; suspendido junio y julio. 2026, básico 4.250.000 (sin auxilio, porque supera 2 SMMLV); suspendido abril; junio, 5.662.619,05 con 3 días de licencia (punto 1); licencia todo agosto.`],
 sol:String.raw`<h5>2025</h5><ol class="steps">
 <li><b>Prima 1:</b> 1/1/25 – 30/6/25 = 180 − 30 (junio) = 150 días. Marzo, abril y mayo no son iguales, así que la base es el promedio de enero a mayo: (4 × 3.835.000 + 5.835.000)/5 = 4.235.000, más 200.000. \((4.235.000+200.000)\times150/360=\) <b>1.847.917</b>. Mora: 1/7/25 – 31/8/26 = 420 × 61.166 = <b>25.689.720</b>.</li>
 <li><b>Prima 2:</b> 1/7/25 – 31/12/25 = 180 − 30 (julio) = 150. Octubre a diciembre son iguales: \((3.835.000+200.000)\times150/360=\) <b>1.681.250</b>. Mora: 21/12/25 – 31/8/26 = 250 × 61.166 = <b>15.291.500</b>.</li>
 <li><b>Cesantías:</b> 1/1/25 – 31/12/25 = 360 − 60 = 300. \((3.835.000+200.000)\times300/360=\) <b>3.362.500</b>. No se consignaron: mora 15/2/26 – 31/8/26 = 196 × 61.166 = <b>11.988.536</b>.</li>
 <li><b>Intereses:</b> 3.362.500 × 300 × 12 % / 360 = <b>336.250</b>; como no se pagaron al 31 de enero de 2026, la sanción es otro tanto: <b>336.250</b>.</li></ol>
 <h5>2026</h5><ol class="steps">
-<li><b>Prima 1:</b> 1/1/26 – 30/6/26 = 180 − 30 (abril) − 3 (licencia de junio) = 147. Marzo, mayo y junio no son iguales: promedio de enero, febrero, marzo, mayo y junio = (4 × 4.250.000 + 5.804.285,71)/5 = 4.560.857,14. \(4.560.857{,}14\times147/360=\) <b>1.862.350</b>. Mora: 1/7/26 – 31/8/26 = 60 × 141.666 = <b>8.499.960</b>.</li>
+<li><b>Prima 1:</b> 1/1/26 – 30/6/26 = 180 − 30 (abril) − 3 (licencia de junio) = 147. Marzo, mayo y junio no son iguales: promedio de enero, febrero, marzo, mayo y junio = (4 × 4.250.000 + 5.662.619,05)/5 = 4.532.523,81. \(4.532.523{,}81\times147/360=\) <b>1.850.781</b>. Mora: 1/7/26 – 31/8/26 = 60 × 141.666 = <b>8.499.960</b>.</li>
 <li><b>Prima 2:</b> 1/7/26 – 31/8/26 = 60 − 30 (agosto) = 30. Base: julio, 4.250.000. \(4.250.000\times30/360=\) <b>354.167</b>, con la liquidación.</li>
-<li><b>Cesantías:</b> 1/1/26 – 31/8/26 = 240 − 63 = 177. Base: promedio de los seis meses trabajados = 4.509.047,62. \(4.509.047{,}62\times177/360=\) <b>2.216.948</b>, con la liquidación.</li>
-<li><b>Intereses:</b> 2.216.948 × 177 × 12 % / 360 = <b>130.800</b>, con la liquidación.</li></ol>
+<li><b>Cesantías:</b> 1/1/26 – 31/8/26 = 240 − 63 = 177. Base: promedio de los seis meses trabajados = 4.485.436,51. \(4.485.436{,}51\times177/360=\) <b>2.205.340</b>, con la liquidación.</li>
+<li><b>Intereses:</b> 2.205.340 × 177 × 12 % / 360 = <b>130.115</b>, con la liquidación.</li></ol>
 <h5>Resumen</h5><div class="tbl"><table><tr><th>Concepto</th><th class="num">Valor</th></tr>
-<tr><td>Primas (cuatro semestres)</td><td class="num">5.745.684</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.579.448</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">467.050</td></tr>
-<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>11.792.182</b></td></tr>
+<tr><td>Primas (cuatro semestres)</td><td class="num">5.734.115</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.567.840</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">466.365</td></tr>
+<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>11.768.320</b></td></tr>
 <tr><td>Mora de las primas</td><td class="num">49.481.180</td></tr><tr><td>Mora por no consignar las cesantías de 2025</td><td class="num">11.988.536</td></tr><tr><td>Sanción por no pagar los intereses de 2025</td><td class="num">336.250</td></tr>
-<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>73.598.148</b></td></tr></table></div>
-<p class="hint">Junio de 2026 entra al promedio con lo que efectivamente devengó (5.804.285,71). Las vacaciones no son una prestación social, por eso no están aquí. Las moras siguen la regla de clase hasta la fecha de retiro; después del retiro corre la indemnización moratoria del art. 65.</p>`,
-res:String.raw`<p>Prestaciones adeudadas: <b>$11.792.182</b> (primas 5.745.684, cesantías 5.579.448 e intereses 467.050). Con las moras y la sanción por intereses, el total es <b>$73.598.148</b>.</p>`},
+<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>73.574.286</b></td></tr></table></div>
+<p class="hint">Junio de 2026 entra al promedio con lo que efectivamente devengó (5.662.619,05). Las vacaciones no son una prestación social, por eso no están aquí. Las moras siguen la regla de clase hasta la fecha de retiro; después del retiro corre la indemnización moratoria del art. 65.</p>`,
+res:String.raw`<p>Prestaciones adeudadas: <b>$11.768.320</b> (primas 5.734.115, cesantías 5.567.840 e intereses 466.365). Con las moras y la sanción por intereses, el total es <b>$73.574.286</b>.</p>`},
 
 {id:"lab26-3",n:"3",t:"Indemnización por despido sin justa causa",tipo:"Indemnización (art. 64)",temas:["indemnizaciones"],tool:{id:"indemnizaciones",pre:"pedro",lbl:"Abrir la indemnización de Pedro"},
 enun:String.raw`<p>El 25 de agosto le notifican a Pedro que desde el 1 de septiembre ya no trabajará porque el cargo se lo darán a otra persona. Realice la indemnización a que tiene derecho.</p>`,
