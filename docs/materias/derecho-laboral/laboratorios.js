@@ -38,6 +38,27 @@ SIMS.pro=function(){
 };
 
 // ---- Indemnización (art. 64)
+// ---- Guardar resultados: cada herramienta guarda sus datos con un nombre (en este navegador) y recuerda lo último que se hizo
+function guardados(key,{get,set,label,restore}){const K="eco-guard-"+key,KL="eco-last-"+key,esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const rd=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},wr=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+  const lista=()=>rd(K)||[],box=document.createElement("details");box.className="gbox";
+  const draw=(m)=>{const a=lista();box.innerHTML=`<summary>💾 Guardar este resultado o abrir uno guardado${a.length?` <span class="gb-n">${a.length}</span>`:""}</summary><div class="gb-in">
+    <div class="gb-row"><label for="${key}-gn">Nombre<input id="${key}-gn" placeholder="Por ejemplo: ${esc(label)} de Pedro"></label><button class="btn" type="button" data-g="save">Guardar</button></div>
+    ${a.length?`<ul class="gb-l">${a.map((x,i)=>`<li><span><b>${esc(x.n)}</b><small>${esc(x.f)}</small></span><span><button class="btn" type="button" data-g="open" data-i="${i}">Abrir</button><button class="btn gb-del" type="button" data-g="del" data-i="${i}" aria-label="Borrar ${esc(x.n)}">Borrar</button></span></li>`).join("")}</ul>`:`<p class="hint">Todavía no has guardado nada aquí.</p>`}
+    <p class="hint" style="margin:0">Se guarda en este navegador (si cambias de celular o computador, no aparece allá). Además, la herramienta recuerda lo último que hiciste.</p><p class="gb-m" role="status">${m||""}</p></div>`};
+  box.addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;const a=lista();
+    if(b.dataset.g==="save"){const n=($(key+"-gn").value||"").trim()||`${label} ${a.length+1}`;a.unshift({n,f:new Date().toLocaleString("es-CO",{dateStyle:"medium",timeStyle:"short"}),s:get()});
+      const ok=wr(K,a.slice(0,40));draw(ok?`Guardado «${esc(n)}». Ya puedes hacer otro.`:"No se pudo guardar: este navegador no permite guardar datos (por ejemplo, en modo incógnito).");box.open=true}
+    else if(b.dataset.g==="open"){const x=a[+b.dataset.i];if(x){set(x.s);wr(KL,get());draw(`Abriste «${esc(x.n)}».`);box.open=true}}
+    else if(b.dataset.g==="del"){const x=a.splice(+b.dataset.i,1)[0];wr(K,a);draw(`Borraste «${esc(x.n)}».`);box.open=true}});
+  draw();$("sim").prepend(box);
+  // lo último que se hizo: se restaura al volver, salvo que se llegue desde un taller con datos cargados
+  let tm=null;const saveLast=()=>{clearTimeout(tm);tm=setTimeout(()=>wr(KL,get()),400)};
+  $("sim").addEventListener("input",saveLast);$("sim").addEventListener("change",saveLast);$("sim").addEventListener("click",e=>{if(e.target.closest(".pre button,[data-k]"))saveLast()});
+  const last=rd(KL);if(restore&&last){try{set(last);draw("Se cargó lo último que hiciste aquí.")}catch(e){}}else saveLast()}
+const formGet=ids=>()=>Object.fromEntries(ids.filter(i=>$(i)).map(i=>[i,$(i).type==="checkbox"?$(i).checked:$(i).value]));
+const formSet=(ids,after)=>st=>{ids.forEach(i=>{const el=$(i);if(el&&i in st){if(el.type==="checkbox")el.checked=st[i];else el.value=st[i]}});after()};
+
 SIMS.ind=function(){
   $("sim").innerHTML=`<div class="calcf">${selIn("i-tipo","Tipo de contrato",[["indef","Término indefinido"],["fijo","Término fijo"],["obra","Obra o labor"]],"indef")}${numIn("i-sal","Último salario mensual",3000000,"10000")}
   <span id="i-wini">${dateIn("i-ini","Inicio del contrato","2025-01-01")}</span>${dateIn("i-des","Fecha del despido","2026-05-10")}<span id="i-wfin" hidden>${dateIn("i-fin","Vencimiento pactado o fin de la obra","2026-12-31")}</span></div>
@@ -52,8 +73,9 @@ SIMS.ind=function(){
     else{
       $("i-res").innerHTML=tiles([["Tiempo que faltaba",`${R.falta.toLocaleString("es-CO")} días`],["Días a pagar",String(R.dias)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
       $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Días que faltaban = días360(${dt(des)}, ${dt(fin)}) = ${R.falta}${R.minimo15?"<br>Es menor que 15 ⇒ se paga el mínimo de 15 días (obra o labor)":""}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>${tipo==="fijo"?`<p class="hint" style="margin:0">Usa como vencimiento el fin del período o de la prórroga que estaba corriendo. La estación de prórrogas te da esa fecha.</p>`:""}`)}};
-  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;const P={pedro:{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31"}}[pre];if(P){$("i-tipo").value=P.tipo;$("i-sal").value=P.sal;$("i-ini").value=P.ini;$("i-des").value=P.des}}
+  const pre=window.TOOL_PRE;window.TOOL_PRE=null;const P={pedro:{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31"}}[pre];if(P){$("i-tipo").value=P.tipo;$("i-sal").value=P.sal;$("i-ini").value=P.ini;$("i-des").value=P.des}
   watch(["i-tipo","i-sal","i-ini","i-des","i-fin"],run);run();
+  {const ids=["i-tipo","i-sal","i-ini","i-des","i-fin"];guardados("indem",{get:formGet(ids),set:formSet(ids,run),label:"Indemnización",restore:!P})}
 };
 
 // ---- Moratoria (art. 65)
@@ -126,7 +148,7 @@ SIMS.val=function(){
 const PLAP={
   ej1:{t:"Taller · Ejercicio 1 (ingresó por primera vez)",ingreso:2,venia:false,salario:2940000,x:"2-4: 8am-5pm\n5: 10pm-7am\n6: descanso\n7-11: 6pm-4am\n12: 1pm-8pm\n13: 2pm-11pm\n14-15: 2pm-11pm\n16-19: 8am-12m, 2pm-7pm\n20-21: 5am-3pm\n22-24: 11am-9pm\n25: permiso remunerado\n26: descanso\n27-28: 10pm-7am\n29-30: incapacidad\n31: 9pm-7am"},
   ej2:{t:"Taller · Ejercicio 2 (venía laborando)",ingreso:1,venia:true,salario:2850000,x:"1-4: 2pm-11pm\n5-6: descanso\n7-9: 9pm-7am\n10-12: sancion\n13-15: 7pm-4am\n16-19: 8am-12m, 2pm-8pm\n20-21: 10am-7pm\n22-23: 10pm-8am\n24: licencia no remunerada\n25: 10pm-8am\n26: incapacidad\n27-28: 2pm-11pm\n29: descanso\n30-31: licencia no remunerada"},
-  pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",ingreso:1,venia:true,salario:4250000,n:30,w:"1",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-6: 2pm-10pm\n8-11: 2pm-10pm\n12-14: licencia no remunerada\n15-20: 2pm-10pm\n22-27: 2pm-10pm\n29-30: 2pm-10pm"},
+  pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",ingreso:1,venia:true,salario:4250000,n:30,w:"2",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# Calendario del taller: el 1 de junio es martes; domingos 6, 13, 20 y 27\n# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-5: 2pm-10pm\n7-11: 2pm-10pm\n12-14: licencia no remunerada\n15-19: 2pm-10pm\n21-26: 2pm-10pm\n28-30: 2pm-10pm"},
   vacio:{t:"Empezar en blanco",ingreso:1,venia:true,salario:2000000,x:"1-3: 6am-2pm\n"}};
 const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],DI1="DLMMJVS";
 const hh=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mi=m%60,ap=h<12?"a. m.":"p. m.",h12=h%12===0?12:h%12;return `${h12}:${String(mi).padStart(2,"0")} ${ap}`};
@@ -187,9 +209,11 @@ SIMS.planilla=function(){
     <div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
     <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>
     <div class="stepc"><h4><span class="n">5</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
-  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre&&PLAP[pre]?pre:"ej1")}
+  const pre=window.TOOL_PRE;window.TOOL_PRE=null;const viaPre=!!(pre&&PLAP[pre]);load(viaPre?pre:"ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
-  watch(["pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"],run);run()};
+  const PIDS=["pl-pre","pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"];
+  watch(PIDS.slice(1),run);run();
+  guardados("planilla",{get:formGet(PIDS),set:formSet(PIDS,run),label:"Planilla",restore:!viaPre})};
 
 // ---- Prima de servicios (art. 306)
 SIMS.prima=function(){
@@ -231,6 +255,9 @@ SIMS.prima=function(){
   $("pr-sem").addEventListener("change",()=>{drawM();run()});
   watch(["pr-an","pr-ing","pr-ret","pr-aux","pr-aus","pr-pago","pr-bm"],run);
   drawM();run();
+  {const ids=["pr-an","pr-ing","pr-ret","pr-aux","pr-aus","pr-pago","pr-bm"];guardados("prima",{label:"Prima",restore:true,
+    get:()=>Object.assign(formGet(ids)(),{sem:$("pr-sem").value,m:Array.from({length:6},(_,i)=>$("pr-m"+i).value)}),
+    set:st=>{$("pr-sem").value=st.sem||"1";drawM();(st.m||[]).forEach((v,i)=>{if($("pr-m"+i))$("pr-m"+i).value=v});formSet(ids,run)(st)}})}
 };
 
 // ---- Liquidación de prestaciones con el formato de clase (primas, cesantías e intereses)
@@ -270,11 +297,14 @@ SIMS.liq=function(){
   const PEDRO={ini:"2025-01-01",ret:"2026-08-31",m:{}};
   [1,2,3,4].forEach(m=>PEDRO.m["2025-"+m]=[1835000,2000000,0,"Comisiones"]);PEDRO.m["2025-5"]=[1835000,4000000,0,"Comisiones"];PEDRO.m["2025-6"]=[1835000,0,30,"Suspensión"];PEDRO.m["2025-7"]=[1835000,0,30,"Suspensión"];
   [8,9,10,11,12].forEach(m=>PEDRO.m["2025-"+m]=[1835000,2000000,0,"Comisiones"]);[1,2,3,5,7].forEach(m=>PEDRO.m["2026-"+m]=[4250000,0,0,""]);PEDRO.m["2026-4"]=[4250000,0,30,"Suspensión"];
-  PEDRO.m["2026-6"]=[4250000,1554286,3,"Turno 2pm-10pm; licencia 12-14"];PEDRO.m["2026-8"]=[4250000,0,30,"Licencia no remunerada"];
+  PEDRO.m["2026-6"]=[4250000,1412619.05,3,"Turno 2pm-10pm; licencia 12-14"];PEDRO.m["2026-8"]=[4250000,0,30,"Licencia no remunerada"];
   const load=k=>{if(k==="pedro"){$("lq-ini").value=PEDRO.ini;$("lq-ret").value=PEDRO.ret;vals=JSON.parse(JSON.stringify(PEDRO.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false;$("lq-m").innerHTML="";draw();return}
     if(k==="clase"){$("lq-ini").value=CLASE.ini;$("lq-ret").value=CLASE.ret;vals=JSON.parse(JSON.stringify(CLASE.m));$("lq-pp").checked=$("lq-pc").checked=$("lq-pi").checked=false}
     else{vals={};$("lq-ini").value=di(HOY).slice(0,4)+"-01-01";$("lq-ret").value=di(HOY)}$("lq-m").innerHTML="";draw()};
   $("lq-ej").addEventListener("click",e=>{const bt=e.target.closest("button");if(bt)load(bt.dataset.k)});
   ["lq-ini","lq-ret"].forEach(i=>$(i).addEventListener("change",draw));["lq-pp","lq-pc","lq-pi"].forEach(i=>$(i).addEventListener("change",run));
-  {const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre==="pedro"?"pedro":"clase")}
+  const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre==="pedro"?"pedro":"clase");
+  guardados("liquidacion",{label:"Liquidación",restore:pre!=="pedro",
+    get:()=>{read();return{ini:$("lq-ini").value,ret:$("lq-ret").value,vals:JSON.parse(JSON.stringify(vals)),pp:$("lq-pp").checked,pc:$("lq-pc").checked,pi:$("lq-pi").checked}},
+    set:st=>{$("lq-ini").value=st.ini;$("lq-ret").value=st.ret;vals=JSON.parse(JSON.stringify(st.vals||{}));$("lq-pp").checked=!!st.pp;$("lq-pc").checked=!!st.pc;$("lq-pi").checked=!!st.pi;$("lq-m").innerHTML="";draw()}})
 };
