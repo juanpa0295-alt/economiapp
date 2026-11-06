@@ -30,6 +30,17 @@ const PRESETS={
  c3:{t:"Taller 2 · Ej. 2 · Cournot con q ∈ {1, 2, 3}",R:["1","2","3"],C:["1","2","3"],cells:[["4, 4","3, 6","2, 6"],["6, 3","4, 4","2, 3"],["6, 2","3, 2","0, 0"]]},
  c6:{t:"Taller 2 · Ej. 6 · Cournot finito (a − c = 12)",R:["qm/2","qc"],C:["qm/2","qc"],cells:[["18, 18","15, 20"],["20, 15","16, 16"]]},
  hr:{t:"Taller 2 · Ej. 13 · Harrison y Rutström (1991), Tabla I",R:["K","A"],C:["K","A"],p1:"EE. UU.",p2:"CE",cells:[["0, 0","0.85, -3.85"],["-3.31, 1.06","1.46, 0.62"]]}};
+// ---------- Talleres: cada preset dice de qué taller y punto es, para agrupar y ordenar los menús
+// [taller, orden, etiqueta]; taller null = ejemplo
+const TLGRP=[["1","Primer taller"],["2","Segundo taller"],["3","Tercer taller"],[null,"Ejemplos"]];
+function tagPre(O,meta){Object.entries(meta).forEach(([k,[tl,ord,t]])=>{if(O[k])Object.assign(O[k],{tl,ord,t})})}
+function preOpts(O,list,sel){const ks=list.filter(k=>O[k]);return TLGRP.map(([g,name])=>{const its=ks.filter(k=>(O[k].tl||null)===g).sort((a,b)=>(O[a].ord||99)-(O[b].ord||99));
+  return its.length?`<optgroup label="${name}">${its.map(k=>`<option value="${k}"${k===sel?" selected":""}>${O[k].t}</option>`).join("")}</optgroup>`:""}).join("")}
+function takePre(O){const p=window.TOOL_PRE;window.TOOL_PRE=null;return p&&O[p]?p:null}
+tagPre(PRESETS,{ej1:["1",1,"Punto 1 · Entrada al mercado"],ej2:["1",2,"Punto 2 · Figura 1 en forma estratégica"],tabla1:["1",3,"Punto 3a y 3c · Batalla de los sexos (Tabla 1)"],ej3b:["1",3.5,"Punto 3b · Batalla de los sexos secuencial"],
+  tabla2:["1",4,"Punto 4 · Tabla 2"],tabla3:["1",5,"Punto 5 · Tabla 3"],ej6:["1",6,"Punto 6 · Juegos o Macro"],tabla5:["1",7,"Punto 7 · Tabla 5"],ej10:["1",10,"Punto 10 · Figura 2 en forma estratégica"],
+  tabla4:["1",15,"Punto 15 · Tabla 4 (racionalizables)"],tabla6:["1",16,"Punto 16 · Tabla 6 (reparto de 10 US$)"],ej17a:["1",17,"Punto 17 · Suma cero, primera matriz"],ej17b:["1",17.5,"Punto 17 · Suma cero, segunda matriz"],ej18:["1",18,"Punto 18 · Penal (portero contra pateador)"],
+  c3:["2",2,"Punto 2 · Cournot con q ∈ {1, 2, 3}"],c6:["2",6,"Punto 6 · Cournot finito (a − c = 12)"],hr:["2",13,"Punto 13 · Harrison y Rutström (1991), Tabla I"],app:[null,1,"Ejemplo de Economiapp (mixtas 2×2)"]});
 const ALPH=["A","B","C","D","E","F"],ALPH2=["R","S","T","U","V","W"];
 
 // ---------- Presentación de una bimatriz con mejores respuestas subrayadas
@@ -95,8 +106,8 @@ function mixedHTML(G2,p1n="1",p2n="2"){const M=GT.mixed2x2(G2),[r0,r1]=G2.R,[c0,
   return h}
 
 // ---------- Resolvedor completo
-function solverUI(root,opt){const pfx=opt.id,secs=opt.sections,list=opt.presets||Object.keys(PRESETS);let st=JSON.parse(JSON.stringify(PRESETS[opt.preset]));let practice=false;
-  root.innerHTML=`<div class="row slv-top"><label class="selw" for="${pfx}-pre">Ejercicio<select id="${pfx}-pre">${list.map(k=>`<option value="${k}" ${k===opt.preset?"selected":""}>${PRESETS[k].t}</option>`).join("")}<option value="_r2">Juego aleatorio 2×2 para practicar</option><option value="_r3">Juego aleatorio 3×3 para practicar</option></select></label>
+function solverUI(root,opt){const pfx=opt.id,secs=opt.sections,list=opt.presets||Object.keys(PRESETS);{const tp=takePre(PRESETS);if(tp){opt=Object.assign({},opt,{preset:tp});if(!list.includes(tp))list.push(tp)}}let st=JSON.parse(JSON.stringify(PRESETS[opt.preset]));let practice=false;
+  root.innerHTML=`<div class="row slv-top"><label class="selw" for="${pfx}-pre">Ejercicio<select id="${pfx}-pre">${preOpts(PRESETS,list,opt.preset)}<optgroup label="Para practicar"><option value="_r2">Juego aleatorio 2×2 para practicar</option><option value="_r3">Juego aleatorio 3×3 para practicar</option></optgroup></select></label>
     <label class="selw" for="${pfx}-m">Filas<select id="${pfx}-m">${[2,3,4,5,6].map(v=>`<option>${v}</option>`).join("")}</select></label>
     <label class="selw" for="${pfx}-n">Columnas<select id="${pfx}-n">${[2,3,4,5,6].map(v=>`<option>${v}</option>`).join("")}</select></label></div>
     <div class="row"><label class="chkl" for="${pfx}-zs"><input type="checkbox" id="${pfx}-zs"> Suma cero: escribo solo los pagos del jugador 1</label>${opt.noPractice?"":`<label class="chkl" for="${pfx}-pr"><input type="checkbox" id="${pfx}-pr"> Modo práctica: ocultar la solución</label>`}</div>
@@ -167,8 +178,8 @@ function solverUI(root,opt){const pfx=opt.id,secs=opt.sections,list=opt.presets|
   root.addEventListener("click",e=>{const b=e.target.closest("[data-reveal]");if(b){b.nextElementSibling.hidden=false;b.remove()}});
   grid();run()}
 
-SIMS.dom=()=>solverUI($("sim"),{id:"sd",preset:"tabla2",sections:["forma","elim"],presets:["tabla2","tabla3","tabla4","tabla6","ej2","tabla5"]});
-SIMS.nash=()=>solverUI($("sim"),{id:"sn",preset:"tabla1",sections:["forma","nash"],presets:["tabla1","tabla2","tabla3","ej6","tabla5","ej1","ej2","ej10","tabla6"]});
+SIMS.dom=()=>solverUI($("sim"),{id:"sd",preset:"tabla2",sections:["forma","elim"],presets:["tabla2","tabla3","tabla4","tabla6","ej17b","tabla5","c6","hr"]});
+SIMS.nash=()=>solverUI($("sim"),{id:"sn",preset:"tabla1",sections:["forma","nash"],presets:["ej1","ej2","tabla1","ej3b","tabla2","tabla3","ej6","tabla5","ej10","tabla6","c3","c6","hr"]});
 SIMS.mix=()=>solverUI($("sim"),{id:"sm",preset:"app",sections:["nash","mixtas"],presets:["app","tabla1","ej6","tabla2","tabla3","tabla5","ej1","ej18"]});
 SIMS.rac=()=>solverUI($("sim"),{id:"sr",preset:"tabla4",sections:["forma","elim"],presets:["tabla4","tabla3","tabla2"]});
 SIMS.mm=()=>solverUI($("sim"),{id:"sx",preset:"ej18",sections:["forma","maximin"],presets:["ej18","ej17a","ej17b","tabla6","tabla1"]});
@@ -259,6 +270,29 @@ G
   Abajo: 2
     Izq: 0, 0
     Der: 1, 3`},
+ c3t:{t:"",x:`# Cournot con q ∈ {qB, qM, qA} = {1, 2, 3}: la firma 2 no observa a la 1
+1
+  qB: 2 [h]
+    qB: 4, 4
+    qM: 3, 6
+    qA: 2, 6
+  qM: 2 [h]
+    qB: 6, 3
+    qM: 4, 4
+    qA: 2, 3
+  qA: 2 [h]
+    qB: 6, 2
+    qM: 3, 2
+    qA: 0, 0`},
+ hrt:{t:"",x:`# Harrison y Rutström (1991): mantener (K) o abolir (A) la protección.
+# La CE elige sin saber qué hizo EE. UU. (pagos en miles de millones de dólares)
+EEUU
+  K: CE [h]
+    K: 0, 0
+    A: 0.85, -3.85
+  A: CE [h]
+    K: -3.31, 1.06
+    A: 1.46, 0.62`},
  cien:{t:"Ciempiés (cuatro etapas)",x:`# En cada nodo: seguir (S) o terminar (T)
 1
   T: 1, 0
@@ -317,8 +351,11 @@ function extBehavText(T,p,behav,{detail}={}){const Hs=T.H.filter(h=>h.p===p);
   return parts.map((x,k)=>Hs.length>1?`${x.pure?x.a:`(${x.a})`} ${extWhere(Hs[k])}`:(x.pure?x.a:`(${x.a})`)).join("; ")}
 function extWhere(h){const hs=h.nodes.map(GT.extHistory);return hs[0]==="inicio"?"al inicio":`tras ${hs.join(" o ")}`}
 
-function extUI(root,preset){const P=`x${Math.random().toString(36).slice(2,7)}`;let practice=false,sel=0,last=null,timer=null;
-  root.innerHTML=`<div class="row slv-top"><label class="selw" for="${P}-pre">Ejercicio<select id="${P}-pre">${Object.keys(EXTP).map(k=>`<option value="${k}" ${k===preset?"selected":""}>${EXTP[k].t}</option>`).join("")}</select></label>
+tagPre(EXTP,{ent:["1",1,"Punto 1 · Entrada al mercado"],fig1:["1",2,"Punto 2 · Figura 1"],bosSim:["1",3,"Punto 3a · Batalla de los sexos simultánea"],bosSeq:["1",3.5,"Punto 3b · Batalla de los sexos secuencial"],t5:["1",7,"Punto 7 · Tabla 5 jugada en secuencia"],
+  fig2:["1",10,"Punto 10 · Figura 2"],fig3:["1",12,"Punto 12 · Figura 3 (tres jugadores)"],fig4:["1",13,"Punto 13 · Figura 4 (tres jugadores)"],c3t:["2",2,"Punto 2 · Cournot finito en forma extensiva"],hrt:["2",13,"Punto 13b · Harrison y Rutström en forma extensiva"],
+  app:[null,1,"Ejemplo de Economiapp (secuencial 2×2)"],cien:[null,2,"Ciempiés (cuatro etapas)"],azar:[null,3,"Con azar: el tipo del jugador 1"]});
+function extUI(root,preset){preset=takePre(EXTP)||preset;const P=`x${Math.random().toString(36).slice(2,7)}`;let practice=false,sel=0,last=null,timer=null;
+  root.innerHTML=`<div class="row slv-top"><label class="selw" for="${P}-pre">Ejercicio<select id="${P}-pre">${preOpts(EXTP,Object.keys(EXTP),preset)}</select></label>
     <label class="chkl" for="${P}-pr"><input type="checkbox" id="${P}-pr"> Modo práctica: ocultar la solución</label></div>
     <div class="ext-ed"><label class="selw" for="${P}-tx">Árbol del juego<textarea id="${P}-tx" spellcheck="false" autocapitalize="off" autocomplete="off" rows="12"></textarea></label>
     <details class="ext-help"><summary>Cómo escribir el árbol</summary>
@@ -420,8 +457,9 @@ SIMS.sub=()=>extUI($("sim"),"fig2");
 const T3P={
   f4:{t:"Ej. 13 · Figura 4",S:[["A","B"],["X","Y"],["C","D"]],P:[[["2, 2, 2","0, 2, 0"],["0, 1, 0","2, 1, 2"]],[["1, 0, 3","1, 0, 3"],["1, 0, 3","1, 0, 3"]]]},
   f3:{t:"Ej. 12 · Figura 3",S:[["C","B"],["C'","B'"],["I","D"]],P:[[["1, 1, 1","1, 1, 1"],["4, 4, 0","0, 0, 1"]],[["3, 2, 2","0, 0, 0"],["3, 2, 2","0, 0, 0"]]]}};
+tagPre(T3P,{f4:["1",13,"Punto 13 · Figura 4"],f3:["1",12,"Punto 12 · Figura 3"]});
 SIMS.tres=function(){let st=JSON.parse(JSON.stringify(T3P.f4));
-  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="t3-pre">Ejercicio<select id="t3-pre">${Object.keys(T3P).map(k=>`<option value="${k}">${T3P[k].t}</option>`).join("")}</select></label></div>
+  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="t3-pre">Ejercicio<select id="t3-pre">${preOpts(T3P,Object.keys(T3P),"f4")}</select></label></div>
   <p class="hint" style="margin:0">Como en tus apuntes: una tabla por cada estrategia del jugador 3. Cada celda es «π₁, π₂, π₃».</p><div id="t3-in"></div><div id="t3-out" class="slv-out"></div>`;
   const build=()=>{let h=`<div class="calcf">${[0,1,2].map(p=>st.S[p].map((s,k)=>`<label for="t3-s${p}${k}">Estrategia ${k+1} del jugador ${p+1}<input id="t3-s${p}${k}" value="${s}"></label>`).join("")).join("")}</div><div class="t3grid">`;
     st.S[2].forEach((s3,k)=>{h+=`<div class="tbl gin"><table><tr><th>S₃ = ${s3}</th>${st.S[1].map(s2=>`<th>${s2}</th>`).join("")}</tr>${st.S[0].map((s1,i)=>`<tr><th>${s1}</th>${st.S[1].map((_,j)=>`<td><input id="t3-x${i}${j}${k}" value="${st.P[i][j][k]}" aria-label="Pagos de (${s1}, ${st.S[1][j]}, ${s3})"></td>`).join("")}</tr>`).join("")}</table></div>`});
@@ -465,7 +503,21 @@ const EXP={
   ebp1:{t:"EBP · Ejemplo 1",x:"r 1: A>(0,2) B>x C>y\nx 2 h: a>(2,1) b>(-1,-1)\ny 2 h: a>(1,1) b>(-2,0)"},
   ebp2:{t:"EBP · Ejemplo 2",x:"r 1: D>(1,3) C>x I>y\nx 2 h: a>(0,1) b>(0,2)\ny 2 h: a>(0,0) b>(2,1)"},
   tres:{t:"EBP · Tres jugadores (requisito 4)",x:"r 1: A>x B>(1,0,3)\nx 2: X>y Y>z\ny 3 h: C>(2,2,2) D>(0,2,0)\nz 3 h*: C>(0,1,0) D>(2,1,2)"},
-  req5:{t:"EBP · Requisito 5 (estrategias dominadas)",x:"r 1: D>(2,2) C>x I>y\nx 2 h: a>(0,1) b>(1,0)\ny 2 h*: a>(0,0) b>(3,1)"}};
+  req5:{t:"EBP · Requisito 5 (estrategias dominadas)",x:"r 1: D>(2,2) C>x I>y\nx 2 h: a>(0,1) b>(1,0)\ny 2 h*: a>(0,0) b>(3,1)"},
+  t1ent:{t:"",x:"r 1: E>n2 NE>(0,2)\nn2 2: P>(-1,-1) C>(1,1)"},
+  t1f1:{t:"",x:"r 1: Z>x X>y Y>w\nx 2 h: R>(1,1) L>(0,0)\ny 2 h: R>(0,0) L>v\nv 1: B>(3,2) A>(1,2)\nw 2 k: R>(2,2) L>(2,3)"},
+  t1bos:{t:"",x:"r 1: B>x S>y\nx 2 h: B>(3,2) S>(1,1)\ny 2 h: B>(0,0) S>(2,3)"},
+  t1bseq:{t:"",x:"r 1: B>x S>y\nx 2: B>(3,2) S>(1,1)\ny 2: B>(0,0) S>(2,3)"},
+  t1t5:{t:"",x:"r 1: A>x B>y\nx 2: I>(1,9) D>(1,9)\ny 2: I>(0,0) D>(2,1)"},
+  t1f2:{t:"",x:"r 1: A>x B>y\nx 2 h: X>z Y>(5,5)\ny 2 h: X>(8,3) Y>(3,8)\nz 1: C>(1,0) D>(2,10)"},
+  t1f3:{t:"",x:"r 1: C>x B>y\nx 2: C'>(1,1,1) B'>z\ny 3 h: I>(3,2,2) D>(0,0,0)\nz 3 h: I>(4,4,0) D>(0,0,1)"},
+  t1f4:{t:"",x:"r 1: A>x B>(1,0,3)\nx 2: X>y Y>z\ny 3 h: C>(2,2,2) D>(0,2,0)\nz 3 h: C>(0,1,0) D>(2,1,2)"},
+  t2c3:{t:"",x:"r 1: qB>x qM>y qA>z\nx 2 h: qB>(4,4) qM>(3,6) qA>(2,6)\ny 2 h: qB>(6,3) qM>(4,4) qA>(2,3)\nz 2 h: qB>(6,2) qM>(3,2) qA>(0,0)"},
+  t2hr:{t:"",x:"r 1: K>x A>y\nx 2 h: K>(0,0) A>(0.85,-3.85)\ny 2 h: K>(-3.31,1.06) A>(1.46,0.62)"}};
+tagPre(EXP,{t1ent:["1",1,"Punto 1 · Entrada al mercado"],t1f1:["1",2,"Punto 2 · Figura 1"],t1bos:["1",3,"Punto 3a · Batalla de los sexos simultánea"],t1bseq:["1",3.5,"Punto 3b · Batalla de los sexos secuencial"],t1t5:["1",7,"Punto 7 · Tabla 5 en secuencia"],
+  t1f2:["1",10,"Punto 10 · Figura 2"],t1f3:["1",12,"Punto 12 · Figura 3 (tres jugadores)"],t1f4:["1",13,"Punto 13 · Figura 4 (tres jugadores)"],t2c3:["2",2,"Punto 2 · Cournot finito en forma extensiva"],t2hr:["2",13,"Punto 13b · Harrison y Rutström"],
+  ent:["3",1,"Punto 1 · Entrada al mercado (millones US$)"],ns:["3",2,"Punto 2 · Norte o Sur en secuencia"],f1:["3",3,"Punto 3 · Figura 1"],f2:["3",4,"Punto 4 · Figura 2"],f3:["3",5,"Punto 5 · Figura 3"],f4:["3",6,"Punto 6 · Figura 4 (tres jugadores)"],f5:["3",6.5,"Punto 6 · Figura 5"],f6:["3",9,"Punto 9 · Figura 6"],
+  eps1:[null,1,"EPS · Ejemplo 1 (amenaza no creíble)"],eps2:[null,2,"EPS · Ejemplo 2"],damme:[null,3,"EPS · Ejemplo 3 (van Damme, 1987)"],ebp1:[null,4,"EBP · Ejemplo 1"],ebp2:[null,5,"EBP · Ejemplo 2"],tres:[null,6,"EBP · Tres jugadores (requisito 4)"],req5:[null,7,"EBP · Requisito 5 (estrategias dominadas)"]});
 const uS=u=>`(${u.map(qs_).join(", ")})`;
 function arbTree(g,A,path){const ids=g.pre,leaves=ids.filter(id=>g.nodes[id].leaf),Y={},dx=150,dy=34;let k=0;
   const place=id=>{const n=g.nodes[id];if(n.leaf){Y[id]=k++*dy;return Y[id]}const ys=n.ch.map(place);Y[id]=(ys[0]+ys[ys.length-1])/2;return Y[id]};place(g.root);
@@ -498,8 +550,8 @@ function arbStep(g,st,n){const who=p=>`jugador ${p}`;let h=`<p><b>${n}. Resolvem
     if(st.mixed){h+=`<p>No hay equilibrio en puras. En mixtas, el ${who(s[0].p)} juega ${G.R[0]} con probabilidad ${qs_(st.p)} para que el otro quede indiferente, y el ${who(s[1].p)} juega ${G.C[0]} con probabilidad ${qs_(st.x)}.</p>`}
     else h+=`<p>Equilibrio${st.eqs.length>1?"s":""} de este subjuego: ${st.eqs.map(e=>`(${nmR(0,e[0])}, ${nmR(1,e[1])})`).join(", ")}.</p>`;return h}
   h+=`<div class="tbl"><table><tr><th>Perfil</th><th>Pagos</th><th>¿Equilibrio?</th></tr>${st.prof.map(pr=>`<tr class="${st.eqs.includes(pr)?"ne":""}"><td>(${pr.map((k,i)=>nmR(i,k)).join(", ")})</td><td class="num">${uS(st.val(pr))}</td><td>${st.eqs.includes(pr)?"✓":""}</td></tr>`).join("")}</table></div>`;return h}
-SIMS.arbol=function(opt){opt=opt||{};const pfx=opt.id||"ex",secs=opt.sections||["forma","nash","eps","ebp"],list=opt.presets||Object.keys(EXP);let txt=EXP[opt.preset||list[0]].x,pick=-1;
-  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="${pfx}-pre">Ejercicio<select id="${pfx}-pre">${list.map(k=>`<option value="${k}"${k===(opt.preset||list[0])?" selected":""}>${EXP[k].t}</option>`).join("")}</select></label></div>
+SIMS.arbol=function(opt){opt=opt||{};const pfx=opt.id||"ex",secs=opt.sections||["forma","nash","eps","ebp"],list=(opt.presets||Object.keys(EXP)).slice();{const tp=takePre(EXP);if(tp){opt=Object.assign({},opt,{preset:tp});if(!list.includes(tp))list.push(tp)}}let txt=EXP[opt.preset||list[0]].x,pick=-1;
+  $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="${pfx}-pre">Ejercicio<select id="${pfx}-pre">${preOpts(EXP,list,opt.preset||list[0])}</select></label></div>
   <details class="exted"><summary>Editar o escribir otro árbol</summary><p class="hint">Una línea por nodo de decisión: <code>nombre jugador conjunto : acción&gt;destino …</code>. El destino es otro nodo o los pagos entre paréntesis. Los nodos con el mismo conjunto (por ejemplo <code>h</code>) están unidos por la línea punteada; si no escribes conjunto, el nodo está solo. Un <code>*</code> después del conjunto (<code>h*</code>) indica a qué nodo se refiere μ.</p><textarea id="${pfx}-tx" rows="6" spellcheck="false" aria-label="Árbol del juego"></textarea></details>
   <div id="${pfx}-out" class="slv-out"></div>`;
   const tx=$(pfx+"-tx");tx.value=txt;
