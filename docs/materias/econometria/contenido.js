@@ -1547,3 +1547,163 @@ sol:String.raw`<h5>¿La misma función?</h5><ol class="steps">
 <li>\(\sum(x-\bar x)^2=256(24)=6.144\), así que \(ee(b)=\sqrt{0{,}38/6.144}=0{,}00786\).</li>
 <li>H₀: β = 0,10. \(t=\dfrac{0{,}07-0{,}10}{0{,}00786}=-3{,}81\), y \(|t|>1{,}97\), así que se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 10,18 &gt; 2,41: la función de gasto difiere entre grupos de ingreso. La elasticidad conjunta 0,07 es significativamente distinta de 0,10 (t = −3,81).</p>`}]});
+
+
+// =====================================================================
+// PRUEBAS W, LR Y LM: la trinidad clásica (rama de Inferencia)
+// =====================================================================
+BRANCHES.push({g:"Pruebas Wald, LR y LM", from:"inferencia", items:[
+{id:"trinidad", t:"Wald, LR y LM: tres formas de probar restricciones", nuevo:true, exam:true, html:String.raw`
+<section><h3>La idea</h3>
+<p class="lead">Las tres pruebas responden la misma pregunta que la F: ¿son creíbles las restricciones \(H_0: R\boldsymbol\beta=\mathbf r\)? La diferencia está en qué modelo estiman y qué miden. Las tres siguen una \(\chi^2(q)\) cuando la muestra es grande, con q = número de restricciones.</p>
+<div class="tbl"><table><tr><th>Prueba</th><th>Modelo que estima</th><th>Qué mide</th><th>Distribución</th></tr>
+<tr><td><b>Wald (W)</b></td><td>Solo el no restringido</td><td>Distancia horizontal: ¿está \(R\hat{\boldsymbol\beta}-\mathbf r\) cerca de cero?</td><td>χ²(q)</td></tr>
+<tr><td><b>Razón de verosimilitud (LR)</b></td><td>Los dos</td><td>Distancia vertical: ¿cuánto cae la log-verosimilitud al imponer H₀?</td><td>χ²(q)</td></tr>
+<tr><td><b>Multiplicador de Lagrange (LM)</b></td><td>Solo el restringido</td><td>Pendiente: en el restringido, ¿la verosimilitud todavía quiere subir?</td><td>χ²(q)</td></tr></table></div></section>
+<section><h3>Las fórmulas generales</h3>
+<div class="mj">\[W=(R\hat{\boldsymbol\beta}-\mathbf r)'\left[R\,\hat V(\hat{\boldsymbol\beta})\,R'\right]^{-1}(R\hat{\boldsymbol\beta}-\mathbf r)\qquad LR=2\left(\ell_{NR}-\ell_{R}\right)\qquad LM=nR^2_{aux}\]</div></section>
+<section><h3>En el modelo lineal: solo necesitas las dos SCR</h3>
+<p>Con errores normales y \(\hat\sigma^2=SCR/n\) (máxima verosimilitud):</p>
+<div class="mj">\[W=n\,\frac{SCR_R-SCR_{NR}}{SCR_{NR}}\qquad LR=n\ln\frac{SCR_R}{SCR_{NR}}\qquad LM=n\,\frac{SCR_R-SCR_{NR}}{SCR_R}\]</div>
+<p>Y la relación con la F de siempre: \(W=\dfrac{q\,n}{n-k}\,F\approx qF\).</p></section>
+<section><h3>Por qué siempre W ≥ LR ≥ LM</h3>
+<p>Llama \(x=(SCR_R-SCR_{NR})/SCR_{NR}\ge 0\). Entonces \(W=nx\), \(LR=n\ln(1+x)\) y \(LM=n\,x/(1+x)\). Para todo x ≥ 0 se cumple \(x\ge\ln(1+x)\ge x/(1+x)\).</p>
+<p class="warn"><b>Consecuencia para el examen:</b> como las tres se comparan con el mismo valor crítico, puede pasar que Wald rechace y LM no. No es un error de cálculo: con muestras pequeñas y evidencia en el borde, Wald es la que más rechaza y LM la más conservadora. Con n grande las tres convergen.</p></section>
+<section><h3>LM paso a paso</h3>
+<ol class="steps"><li>Estima el modelo <b>restringido</b> y guarda sus residuos \(\tilde u\).</li>
+<li>Regresa \(\tilde u\) contra <b>todas</b> las variables del modelo no restringido, con constante.</li>
+<li>Calcula \(LM=n\cdot R^2\) de esa regresión auxiliar y compáralo con \(\chi^2(q)\).</li></ol>
+<p>La lógica: si las variables excluidas no importan, no deben explicar nada de los residuos restringidos y el R² será casi cero.</p></section>
+<section><h3>Ejemplo resuelto: Chow con las tres pruebas</h3>
+<p>Modelo simple (k = 2) con n = 40 y quiebre después de la observación 20. \(SCR_R=150\), \(SCR_1=50\), \(SCR_2=60\), así que \(SCR_{NR}=110\) y q = k = 2.</p>
+<ol class="steps"><li>F de Chow: \(F=\dfrac{(150-110)/2}{110/36}=6{,}55>F_{0{,}05}(2,36)=3{,}26\). Se rechaza H₀.</li>
+<li>\(W=40\cdot40/110=14{,}55\); \(LR=40\ln(150/110)=12{,}41\); \(LM=40\cdot40/150=10{,}67\).</li>
+<li>Las tres superan \(\chi^2_{0{,}05}(2)=5{,}99\): hay cambio estructural. Y se cumple 14,55 ≥ 12,41 ≥ 10,67.</li></ol></section>
+<section><h3>Ejemplo resuelto: cuando no coinciden</h3>
+<p>q = 1, n = 25, \(SCR_R=117\), \(SCR_{NR}=100\). Crítico \(\chi^2_{0{,}05}(1)=3{,}84\).</p>
+<div class="tbl"><table><tr><th>Prueba</th><th>Cálculo</th><th>Valor</th><th>p-valor</th><th>Decisión</th></tr>
+<tr><td>Wald</td><td>25 · 17 / 100</td><td>4,25</td><td>0,039</td><td>Rechaza</td></tr>
+<tr><td>LR</td><td>25 · ln(1,17)</td><td>3,93</td><td>0,048</td><td>Rechaza</td></tr>
+<tr><td>LM</td><td>25 · 17 / 117</td><td>3,63</td><td>0,057</td><td>No rechaza</td></tr></table></div>
+<p>En un caso así se reportan las tres, se explica la desigualdad y, si los errores son normales, se da prioridad a la F, que es exacta en muestras pequeñas.</p></section>
+<section><h3>Cuándo conviene cada una</h3>
+<ul><li><b>Wald:</b> cuando el restringido es difícil de estimar (restricciones no lineales). Debilidad: con restricciones no lineales el resultado cambia según cómo se escriba la restricción.</li>
+<li><b>LM:</b> cuando el no restringido es difícil. Por eso muchas pruebas de diagnóstico son LM: Breusch-Pagan (heterocedasticidad) y Breusch-Godfrey (autocorrelación).</li>
+<li><b>LR:</b> cuando se pueden estimar los dos. No depende de cómo se escriba la restricción, pero exige que la verosimilitud esté bien especificada.</li></ul></section>
+<p class="link"><b>Conexión con cambio estructural:</b> la prueba de Chow es la versión F de \(H_0:\boldsymbol\beta^{(1)}=\boldsymbol\beta^{(2)}\). Con las mismas SCR se obtienen W, LR y LM con q = k. Si las varianzas difieren entre tramos, la versión Wald con varianzas separadas, \(W=(\hat{\boldsymbol\beta}_1-\hat{\boldsymbol\beta}_2)'[\hat V_1+\hat V_2]^{-1}(\hat{\boldsymbol\beta}_1-\hat{\boldsymbol\beta}_2)\sim\chi^2(k)\), sigue siendo válida y la F de Chow no.</p>`,
+deep:[
+{k:"Intuición", t:"Las tres pruebas sobre la curva de verosimilitud", html:String.raw`<p>Dibuja la log-verosimilitud \(\ell(\beta)\) como una montaña con cima en \(\hat\beta\) (no restringido). La restricción fija \(\beta=\beta_0\).</p><ul><li><b>Wald</b> mide la distancia horizontal \(\hat\beta-\beta_0\), ponderada por la curvatura: si la montaña es muy puntuda, una distancia pequeña ya es mucha evidencia.</li><li><b>LR</b> mide cuánto se baja de la cima al pararse en \(\beta_0\): \(\ell(\hat\beta)-\ell(\beta_0)\).</li><li><b>LM</b> se para en \(\beta_0\) y mira la pendiente (el score). Si la restricción es cierta, ahí la montaña debería estar casi plana.</li></ul><p>Si la log-verosimilitud fuera exactamente una parábola, las tres darían el mismo número.</p>`},
+{k:"Demostración", t:"Por qué LM = n·R² de la regresión auxiliar", html:String.raw`<p>Los residuos restringidos \(\tilde u\) tienen media cero (el modelo lleva constante), así que su suma de cuadrados total es \(SCR_R\). Al regresarlos contra todas las X, la SCR que queda es la del modelo no restringido, \(SCR_{NR}\). Por tanto \(R^2_{aux}=(SCR_R-SCR_{NR})/SCR_R\) y \(nR^2_{aux}=n(SCR_R-SCR_{NR})/SCR_R\), que es la fórmula de LM.</p>`},
+{k:"Herramienta", t:"Calcularlo con tus números", html:String.raw`<p>La <button class="btn" type="button" data-go="t-calc">Calculadora de ejercicios</button> trae la sección Wald, LR y LM: pones n, q, k y las dos SCR, y te da el procedimiento completo con valores críticos y p-valores. El punto 12 de los Ejercicios propuestos 3 (Nerlove) es un ejemplo completo.</p>`}],
+code:{r:String.raw`library(lmtest)
+m_r  <- lm(y ~ x, data = df)               # restringido
+m_nr <- lm(y ~ x + D + D:x, data = df)     # no restringido
+n <- nobs(m_nr); q <- 2
+scr_r <- deviance(m_r); scr_nr <- deviance(m_nr)
+
+W  <- n * (scr_r - scr_nr) / scr_nr
+LR <- n * log(scr_r / scr_nr)
+LM <- n * (scr_r - scr_nr) / scr_r
+pchisq(c(W = W, LR = LR, LM = LM), df = q, lower.tail = FALSE)
+
+# Con funciones (waldtest usa s² = SCR/(n - k): reporta q·F)
+waldtest(m_r, m_nr, test = "Chisq")
+lrtest(m_r, m_nr)
+aux <- lm(resid(m_r) ~ x + D + D:x, data = df)
+n * summary(aux)$r.squared                 # LM`, stata:String.raw`reg y x D Dx
+test D Dx                 // F (y Wald = q·F)
+estimates store nr
+reg y x
+estimates store r
+lrtest nr r               // LR
+predict u_r, resid
+reg u_r x D Dx
+display e(N)*e(r2)        // LM`, py:String.raw`import numpy as np
+from scipy.stats import chi2
+r  = smf.ols("y ~ x", data=df).fit()
+nr = smf.ols("y ~ x + D + D:x", data=df).fit()
+n, q = nr.nobs, 2
+W  = n * (r.ssr - nr.ssr) / nr.ssr
+LR = n * np.log(r.ssr / nr.ssr)
+LM = n * (r.ssr - nr.ssr) / r.ssr
+print(chi2.sf([W, LR, LM], q))`},
+qs:[{q:"¿Qué prueba usarías si el modelo no restringido es muy difícil de estimar?",a:"LM: solo necesita el modelo restringido. Por eso Breusch-Pagan y Breusch-Godfrey son pruebas LM."},
+{q:"n = 30, q = 2, SCR_R = 120 y SCR_NR = 100. Calcula W, LR y LM y concluye al 5 %.",a:"W = 30·20/100 = 6,00; LR = 30·ln(1,2) = 5,47; LM = 30·20/120 = 5,00. Con χ²(2) = 5,99, solo Wald rechaza (por muy poco). La F = (20/2)/(100/26) = 2,60 < 3,37 tampoco rechaza: no hay evidencia suficiente."},
+{q:"Si LM rechaza H₀ en un modelo lineal, ¿qué puedes decir de Wald?",a:"Que también rechaza: W ≥ LR ≥ LM y las tres usan el mismo valor crítico χ²(q)."}]}
+]});
+
+// =====================================================================
+// SIMULACRO DEL PARCIAL: cambio estructural y pruebas W, LR y LM
+// =====================================================================
+TALLERES.push({id:"tl-sim-ce", t:"Simulacro: cambio estructural y W, LR, LM", sub:"Simulacro del parcial", anchor:"chow",
+intro:`Un examen de práctica con los temas del parcial: test de Chow, dummies, Chow predictivo, quiebre desconocido y las pruebas Wald, LR y LM. Tiempo sugerido: 2 horas, nota sobre 5,0 y α = 5 % en todo. Activa «Intentar primero» para ocultar las soluciones. Los números se verificaron.`,
+puntos:[
+{id:"sim-a", n:"A", t:"Verdadero o falso (1,5 puntos)", tipo:"Conceptual", temas:["chow","trinidad","dicotomicas"],
+enun:String.raw`<p>Diga si cada afirmación es verdadera o falsa y justifique en máximo tres líneas (0,3 c/u).</p><ol>
+<li>El test de Chow sigue siendo válido aunque la varianza del error sea distinta antes y después del quiebre.</li>
+<li>Para calcular el estadístico LM es necesario estimar el modelo no restringido.</li>
+<li>En un modelo lineal con errores normales, si la prueba LM rechaza H₀, entonces Wald también rechaza H₀.</li>
+<li>Si un investigador elige la fecha del quiebre donde ve el mayor salto en la serie y aplica el Chow con valores críticos de la F, la prueba tiene un tamaño mayor al 5 %.</li>
+<li>En \(Y=\beta_1+\beta_2X+\delta_1D+\delta_2(D\cdot X)+\mu\), un \(\delta_2\) significativo indica que solo cambió el nivel de Y, no el efecto marginal de X.</li></ol>`,
+saber:[String.raw`Supuestos del Chow: fecha conocida de antemano y varianzas iguales en los dos tramos.`,
+String.raw`W ≥ LR ≥ LM en el modelo lineal, con el mismo valor crítico χ²(q).`],
+sol:String.raw`<ol class="steps">
+<li><b>Falso.</b> El Chow supone \(\sigma_1^2=\sigma_2^2\). Con varianzas distintas la F no sigue su distribución. Se prueba antes con \(F=\hat\sigma_1^2/\hat\sigma_2^2\) y, si se rechaza, se usa la versión Wald con varianzas separadas.</li>
+<li><b>Falso.</b> LM solo necesita el restringido: sus residuos se regresan contra todas las variables y LM = n·R². Esa es su ventaja.</li>
+<li><b>Verdadero.</b> Como W ≥ LR ≥ LM y el crítico es el mismo, si LM lo supera, W también.</li>
+<li><b>Verdadero.</b> Escoger la fecha mirando los datos equivale a tomar el máximo de muchas F, que es mayor que una F típica: se rechaza H₀ cierta más del 5 % de las veces. Por eso existen los críticos de Andrews (sup-F).</li>
+<li><b>Falso.</b> \(\delta_2\) acompaña a D·X: mide el cambio en la pendiente, que pasa de \(\beta_2\) a \(\beta_2+\delta_2\). El cambio de nivel es \(\delta_1\).</li></ol>`,
+res:String.raw`<p>1 F · 2 F · 3 V · 4 V · 5 F.</p>`},
+
+{id:"sim-b", n:"B", t:"Chow en una función de consumo (1,0 punto)", tipo:"Prueba de Chow y W, LR, LM", temas:["chow","trinidad"], tool:{id:"t-calc",lbl:"Abrir en la Calculadora (SCR)"},
+enun:String.raw`<p>La función \(C_t=\beta_1+\beta_2Y_t+\beta_3r_t+\mu_t\) se estima con n = 36 trimestres. Se sospecha un quiebre por una reforma tributaria después del trimestre 18.</p>
+<div class="tbl"><table><tr><th>Regresión</th><th>Observaciones</th><th>SCR</th></tr><tr><td>Muestra completa</td><td>36</td><td>0,42</td></tr><tr><td>Trimestres 1–18</td><td>18</td><td>0,12</td></tr><tr><td>Trimestres 19–36</td><td>18</td><td>0,15</td></tr></table></div>
+<p><b>a)</b> Plantee H₀ y H₁ (0,2). <b>b)</b> Calcule el estadístico de Chow y concluya; \(F_{0{,}05}(3,30)=2{,}92\) (0,4). <b>c)</b> Calcule W, LR y LM, compare con \(\chi^2_{0{,}05}(3)=7{,}81\) y verifique el orden (0,4).</p>`,
+saber:[String.raw`\(F=\dfrac{[SCR_R-(SCR_1+SCR_2)]/k}{(SCR_1+SCR_2)/(n-2k)}\), con k contando el intercepto.`,
+String.raw`\(W=n\dfrac{SCR_R-SCR_{NR}}{SCR_{NR}}\), \(LR=n\ln\dfrac{SCR_R}{SCR_{NR}}\), \(LM=n\dfrac{SCR_R-SCR_{NR}}{SCR_R}\), con q = k.`],
+sol:String.raw`<h5>a)</h5><p>H₀: los tres coeficientes son iguales en ambos subperiodos. H₁: al menos uno cambia después del trimestre 18.</p>
+<h5>b)</h5><ol class="steps"><li>\(SCR_{NR}=0{,}12+0{,}15=0{,}27\); k = 3; n − 2k = 30.</li>
+<li>\(F=\dfrac{(0{,}42-0{,}27)/3}{0{,}27/30}=\dfrac{0{,}05}{0{,}009}=5{,}56\).</li>
+<li>5,56 &gt; 2,92: se rechaza H₀.</li></ol>
+<h5>c)</h5><ol class="steps"><li>\(W=36\cdot0{,}15/0{,}27=20{,}00\).</li><li>\(LR=36\ln(0{,}42/0{,}27)=15{,}91\).</li><li>\(LM=36\cdot0{,}15/0{,}42=12{,}86\).</li><li>Las tres superan 7,81 y se cumple 20,00 ≥ 15,91 ≥ 12,86.</li></ol>`,
+res:String.raw`<p>F = 5,56 &gt; 2,92 y W = 20,00, LR = 15,91, LM = 12,86 &gt; 7,81: la reforma tributaria cambió la función de consumo.</p>`},
+
+{id:"sim-c", n:"C", t:"Cuando las pruebas no coinciden (1,0 punto)", tipo:"F, W, LR y LM", temas:["trinidad","dicotomicas","inferencia"], tool:{id:"t-calc",lbl:"Abrir en la Calculadora (Wald, LR y LM)"},
+enun:String.raw`<p>Con n = 30 se estimó el modelo con intercepto, X, D y D·X (SCR = 100) y el modelo sin las dummies (SCR = 120).</p>
+<p><b>a)</b> Calcule la F de la prueba conjunta \(\delta_1=\delta_2=0\); \(F_{0{,}05}(2,26)=3{,}37\) (0,3). <b>b)</b> Calcule W, LR y LM; \(\chi^2_{0{,}05}(2)=5{,}99\) (0,3). <b>c)</b> ¿Qué concluye? Explique por qué no coinciden y cuál reportaría (0,4).</p>`,
+saber:[String.raw`q = 2 restricciones; el no restringido tiene k = 4 parámetros.`,String.raw`W ≥ LR ≥ LM; las tres solo son válidas asintóticamente.`],
+sol:String.raw`<h5>a)</h5><p>\(F=\dfrac{(120-100)/2}{100/26}=\dfrac{10}{3{,}846}=2{,}60<3{,}37\) (p ≈ 0,093). No se rechaza H₀.</p>
+<h5>b)</h5><div class="tbl"><table><tr><th>Prueba</th><th>Cálculo</th><th>Valor</th><th>p-valor</th><th>Decisión</th></tr>
+<tr><td>Wald</td><td>30 · 20 / 100</td><td>6,00</td><td>0,0498</td><td>Rechaza (al límite)</td></tr>
+<tr><td>LR</td><td>30 · ln(1,2)</td><td>5,47</td><td>0,065</td><td>No rechaza</td></tr>
+<tr><td>LM</td><td>30 · 20 / 120</td><td>5,00</td><td>0,082</td><td>No rechaza</td></tr></table></div>
+<h5>c)</h5><p>Solo Wald rechaza, y por muy poco. Pasa por la desigualdad W ≥ LR ≥ LM: con n pequeño y evidencia en el borde, Wald tiende a sobre-rechazar. Se reporta la F, que con errores normales es exacta en muestras finitas.</p>`,
+res:String.raw`<p>F = 2,60 &lt; 3,37; LR y LM tampoco rechazan. No hay evidencia suficiente de cambio estructural al 5 %; el rechazo de Wald (6,00 vs 5,99) se explica por W ≥ LR ≥ LM con n = 30.</p>`},
+
+{id:"sim-d1", n:"D.a", t:"LM con la regresión auxiliar (0,5 puntos)", tipo:"Prueba LM", temas:["trinidad","especificacion"],
+enun:String.raw`<p>Un investigador estima un modelo restringido con n = 50 y quiere probar si dos variables omitidas, \(z_1\) y \(z_2\), deben incluirse. Regresa los residuos restringidos contra todas las variables (incluidas \(z_1\) y \(z_2\)) y obtiene R² = 0,14. Calcule el LM, dé sus grados de libertad y concluya.</p>`,
+saber:[String.raw`\(LM=n\cdot R^2_{aux}\sim\chi^2(q)\), con q = número de variables omitidas que se prueban.`],
+sol:String.raw`<ol class="steps"><li>\(LM=50\times0{,}14=7{,}00\).</li><li>q = 2, \(\chi^2_{0{,}05}(2)=5{,}99\).</li><li>7,00 &gt; 5,99 (p ≈ 0,030): se rechaza H₀.</li></ol>`,
+res:String.raw`<p>LM = 7,00 &gt; 5,99: \(z_1\) y \(z_2\) deben incluirse en el modelo.</p>`},
+
+{id:"sim-d2", n:"D.b", t:"Chow predictivo con dos observaciones nuevas (0,5 puntos)", tipo:"Pronósticos de Chow", temas:["ce-pronosticos","chow"], tool:{id:"t-calc",lbl:"Abrir en la Calculadora (pronósticos de Chow)"},
+enun:String.raw`<p>Un modelo con k = 3 se estimó con \(n_1=30\) observaciones (\(SCR_1=54\)). Llegan \(n_2=2\) observaciones nuevas y, al estimar con las 32, SCR = 66. ¿Por qué no se puede usar el Chow clásico? Aplique la prueba adecuada; \(F_{0{,}05}(2,27)=3{,}35\).</p>`,
+saber:[String.raw`\(F=\dfrac{(SCR_R-SCR_1)/n_2}{SCR_1/(n_1-k)}\sim F(n_2,\,n_1-k)\).`],
+sol:String.raw`<ol class="steps"><li>El Chow clásico necesita estimar el tramo 2 por separado, y con \(n_2=2<k=3\) no hay grados de libertad.</li>
+<li>\(F=\dfrac{(66-54)/2}{54/27}=\dfrac{6}{2}=3{,}00\).</li><li>3,00 &lt; 3,35: no se rechaza H₀.</li></ol>`,
+res:String.raw`<p>F = 3,00 &lt; 3,35: el modelo estimado con las 30 observaciones predice adecuadamente las 2 nuevas.</p>`},
+
+{id:"sim-e", n:"E", t:"Quiebre desconocido: leer la salida de R (0,5 puntos)", tipo:"Interpretación de sup-F", temas:["chow","ce-recursivos"],
+enun:String.raw`<p>Sobre una serie de 120 meses se ejecutó:</p>
+<pre class="ce-code">fs &lt;- Fstats(y ~ x1 + x2, data = datos, from = 0.15)
+sctest(fs, type = "supF")
+#   sup.F = 18.42, p-value = 0.0021
+breakpoints(fs)
+#   Breakpoints at observation number: 74</pre>
+<p><b>a)</b> ¿Qué hipótesis se prueba y qué concluye? (0,2) <b>b)</b> ¿Por qué no se compara sup.F con una tabla F ordinaria? (0,15) <b>c)</b> ¿Qué haría después con la observación 74? (0,15)</p>`,
+saber:[String.raw`sup-F (Quandt-Andrews) toma el máximo de las F de Chow en todas las fechas posibles del rango recortado y usa los valores críticos de Andrews (1993).`],
+sol:String.raw`<h5>a)</h5><p>H₀: coeficientes estables en toda la muestra; H₁: un quiebre en una fecha desconocida entre el 15 % y el 85 % (obs. 18 a 102). p = 0,0021 &lt; 0,05: hay cambio estructural.</p>
+<h5>b)</h5><p>Porque es el máximo de muchas F. Ese máximo no sigue una F; con la tabla ordinaria se rechazaría H₀ demasiado seguido.</p>
+<h5>c)</h5><ul><li>Crear D = 1 para t &gt; 74 e interactuarla con x1 y x2 para ver qué coeficientes cambiaron.</li><li>Revisar el CUSUM y buscar el evento económico de esa fecha.</li><li>Reestimar por tramos o con las dummies.</li></ul>`,
+res:String.raw`<p>Se rechaza la estabilidad (p = 0,0021); el quiebre estimado está en la observación 74, que luego se usa como fecha conocida en un modelo con dummies.</p>`}
+]});
