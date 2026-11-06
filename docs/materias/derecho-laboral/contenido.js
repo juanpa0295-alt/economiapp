@@ -148,7 +148,7 @@ qs:[{q:"Un trabajador gana $1.750.905 y trabajó todo el primer semestre de 2026
 <tr><td>Cesantías del año</td><td>Al fondo</td><td>14 de febrero del año siguiente</td><td>Desde el <b>15 de febrero</b>, un día de salario por cada día de retraso (art. 99 de la Ley 50 de 1990)</td></tr>
 <tr><td>Intereses sobre las cesantías</td><td>Directamente al trabajador</td><td>31 de enero del año siguiente</td><td>Un valor adicional igual a los intereses: se pagan dobles (Ley 52 de 1975)</td></tr>
 <tr><td>Cesantías e intereses del año del retiro</td><td>Directamente al trabajador</td><td>Con la liquidación final</td><td>Indemnización moratoria (art. 65)</td></tr></table></div></section>
-<section><h3>La base y las fórmulas</h3><p>La base es la misma de la prima: si el salario devengado de los últimos tres meses es igual, el salario actual; si no, el promedio del año (o de lo trabajado, si es menos). Se le suma el auxilio de transporte para quienes ganan hasta 2 SMMLV, y se restan los días de suspensión del artículo 51.</p>
+<section><h3>La base y las fórmulas</h3><p>La base es la misma de la prima: si el salario devengado de los últimos tres meses es igual, el salario actual; si no, el promedio de todos los meses del año (o de lo trabajado, si es menos), contando como 0 los meses suspendidos, como lo hace la profesora. Se le suma el auxilio de transporte para quienes ganan hasta 2 SMMLV, y se restan los días de suspensión del artículo 51.</p>
 <div class="mj">\[\text{Cesantías}=\frac{(\text{salario}+\text{auxilio})\times(\text{días}-\text{días art. 51})}{360}\qquad\qquad\text{Intereses}=\frac{\text{cesantías}\times\text{días}\times12\,\%}{360}\]</div>
 <p>Con el año completo, las cesantías son un mes de base y los intereses el 12 % de ellas.</p></section>
 <section><h3>Salario integral</h3><p>Quien gana salario integral <b>no tiene derecho</b> a cesantías ni a prima (art. 132). Del 100 % del salario integral, el 70 % es la base de la seguridad social (IBC) y el 30 % es el factor prestacional que ya paga esas prestaciones.</p></section>
@@ -236,40 +236,41 @@ sol:String.raw`<ol class="steps"><li><b>Un día normal</b> (2 pm – 10 pm, 8 ho
 <tr><td>HEND</td><td class="num">3</td><td class="num">2,50</td><td class="num">151.785,71</td></tr>
 <tr><td><b>Total</b></td><td></td><td></td><td class="num"><b>5.662.619,05</b></td></tr></table></div></li>
 <li><b>Comprobación:</b> las horas base son 140 HD + 42 HN = 182 = 26 días × 7 (los 30 días menos los 3 de licencia y el domingo 20). Sin recargos ni extras habría ganado 4.250.000 × 26/30 = 3.683.333,33.</li></ol>
-<p class="hint">Si la licencia no le quitara el dominical, el domingo 20 se pagaría proporcional (5,83 h) y el mes daría $5.780.674,60. Si en clase se toma la jornada legal de junio de 2026 (44 horas semanales, 7,33 diarias, hasta el 14 de julio) o la nocturna desde las 9 pm, el resultado cambia. En el resolvedor puedes cambiar esos datos y ver el efecto al instante.</p>`,
+<p class="hint"><b>Ojo:</b> en la solución de clase junio vale <b>$5.448.094</b> (se deduce de sus promedios del punto 2), $214.525 menos que aquí. El supuesto que más se acerca en el resolvedor es la nocturna desde las 9 pm sin perder el domingo 20 ($5.440.674,60). La liquidación del punto 2 usa el valor de clase. Si la licencia no le quitara el dominical, el domingo 20 se pagaría proporcional (5,83 h) y el mes daría $5.780.674,60. Si en clase se toma la jornada legal de junio de 2026 (44 horas semanales, 7,33 diarias, hasta el 14 de julio) o la nocturna desde las 9 pm, el resultado cambia. En el resolvedor puedes cambiar esos datos y ver el efecto al instante.</p>`,
 res:String.raw`<p>Salario de junio de 2026: <b>$5.662.619,05</b>, con el recargo del 75 % de la tabla del taller, jornada de 7 horas y nocturna desde las 7 pm. Pedro no tiene auxilio de transporte porque gana más de 2 SMMLV.</p>`},
 
 {id:"lab26-2",n:"2",t:"Liquidación de las prestaciones sociales desde 2025",tipo:"Liquidación",temas:["prima","cesantias","liquidacion"],tool:{id:"liquidacion",pre:"pedro",lbl:"Abrir la liquidación de Pedro"},
 enun:String.raw`<p>Liquide las prestaciones sociales a que tiene derecho Pedro, teniendo en cuenta que al momento del retiro le adeudan todas las prestaciones desde 2025.</p>`,
-saber:[String.raw`<b>Base:</b> si los tres últimos meses del periodo son iguales, el salario de ese mes; si no, el promedio de lo devengado (sin contar los meses suspendidos). Más el auxilio de transporte si el básico es de hasta 2 SMMLV.`,
+saber:[String.raw`<b>Base (como en clase):</b> si los tres últimos meses del periodo son iguales, el salario de ese mes; si no, el <b>promedio de todos los meses del periodo</b>, y los meses suspendidos todo el mes cuentan como <b>0</b>. Más el auxilio de transporte si el básico es de hasta 2 SMMLV.`,
 String.raw`<b>Fórmulas:</b> prima y cesantías = base × (días − días art. 51) / 360; intereses = cesantías × días × 12 % / 360.`,
 String.raw`<b>Moras (convención de clase):</b> un día de salario básico (truncado) por cada día de retraso hasta el retiro. Prima: desde el 1 de julio y el 21 de diciembre. Cesantías: desde el 15 de febrero. Intereses no pagados al 31 de enero: se pagan dobles.`,
-String.raw`<b>Datos:</b> 2025, básico 1.835.000 (auxilio 200.000); devengó 3.835.000 de enero a abril y de agosto a diciembre, 5.835.000 en mayo; suspendido junio y julio. 2026, básico 4.250.000 (sin auxilio, porque supera 2 SMMLV); suspendido abril; junio, 5.662.619,05 con 3 días de licencia (punto 1); licencia todo agosto.`],
+String.raw`<b>Datos:</b> 2025, básico 1.835.000 (auxilio 200.000); devengó 3.835.000 de enero a abril y de agosto a diciembre, 5.835.000 en mayo; suspendido junio y julio. 2026, básico 4.250.000 (sin auxilio, porque supera 2 SMMLV); suspendido abril; junio, <b>5.448.094</b> con 3 días de licencia (el valor de la solución de clase); licencia todo agosto.`],
 sol:String.raw`<h5>2025</h5><ol class="steps">
-<li><b>Prima 1:</b> 1/1/25 – 30/6/25 = 180 − 30 (junio) = 150 días. Marzo, abril y mayo no son iguales, así que la base es el promedio de enero a mayo: (4 × 3.835.000 + 5.835.000)/5 = 4.235.000, más 200.000. \((4.235.000+200.000)\times150/360=\) <b>1.847.917</b>. Mora: 1/7/25 – 31/8/26 = 420 × 61.166 = <b>25.689.720</b>.</li>
+<li><b>Prima 1:</b> 1/1/25 – 30/6/25 = 180 − 30 (junio) = 150 días. Abril, mayo y junio no son iguales (junio vale 0), así que la base es el promedio de los seis meses: (4 × 3.835.000 + 5.835.000 + 0)/6 = 3.529.166,67, más 200.000. \((3.529.166{,}67+200.000)\times150/360=\) <b>1.553.819</b>. Mora: 1/7/25 – 31/8/26 = 420 × 61.166 = <b>25.689.720</b>.</li>
 <li><b>Prima 2:</b> 1/7/25 – 31/12/25 = 180 − 30 (julio) = 150. Octubre a diciembre son iguales: \((3.835.000+200.000)\times150/360=\) <b>1.681.250</b>. Mora: 21/12/25 – 31/8/26 = 250 × 61.166 = <b>15.291.500</b>.</li>
-<li><b>Cesantías:</b> 1/1/25 – 31/12/25 = 360 − 60 = 300. \((3.835.000+200.000)\times300/360=\) <b>3.362.500</b>. No se consignaron: mora 15/2/26 – 31/8/26 = 196 × 61.166 = <b>11.988.536</b>.</li>
+<li><b>Cesantías:</b> 1/1/25 – 31/12/25 = 360 − 60 = 300. Octubre a diciembre son iguales: \((3.835.000+200.000)\times300/360=\) <b>3.362.500</b>. No se consignaron: mora 15/2/26 – 31/8/26 = 196 × 61.166 = <b>11.988.536</b>.</li>
 <li><b>Intereses:</b> 3.362.500 × 300 × 12 % / 360 = <b>336.250</b>; como no se pagaron al 31 de enero de 2026, la sanción es otro tanto: <b>336.250</b>.</li></ol>
-<h5>2026</h5><ol class="steps">
-<li><b>Prima 1:</b> 1/1/26 – 30/6/26 = 180 − 30 (abril) − 3 (licencia de junio) = 147. Marzo, mayo y junio no son iguales: promedio de enero, febrero, marzo, mayo y junio = (4 × 4.250.000 + 5.662.619,05)/5 = 4.532.523,81. \(4.532.523{,}81\times147/360=\) <b>1.850.781</b>. Mora: 1/7/26 – 31/8/26 = 60 × 141.666 = <b>8.499.960</b>.</li>
-<li><b>Prima 2:</b> 1/7/26 – 31/8/26 = 60 − 30 (agosto) = 30. Base: julio, 4.250.000. \(4.250.000\times30/360=\) <b>354.167</b>, con la liquidación.</li>
-<li><b>Cesantías:</b> 1/1/26 – 31/8/26 = 240 − 63 = 177. Base: promedio de los seis meses trabajados = 4.485.436,51. \(4.485.436{,}51\times177/360=\) <b>2.205.340</b>, con la liquidación.</li>
-<li><b>Intereses:</b> 2.205.340 × 177 × 12 % / 360 = <b>130.115</b>, con la liquidación.</li></ol>
+<h5>2026 (como en el tablero)</h5><ol class="steps">
+<li><b>Prima 1:</b> 1/1/26 – 30/6/26 = 180 días. Base: (4 × 4.250.000 + 0 (abril) + 5.448.094)/6 = 3.741.349. \(3.741.349\times(180-33)/360=\) <b>1.527.718</b>. Mora: 1/7/26 – 31/8/26 = 60 × 141.666 = <b>8.499.960</b> (en el tablero, 8.500.000 con 141.666,67).</li>
+<li><b>Prima 2:</b> 1/7/26 – 31/8/26 = 60 días. Base: (4.250.000 + 0 (agosto))/2 = 2.125.000. \(2.125.000\times(60-30)/360=\) <b>177.083</b>, con la liquidación.</li>
+<li><b>Cesantías:</b> 1/1/26 – 31/8/26 = 240 días. Base: (5 × 4.250.000 + 0 + 5.448.094 + 0)/8 = 3.337.262. \(3.337.262\times(240-63)/360=\) <b>1.640.820</b>, con la liquidación.</li>
+<li><b>Intereses:</b> 1.640.820 × (240 − 63) × 0,12 / 360 = <b>96.808</b>, con la liquidación.</li></ol>
 <h5>Resumen</h5><div class="tbl"><table><tr><th>Concepto</th><th class="num">Valor</th></tr>
-<tr><td>Primas (cuatro semestres)</td><td class="num">5.734.115</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.567.840</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">466.365</td></tr>
-<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>11.768.320</b></td></tr>
+<tr><td>Primas (cuatro semestres)</td><td class="num">4.939.870</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.003.320</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">433.058</td></tr>
+<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>10.376.248</b></td></tr>
 <tr><td>Mora de las primas</td><td class="num">49.481.180</td></tr><tr><td>Mora por no consignar las cesantías de 2025</td><td class="num">11.988.536</td></tr><tr><td>Sanción por no pagar los intereses de 2025</td><td class="num">336.250</td></tr>
-<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>73.574.286</b></td></tr></table></div>
-<p class="hint">Junio de 2026 entra al promedio con lo que efectivamente devengó (5.662.619,05). Las vacaciones no son una prestación social, por eso no están aquí. Las moras siguen la regla de clase hasta la fecha de retiro; después del retiro corre la indemnización moratoria del art. 65.</p>`,
-res:String.raw`<p>Prestaciones adeudadas: <b>$11.768.320</b> (primas 5.734.115, cesantías 5.567.840 e intereses 466.365). Con las moras y la sanción por intereses, el total es <b>$73.574.286</b>.</p>`},
+<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>72.182.214</b></td></tr></table></div>
+<p class="hint">La base cuenta los meses suspendidos como 0 y, además, se restan sus días: así lo resolvió la profesora. Las vacaciones no son una prestación social, por eso no están aquí. Después del retiro corre la indemnización moratoria del art. 65.</p>`,
+res:String.raw`<p>Prestaciones adeudadas: <b>$10.376.248</b> (primas 4.939.870, cesantías 5.003.320 e intereses 433.058). Con las moras y la sanción por intereses, el total es <b>$72.182.214</b>. Los valores de 2026 coinciden con el tablero.</p>`},
 
 {id:"lab26-3",n:"3",t:"Indemnización por despido sin justa causa",tipo:"Indemnización (art. 64)",temas:["indemnizaciones"],tool:{id:"indemnizaciones",pre:"pedro",lbl:"Abrir la indemnización de Pedro"},
 enun:String.raw`<p>El 25 de agosto le notifican a Pedro que desde el 1 de septiembre ya no trabajará porque el cargo se lo darán a otra persona. Realice la indemnización a que tiene derecho.</p>`,
 saber:[String.raw`Darle el cargo a otra persona no es una justa causa (art. 62): es despido sin justa causa, y en el contrato indefinido no hace falta preaviso.`,
 String.raw`<b>Art. 64, contrato indefinido, salario menor de 10 SMMLV:</b> 30 días por el primer año, 20 por cada año siguiente y, por la fracción, 20 × días sobrantes / 360, redondeado al día entero.`,
-String.raw`Las suspensiones del art. 51 solo se descuentan para vacaciones, cesantías y pensión (art. 53): para la indemnización cuenta todo el tiempo.`],
+String.raw`Según el art. 53, las suspensiones del art. 51 se descuentan para vacaciones, cesantías y pensión; el artículo no menciona la indemnización. Si en clase se descuentan, la calculadora tiene el campo «Días de suspensión a descontar (art. 51)».`],
 sol:String.raw`<ol class="steps"><li><b>Tiempo de servicio:</b> del 8/5/2021 al 31/8/2026 = (2026 − 2021) × 360 + (8 − 5) × 30 + (30 − 8) + 1 = <b>1.913 días</b> = 5 años y 113 días.</li>
 <li><b>Días de indemnización:</b> primer año 30; cuatro años siguientes 20 × 4 = 80; fracción 20 × 113/360 = 6,28, que se redondea a 6. Total: 30 + 80 + 6 = <b>116 días</b>.</li>
 <li><b>Salario diario:</b> 4.250.000 / 30 = 141.666,67.</li>
-<li><b>Indemnización:</b> 116 × 141.666,67 = <b>$16.433.333</b>.</li></ol>`,
-res:String.raw`<p>Indemnización por despido sin justa causa: <b>$16.433.333</b> (116 días de salario).</p>`}]});
+<li><b>Indemnización:</b> 116 × 141.666,67 = <b>$16.433.333</b>.</li></ol>
+<h5>Si se descuentan las suspensiones</h5><p>Pedro tuvo 123 días del art. 51 (junio y julio de 2025: 60; abril de 2026: 30; licencia de junio: 3; agosto: 30). Servicio: 1.913 − 123 = 1.790 días = 4 años y 350 días. Días: 30 + 20 × 3 + 20 × 350/360 (19,44, que se redondea a 19) = 109. Indemnización: 109 × 141.666,67 = <b>$15.441.667</b>. <button class="btn" type="button" data-tool="indemnizaciones" data-pre="pedro51">Abrir con los 123 días descontados</button></p>`,
+res:String.raw`<p>Indemnización por despido sin justa causa: <b>$16.433.333</b> (116 días de salario). Si se descuentan los 123 días de suspensión: <b>$15.441.667</b> (109 días).</p>`}]});
