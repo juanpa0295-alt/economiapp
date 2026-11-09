@@ -213,3 +213,57 @@ SIMS.vpn=function(){
       +tabla(["Criterio","Excel","Decisión"],[["VPN",xl(`=VNA(${xlpc(t)};B3:B${n+2})+B2`),VPN>0?"Se acepta: genera riqueza por encima de la TIO":"Se rechaza"],["TIR",xl(`=TIR(B2:B${n+2})`),isFinite(TIR)?(TIR>t?"TIR > TIO: se acepta":"TIR < TIO: se rechaza"):"—"],["TIRM",xl(`=TIRM(B2:B${n+2};${xlpc(t)};${xlpc(rv)})`),isFinite(TIRM)?(TIRM>t?"Se acepta":"Se rechaza"):"—"],["RBC","VP de ingresos / VP de egresos",RBC>1?"RBC > 1: se acepta":"Se rechaza"],["CAUE",xl(`=PAGO(${xlpc(t)};${n};-VPN)`),"Equivalente por período del VPN"]])
       +`<p><b>Interpretación:</b> ${VPN>0?`a la TIO de ${pc2(t)} el proyecto deja ${$$(VPN)} de riqueza adicional en pesos de hoy${isFinite(TIR)?` y rinde ${pc2(TIR)} por período`:""}.`:`a la TIO de ${pc2(t)} el proyecto destruye ${$$(-VPN)} en pesos de hoy.`}</p>`};
   onAll($("sim"),run);run()};
+
+// ---------- Taller 02: descuento anticipado y costo real con comisión
+SIMS.costo=function(){
+  $("sim").innerHTML=`${seg("c-mod","Caso",[["desc","Descuento anticipado"],["real","Costo real con comisión"]],"desc")}<div id="c-desc"></div><div id="c-real" hidden></div>`;
+  $("c-desc").innerHTML=`<div class="calcf">${num("d-vn","Valor nominal del título (VN, $)",120000000)}${num("d-ia","Tasa de descuento mensual anticipada (%)",2.1)}${num("d-dias","Días que faltan para el vencimiento",75)}${num("d-dpp","Días por período (mes comercial = 30)",30)}</div><div id="c-do"></div>`;
+  $("c-real").innerHTML=`<div class="calcf">${num("r-v","Monto o valor nominal ($)",800000000)}${num("r-j","Tasa nominal (%)",15.5)}${num("r-m","Períodos por año de la tasa (m)",6)}${num("r-a","Años del crédito",2)}${num("r-c","Comisión o retención (% del monto)",8)}</div>${seg("r-mod","Modalidad de la tasa",[["V","Vencida"],["A","Anticipada"]],"A")}<div id="c-ro"></div>`;
+  let md="A";
+  const desc=()=>{const[VN,iap,dias,dpp]=vals(["d-vn","d-ia","d-dias","d-dpp"]);if(!(VN>0&&iap>0&&iap<100&&dias>0&&dpp>0)){$("c-do").innerHTML=err("Valor nominal, tasa, días y días por período positivos.");return}
+    const ia=iap/100,n=dias/dpp,R=GF.descuento(VN,ia,n),ea=Math.pow(1+R.iv,12)-1;
+    $("c-do").innerHTML=vars([["VN: valor nominal",$$(VN)],["ia: tasa mensual anticipada",pc4(ia)],["n: períodos del descuento ("+fmt(dias,0)+" días ÷ "+fmt(dpp,0)+")",fmt(n,4)]])
+      +`<div class="res">${tiles([["Descuento",$$(R.d)],["Valor recibido",$$(R.rec)],["iv equivalente (mensual)",pc4(R.iv)],["E.A. equivalente",pc4(ea)]])}</div>`
+      +`<div class="eq al chain">Descuento = VN · ia · n = ${$$(VN)} · ${pc4(ia)} · ${fmt(n,4)} = <b>${$$(R.d)}</b><br>Valor recibido = VN − Descuento = <b>${$$(R.rec)}</b><br>iv = ia/(1 − ia) = <b>${pc4(R.iv)}</b> mensual vencida → E.A. = (1 + iv)<sup>12</sup> − 1 = <b>${pc4(ea)}</b></div>`
+      +`<p>Excel: ${xl(`=${xlnum(VN)}*${xlpc(ia)}*${xlnum(+n.toFixed(8))}`)} y ${xl(`=(1+${xlpc(R.iv)})^12-1`)}.</p><p class="warn"><b>Ojo:</b> con tasa nominal o periódica el mes es de 30 días; solo con una E.A. se usan 365 días.</p>`};
+  const real=()=>{const[V,jp,m,a,cp]=vals(["r-v","r-j","r-m","r-a","r-c"]);if(!(V>0&&jp>0&&m>=1&&a>0&&cp>=0&&cp<100)){$("c-ro").innerHTML=err("Monto, tasa, m y años positivos; comisión entre 0 y 100 %.");return}
+    const x=jp/100/m;if(md==="A"&&x>=1){$("c-ro").innerHTML=err("La tasa anticipada por período debe ser menor que 100 %.");return}
+    const iv=md==="A"?x/(1-x):x,ea=Math.pow(1+iv,m)-1,c=cp/100,rec=V*(1-c),VF=V*Math.pow(1+ea,a),rr=GF.costoReal(ea,a,c);
+    $("c-ro").innerHTML=vars([["Monto o valor nominal",$$(V)],["j: tasa nominal ("+(md==="A"?"anticipada":"vencida")+")",pc4(jp/100)],["m: períodos por año",m],["n: años",a],["c: comisión o retención",pc4(c)]])
+      +`<div class="res">${tiles([["E.A. sin comisión",pc4(ea)],["Dinero que recibe",$$(rec)],["Monto a pagar al final",$$(VF)],["Costo real E.A.",pc4(rr)]])}</div>`
+      +`<div class="eq al chain">${md==="A"?`ia = j/m = ${pc4(x)} → iv = ia/(1 − ia) = ${pc4(iv)}<br>`:`iv = j/m = ${pc4(iv)}<br>`}E.A. = (1 + iv)<sup>m</sup> − 1 = <b>${pc4(ea)}</b><br>Recibe = monto·(1 − c) = <b>${$$(rec)}</b>; paga = monto·(1 + E.A.)<sup>n</sup> = <b>${$$(VF)}</b><br>Costo real = (paga/recibe)<sup>1/n</sup> − 1 = <b>${pc4(rr)}</b> (la comisión suma ${fmt((rr-ea)*100,2)} puntos)</div>`
+      +`<p>Excel: ${xl(`=((1+${xlpc(ea)})^${xlnum(a)}/(1-${xlpc(c)}))^(1/${xlnum(a)})-1`)}. Compara este costo real, no la E.A. sin comisión, con las demás opciones.</p>`};
+  bindSeg("c-mod",v=>{$("c-desc").hidden=v!=="desc";$("c-real").hidden=v!=="real"});
+  bindSeg("r-mod",v=>{md=v;real()});
+  onAll($("c-desc"),desc);onAll($("c-real"),real);desc();real()};
+
+// ---------- Taller 02: moneda extranjera y referencia + puntos contra tasa fija
+SIMS.moneda=function(){
+  $("sim").innerHTML=`${seg("m-mod","Caso",[["mon","Moneda extranjera y devaluación"],["ref","Referencia + puntos contra fija"]],"mon")}<div id="m-mon"></div><div id="m-ref" hidden></div>`;
+  $("m-mon").innerHTML=`<div class="calcf">${num("e-l","Costo en pesos: E.A. de la deuda local (%)",17.21099)}${num("e-x","E.A. de la deuda en moneda extranjera (%)",11.5167)}${num("e-d","Devaluación esperada del peso (%)",3.8)}</div><div id="m-mo"></div>`;
+  $("m-ref").innerHTML=`<div class="calcf">${num("f-r","Referencia (IBR o DTF) en E.A. (%)",12)}${num("f-p","Puntos que se suman (%)",6.5)}${num("f-m","Períodos por año de la base de los puntos (trimestre vencido = 4)",4)}${num("f-j","Tasa fija nominal (%)",15.2)}${num("f-mf","Períodos por año de la tasa fija",12)}</div><div id="m-ro"></div>`;
+  const mon=()=>{const[l,x,d]=vals(["e-l","e-x","e-d"]).map(v=>v/100);if(!(l>-1&&x>-1&&d>-1)){$("m-mo").innerHTML=err("Tasas mayores que −100 %.");return}
+    const cop=GF.enPesos(x,d),eq=GF.equilibrio(l,x);
+    $("m-mo").innerHTML=vars([["E.A. local (COP)",pc4(l)],["E.A. en moneda extranjera",pc4(x)],["Devaluación esperada",pc4(d)]])
+      +`<div class="res">${tiles([["Costo en pesos de la deuda extranjera",pc4(cop)],["Devaluación de equilibrio",pc4(eq)]])}</div>`
+      +`<div class="eq al chain">Costo en COP = (1 + E.A. ext)(1 + dev) − 1 = ${fmt(1+x,4)}·${fmt(1+d,4)} − 1 = <b>${pc4(cop)}</b><br>Equilibrio = (1 + E.A. local)/(1 + E.A. ext) − 1 = <b>${pc4(eq)}</b></div>`
+      +`<p><b>Decisión:</b> ${cop<l?"endeudarse en moneda extranjera cuesta menos que en pesos":"endeudarse en pesos es más barato"}. Mientras la devaluación real sea menor que ${pc4(eq)}, la deuda extranjera sigue siendo más barata.</p><p>Excel: ${xl(`=(1+${xlpc(x)})*(1+${xlpc(d)})-1`)} y ${xl(`=(1+${xlpc(l)})/(1+${xlpc(x)})-1`)}. Las tasas se combinan multiplicando, no sumando.</p>`};
+  const ref=()=>{const[r,pp,m,j,mf]=vals(["f-r","f-p","f-m","f-j","f-mf"]);if(!(r>-100&&pp>=0&&m>=1&&j>0&&mf>=1)){$("m-ro").innerHTML=err("Datos positivos y períodos por año ≥ 1.");return}
+    const jr=m*(Math.pow(1+r/100,1/m)-1),jv=jr+pp/100,eav=Math.pow(1+jv/m,m)-1,eaf=Math.pow(1+j/100/mf,mf)-1,jfb=m*(Math.pow(1+eaf,1/m)-1),jreq=jfb-pp/100,eareq=Math.pow(1+jreq/m,m)-1;
+    $("m-ro").innerHTML=vars([["Referencia (E.A.)",pc4(r/100)],["Puntos",pc4(pp/100)],["m de la base de los puntos",m],["Tasa fija (nominal)",pc4(j/100)]])
+      +`<div class="res">${tiles([["E.A. línea variable",pc4(eav)],["E.A. línea fija",pc4(eaf)],["Referencia que las iguala (E.A.)",pc4(eareq)],["Cambio necesario en la referencia",fmt((eareq-r/100)*100,4)+" p.p."]])}</div>`
+      +`<div class="eq al chain">1. Referencia en nominal de esa base: j<sub>r</sub> = m·[(1 + ${pc4(r/100)})<sup>1/m</sup> − 1] = ${pc4(jr)}<br>2. Nominal variable = j<sub>r</sub> + puntos = <b>${pc4(jv)}</b> → E.A. = (1 + j/m)<sup>m</sup> − 1 = <b>${pc4(eav)}</b><br>3. Fija: E.A. = (1 + ${pc4(j/100)}/${mf})<sup>${mf}</sup> − 1 = <b>${pc4(eaf)}</b><br>4. Nominal fija en la base de los puntos = ${pc4(jfb)}; referencia que iguala = ${pc4(jfb)} − ${pc4(pp/100)} = ${pc4(jreq)} → <b>${pc4(eareq)} E.A.</b></div>`
+      +`<p><b>Decisión:</b> ${eav<eaf?"la línea variable es más barata":"la línea fija es más barata"} con la referencia actual. Para igualar a la fija, la referencia debería estar en ${pc4(eareq)} E.A.</p><p class="warn"><b>Convención:</b> aquí la referencia se pasa a la base de los puntos antes de sumar. Si en tu clase suman los puntos a la E.A. de la referencia, sigue lo que indique el profesor.</p>`};
+  bindSeg("m-mod",v=>{$("m-mon").hidden=v!=="mon";$("m-ref").hidden=v!=="ref"});
+  onAll($("m-mon"),mon);onAll($("m-ref"),ref);mon();ref()};
+
+// ---------- Taller 02: rentabilidad bruta, neta y real; tasa continua
+SIMS.neta=function(){
+  $("sim").innerHTML=`<div class="calcf">${num("n-i","Tasa del período (%, por ejemplo 0,031 diaria)",0.031)}${num("n-m","Períodos por año (diaria 365, mensual 12…)",365)}${num("n-g","Gastos operacionales (puntos de E.A.)",2.8)}${num("n-f","Inflación anual (%)",6.24)}</div><div id="n-out"></div>`;
+  const run=()=>{const[ip,m,gp,fp]=vals(["n-i","n-m","n-g","n-f"]);if(!(ip>-100&&m>=1&&gp>=0&&fp>-100)){$("n-out").innerHTML=err("Tasa mayor que −100 %, períodos ≥ 1 y gastos ≥ 0.");return}
+    const i=ip/100,g=gp/100,f=fp/100,bru=Math.pow(1+i,m)-1,net=bru-g,rr=GF.real(net,f),co=GF.continua(bru);
+    $("n-out").innerHTML=vars([["i: tasa del período",pc4(i)],["m: períodos por año",m],["Gastos operacionales",pc4(g)],["π: inflación",pc4(f)]])
+      +`<div class="res">${tiles([["E.A. bruta",pc4(bru)],["E.A. neta",pc4(net)],["Rentabilidad real",pc4(rr)],["Tasa continua de la bruta",pc4(co)]])}</div>`
+      +`<div class="eq al chain">E.A. bruta = (1 + i)<sup>m</sup> − 1 = <b>${pc4(bru)}</b><br>E.A. neta = bruta − gastos = <b>${pc4(net)}</b><br>Real = (1 + neta)/(1 + π) − 1 = <b>${pc4(rr)}</b><br>Continua = LN(1 + E.A.) = <b>${pc4(co)}</b></div>`
+      +`<p>Excel: ${xl(`=(1+${xlpc(i)})^${m}-1`)}, ${xl(`=(1+${xlpc(net)})/(1+${xlpc(f)})-1`)} y ${xl(`=LN(1+${xlpc(bru)})`)}.</p><p class="warn"><b>No restes la inflación:</b> neta − inflación da ${pc4(net-f)}, que sobrestima la rentabilidad real (${pc4(rr)}).</p>`};
+  onAll($("sim"),run);run()};

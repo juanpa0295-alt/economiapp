@@ -18,6 +18,7 @@ docs/
 │   ├── macro2.js                 Macroeconomía 2: Mundell-Fleming, Krugman, SA-DA, modelo i-P, transables y no transables
 │   ├── visual.js                 Motor de los visuales de cambios (data-vis); las escenas viven en el laboratorios.js de cada materia
 │   (econometría) eco/rmanual.js: manual «fórmula | código R» que se agrega a cada lección; código probado con R 4.3 y los datos de wooldridge
+│   ├── finanzas.js               Gerencia Financiera I: matemáticas financieras (incluye descuento, costo real y moneda extranjera del Taller 02)
 │   ├── principios.js             Cálculos de Principios de Macroeconomía
 │   └── simbolico.js              SymPy en el navegador (Pyodide) y respaldo numérico
 └── materias/

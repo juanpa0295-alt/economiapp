@@ -260,7 +260,94 @@ const BRANCHES=[
 <ol class="steps">
 <li><b>Dos deudas de $25.000 (mes 3) y $40.000 (mes 7) cambiadas por dos pagos iguales en los meses 5 y 12, al 36 % N.M.:</b> con 3 % mensual y fecha focal en 12, X = $35.423,66. Compruébalo en el laboratorio de pagos únicos.</li>
 <li><b>Deuda de $3.500.000 con tres pagos iguales (meses 6, 10 y 20) y $1.000.000 en el mes 24, al 1,5 % mensual:</b> X = $1.111.874,58.</li>
-<li><b>Proyecto de $80.000 con ingresos de $73.000 (mes 5) y $85.000 (mes 15):</b> TIR = 7,43 % mensual; con inflación anual del 6 % (0,4868 % mensual), rentabilidad real de 6,91 % mensual.</li></ol></section>`}]},
+<li><b>Proyecto de $80.000 con ingresos de $73.000 (mes 5) y $85.000 (mes 15):</b> TIR = 7,43 % mensual; con inflación anual del 6 % (0,4868 % mensual), rentabilidad real de 6,91 % mensual.</li></ol></section>`},
+ {id:"cuatro-preguntas", t:"Las cuatro preguntas antes de calcular", nuevo:true, html:String.raw`
+<section><h3>Cuando no sabes qué fórmula usar</h3>
+<p class="lead">Casi todos los errores vienen de empezar a operar sin haber leído bien la tasa y el plazo. Haz estas cuatro preguntas, en este orden, antes de escribir una fórmula.</p>
+<div class="tbl"><table><tr><th>Pregunta</th><th>Qué haces</th></tr>
+<tr><td><b>1. ¿Qué me piden?</b></td><td>Un valor en pesos (VF, VP, cuota, intereses), una tasa, un plazo o una decisión. Subraya la incógnita de cada literal.</td></tr>
+<tr><td><b>2. ¿Cómo viene la tasa?</b></td><td>Lee la sigla. E.A. o «efectiva»: ya está lista. N.A.…V.: dividir entre \(m\). Si termina en A (anticipada): primero \(ia=j/m\) y luego \(iv=ia/(1-ia)\).</td></tr>
+<tr><td><b>3. ¿Coinciden tasa y plazo?</b></td><td>Tasa mensual con \(n\) en meses. Si no, cambia una de las dos antes de calcular (solo con tasas vencidas).</td></tr>
+<tr><td><b>4. ¿Es un pago, una serie o una tabla?</b></td><td>Un monto: VF o VP. Cuotas iguales: anualidad. Préstamo con tabla: sistema de amortización. Costos, descuentos o monedas: lecciones de «Tasas aplicadas».</td></tr></table></div>
+<p class="hint">Ruta de conversión de siempre: dividir entre \(m\) → pasar de anticipada a vencida → cambiar de período → pasar a E.A. si hay que comparar.</p></section>`,
+ qs:[{q:"Te dan 24 % N.A.T.A. ¿Qué haces primero?",a:"Divides entre 4 para obtener 6 % trimestral anticipada y luego la pasas a vencida con 0,06/0,94 = 6,3830 %."}]},
+ {id:"plantilla-excel", t:"Cómo se organiza el Excel del parcial", nuevo:true, html:String.raw`
+<section><h3>Un libro con una hoja por ejercicio</h3>
+<p class="lead">El parcial se entrega con una plantilla de Excel: una hoja por ejercicio (EJ1 a EJ7), una hoja CONCEPTOS y una hoja PRINCIPAL que se llena sola. Las celdas en verde son las que debes diligenciar con fórmulas, nunca con valores pegados.</p>
+<div class="tbl"><table><tr><th>Sección de cada hoja</th><th>Qué va ahí</th><th>Ejemplo</th></tr>
+<tr><td>1. Variables</td><td>Los datos del enunciado, en las celdas D6, D7, D8…</td><td>Monto, tasa y plazo</td></tr>
+<tr><td>2. Incógnitas</td><td>Lo que piden, con la función financiera y enlazado a las variables</td><td><code>=PAGO(D7;D8;-D6)</code></td></tr>
+<tr><td>3. Fórmulas</td><td>La fórmula matemática que usas, escrita en texto</td><td>Cuota = VP·i/(1−(1+i)^−n)</td></tr>
+<tr><td>4A. Con fórmulas</td><td>El mismo cálculo con la fórmula matemática, sin función financiera</td><td><code>=D6*D7/(1-(1+D7)^-D8)</code></td></tr>
+<tr><td>4B. Con funciones</td><td>La función de Excel y, al lado, su texto con <code>FORMULATEXT</code>; una celda de comprobación Δ = 4B − 4A</td><td><code>=FORMULATEXT(D24)</code></td></tr>
+<tr><td>5. Respuesta</td><td>Celdas enlazadas a lo ya calculado; alimentan la hoja PRINCIPAL</td><td><code>=D24</code></td></tr></table></div></section>
+<section><h3>Las tablas de cada sistema</h3>
+<ul><li><b>Capitalización:</b> intereses <code>=H8*I8</code> y capital final <code>=H8+J8</code>.</li>
+<li><b>Francés:</b> cuota <code>=$D$11</code> (la celda de la incógnita), intereses <code>=-PAGOINT($D$7;G8;$D$8;$D$6)</code>, abono <code>=-PAGO.PRINC($D$7;G8;$D$8;$D$6)</code>, saldo <code>=H8-K8</code>.</li>
+<li><b>Alemán:</b> abono <code>=$D$11</code>, intereses <code>=H8*$D$7</code>, cuota <code>=J8+K8</code>.</li>
+<li><b>Americano:</b> abono <code>=SI(G8=$D$8;H8;0)</code>, intereses <code>=H8*$D$7</code>, cuota <code>=J8+K8</code>. Todo el saldo y el último pago salen de fórmulas, no se digitan.</li>
+<li><b>Comparación:</b> en EJ7, los totales de intereses se traen de las otras hojas, <code>='EJ5'!D12</code>, y la posición con <code>=SI(H19=MIN($H$19:$H$21);"Más económico";SI(H19=MAX($H$19:$H$21);"Más costoso";"Intermedio"))</code>.</li></ul></section>
+<section><h3>Reglas que se revisan</h3>
+<ol class="steps"><li>Las fórmulas deben verse en las celdas y estar enlazadas; no ocultes ni protejas hojas.</li><li>Copia del Excel al Word las variables, fórmulas, tablas y resultados; deben coincidir con una tolerancia de ±2 %.</li><li>Usa $ en la tasa, el monto, \(n\) y la cuota fija al arrastrar (F4); el saldo inicial y el período van sin $.</li><li>Antes de entregar: saldo final del último mes en 0, suma de abonos igual al monto, cuota = intereses + abono.</li></ol></section>`},
+ {id:"lecciones-parcial", t:"Lo que costó puntos en un parcial real", nuevo:true, html:String.raw`
+<section><h3>Siete errores de un parcial calificado</h3>
+<p class="lead">Un estudiante resolvió bien casi todos los cálculos y aun así perdió cerca de una cuarta parte de la nota. Estos fueron los motivos, para que no se repitan.</p>
+<div class="tbl"><table><tr><th>Qué pasó</th><th>Por qué costó puntos</th><th>Cómo evitarlo</th></tr>
+<tr><td>Pregunta 2 de conceptos en blanco</td><td>Valía 8 de 100 puntos y no requería cálculo</td><td>Reserva los últimos 15 minutos para la sección IV</td></tr>
+<tr><td>Pago del mes 6 del sistema americano: puso el total de todas las cuotas</td><td>Pedían intereses más capital del último mes (\(P\cdot i+P\)), no la suma de las seis cuotas</td><td>Subraya qué mes y qué concepto piden</td></tr>
+<tr><td>Saldos y última cuota del americano digitados</td><td>Valores sin fórmula: el literal queda con máximo 60 %</td><td><code>=SI(A8=$D$8;H8;0)</code> y arrastrar</td></tr>
+<tr><td>Demostración con logaritmos sin LN en el numerador</td><td>Dio 68,5 meses en el Excel y 22 en el Word; el Word y el Excel deben coincidir</td><td>n = LN(VF/VP) / LN(1+i); compara con NPER</td></tr>
+<tr><td>Abono del francés calculado restando</td><td>El enunciado pedía <code>PAGO.PRINC</code> y <code>PAGOINT</code> con verificación</td><td>Usa las dos funciones y verifica con las fórmulas de saldo</td></tr>
+<tr><td>Valor presente con signo negativo y sin escribirlo en el Word</td><td>Justificó con tasas y no con el VP pedido; en el Word no apareció la cifra</td><td>=VA(i;n;0;-VF) y escribe el VP en la respuesta</td></tr>
+<tr><td>Secciones 4B y 5 de las hojas vacías</td><td>No mostró la función utilizada ni la respuesta enlazada</td><td>Llena todas las celdas verdes antes de pasar a la siguiente hoja</td></tr></table></div></section>
+<section><h3>Cómo repartir las dos horas</h3>
+<div class="tbl"><table><tr><th>Sección</th><th>Puntos</th><th>Tiempo sugerido</th></tr>
+<tr><td>I. Valor presente y futuro (EJ1, EJ2)</td><td class="num">20</td><td>20 min</td></tr>
+<tr><td>II. Tasas (EJ3, EJ4)</td><td class="num">30</td><td>25 min</td></tr>
+<tr><td>III. Amortización (EJ5, EJ6, EJ7)</td><td class="num">35</td><td>45 min</td></tr>
+<tr><td>IV. Conceptos</td><td class="num">15</td><td>20 min</td></tr>
+<tr><td>Revisión de Excel y Word</td><td class="num">—</td><td>10 min</td></tr></table></div>
+<p class="hint">Nota = puntos ÷ 20. Cada literal pesa: plantear 20 %, funciones 40 %, resultado 30 %, interpretar 10 %.</p></section>`}]},
+{g:"Tasas aplicadas (Taller 02)", from:"indexadas", items:[
+ {id:"descuento-costo", t:"Descuento anticipado y costo real con comisión", nuevo:true, sim:"costo", html:String.raw`
+<section><h3>Descuento anticipado</h3>
+<p class="lead">Cuando un título se descuenta, la entidad cobra los intereses por adelantado sobre el valor nominal. Se recibe menos que el valor del título.</p>
+<div class="mj">\[Descuento=VN\cdot ia\cdot n\qquad Recibido=VN-Descuento\qquad iv=\frac{ia}{1-ia}\]</div>
+<p><b>Ejemplo:</b> título de $120.000.000 que vence en 75 días, con 2,1 % mensual anticipada. Con el mes de 30 días, \(n=75/30=2{,}5\). Descuento = 120.000.000 · 0,021 · 2,5 = <b>$6.300.000</b>; recibe <b>$113.700.000</b>; la tasa vencida equivalente es 0,021/0,979 = <b>2,1450 %</b> mensual, es decir <b>29,0053 % E.A.</b></p>
+<p class="warn"><b>Días:</b> con una tasa nominal o periódica, el mes es de 30 días (año de 360). Solo si la tasa es E.A. se usan 365 días.</p></section>
+<section><h3>Costo real con comisión o retención</h3>
+<p>Si el emisor retiene un porcentaje \(c\) del monto, recibe menos de lo que debe pagar. El costo verdadero es la tasa que iguala lo recibido con lo pagado:</p>
+<div class="mj">\[i_{real}=\left[\frac{(1+EA)^{n}}{1-c}\right]^{1/n}-1\]</div>
+<p><b>Ejemplo:</b> pagarés por $800.000.000 a 2 años al 15,5 % N.A.B.A. con retención del 8 %. ia = 15,5 %/6 = 2,5833 % → iv = 2,6518 % → <b>17,0039 % E.A.</b> sin retención. Recibe 800.000.000 · 0,92 = $736.000.000 y paga 800.000.000 · 1,170039² = $1.095.193.368,96; costo real = <b>21,9850 % E.A.</b> Un crédito bancario al 16,8 % N.A.M.V. (18,1559 % E.A.) resulta más barato.</p>
+<p class="hint">Compara siempre el costo real contra las otras opciones, no la tasa nominal que anuncian.</p></section>
+${LAB}`,
+ qs:[{q:"Un título de $100 millones se descuenta 60 días al 2 % mensual anticipado. ¿Cuánto se recibe?",a:"n = 60/30 = 2; descuento = 100.000.000 · 0,02 · 2 = 4.000.000; recibe $96.000.000."},
+     {q:"¿Por qué la retención del 8 % sube el costo si la tasa no cambió?",a:"Porque se pagan intereses sobre el monto completo pero se recibe solo el 92 %; el costo real se calcula sobre el dinero que de verdad se recibe."}]},
+ {id:"moneda-referencia", t:"Moneda extranjera, devaluación y referencia + puntos", nuevo:true, sim:"moneda", html:String.raw`
+<section><h3>Endeudarse en moneda extranjera</h3>
+<p class="lead">Una deuda en dólares, reales o pesos mexicanos cuesta la tasa de esa moneda más lo que se devalúe el peso. Las dos tasas se multiplican, no se suman.</p>
+<div class="mj">\[i_{COP}=(1+EA_{ext})(1+dev)-1\qquad dev_{equilibrio}=\frac{1+EA_{local}}{1+EA_{ext}}-1\]</div>
+<p><b>Ejemplo (mesa de tesorería):</b> Colombia 16,2 % N.A.T.V. = 17,2110 % E.A. Brasil 13,5 % capitalizable mensual = 14,3674 % E.A. con devaluación del 4,5 %: costo en pesos <b>19,5140 %</b>. México 11 % capitalizable bimestral = 11,5167 % E.A. con devaluación del 3,8 %: <b>15,7543 %</b>. La opción más barata es México. La devaluación de equilibrio es 5,1063 % para México y 2,4863 % para Brasil: más allá de esos valores, endeudarse afuera deja de convenir.</p></section>
+<section><h3>Referencia + puntos contra tasa fija</h3>
+<p>Una línea variable se pacta como IBR o DTF más unos puntos. Para compararla con una tasa fija hay que poner todo en la misma base antes de sumar.</p>
+<ol class="steps"><li>Pasa la referencia (E.A.) a nominal de la base de los puntos: \(j_r=m[(1+EA)^{1/m}-1]\).</li><li>Suma los puntos: \(j=j_r+puntos\), y convierte a E.A.</li><li>Convierte la tasa fija a E.A. y compara. Para saber cuánto debe cambiar la referencia, haz el camino inverso.</li></ol>
+<p><b>Ejemplo:</b> IBR 12 % E.A. + 6,5 puntos trimestre vencido: referencia nominal 11,4949 %, variable 17,9949 % → <b>19,2461 % E.A.</b> Fija 15,2 % N.A.M.V. = <b>16,3049 % E.A.</b> Para igualarlas el IBR debería bajar a <b>9,1944 % E.A.</b>, 2,8056 puntos menos.</p>
+<p class="warn"><b>Convención:</b> en el parcial de práctica (DTF N.A.T.A. + puntos T.A.) los puntos se suman a la nominal de la misma base. Si un enunciado indica otra forma, sigue la que diga el profesor.</p></section>
+${LAB}`,
+ qs:[{q:"¿Por qué el costo en pesos de la deuda extranjera no es EA_ext + devaluación?",a:"Porque el dinero crece por el interés y además se devalúa: los efectos se componen, (1+EA)(1+dev) − 1, y por eso resulta un poco mayor que la suma."}]},
+ {id:"bruta-neta-real", t:"Rentabilidad bruta, neta y real; tasa continua", nuevo:true, sim:"neta", html:String.raw`
+<section><h3>De la tasa diaria a la rentabilidad real</h3>
+<p class="lead">Un fondo informa su rendimiento diario. Para saber cuánto gana de verdad el inversionista hay que pasar por tres niveles.</p>
+<ol class="steps"><li><b>Bruta:</b> \((1+i)^{m}-1\) con \(m\) = 365 si es diaria.</li><li><b>Neta:</b> E.A. bruta menos los gastos operacionales, en puntos de E.A.</li><li><b>Real:</b> \((1+neta)/(1+\pi)-1\). Nunca restes la inflación.</li></ol>
+<p><b>Ejemplo:</b> rinde 0,031 % diario, con 2,8 puntos de gastos e inflación del 6,24 %. Bruta = 1,00031³⁶⁵ − 1 = <b>11,9780 %</b>; neta = <b>9,1780 %</b>; real = 1,09178/1,0624 − 1 = <b>2,7655 %</b>. Restar da 2,94 %, que sobrestima.</p></section>
+<section><h3>Tasa continua y tablas de equivalencias</h3>
+<p>La tasa continua equivalente a una E.A. es \(r=\ln(1+EA)\). Con 13,2 % E.A. es 12,3986 %. Las nominales equivalentes dependen de cuántas veces se capitalice:</p>
+<div class="tbl"><table><tr><th>Capitalización</th><th>m</th><th>Nominal equivalente a 13,2 % E.A.</th></tr>
+<tr><td>Diaria</td><td class="num">365</td><td class="num">12,4007 %</td></tr><tr><td>Semanal</td><td class="num">52</td><td class="num">12,4134 %</td></tr><tr><td>Mensual</td><td class="num">12</td><td class="num">12,4629 %</td></tr></table></div>
+<p class="hint">Más capitalizaciones por año implican una nominal menor para la misma E.A. Quincenal es m = 24 y cuatrimestral m = 3.</p></section>
+${LAB}`,
+ qs:[{q:"Un fondo rinde 9 % E.A. neta y la inflación es 5 %. ¿Cuál es la rentabilidad real?",a:"1,09/1,05 − 1 = 3,81 %, no 4 %."}]}
+]},
 {g:"Tasas", from:"tasas", items:[
  {id:"tabla-tasas", t:"Tabla de equivalencias de una tasa", sim:"tasas", html:String.raw`
 <section><h3>Para qué sirve</h3><p class="lead">Escribe una tasa en cualquier modalidad y el laboratorio muestra todas sus equivalentes, con el paso a paso para llegar a la que te pidan.</p></section>${WSBOX}`}]},

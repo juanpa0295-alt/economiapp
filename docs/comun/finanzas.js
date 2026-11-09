@@ -45,3 +45,14 @@ GF.tirm=function(f,fin,rein){const n=f.length-1;let vpN=0,vfP=0;f.forEach((x,t)=
 GF.rbc=function(f,i){let b=0,c=0;f.forEach((x,t)=>{const v=x/Math.pow(1+i,t);if(x>=0)b+=v;else c-=v});return c>0?b/c:NaN};
 GF.caue=(f,i)=>{const n=f.length-1;return GF.vpn(f,i)*i/(1-Math.pow(1+i,-n))};
 GF.pri=function(f,i){let acc=0;for(let t=0;t<f.length;t++){const v=f[t]/Math.pow(1+i,t),prev=acc;acc+=v;if(t>0&&prev<0&&acc>=0)return t-1+(-prev)/v}return NaN};
+// ---------- Taller 02: descuento anticipado, costo real, moneda extranjera, tasa continua
+// descuento: VN valor nominal, ia tasa anticipada del período, n períodos (días/30 con tasa nominal o periódica)
+GF.descuento=(VN,ia,n)=>{const d=VN*ia*n;return{d,rec:VN-d,iv:ia/(1-ia)}};
+// costo real de una financiación con comisión o retención c (fracción del monto): ea efectiva anual, n en años
+GF.costoReal=(ea,n,c)=>Math.pow(Math.pow(1+ea,n)/(1-c),1/n)-1;
+// costo en pesos de endeudarse en moneda extranjera con devaluación esperada dev
+GF.enPesos=(eaExt,dev)=>(1+eaExt)*(1+dev)-1;
+// devaluación que iguala el costo en moneda extranjera con el costo local
+GF.equilibrio=(eaLocal,eaExt)=>(1+eaLocal)/(1+eaExt)-1;
+// tasa continua equivalente a una E.A.
+GF.continua=ea=>Math.log(1+ea);
