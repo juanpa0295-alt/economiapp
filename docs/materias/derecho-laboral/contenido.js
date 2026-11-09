@@ -186,6 +186,12 @@ const WORKSHOPS=[
 <li><b>Cesantías:</b> por año calendario; consignación hasta el 14 de febrero; mora desde el 15 de febrero.</li>
 <li><b>Intereses:</b> 12 % anual proporcional a los días; se pagan al trabajador hasta el 31 de enero; si no, se pagan dobles.</li>
 <li><b>Mora:</b> hasta la fecha de retiro, con el salario básico del periodo que se debe / 30, truncado a pesos. Lo del periodo del retiro se paga con la liquidación.</li></ol></details>
+<details class="pdet"><summary><b>Ejercicio completo: de la nómina a la liquidación</b></summary><ol class="steps">
+<li><b>Los meses con novedades</b> (horas extras, recargos, festivos, licencias): calcúlalos uno por uno en la <button class="btn" type="button" data-go="planilla">Resolvedor de horas extras</button> (día por día, con la tabla de la profesora) o en la <button class="btn" type="button" data-go="nomina">Nómina mensual</button> (si el ejercicio da las horas totales). Escribe el <b>mes y año</b> y toca <b>«Enviar este mes a la liquidación»</b>. Repite con cada mes.</li>
+<li><b>Aquí</b>: pon la fecha de inicio y la de retiro. Los meses enviados aparecen en su renglón, con el devengado (básico + extras) y los días del art. 51. Los demás meses escríbelos a mano.</li>
+<li>Marca si las primas, las cesantías o los intereses <b>se pagaron a tiempo</b>; si no, salen las moras y la sanción.</li>
+<li>Copia cada bloque al taller: la fórmula, la sustitución y la nota de por qué se usó el promedio o el salario actual. Si la indemnización también se pide, va en la calculadora de <button class="btn" type="button" data-go="indemnizaciones">Indemnizaciones</button>.</li>
+<li>Con «💾 Guardar» conservas la liquidación completa para volver a verla después.</li></ol></details>
 <div class="sim" id="sim"></div>`,
   d:"Escribe la fecha de inicio, la de retiro y el salario de cada mes (con extras y días del artículo 51). Calcula las primas, las cesantías y sus intereses de todo el contrato, con las moras y sanciones si no se pagaron, escrito como en el tablero. Trae cargado el ejercicio de clase."},
  {id:"planilla",t:"Resolvedor del taller de horas extras",anchor:"jornada",links:["jornada","nomina"],sim:"planilla",html:String.raw`

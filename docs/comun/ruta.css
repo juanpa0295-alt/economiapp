@@ -472,6 +472,10 @@ input.rc-in:disabled,select.rc-in:disabled{opacity:.85}
 .lq-sub{padding-left:1.2em;font-variant-numeric:tabular-nums}
 .lq-ftab small{color:var(--muted)}
 .lq-ftab{margin-bottom:10px}
+/* Puente nómina → liquidación */
+.sendliq{display:flex;flex-direction:column;gap:6px;margin:12px 0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;font-size:14px}
+.sendliq-b{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.okbox{margin:8px 0;padding:8px 12px;border-radius:8px;background:var(--line-soft);font-size:14px}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
