@@ -38,6 +38,13 @@ SIMS.pro=function(){
 };
 
 // ---- Indemnización (art. 64)
+// ---- Puente nómina → liquidación: un mes calculado en la nómina o en la planilla llega a la tabla de la liquidación
+const LIQ_IN="eco-liq-envios",MESN=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+function enviarALiq(env){let a=[];try{a=JSON.parse(localStorage.getItem(LIQ_IN)||"[]")}catch(e){a=window.LIQ_ENVIOS||[]}
+  a=a.filter(x=>!(x.y===env.y&&x.m===env.m));a.push(env);window.LIQ_ENVIOS=a;try{localStorage.setItem(LIQ_IN,JSON.stringify(a))}catch(e){}}
+function tomarEnvios(){let a=null;try{a=JSON.parse(localStorage.getItem(LIQ_IN)||"null")}catch(e){}a=a||window.LIQ_ENVIOS||[];try{localStorage.removeItem(LIQ_IN)}catch(e){}window.LIQ_ENVIOS=[];return a}
+function botonEnvio(id,info){return`<div class="sendliq"><div><b>¿Sigue la liquidación?</b> ${info}</div><div class="sendliq-b"><button class="btn" type="button" id="${id}">Enviar este mes a la liquidación</button><span id="${id}-m" role="status"></span></div></div>`}
+
 // ---- Guardar resultados: cada herramienta guarda sus datos con un nombre (en este navegador) y recuerda lo último que se hizo
 function guardados(key,{get,set,label,restore}){const K="eco-guard-"+key,KL="eco-last-"+key,esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const rd=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},wr=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
@@ -119,7 +126,7 @@ SIMS.horas=function(){
 SIMS.nom=function(){
   $("sim").innerHTML=`<div class="calcf">${numIn("n-sal","Salario mensual",1750905,"10000")}${numIn("n-dias","Días trabajados en el mes",30)}${dateIn("n-fec","Mes de la nómina",di(HOY))}${selIn("n-aux","¿Recibe auxilio de transporte?",[["si","Sí, si gana hasta 2 SMMLV"],["no","No (vive cerca o trabaja en casa)"]],"si")}</div>
   <h4 class="subh">Horas del mes</h4><div class="calcf">${Object.keys(KEYS).filter(k=>k!=="ord").map(k=>numIn("n-"+k,KEYS[k],0,"0.5")).join("")}</div>
-  <div class="res" id="n-res"></div><div class="tbl"><table id="n-tab"></table></div><div id="n-emp"></div>`;
+  <div class="res" id="n-res"></div><div class="tbl"><table id="n-tab"></table></div><div id="n-envio"></div><div id="n-emp"></div>`;
   const ks=Object.keys(KEYS).filter(k=>k!=="ord");
   const run=()=>{const sal=N("n-sal"),dias=Math.round(N("n-dias")),f=D("n-fec")||HOY,V_=LAB.valores(f);
     if(!(sal>0)||!(dias>=0&&dias<=30)){$("n-res").innerHTML=err("revisa el salario y que los días estén entre 0 y 30.");return}
@@ -129,6 +136,9 @@ SIMS.nom=function(){
     const row=(a,b,c="")=>`<tr><td>${a}</td><td class="num ${c}">${b}</td></tr>`;
     $("n-tab").innerHTML=`<tr><th>Concepto</th><th>Valor</th></tr><tr><td colspan="2"><b>Devengados</b></td></tr>`+row(`Salario básico (${fm(dias)} días × ${$c(sal/30)})`,$c(R.basico))+X.items.map(i=>row(`${KEYS[i.k]}: ${fmt(i.h,2)} h × ${$c(hora)} × ${fmt(i.factor,2)}`,$c(i.valor))).join("")+row(R.auxT?`Auxilio de transporte (${fm(dias)} días)`:`Auxilio de transporte ${sal>2*V_.smmlv?"(no aplica: gana más de 2 SMMLV)":"(no aplica)"}`,$c(R.auxT))
       +`<tr><td colspan="2"><b>Deducciones</b></td></tr>`+row("Salud (4 % del IBC)",$c(R.salud))+row("Pensión (4 % del IBC)",$c(R.pension))+row(R.fsp?`Fondo de solidaridad pensional (${fmt(R.fsp*100,1)} %)`:"Fondo de solidaridad pensional (no aplica: menos de 4 SMMLV)",$c(R.fspV))+`<tr><td><b>Neto a pagar</b></td><td class="num"><b>${$c(R.neto)}</b></td></tr>`;
+    $("n-envio").innerHTML=botonEnvio("n-send",`Lleva el devengado de este mes sin el auxilio (${$p(R.basico+X.total)}: salario de ${fm(dias)} días más horas extras y recargos) al renglón del mes en la liquidación de prestaciones.${dias<30?` Los ${30-dias} días no trabajados se envían como días del art. 51 (licencia o suspensión); si fueron por ingreso o retiro en el mes, ponlos en 0 en la liquidación.`:""}`);
+    $("n-send").onclick=()=>{const f2=D("n-fec")||HOY;enviarALiq({y:f2.y,m:f2.m,basico:sal,extra:Math.round((R.basico+X.total-sal)*100)/100,art51:30-dias,nota:`Nómina: ${$p(R.basico+X.total)}`,origen:"la nómina"});
+      $("n-send-m").innerHTML=` Listo: ${MESN[f2.m-1]} de ${f2.y} quedó para la liquidación. <button class="btn" type="button" data-go="liquidacion">Ir a la liquidación →</button>`};
     const E=R.empleador,tot=Object.values(E).reduce((a,b)=>a+b,0);
     $("n-emp").innerHTML=stp(1,"Lo que paga el empleador además del salario (aproximado)",`<div class="tbl"><table><tr><th>Concepto</th><th>Valor</th></tr>${[["Pensión (12 %)",E.pension],["ARL riesgo I (0,522 %)",E.arl],["Caja de compensación (4 %)",E.caja],...(R.veces>=10?[["Salud (8,5 %)",E.saludEmp],["ICBF (3 %)",E.icbf],["SENA (2 %)",E.sena]]:[]),["Cesantías (8,33 %)",E.cesantias],["Intereses sobre cesantías (12 % anual de las cesantías)",E.intereses],["Prima de servicios (8,33 %)",E.prima],["Vacaciones (4,17 %)",E.vacaciones]].map(([a,b])=>row(a,$c(b))).join("")}<tr><td><b>Costo adicional del mes</b></td><td class="num"><b>${$c(tot)}</b></td></tr></table></div>${R.veces<10?`<p class="hint" style="margin:0">Salud, ICBF y SENA no se pagan por trabajadores que ganan menos de 10 SMMLV (empresas exoneradas).</p>`:""}`)};
   watch(["n-sal","n-dias","n-fec","n-aux",...ks.map(k=>"n-"+k)],run);run();
@@ -148,7 +158,7 @@ SIMS.val=function(){
 const PLAP={
   ej1:{t:"Taller · Ejercicio 1 (ingresó por primera vez)",ingreso:2,venia:false,salario:2940000,x:"2-4: 8am-5pm\n5: 10pm-7am\n6: descanso\n7-11: 6pm-4am\n12: 1pm-8pm\n13: 2pm-11pm\n14-15: 2pm-11pm\n16-19: 8am-12m, 2pm-7pm\n20-21: 5am-3pm\n22-24: 11am-9pm\n25: permiso remunerado\n26: descanso\n27-28: 10pm-7am\n29-30: incapacidad\n31: 9pm-7am"},
   ej2:{t:"Taller · Ejercicio 2 (venía laborando)",ingreso:1,venia:true,salario:2850000,x:"1-4: 2pm-11pm\n5-6: descanso\n7-9: 9pm-7am\n10-12: sancion\n13-15: 7pm-4am\n16-19: 8am-12m, 2pm-8pm\n20-21: 10am-7pm\n22-23: 10pm-8am\n24: licencia no remunerada\n25: 10pm-8am\n26: incapacidad\n27-28: 2pm-11pm\n29: descanso\n30-31: licencia no remunerada"},
-  pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",ingreso:1,venia:true,salario:4250000,n:30,w:"2",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# Calendario del taller: el 1 de junio es martes; domingos 6, 13, 20 y 27\n# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-5: 2pm-10pm\n7-11: 2pm-10pm\n12-14: licencia no remunerada\n15-19: 2pm-10pm\n21-26: 2pm-10pm\n28-30: 2pm-10pm"},
+  pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",mes:"2026-06",ingreso:1,venia:true,salario:4250000,n:30,w:"2",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# Calendario del taller: el 1 de junio es martes; domingos 6, 13, 20 y 27\n# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-5: 2pm-10pm\n7-11: 2pm-10pm\n12-14: licencia no remunerada\n15-19: 2pm-10pm\n21-26: 2pm-10pm\n28-30: 2pm-10pm"},
   vacio:{t:"Empezar en blanco",ingreso:1,venia:true,salario:2000000,x:"1-3: 6am-2pm\n"}};
 const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],DI1="DLMMJVS";
 const hh=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mi=m%60,ap=h<12?"a. m.":"p. m.",h12=h%12===0?12:h%12;return `${h12}:${String(mi).padStart(2,"0")} ${ap}`};
@@ -156,7 +166,7 @@ const hN=v=>v?(Math.round(v*100)/100).toLocaleString("es-CO"):"";
 SIMS.planilla=function(){
   $("sim").innerHTML=`<div class="calcf">${selIn("pl-pre","Ejercicio",Object.keys(PLAP).map(k=>[k,PLAP[k].t]),"ej1")}</div>
   <details class="exted" open><summary>Datos del mes y del trabajador</summary><div class="calcf" style="margin-top:8px">
-  ${numIn("pl-n","Días del mes",31)}${selIn("pl-w","El día 1 es",DIAS.map((d,i)=>[String(i),d]),"2")}<label for="pl-f">Festivos (días)<input id="pl-f" value="1, 14, 21"></label>
+  <label for="pl-mes">Mes y año (para enviarlo a la liquidación)<input id="pl-mes" type="month" value=""></label>${numIn("pl-n","Días del mes",31)}${selIn("pl-w","El día 1 es",DIAS.map((d,i)=>[String(i),d]),"2")}<label for="pl-f">Festivos (días)<input id="pl-f" value="1, 14, 21"></label>
   ${selIn("pl-v","El trabajador",[["v","venía laborando"],["n","ingresó por primera vez"]],"n")}${numIn("pl-i","Día de ingreso",2)}
   ${numIn("pl-s","Salario mensual",2940000,"1000")}${numIn("pl-j","Jornada diaria (h, lunes a sábado)",7,"0.5")}
   ${selIn("pl-d","Recargo dominical y festivo",[["0.75","75 % (tabla del taller 2026-2)"],["0.8","80 % (desde 1-jul-2025)"],["0.9","90 % (desde 1-jul-2026)"],["1","100 % (desde 1-jul-2027)"]],"0.9")}
@@ -169,7 +179,7 @@ SIMS.planilla=function(){
   ${selIn("pl-de","Deducciones",[["0","no descontar"],["1","salud 4 % y pensión 4 %"]],"0")}</div></details>
   <label for="pl-tx" style="display:block;font-size:13px;margin-top:6px"><b>Novedades del mes</b>, una por línea: «días: horario» o «días: novedad». Horarios: <code>8am-5pm</code>, <code>10:00pm-7:00am</code>, <code>8am-12m, 2pm-7pm</code>. Novedades: <code>descanso</code>, <code>permiso remunerado</code>, <code>incapacidad</code>, <code>sancion</code>, <code>licencia no remunerada</code>, <code>vacaciones</code>. Los domingos y festivos que no escribas se toman como descanso.</label>
   <textarea id="pl-tx" class="pltx" rows="10" spellcheck="false"></textarea><div id="pl-out" class="slv-out"></div>`;
-  const load=k=>{const p=PLAP[k];$("pl-pre").value=k;$("pl-tx").value=p.x;$("pl-s").value=p.salario;$("pl-v").value=p.venia?"v":"n";$("pl-i").value=p.ingreso;$("pl-n").value=p.n||31;$("pl-w").value=p.w||"2";$("pl-f").value=p.f||"1, 14, 21";$("pl-j").value=p.j||7;$("pl-d").value=p.d||"0.9";$("pl-no").value=p.no||"19"};
+  const load=k=>{const p=PLAP[k];$("pl-pre").value=k;$("pl-tx").value=p.x;$("pl-s").value=p.salario;$("pl-v").value=p.venia?"v":"n";$("pl-i").value=p.ingreso;$("pl-n").value=p.n||31;$("pl-w").value=p.w||"2";$("pl-f").value=p.f||"1, 14, 21";$("pl-j").value=p.j||7;$("pl-d").value=p.d||"0.9";$("pl-no").value=p.no||"19";$("pl-mes").value=p.mes||""};
   const run=()=>{const out=$("pl-out");const n=Math.round(N("pl-n")),w=+$("pl-w").value,sal=N("pl-s"),J=N("pl-j"),venia=$("pl-v").value==="v",ing=venia?1:Math.round(N("pl-i"));
     $("pl-i").disabled=venia;
     if(!(n>=28&&n<=31)||!(sal>0)||!(J>0&&J<=10)||!(ing>=1&&ing<=n)){out.innerHTML=`<p class="err">Revisa los datos: días del mes entre 28 y 31, salario positivo, jornada entre 0 y 10 horas y día de ingreso dentro del mes.</p>`;return}
@@ -208,10 +218,21 @@ SIMS.planilla=function(){
     <div class="stepc"><h4><span class="n">2</span>Planilla de horas</h4><p class="hint">Cada turno se asigna a la fila del día en que empieza. Cada franja se clasifica por el día en que cae: lo que pasa de medianoche a un domingo o festivo es dominical. Las primeras ${hN(J)} horas del turno son ordinarias y el resto son extra.</p>${tab}</div>
     <div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
     <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>
+    ${botonEnvio("pl-send",`Lleva el total de este mes (${$p(r.tot[0].total+r.tot[1].total)}) y sus ${r.rows.filter(x=>x.d<=30&&(x.tipo==="licencia"||x.tipo==="sancion")).length} días de licencia o suspensión (art. 51) al renglón del mes en la liquidación de prestaciones.`)}
     <div class="stepc"><h4><span class="n">5</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
   const pre=window.TOOL_PRE;window.TOOL_PRE=null;const viaPre=!!(pre&&PLAP[pre]);load(viaPre?pre:"ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
-  const PIDS=["pl-pre","pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"];
+  $("sim").addEventListener("click",e=>{if(e.target.id!=="pl-send")return;const mm=$("pl-send-m"),v=$("pl-mes").value;
+    if(!/^\d{4}-\d{2}$/.test(v)){mm.innerHTML=` Escribe arriba el <b>mes y año</b> de esta planilla.`;$("pl-mes").focus();return}
+    const n=Math.round(N("pl-n")),sal=N("pl-s"),p=LAB.parsePlanilla($("pl-tx").value,n);if(p.errs.length)return;
+    const fs=($("pl-f").value.match(/\d+/g)||[]).map(Number).filter(d=>d>=1&&d<=n),V0=LAB.valores({y:2026,m:10,d:1}),venia=$("pl-v").value==="v";
+    const r=LAB.planilla({ndias:n,dow1:+$("pl-w").value,festivos:fs,ingreso:venia?1:Math.round(N("pl-i")),venia,salario:sal,jornada:N("pl-j"),d:+$("pl-d").value,noct:+$("pl-no").value,smmlv:V0.smmlv,pierde:$("pl-pd").value==="1",propHoras:$("pl-pr").value==="h",domTrab:$("pl-dt").value,ndiasPrev:30,incap:$("pl-in").value==="2/3"?2/3:1},p.rec);
+    const tot=r.tot[0].total+r.tot[1].total,a51=r.rows.filter(x=>x.d<=30&&(x.tipo==="licencia"||x.tipo==="sancion")).length,[y,m]=v.split("-").map(Number);
+    enviarALiq({y,m,basico:sal,extra:Math.round((tot-sal)*100)/100,art51:a51,nota:`Planilla: ${$p(tot)}${a51?`, ${a51} días art. 51`:""}`,origen:"el resolvedor de horas extras"});
+    mm.innerHTML=` Listo: ${MESN[m-1]} de ${y} quedó para la liquidación. <button class="btn" type="button" data-go="liquidacion">Ir a la liquidación →</button>`});
+  $("pl-mes").addEventListener("change",()=>{const v=$("pl-mes").value;if(!/^\d{4}-\d{2}$/.test(v))return;const [y,m]=v.split("-").map(Number);
+    $("pl-n").value=new Date(Date.UTC(y,m,0)).getUTCDate();$("pl-w").value=String(new Date(Date.UTC(y,m-1,1)).getUTCDay());run()});
+  const PIDS=["pl-pre","pl-mes","pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"];
   watch(PIDS.slice(1),run);run();
   guardados("planilla",{get:formGet(PIDS),set:formSet(PIDS,run),label:"Planilla",restore:!viaPre})};
 
@@ -267,6 +288,8 @@ SIMS.liq=function(){
   const CLASE={ini:"2025-09-20",ret:"2026-11-03",m:{"2025-9":[2000000,0,0,""],"2025-10":[2000000,0,0,""],"2025-11":[2000000,0,0,""],"2025-12":[2000000,0,0,""],"2026-1":[2900000,0,0,""],"2026-2":[2900000,0,0,""],"2026-3":[2900000,0,0,""],"2026-4":[2900000,0,0,""],"2026-5":[2900000,0,30,"Art. 51"],"2026-6":[2900000,0,0,""],"2026-7":[2900000,50000,0,"Horas extra"],"2026-8":[2900000,400000,0,"Recargos"],"2026-9":[2900000,400000,0,"Recargos"],"2026-10":[2900000,400000,0,"Recargos"],"2026-11":[2900000,400000,0,"Recargos"]},pagos:{prima:false,ces:false,int:false}};
   $("sim").innerHTML=`<div class="chips pre" id="lq-ej"><button type="button" data-k="clase">Ejercicio de clase: 20 sep 2025 a 3 nov 2026, no le han pagado primas</button><button type="button" data-k="pedro">Taller 2026-2: Pedro (2025 y 2026)</button><button type="button" data-k="limpio">Empezar uno nuevo</button></div>
   <div class="calcf">${dateIn("lq-ini","Fecha de inicio","2025-09-20")}${dateIn("lq-ret","Fecha de retiro (o de corte)","2026-11-03")}</div>
+  <div id="lq-env"></div>
+  <p class="hint"><b>¿El ejercicio trae la nómina de un mes</b> (horas extras, recargos, licencias)? Calcúlala en la <button class="btn" type="button" data-go="nomina">Nómina mensual</button> o en el <button class="btn" type="button" data-go="planilla">Resolvedor de horas extras</button> y toca «Enviar este mes a la liquidación»: el devengado y los días del art. 51 llegan solos a su renglón.</p>
   <p class="hint">Un renglón por mes. <b>Básico</b>: el salario mensual del contrato. <b>Extras</b>: horas extra, recargos y comisiones de ese mes. <b>Art. 51</b>: días de suspensión (licencia no remunerada, sanción), que se restan de los días. Si entró o salió a mitad de mes, escribe el salario del mes completo.</p>
   <div class="tbl"><table id="lq-m"></table></div>
   <div class="chips" style="margin:8px 0"><label class="chkl"><input type="checkbox" id="lq-pp"> Las primas se pagaron a tiempo</label><label class="chkl"><input type="checkbox" id="lq-pc"> Las cesantías se consignaron a tiempo</label><label class="chkl"><input type="checkbox" id="lq-pi"> Los intereses se pagaron a tiempo</label></div>
@@ -315,5 +338,10 @@ SIMS.liq=function(){
   const pre=window.TOOL_PRE;window.TOOL_PRE=null;load(pre==="pedro"?"pedro":"clase");
   guardados("liquidacion",{label:"Liquidación",restore:pre!=="pedro",
     get:()=>{read();return{ini:$("lq-ini").value,ret:$("lq-ret").value,vals:JSON.parse(JSON.stringify(vals)),pp:$("lq-pp").checked,pc:$("lq-pc").checked,pi:$("lq-pi").checked}},
-    set:st=>{$("lq-ini").value=st.ini;$("lq-ret").value=st.ret;vals=JSON.parse(JSON.stringify(st.vals||{}));$("lq-pp").checked=!!st.pp;$("lq-pc").checked=!!st.pc;$("lq-pi").checked=!!st.pi;$("lq-m").innerHTML="";draw()}})
+    set:st=>{$("lq-ini").value=st.ini;$("lq-ret").value=st.ret;vals=JSON.parse(JSON.stringify(st.vals||{}));$("lq-pp").checked=!!st.pp;$("lq-pc").checked=!!st.pc;$("lq-pi").checked=!!st.pi;$("lq-m").innerHTML="";draw()}});
+  // meses que llegan desde la nómina o la planilla
+  const env=tomarEnvios();if(env.length){read();const a=D("lq-ini"),b=D("lq-ret"),k0=a?a.y*12+a.m:0,k1=b?b.y*12+b.m:0,dentro=[],fuera=[];
+    env.forEach(x=>{vals[x.y+"-"+x.m]=[x.basico,x.extra,x.art51,x.nota];(x.y*12+x.m>=k0&&x.y*12+x.m<=k1?dentro:fuera).push(x)});
+    $("lq-m").innerHTML="";draw();$("sim").dispatchEvent(new Event("change"));
+    $("lq-env").innerHTML=`<div class="okbox">${dentro.length?`Llegó desde ${dentro[0].origen}: ${dentro.map(x=>`<b>${MESN[x.m-1]} de ${x.y}</b> (devengado ${$p(x.basico+x.extra)}${x.art51?`, ${x.art51} días del art. 51`:""})`).join("; ")}. Revisa su renglón en la tabla.`:""}${fuera.length?` ${fuera.map(x=>`${MESN[x.m-1]} de ${x.y}`).join(", ")} está fuera de las fechas de esta liquidación: ajusta la fecha de inicio o de retiro y aparecerá con sus datos.`:""}</div>`}
 };
