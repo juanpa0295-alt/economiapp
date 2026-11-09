@@ -27,7 +27,7 @@ const NW='<span class="tag nw">Nuevo</span>';
 function typeset(el){if(window.MathJax&&MathJax.typesetPromise){try{MathJax.typesetClear&&MathJax.typesetClear([el])}catch(e){}MathJax.typesetPromise([el]).catch(()=>{})}}
 
 function renderMap(){
-  trunkEl.innerHTML=TRUNK.map((s,i)=>`<li><button class="st ${done[s.id]?"done":""} ${cur===s.id?"on":""}" type="button" data-go="${s.id}">
+  trunkEl.innerHTML=TRUNK.map((s,i)=>`${s.parte&&(!i||TRUNK[i-1].parte!==s.parte)?`<li class="tparte">${s.parte}</li>`:""}<li><button class="st ${done[s.id]?"done":""} ${cur===s.id?"on":""}" type="button" data-go="${s.id}">
     <span class="dot">${done[s.id]?"✓":i+1}</span><span class="nm">${s.t}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}</button></li>`).join("");
   brEl.innerHTML=BRANCHES.map((b,gi)=>{const has=b.items.some(it=>it.id===cur),op=has||OPENG.has(gi),nd=b.items.filter(it=>done[it.id]).length;
     return `<details class="bgrp${has?" cur":""}" data-g="${gi}" ${op?"open":""}><summary><span class="bgt">${b.g}</span><span class="bgn">${nd?nd+"/":""}${b.items.length}</span></summary><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
@@ -108,7 +108,7 @@ function show(id,scroll){
   const s=byId(id)||TRUNK[0]; const prevIdx=ALL.findIndex(x=>x.id===cur); cur=s.id; remember(s.id);
   const i=ALL.indexOf(s), prev=ALL[i-1], next=ALL[i+1];
   const eyebrow=s.kind==="t"
-    ? `<span>Estación ${i+1} de ${TRUNK.length}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}${s.nuevo?NW:TNOTE}`
+    ? `<span>Estación ${i+1} de ${TRUNK.length}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}${s.parte?`<span>· ${s.parte}</span>`:""}${s.nuevo?NW:s.parte?"":TNOTE}`
     : s.kind==="b" ? `<span class="tag br">Rama</span>${s.nuevo?NW:""}<span>${s.grp.g} · sale de ${byId(s.grp.from).t}</span>`
     : s.kind==="k" ? `<span class="tag ws">Taller resuelto</span><span>${s.sub||""} · ${s.puntos.length} puntos</span>`
     : `<span class="tag ws">Herramienta</span><span>${s.grp==="ver"?"Para entender":"Para resolver ejercicios"}</span>`;
@@ -194,8 +194,8 @@ function bindCtl(ids,run){ids.forEach(id=>{const r=$(id+"-r"),n=$(id);
   n.addEventListener("input",()=>{if(n.value!==""&&isFinite(+n.value))r.value=n.value;run()})})}
 const V=id=>parseFloat($(id).value);
 function seg(id,label,opts,val){return `<div class="seg" id="${id}" role="group" aria-label="${label}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="${v===val}">${t}</button>`).join("")}</div>`}
-function bindSeg(id,cb){$(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset.v)})}
+function bindSeg(id,cb){const el=$(id);el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!el.isConnected)return;
+  el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset.v)})}
 function nice(v){const p=10**Math.floor(Math.log10(v)),m=v/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
 function ticks(a,b,step){const o=[];for(let v=Math.ceil(a/step-1e-9)*step;v<=b+1e-9;v+=step)o.push(+v.toFixed(8));return o}
 function frame(W,H,xr,yr,xt,yt,xl,yl){
