@@ -477,6 +477,10 @@ input.rc-in:disabled,select.rc-in:disabled{opacity:.85}
 .sendliq-b{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .okbox{margin:8px 0;padding:8px 12px;border-radius:8px;background:var(--line-soft);font-size:14px}
 
+/* separadores de partes en el tronco */
+ol.trunk li.tparte{font:600 11px/1.2 var(--f-mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 0 4px 34px}
+ol.trunk li.tparte:first-child{padding-top:2px}
+
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
 .calcf>span{display:contents}
