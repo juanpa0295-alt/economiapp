@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Evaluación de Proyectos · Economiapp</title>
+<meta name="description" content="Programa 1503750: ciclo del proyecto y MGA, marco lógico (árboles y matriz), estudio de mercado y proyección de la demanda, tamaño y localización, puntos de equilibrio, matriz de Conesa, matriz de riesgos, flujos de caja del proyecto y del inversionista (VPN, TIR, TIRM, B/C, PRI), riesgo del VPN (Hillier y Monte Carlo) y evaluación económica con precios de cuenta.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#1d4f7a;--line-soft:#dbe8f4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#7fb0dc;--line-soft:#0c2236}}
+:root[data-theme="dark"]{--line:#7fb0dc;--line-soft:#0c2236}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Evaluación de Proyectos</div>
+    <h1>Evaluación de Proyectos</h1>
+    <p>El tronco sigue las cinco unidades del programa (1503750): generalidades y marco lógico, estudios de mercado, técnico, administrativo-legal-ambiental, y financiero y de riesgo. Los laboratorios funcionan como plantillas de un proyecto real: árbol de problemas y matriz de marco lógico (se guardan en tu navegador), proyección de la demanda, localización por puntos, puntos de equilibrio, matriz de Conesa, mapa de riesgos, flujos de caja con financiación, riesgo del VPN y evaluación económica. Cada cálculo indica su equivalente en Excel. Continúa lo visto en Gerencia Financiera.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las cinco unidades del programa</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-ep-done";</script>
+<script src="evaluacion-proyectos/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="evaluacion-proyectos/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>
