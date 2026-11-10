@@ -32,16 +32,41 @@ LAB.valores=fecha=>{const [,sm,aux]=LAB.at(LEY.smmlv,fecha),[,jor]=LAB.at(LEY.jo
 
 // ---------- art. 46: prórrogas del contrato a término fijo
 // inicio: fecha; meses: duración inicial; corte: fecha de consulta. Devuelve los períodos y la fecha de conversión a indefinido.
-LAB.prorrogas=function(inicio,meses,corte){
+// fin de un período de n días contados con el año de 360 (el primer día cuenta): el primer día en que días360 + 1 llega a n
+LAB.add360=(start,n)=>{let d=start;for(let k=0;k<4000;k++){if(LAB.days360(start,d)+1>=n)return d;d=LAB.addDays(d,1)}return d};
+// fin de un período de «meses y días»: calendario (meses del calendario + días corridos) o año de 360 (30 días por mes)
+LAB.finPeriodo=(start,meses,dias,modo)=>modo==="360"?LAB.add360(start,meses*30+dias):(dias?LAB.addDays(LAB.endOf(start,meses),dias):LAB.endOf(start,meses));
+LAB.prorrogas=function(inicio,meses,corte,opt={}){const dias0=opt.dias||0,modo=opt.modo||"cal",corta=meses*30+dias0<360;
   const ref=LAB.cmp(inicio,LAB.parse(LEY.reforma))<0?LAB.parse(LEY.reforma):inicio,tope=LAB.addDays(LAB.endOf(ref,48),0);
   const per=[];let s=inicio,n=0,conv=null;
-  while(per.length<60){if(LAB.cmp(s,tope)>0){conv=s;break}const dur=n===0?meses:(meses<12&&n>=4?12:meses),e=LAB.endOf(s,dur);
-    const p={n,inicio:s,fin:e,meses:dur,preaviso:LAB.addDays(e,-30),excede:LAB.cmp(e,tope)>0};
+  while(per.length<60){if(LAB.cmp(s,tope)>0){conv=s;break}const anual=corta&&n>=4,dur=n===0||!anual?meses:12,dd=anual?0:dias0,e=LAB.finPeriodo(s,dur,dd,modo);
+    const p={n,inicio:s,fin:e,meses:dur,dias:dd,anual,preaviso:LAB.addDays(e,-30),excede:LAB.cmp(e,tope)>0};
     if(p.excede){conv=LAB.addDays(tope,1);p.fin=tope;p.recortado=true;per.push(p);break}
     per.push(p);
     s=LAB.addDays(e,1);n++}
   const actual=corte?per.find(p=>LAB.cmp(p.inicio,corte)<=0&&LAB.cmp(corte,p.fin)<=0)||null:null;
   return{periodos:per,ref,tope,conversion:conv,actual,antesReforma:LAB.cmp(inicio,LAB.parse(LEY.reforma))<0,indefinidoEnCorte:conv&&corte&&LAB.cmp(corte,conv)>=0}};
+
+// ---------- festivos de Colombia (Ley 51 de 1983: los movibles pasan al lunes siguiente)
+LAB.pascua=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=(h+l-7*m+114)%31+1;return{y,m:mo,d:da}};
+LAB.festivos=function(y){const lunes=d=>{const w=new Date(Date.UTC(d.y,d.m-1,d.d)).getUTCDay();return w===1?d:LAB.addDays(d,(8-w)%7)},P=LAB.pascua(y),f=[];
+  const fijo=(m,d,n)=>f.push({f:{y,m,d},n}),mov=(m,d,n)=>f.push({f:lunes({y,m,d}),n}),pas=(k,n,mv)=>{const d=LAB.addDays(P,k);f.push({f:mv?lunes(d):d,n})};
+  fijo(1,1,"Año Nuevo");mov(1,6,"Reyes Magos");mov(3,19,"San José");pas(-3,"Jueves Santo");pas(-2,"Viernes Santo");fijo(5,1,"Día del Trabajo");pas(39,"Ascensión del Señor",1);pas(60,"Corpus Christi",1);pas(68,"Sagrado Corazón",1);
+  mov(6,29,"San Pedro y San Pablo");fijo(7,20,"Independencia");fijo(8,7,"Batalla de Boyacá");mov(8,15,"Asunción de la Virgen");mov(10,12,"Día de la Raza");mov(11,1,"Todos los Santos");mov(11,11,"Independencia de Cartagena");fijo(12,8,"Inmaculada Concepción");fijo(12,25,"Navidad");
+  return f.sort((a,b)=>LAB.cmp(a.f,b.f))};
+LAB.esFestivo=d=>LAB.festivos(d.y).find(x=>LAB.cmp(x.f,d)===0)||null;
+
+// ---------- vacaciones (arts. 186 a 192): 15 días hábiles por año; al terminar, compensación proporcional
+// inicio: desde cuándo se deben; servicio en días de 360 menos suspensiones (art. 53); salario: el ordinario (sin horas extra ni dominicales trabajados)
+LAB.vacaciones=function({inicio,retiro,salario,art51=0,disfrutados=0}){const total=LAB.days360(inicio,retiro)+1,dias=Math.max(0,total-Math.max(0,Math.round(art51))),
+  causados=dias*15/360,pend=Math.max(0,causados-disfrutados),diario=salario/30,valor=diario*pend;
+  return{total,art51:total-dias,dias,causados,disfrutados,pend,diario,valor,valor720:salario*dias/720}};
+// fecha de regreso: cuenta días hábiles desde el inicio del disfrute (no cuentan domingos ni festivos; el sábado cuenta si se trabaja ese día)
+LAB.disfrute=function(inicio,habiles,sabado){const lista=[],no=[];let d=inicio,k=0;
+  while(lista.length<habiles&&k<400){const w=new Date(Date.UTC(d.y,d.m-1,d.d)).getUTCDay(),fe=LAB.esFestivo(d);
+    if(w===0||fe||(w===6&&!sabado))no.push({f:d,por:fe?fe.n:w===0?"domingo":"sábado (no laborable)"});else lista.push(d);d=LAB.addDays(d,1);k++}
+  let reg=d;for(let j=0;j<20;j++){const w=new Date(Date.UTC(reg.y,reg.m-1,reg.d)).getUTCDay();if(w===0||LAB.esFestivo(reg)||(w===6&&!sabado))reg=LAB.addDays(reg,1);else break}
+  return{habiles:lista,no,ultimo:lista[lista.length-1],regreso:reg,calendario:LAB.diasCal(inicio,reg)}};
 
 // ---------- art. 64: indemnización por despido sin justa causa
 LAB.indemnizacion=function({tipo,salario,inicio,despido,finPactado,smmlv,art51=0}){
@@ -74,9 +99,9 @@ LAB.prima=function({anio,sem,ingreso,retiro,meses,aux="auto",ausencias=0,pago,ba
 // ---------- liquidación de prestaciones con el formato de clase: primas, cesantías (art. 249, Ley 50 de 1990) e intereses (Ley 52 de 1975)
 // meses: [{y,m,basico,extra,art51}] desde el mes de ingreso hasta el de retiro. pagos: {prima,ces,int} = true si se pagaron a tiempo.
 // Convenciones de clase: días de 360 contando ambos extremos, salario diario truncado a pesos, mora con el salario básico.
-// Como en clase: los meses suspendidos todo el mes (art. 51) cuentan con devengado 0 en la comparación y en el promedio
+// Como en clase: los meses suspendidos todo el mes (art. 51) cuentan con devengado 0 en el promedio; si uno de los tres últimos meses está suspendido, ya no son «iguales»
 LAB.basePeriodo=function(meses,fin){if(!meses.length)return null;const dev=r=>r.art51>=30?0:r.basico+r.extra,ult=meses.slice(-3);
-  const iguales=ult.every(r=>Math.abs(dev(r)-dev(ult[0]))<0.5),prom=meses.reduce((x,r)=>x+dev(r),0)/meses.length;
+  const iguales=ult.every(r=>r.art51<30&&Math.abs(dev(r)-dev(ult[0]))<0.5),prom=meses.reduce((x,r)=>x+dev(r),0)/meses.length;
   const V=LAB.valores(fin),ultimo=meses[meses.length-1],aux=ultimo.basico<=2*V.smmlv?V.aux:0,sal=iguales?dev(ultimo):prom;
   return{vivos:meses,ult,iguales,prom,sal,aux,base:sal+aux,basico:ultimo.basico,diario:Math.floor(ultimo.basico/30),devs:meses.map(dev),susp:meses.filter(r=>r.art51>=30).length}};
 LAB.liquidacion=function({inicio,retiro,meses,pagos={}}){
