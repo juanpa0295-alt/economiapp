@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Economía Internacional · Economiapp</title>
+<meta name="description" content="Programa 1503705: modelo ricardiano y Dornbusch-Fischer-Samuelson, factores específicos, Heckscher-Ohlin con Stolper-Samuelson y Rybczynski, modelo estándar, ciclo del producto, Linder y gravedad, competencia monopolística, dumping recíproco, migración, aranceles y protección efectiva, economía política, integración (Viner) y política comercial estratégica.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#0f6b6b;--line-soft:#d6efef}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#6cc6c6;--line-soft:#053030}}
+:root[data-theme="dark"]{--line:#6cc6c6;--line-soft:#053030}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Economía Internacional</div>
+    <h1>Economía Internacional</h1>
+    <p>El tronco sigue las ocho unidades del programa (1503705), de la teoría clásica a la política comercial estratégica, con el texto de Krugman y Obstfeld. Cada modelo tiene su laboratorio: ventaja comparativa con la frontera de posibilidades, el continuo DFS, los teoremas de Stolper-Samuelson y Rybczynski con coeficientes fijos, la ecuación de gravedad estimada con tus datos, el ejemplo de los automóviles de Krugman, dumping recíproco, migración, los triángulos del arancel, la protección efectiva, creación y desviación de comercio, y el juego Boeing-Airbus. La parte monetaria internacional está en Macroeconomía 2.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las ocho unidades del programa</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-ei-done";</script>
+<script src="economia-internacional/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="economia-internacional/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>
