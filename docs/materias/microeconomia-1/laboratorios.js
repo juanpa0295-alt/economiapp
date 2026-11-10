@@ -1,0 +1,219 @@
+// Microeconomía I · laboratorios interactivos
+// ===================== AYUDAS COMUNES DE LOS LABORATORIOS DE MICROECONOMÍA =====================
+const SIMS={};
+let CLIP=0;
+function plotXY({xr,yr,series=[],points=[],vlines=[],hlines=[],xl,yl,H=300,label,areas=[]}){
+  const W=600,f=frame(W,H,xr,yr,ticks(xr[0],xr[1],nice((xr[1]-xr[0])/5)),ticks(yr[0],yr[1],nice((yr[1]-yr[0])/4)),xl,yl),id="cp"+(++CLIP);
+  let b="";
+  areas.forEach(a=>{const d=a.pts.map(([x,y],i)=>(i?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(y).toFixed(1)).join("")+"Z";b+=`<path d="${d}" fill="var(${a.col})" fill-opacity="${a.op||.22}" stroke="none"/>`});
+  series.forEach(s=>{const pts=s.pts||[...Array(241)].map((_,i)=>{const x=xr[0]+(xr[1]-xr[0])*i/240;const y=s.f(x);return[x,y==null?NaN:y]});
+    let d="",pen=false;pts.forEach(([x,y])=>{if(!isFinite(y)){pen=false;return}d+=(pen?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(Math.max(yr[0]-(yr[1]-yr[0]),Math.min(yr[1]+(yr[1]-yr[0]),y))).toFixed(1);pen=true});
+    b+=`<path d="${d}" fill="none" stroke="var(${s.col||"--ink"})" stroke-width="${s.w||2.5}" ${s.dash?`stroke-dasharray="${s.dash}"`:""}/>`});
+  vlines.forEach(v=>b+=`<line x1="${f.sx(v.x)}" x2="${f.sx(v.x)}" y1="${f.sy(yr[0])}" y2="${f.sy(yr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  hlines.forEach(v=>b+=`<line y1="${f.sy(v.y)}" y2="${f.sy(v.y)}" x1="${f.sx(xr[0])}" x2="${f.sx(xr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  let p="";points.forEach(q=>{if(!isFinite(q.x)||!isFinite(q.y))return;const x=f.sx(q.x),y=f.sy(q.y),anc=x>W*.7?"end":"start";
+    p+=`<circle cx="${x}" cy="${y}" r="6" fill="var(${q.col||"--ink"})" stroke="var(--card)" stroke-width="2"/>${q.label?`<text x="${x+(anc==="end"?-9:9)}" y="${y-9}" font-size="12" font-weight="600" text-anchor="${anc}" fill="var(${q.col||"--ink"})">${q.label}</text>`:""}`});
+  return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label||"Gráfico"}"><defs><clipPath id="${id}"><rect x="${f.L}" y="${f.T}" width="${W-f.L-f.R}" height="${H-f.T-f.B}"/></clipPath></defs>${f.g}<g clip-path="url(#${id})">${b}</g>${p}</svg></div>`}
+const legend=items=>`<div class="legend">${items.map(([c,t,d])=>`<span><i style="background:var(${c})${d?";opacity:.55":""}"></i>${t}</span>`).join("")}</div>`;
+const okAll=a=>a.every(x=>isFinite(x)),n2=v=>fmt(v,2),n4=v=>fmt(v,4);
+const tabsBox=(id,opts)=>`<div style="margin-bottom:10px">${seg(id,"Herramienta",opts,opts[0][0])}</div><div id="${id}-b"></div>`;
+function tabsRun(id,M){const go=k=>M[k]();bindSeg(id,go);go(Object.keys(M)[0])}
+const nin=(id,l,v,st)=>`<label for="${id}">${l}<input type="number" id="${id}" value="${v}" ${st?`step="${st}"`:""} inputmode="decimal"></label>`;
+const N=id=>{const e=$(id);return e?parseFloat(String(e.value).replace(",",".")):NaN};
+const onIn=(ids,run)=>ids.forEach(id=>{const e=$(id);if(e)e.addEventListener("input",run)});
+
+
+
+// ===================== LABORATORIOS DE MICROECONOMÍA I =====================
+const n0=v=>fmt(v,0);
+const demCtl=(p,a=100,b=1)=>`${ctl(p+"-a","Demanda: intercepto a (P = a − bQ)",10,1000,1,a)}${ctl(p+"-b","Demanda: pendiente b",0.05,10,0.05,b)}`;
+const areaPol=(f,g,x0,x1)=>{const pts=[];for(let i=0;i<=30;i++){const x=x0+(x1-x0)*i/30;pts.push([x,f(x)])}for(let i=30;i>=0;i--){const x=x0+(x1-x0)*i/30;pts.push([x,g(x)])}return pts};
+
+// ---------- Costos y escala
+SIMS.escala=function(){
+  $("sim").innerHTML=`<p class="hint">C(q) = F + c·q + d·q².</p><div class="ctr">${ctl("es-F","Costo fijo F",0,2000,10,100)}${ctl("es-c","c",0,100,1,10)}${ctl("es-d","d",0,5,0.05,1)}${ctl("es-q","Producción a evaluar q",1,100,1,5)}</div><div class="res" id="es-res"></div>${legend([["--line","Costo medio"],["--exam","Costo marginal"]])}<div id="es-p"></div><div id="es-st"></div>`;
+  const run=()=>{const k={F:V("es-F"),c:V("es-c"),d:V("es-d")},q=V("es-q");if(!okAll([k.F,k.c,k.d,q]))return;const R=M1.costos(k,q),qm=M1.minCMe(k),sub=M1.costos(k,q).CT<2*M1.costos(k,q/2).CT;
+    $("es-res").innerHTML=tiles([["CMe",n2(R.CMe)],["CMg",n2(R.CMg)],["Índice S = CMe/CMg",n4(R.S),R.S>1?"okt":""],["Mínimo del CMe",isFinite(qm)?`q = ${n2(qm)}`:"no tiene (siempre baja)"]]);
+    const xm=isFinite(qm)?Math.max(qm*2.5,q*1.5):q*3,top=Math.max(M1.costos(k,xm*0.15).CMe,M1.costos(k,xm).CMg)*1.05;
+    $("es-p").innerHTML=plotXY({xr:[0,xm],yr:[0,top],series:[{f:x=>x>0?M1.costos(k,x).CMe:NaN,col:"--line"},{f:x=>M1.costos(k,x).CMg,col:"--exam"}],vlines:[{x:q}],points:isFinite(qm)?[{x:qm,y:M1.costos(k,qm).CMe,label:"mín CMe"}]:[],xl:"q",yl:"costo por unidad",label:"Costo medio y marginal"});
+    $("es-st").innerHTML=stp(1,"Cálculo",`<div class="eq al">CT = ${fm(k.F)} + ${fm(k.c)}·${fm(q)} + ${fm(k.d)}·${fm(q)}² = ${n2(R.CT)}<br>CMe = ${n2(R.CMe)} · CMg = ${fm(k.c)} + ${fm(2*k.d)}·${fm(q)} = ${n2(R.CMg)}<br>S = ${n2(R.CMe)}/${n2(R.CMg)} = <b>${n4(R.S)}</b> ⟹ ${R.S>1?"economías de escala":R.S<1?"deseconomías de escala":"escala mínima eficiente"}<br>Subaditividad: C(${fm(q)}) = ${n2(R.CT)} ${sub?"<":"≥"} 2·C(${fm(q/2)}) = ${n2(2*M1.costos(k,q/2).CT)} ⟹ ${sub?"una sola empresa produce más barato":"dos empresas producen igual o más barato"}</div>`)};
+  bindCtl(["es-F","es-c","es-d","es-q"],run);run()};
+
+// ---------- Monopolio
+SIMS.mono=function(){
+  $("sim").innerHTML=tabsBox("mo",[["lin","Demanda lineal"],["el","Margen con elasticidad constante"]]);const B=$("mo-b");
+  tabsRun("mo",{
+   lin(){B.innerHTML=`<div class="ctr">${demCtl("ml")}${ctl("ml-F","Costo fijo F",0,2000,10,0)}${ctl("ml-c","c (C = F + cQ + dQ²)",0,200,1,20)}${ctl("ml-d","d",0,3,0.05,0)}</div><div class="res" id="ml-res"></div>${legend([["--ink","Demanda"],["--exam","Ingreso marginal"],["--branch","Costo marginal"],["--good","Excedente del consumidor"],["--line","Excedente del productor"],["--bad","Pérdida irrecuperable"]])}<div id="ml-p"></div><div id="ml-st"></div>`;
+    const run=()=>{const v={a:V("ml-a"),b:V("ml-b"),F:V("ml-F"),c:V("ml-c"),d:V("ml-d")};if(!okAll(Object.values(v)))return;if(v.c>=v.a){$("ml-res").innerHTML=err("el costo marginal debe ser menor que el intercepto de la demanda.");return}const R=M1.monopolio(v);
+      $("ml-res").innerHTML=tiles([["Cantidad",n2(R.Q)],["Precio",n2(R.P)],["Beneficio",n2(R.pi),R.pi<0?"badt":"okt"],["Índice de Lerner",n4(R.lerner)],["Elasticidad en el óptimo",n4(R.eps)],["Pérdida irrecuperable",n2(R.PIE),"badt"]]);
+      const Pd=q=>v.a-v.b*q,CMg=q=>v.c+2*v.d*q,xm=v.a/v.b;
+      $("ml-p").innerHTML=plotXY({xr:[0,xm],yr:[0,v.a*1.05],areas:[{pts:areaPol(Pd,()=>R.P,0,R.Q),col:"--good"},{pts:areaPol(()=>R.P,CMg,0,R.Q),col:"--line"},{pts:areaPol(Pd,CMg,R.Q,R.Qc),col:"--bad",op:.35}],series:[{f:Pd,col:"--ink"},{f:q=>v.a-2*v.b*q,col:"--exam",w:2},{f:CMg,col:"--branch"}],points:[{x:R.Q,y:R.P,label:"monopolio"},{x:R.Qc,y:R.Pc,label:"competencia",col:"--muted"}],xl:"Q",yl:"P",label:"Equilibrio del monopolio"});
+      $("ml-st").innerHTML=stp(1,"IMg = CMg",`<div class="eq al">IMg = ${fm(v.a)} − ${fm(2*v.b)}Q · CMg = ${fm(v.c)} + ${fm(2*v.d)}Q<br>Q<sub>m</sub> = ${fr(fm(v.a)+" − "+fm(v.c),fm(2*v.b)+" + "+fm(2*v.d))} = <b>${n2(R.Q)}</b> · P<sub>m</sub> = ${fm(v.a)} − ${fm(v.b)}·${n2(R.Q)} = <b>${n2(R.P)}</b><br>π = ${n2(R.P)}·${n2(R.Q)} − C = <b>${n2(R.pi)}</b></div>`)
+        +stp(2,"Poder de mercado",`<div class="eq al">Lerner = (P − CMg)/P = (${n2(R.P)} − ${n2(R.CMg)})/${n2(R.P)} = <b>${n4(R.lerner)}</b> · 1/|ε| = ${n4(1/Math.abs(R.eps))}</div>`)
+        +stp(3,"Comparación con competencia",`<div class="tbl"><table><tr><th></th><th class="num">Competencia</th><th class="num">Monopolio</th></tr><tr><td>Q</td><td class="num">${n2(R.Qc)}</td><td class="num">${n2(R.Q)}</td></tr><tr><td>P</td><td class="num">${n2(R.Pc)}</td><td class="num">${n2(R.P)}</td></tr><tr><td>Excedente del consumidor</td><td class="num">${n2(R.ECc)}</td><td class="num">${n2(R.EC)}</td></tr><tr><td>Excedente del productor</td><td class="num">${n2(R.EPc)}</td><td class="num">${n2(R.EP)}</td></tr><tr><td><b>Total</b></td><td class="num">${n2(R.Wc)}</td><td class="num">${n2(R.Wm)}</td></tr></table></div><p>Pérdida irrecuperable: ${n2(R.Wc)} − ${n2(R.Wm)} = <b>${n2(R.PIE)}</b>. Transferencia del consumidor al monopolista: (${n2(R.P)} − ${n2(R.Pc)})·${n2(R.Q)} = ${n2((R.P-R.Pc)*R.Q)}.</p>`)};
+    bindCtl(["ml-a","ml-b","ml-F","ml-c","ml-d"],run);run()},
+   el(){B.innerHTML=`<div class="ctr">${ctl("me-c","Costo marginal",1,200,1,30)}${ctl("me-e","Elasticidad de la demanda (valor absoluto)",1.05,10,0.05,4)}</div><div id="me-o"></div>`;
+    const run=()=>{const c=V("me-c"),e=V("me-e"),P=M1.markup(c,e);$("me-o").innerHTML=`<div class="res">${tiles([["Precio",n2(P)],["Margen sobre el costo",fmt(100*(P/c-1),1)+" %"],["Lerner",n4(1/e)]])}</div><div class="eq al">P = CMg/(1 − 1/|ε|) = ${fm(c)}/(1 − 1/${fm(e)}) = <b>${n2(P)}</b></div><p class="hint">Con |ε| cerca de 1 el margen se dispara; el monopolista nunca opera con |ε| ≤ 1.</p>`};
+    bindCtl(["me-c","me-e"],run);run()}})};
+
+// ---------- Multiplanta
+SIMS.multi=function(){
+  $("sim").innerHTML=`<div class="ctr">${demCtl("mp")}${ctl("mp-c1","Planta 1: c₁ (CMg₁ = c₁ + 2d₁q₁)",0,100,1,10)}${ctl("mp-d1","Planta 1: d₁",0.05,5,0.05,1)}${ctl("mp-c2","Planta 2: c₂",0,100,1,20)}${ctl("mp-d2","Planta 2: d₂",0.05,5,0.05,0.5)}</div><div class="res" id="mp-res"></div>${legend([["--ink","Demanda"],["--exam","Ingreso marginal"],["--line","CMg planta 1"],["--branch","CMg planta 2"],["--good","Suma horizontal de los CMg"]])}<div id="mp-p"></div><div id="mp-st"></div>`;
+  const run=()=>{const a=V("mp-a"),b=V("mp-b"),pl=[{c:V("mp-c1"),d:V("mp-d1"),F:0},{c:V("mp-c2"),d:V("mp-d2"),F:0}];if(!okAll([a,b,pl[0].c,pl[0].d,pl[1].c,pl[1].d]))return;if(Math.min(pl[0].c,pl[1].c)>=a){$("mp-res").innerHTML=err("algún costo marginal debe ser menor que a.");return}
+    const R=M1.multiplanta({a,b,plantas:pl});$("mp-res").innerHTML=tiles([["q₁",n2(R.qs[0])],["q₂",n2(R.qs[1])],["Q total",n2(R.Q)],["Precio",n2(R.P)],["CMg común",n2(R.lam)],["Beneficio",n2(R.pi)]]);
+    const qsum=l=>pl.reduce((s,p)=>s+Math.max(0,(l-p.c)/(2*p.d)),0),lmax=a,curve=g=>[...Array(161)].map((_,i)=>{const l=lmax*i/160;return[g(l),l]});
+    $("mp-p").innerHTML=plotXY({xr:[0,a/b],yr:[0,a*1.05],series:[{f:q=>a-b*q,col:"--ink"},{f:q=>a-2*b*q,col:"--exam",w:2},{f:q=>pl[0].c+2*pl[0].d*q,col:"--line",w:2},{f:q=>pl[1].c+2*pl[1].d*q,col:"--branch",w:2},{pts:curve(qsum),col:"--good"}],hlines:[{y:R.lam}],points:[{x:R.Q,y:R.lam,label:"IMg = ΣCMg"},{x:R.Q,y:R.P,label:"P",col:"--muted"}],xl:"Q",yl:"P",label:"Monopolista multiplanta"});
+    $("mp-st").innerHTML=stp(1,"Reparto",`<div class="eq al">Con un CMg común λ: q₁ = (λ − ${fm(pl[0].c)})/${fm(2*pl[0].d)}, q₂ = (λ − ${fm(pl[1].c)})/${fm(2*pl[1].d)}<br>IMg(q₁ + q₂) = λ ⟹ λ = <b>${n2(R.lam)}</b><br>q₁ = ${n2(R.qs[0])}, q₂ = ${n2(R.qs[1])}, Q = ${n2(R.Q)}, P = ${fm(a)} − ${fm(b)}·${n2(R.Q)} = ${n2(R.P)}</div><p class="hint">Comprobación: CMg₁ = ${n2(pl[0].c+2*pl[0].d*R.qs[0])}, CMg₂ = ${n2(pl[1].c+2*pl[1].d*R.qs[1])}${R.qs[1]===0||R.qs[0]===0?" (una planta no produce: su costo marginal inicial ya supera λ)":""}.</p>`)};
+  bindCtl(["mp-a","mp-b","mp-c1","mp-d1","mp-c2","mp-d2"],run);run()};
+
+// ---------- Monopolio natural
+SIMS.natural=function(){
+  $("sim").innerHTML=`<div class="ctr">${demCtl("na")}${ctl("na-F","Costo fijo F",0,5000,50,1000)}${ctl("na-c","Costo marginal c",0,200,1,20)}</div><div class="res" id="na-res"></div>${legend([["--ink","Demanda"],["--line","Costo medio"],["--branch","Costo marginal"],["--exam","Ingreso marginal"]])}<div id="na-p"></div><div id="na-st"></div>`;
+  const run=()=>{const v={a:V("na-a"),b:V("na-b"),F:V("na-F"),c:V("na-c")};if(!okAll(Object.values(v))||v.c>=v.a)return;const R=M1.natural(v),m=R.m;
+    $("na-res").innerHTML=tiles([["Sin regular: P",n2(m.P)],["Primer óptimo: subsidio",n2(v.F)],["Segundo óptimo: P",R.segundo.viable?n2(R.segundo.P):"no viable","okt"]]);
+    $("na-p").innerHTML=plotXY({xr:[0,v.a/v.b],yr:[0,v.a*1.05],series:[{f:q=>v.a-v.b*q,col:"--ink"},{f:q=>v.a-2*v.b*q,col:"--exam",w:2},{f:q=>q>0?v.c+v.F/q:NaN,col:"--line"},{f:()=>v.c,col:"--branch"}],points:[{x:m.Q,y:m.P,label:"monopolio"},{x:R.primer.Q,y:R.primer.P,label:"P = CMg",col:"--branch"},...(R.segundo.viable?[{x:R.segundo.Q,y:R.segundo.P,label:"P = CMe",col:"--line"}]:[])],xl:"Q",yl:"P",label:"Monopolio natural"});
+    $("na-st").innerHTML=stp(1,"Tres reglas",`<div class="tbl"><table><tr><th>Regla</th><th class="num">Q</th><th class="num">P</th><th class="num">Beneficio</th><th class="num">Bienestar (con F)</th></tr><tr><td>Sin regulación (IMg = CMg)</td><td class="num">${n2(m.Q)}</td><td class="num">${n2(m.P)}</td><td class="num">${n2(m.pi)}</td><td class="num">${n2(R.Wm)}</td></tr><tr><td>Primer óptimo (P = CMg)</td><td class="num">${n2(R.primer.Q)}</td><td class="num">${n2(R.primer.P)}</td><td class="num">${n2(R.primer.pi)}</td><td class="num">${n2(R.primer.W)}</td></tr><tr><td>Segundo óptimo (P = CMe)</td><td class="num">${R.segundo.viable?n2(R.segundo.Q):"—"}</td><td class="num">${R.segundo.viable?n2(R.segundo.P):"—"}</td><td class="num">0</td><td class="num">${R.segundo.viable?n2(R.segundo.W):"—"}</td></tr></table></div><div class="eq al">P = CMe: ${fm(v.a)} − ${fm(v.b)}Q = ${fm(v.c)} + ${fm(v.F)}/Q ⟹ ${fm(v.b)}Q² − ${fm(v.a-v.c)}Q + ${fm(v.F)} = 0 ⟹ Q = ${R.segundo.viable?n2(R.segundo.Q):"sin solución real (el costo fijo es demasiado alto)"}</div>`)};
+  bindCtl(["na-a","na-b","na-F","na-c"],run);run()};
+
+// ---------- Precio límite
+SIMS.limite=function(){
+  $("sim").innerHTML=`<div class="ctr">${demCtl("li")}${ctl("li-cI","Costo marginal de la establecida",0,100,1,20)}${ctl("li-cE","Costo marginal del entrante",0,100,1,20)}${ctl("li-FE","Costo fijo de entrar",0,3000,10,100)}</div><div class="res" id="li-res"></div><div id="li-st"></div>`;
+  const run=()=>{const v={a:V("li-a"),b:V("li-b"),cI:V("li-cI"),cE:V("li-cE"),FE:V("li-FE")};if(!okAll(Object.values(v)))return;const R=M1.limite(v);
+    $("li-res").innerHTML=tiles([["Producción límite",n2(R.QL)],["Precio límite",n2(R.PL)],["Monopolio puro",`Q = ${n2(R.Qm)}, P = ${n2(R.Pm)}`],["Entrada",R.tipo,R.tipo==="acomodada"?"badt":"okt"]]);
+    $("li-st").innerHTML=stp(1,"Producción límite",`<div class="eq al">El entrante ve la demanda residual P = ${fm(v.a)} − ${fm(v.b)}Q<sub>I</sub> − ${fm(v.b)}q<sub>E</sub>; su mejor beneficio es (a − bQ<sub>I</sub> − c<sub>E</sub>)²/(4b) − F<sub>E</sub><br>Beneficio cero ⟹ Q<sub>L</sub> = ${fr(`${fm(v.a)} − ${fm(v.cE)} − 2√(${fm(v.b)}·${fm(v.FE)})`,fm(v.b))} = <b>${n2(R.QL)}</b> · P<sub>L</sub> = <b>${n2(R.PL)}</b></div>`)
+      +stp(2,"¿Disuadir o acomodar?",`<div class="tbl"><table><tr><th>Estrategia de la establecida</th><th class="num">Su beneficio</th></tr><tr><td>Monopolio puro (Q = ${n2(R.Qm)})</td><td class="num">${n2(R.piM)}${R.Qm>=R.QL?" (ya bloquea la entrada)":" (pero el entrante entraría)"}</td></tr><tr><td>Producir Q<sub>L</sub> = ${n2(R.QL)} y disuadir</td><td class="num">${n2(R.piL)}</td></tr><tr><td>Acomodar como líder de Stackelberg (q<sub>I</sub> = ${n2(R.qI)}, entrante ${n2(R.qE)})</td><td class="num">${n2(R.piS)}</td></tr></table></div><p>Entrada <b>${R.tipo}</b>: ${R.tipo==="bloqueada"?"el monopolio puro ya deja al entrante sin beneficio.":R.tipo==="disuadida"?"le conviene más producir la cantidad límite que compartir el mercado.":"le conviene más dejarlo entrar y producir como líder."}${R.piE<0&&R.tipo!=="bloqueada"?" Además, con la acomodación el entrante no cubriría su costo fijo.":""}</p>`)};
+  bindCtl(["li-a","li-b","li-cI","li-cE","li-FE"],run);run()};
+
+// ---------- Discriminación
+SIMS.discr=function(){
+  $("sim").innerHTML=tabsBox("di",[["t3","Tercer grado (dos mercados)"],["t2","Tarifa en dos partes"]]);const B=$("di-b");
+  tabsRun("di",{
+   t3(){B.innerHTML=`<div class="ctr">${ctl("d3-a1","Mercado 1: a₁ (P₁ = a₁ − b₁Q₁)",10,500,1,100)}${ctl("d3-b1","Mercado 1: b₁",0.05,10,0.05,1)}${ctl("d3-a2","Mercado 2: a₂",10,500,1,60)}${ctl("d3-b2","Mercado 2: b₂",0.05,10,0.05,1)}${ctl("d3-c","Costo marginal constante",0,200,1,20)}</div><div class="res" id="d3-res"></div><div id="d3-st"></div>`;
+    const run=()=>{const ms=[{a:V("d3-a1"),b:V("d3-b1")},{a:V("d3-a2"),b:V("d3-b2")}],c=V("d3-c");if(!okAll([ms[0].a,ms[0].b,ms[1].a,ms[1].b,c]))return;const R=M1.tercer({mercados:ms,c});
+      $("d3-res").innerHTML=tiles([["Beneficio discriminando",n2(R.piD),"okt"],["Beneficio con precio único",n2(R.uni.pi)],["Discriminación perfecta",n2(R.piP)]]);
+      $("d3-st").innerHTML=stp(1,"Tercer grado: IMg₁ = IMg₂ = CMg",`<div class="tbl"><table><tr><th>Mercado</th><th class="num">Q</th><th class="num">P</th><th class="num">|ε|</th><th class="num">Beneficio</th></tr>${R.seg.map((s,i)=>`<tr><td>${i+1}: IMg = ${fm(ms[i].a)} − ${fm(2*ms[i].b)}Q = ${fm(c)}</td><td class="num">${n2(s.Q)}</td><td class="num">${n2(s.P)}</td><td class="num">${s.Q>0?n4(Math.abs(s.eps)):"—"}</td><td class="num">${n2(s.pi)}</td></tr>`).join("")}</table></div><p>El precio es mayor donde la demanda es menos elástica.</p>`)
+        +stp(2,"Precio único",`<p>Con un solo precio, el mejor es <b>${n2(R.uni.P)}</b>: vende ${n2(R.uni.qs[0])} en el mercado 1 y ${n2(R.uni.qs[1])} en el 2${R.uni.qs[1]===0||R.uni.qs[0]===0?" (abandona un mercado)":""}, con beneficio ${n2(R.uni.pi)}.</p>`)
+        +stp(3,"Primer grado",`<p>Vende hasta P = CMg en cada mercado (${n2(R.primer[0].Q)} y ${n2(R.primer[1].Q)}) y se queda con todo el excedente: ${n2(R.piP)}. Es eficiente: no hay pérdida irrecuperable.</p>`)};
+    bindCtl(["d3-a1","d3-b1","d3-a2","d3-b2","d3-c"],run);run()},
+   t2(){B.innerHTML=`<p class="hint">Cada consumidor tiene la demanda q = (A − p)/B.</p><div class="ctr">${ctl("d2-A","A",10,500,1,100)}${ctl("d2-B","B",0.1,10,0.1,1)}${ctl("d2-c","Costo marginal",0,200,1,20)}${ctl("d2-n","Número de consumidores",1,1000,1,100)}</div><div id="d2-o"></div>`;
+    const run=()=>{const v={A:V("d2-A"),B:V("d2-B"),c:V("d2-c"),n:V("d2-n")};if(!okAll(Object.values(v)))return;const R=M1.dosPartes(v),qm=(v.A-v.c)/(2*v.B),pm=v.A-v.B*qm;
+      $("d2-o").innerHTML=`<div class="res">${tiles([["Precio por unidad",n2(R.p)],["Cuota fija",n2(R.T)],["Beneficio total",n2(R.pi),"okt"],["Con precio de monopolio",n2(v.n*(pm-v.c)*qm)]])}</div><div class="eq al">p = CMg = ${fm(v.c)} ⟹ cada uno compra q = (${fm(v.A)} − ${fm(v.c)})/${fm(v.B)} = ${n2(R.q)}<br>Cuota = excedente de cada uno = ½·${n2(R.q)}·(${fm(v.A)} − ${fm(v.c)}) = <b>${n2(R.T)}</b><br>Beneficio = ${fm(v.n)} × ${n2(R.T)} = ${n2(R.pi)}</div><p class="hint">Con consumidores iguales replica la discriminación de primer grado. Con consumidores distintos, la cuota debe ser la que acepta el que menos valora (o se ofrecen menús).</p>`};
+    bindCtl(["d2-A","d2-B","d2-c","d2-n"],run);run()}})};
+
+// ---------- Competencia monopolística
+SIMS.chamb=function(){
+  $("sim").innerHTML=`<p class="hint">Demanda de la empresa P = A − bq; costo C = F + cq + dq².</p><div class="ctr">${ctl("ch-A","A (se reduce cuando entran empresas)",5,300,0.5,50)}${ctl("ch-b","b",0.05,5,0.05,1)}${ctl("ch-F","F",1,2000,1,100)}${ctl("ch-c","c",0,100,1,10)}${ctl("ch-d","d",0.01,3,0.01,0.25)}</div><div class="res" id="ch-res"></div>${legend([["--ink","Demanda actual"],["--muted","Demanda de largo plazo"],["--line","Costo medio"],["--exam","Costo marginal"]])}<div id="ch-p"></div><div id="ch-st"></div>`;
+  const run=()=>{const v={A:V("ch-A"),b:V("ch-b"),F:V("ch-F"),c:V("ch-c"),d:V("ch-d")};if(!okAll(Object.values(v)))return;const R=M1.chamberlin(v),CMe=q=>q>0?v.F/q+v.c+v.d*q:NaN;
+    $("ch-res").innerHTML=tiles([["Corto plazo: q",n2(R.q)],["Precio",n2(R.P)],["Beneficio",n2(R.pi),R.pi<0?"badt":"okt"],["Largo plazo: q",n2(R.qL)],["Capacidad ociosa",n2(R.capOciosa)]]);
+    const xm=Math.max(R.qMin*1.8,v.A/v.b*0.8);
+    $("ch-p").innerHTML=plotXY({xr:[0,xm],yr:[0,Math.max(v.A,R.ALP)*1.05],series:[{f:q=>v.A-v.b*q,col:"--ink"},{f:q=>R.ALP-v.b*q,col:"--muted",dash:"6 5",w:2},{f:CMe,col:"--line"},{f:q=>v.c+2*v.d*q,col:"--exam",w:2}],points:[{x:R.q,y:R.P,label:"CP"},{x:R.qL,y:R.PL,label:"LP (tangencia)",col:"--muted"},{x:R.qMin,y:CMe(R.qMin),label:"mín CMe",col:"--line"}],xl:"q",yl:"P",label:"Competencia monopolística"});
+    $("ch-st").innerHTML=stp(1,"Corto plazo",`<div class="eq al">IMg = CMg: ${fm(v.A)} − ${fm(2*v.b)}q = ${fm(v.c)} + ${fm(2*v.d)}q ⟹ q = <b>${n2(R.q)}</b>, P = ${n2(R.P)}, π = ${n2(R.pi)}</div><p>${R.pi>0?"Hay beneficio: entrarán nuevas marcas y A bajará.":R.pi<0?"Hay pérdidas: saldrán empresas y A subirá.":"Ya está en el largo plazo."}</p>`)
+      +stp(2,"Largo plazo: tangencia",`<div class="eq al">Beneficio máximo cero: (A − c)²/(4(b + d)) = F ⟹ A = ${fm(v.c)} + 2√(${fm(v.b+v.d)}·${fm(v.F)}) = <b>${n2(R.ALP)}</b><br>q = ${n2(R.qL)}, P = ${n2(R.PL)} = CMe · mínimo del CMe en q = √(F/d) = ${n2(R.qMin)}<br>Exceso de capacidad = ${n2(R.qMin)} − ${n2(R.qL)} = <b>${n2(R.capOciosa)}</b></div>`)};
+  bindCtl(["ch-A","ch-b","ch-F","ch-c","ch-d"],run);run()};
+
+// ---------- Regulación: Ramsey y precio tope
+SIMS.ramsey=function(){
+  $("sim").innerHTML=tabsBox("ra",[["ram","Precios de Ramsey"],["cap","Precio tope (IPC − X)"]]);const B=$("ra-b");
+  tabsRun("ra",{
+   ram(){B.innerHTML=`<p class="hint">Dos servicios con demanda q = α − β·p, costo marginal c y un costo fijo común F.</p><div class="ctr">${ctl("rr-a1","Servicio 1: α₁",10,500,1,100)}${ctl("rr-b1","Servicio 1: β₁",0.1,20,0.1,2)}${ctl("rr-c1","Servicio 1: c₁",0,100,1,10)}${ctl("rr-a2","Servicio 2: α₂",10,500,1,100)}${ctl("rr-b2","Servicio 2: β₂",0.1,20,0.1,5)}${ctl("rr-c2","Servicio 2: c₂",0,100,1,10)}${ctl("rr-F","Costo fijo F",0,5000,10,500)}</div><div class="res" id="rr-res"></div><div id="rr-st"></div>`;
+    const run=()=>{const prods=[{al:V("rr-a1"),be:V("rr-b1"),c:V("rr-c1")},{al:V("rr-a2"),be:V("rr-b2"),c:V("rr-c2")}],F=V("rr-F");if(!okAll([F,...prods.flatMap(x=>[x.al,x.be,x.c])]))return;const R=M1.ramsey({prods,F});
+      if(!R.viable){$("rr-res").innerHTML=err(`ni con precios de monopolio se cubre el costo fijo (beneficio máximo ${n2(R.piMax)}).`);$("rr-st").innerHTML="";return}
+      $("rr-res").innerHTML=tiles([["k (Ramsey)",n4(R.k)],["p₁",n2(R.ps[0])],["p₂",n2(R.ps[1])],["Margen 1",fmt(100*R.mk[0],1)+" %"],["Margen 2",fmt(100*R.mk[1],1)+" %"]]);
+      $("rr-st").innerHTML=stp(1,"Regla de la elasticidad inversa",`<div class="eq al">(p<sub>i</sub> − c<sub>i</sub>)/p<sub>i</sub> = k/|ε<sub>i</sub>| ⟹ con demanda lineal p<sub>i</sub> = (c<sub>i</sub> + k·α<sub>i</sub>/β<sub>i</sub>)/(1 + k)<br>k se escoge para que el beneficio cubra exactamente F = ${fm(F)}: k = <b>${n4(R.k)}</b></div><div class="tbl"><table><tr><th>Servicio</th><th class="num">p</th><th class="num">q</th><th class="num">|ε|</th><th class="num">Margen</th><th class="num">Margen × |ε|</th></tr>${R.ps.map((p,i)=>`<tr><td>${i+1}</td><td class="num">${n2(p)}</td><td class="num">${n2(R.qs[i])}</td><td class="num">${n4(Math.abs(R.eps[i]))}</td><td class="num">${fmt(100*R.mk[i],2)} %</td><td class="num">${n4(R.mk[i]*Math.abs(R.eps[i]))}</td></tr>`).join("")}</table></div><p>El servicio con demanda menos elástica lleva el margen mayor; la última columna es igual a k en los dos.</p>`)};
+    bindCtl(["rr-a1","rr-b1","rr-c1","rr-a2","rr-b2","rr-c2","rr-F"],run);run()},
+   cap(){B.innerHTML=`<div class="ctr">${ctl("rc-p","Precio inicial",1,1000,1,100)}${ctl("rc-i","Inflación anual (%)",0,30,0.1,5)}${ctl("rc-x","Factor X de productividad (%)",0,15,0.1,2)}${ctl("rc-g","Reducción real de costos de la empresa (%)",0,15,0.1,3)}${ctl("rc-n","Años",1,10,1,5)}</div><div id="rc-o"></div>`;
+    const run=()=>{const p0=V("rc-p"),i=V("rc-i")/100,x=V("rc-x")/100,g=V("rc-g")/100,n=Math.round(V("rc-n"));let rows="",p=p0,c=p0*0.8;for(let t=1;t<=n;t++){p=p*(1+i-x);c=c*(1+i)*(1-g);rows+=`<tr><td>${t}</td><td class="num">${n2(p)}</td><td class="num">${n2(c)}</td><td class="num">${n2(p-c)}</td></tr>`}
+      $("rc-o").innerHTML=`<div class="eq al">P<sub>t</sub> = P<sub>t−1</sub>·(1 + IPC − X) = P<sub>t−1</sub>·(1 + ${fmt(i,3)} − ${fmt(x,3)})</div><div class="tbl"><table><tr><th>Año</th><th class="num">Precio tope</th><th class="num">Costo unitario (empieza en 80 % del precio)</th><th class="num">Margen</th></tr>${rows}</table></div><p class="hint">Si la empresa reduce costos más rápido que X (${fmt(100*g,1)} % frente a ${fmt(100*x,1)} %), su margen crece: el precio tope premia la eficiencia, a diferencia de la regulación por tasa de ganancia.</p>`};
+    bindCtl(["rc-p","rc-i","rc-x","rc-g","rc-n"],run);run()}})};
+
+// ---------- Monopsonio
+SIMS.monops=function(){
+  $("sim").innerHTML=`<p class="hint">Oferta de trabajo w = e + f·L e ingreso del producto marginal IPMg = g − h·L.</p><div class="ctr">${ctl("mn-e","e",0,100,1,10)}${ctl("mn-f","f",0.05,5,0.05,1)}${ctl("mn-g","g",10,500,1,100)}${ctl("mn-h","h",0.05,5,0.05,1)}${ctl("mn-w","Salario mínimo (0 = sin mínimo)",0,200,1,0)}</div><div class="res" id="mn-res"></div>${legend([["--branch","Oferta (salario)"],["--exam","Costo marginal del factor"],["--line","IPMg (demanda)"],["--muted","Ingreso marginal del sindicato"]])}<div id="mn-p"></div><div id="mn-st"></div>`;
+  const run=()=>{const v={e:V("mn-e"),f:V("mn-f"),g:V("mn-g"),h:V("mn-h"),wmin:V("mn-w")};if(!okAll(Object.values(v))||v.g<=v.e){$("mn-res").innerHTML=err("g debe ser mayor que e.");return}const R=M1.monopsonio(v);
+    $("mn-res").innerHTML=tiles([["Competencia",`L = ${n2(R.Lc)}, w = ${n2(R.wc)}`],["Monopsonio",`L = ${n2(R.Lm)}, w = ${n2(R.wm)}`,"badt"],["Sindicato (monopolio)",`L = ${n2(R.Lu)}, w = ${n2(R.wu)}`],...(v.wmin>0?[["Con salario mínimo",`L = ${n2(R.Lw)}`]]:[])]);
+    const xm=v.g/v.h;
+    $("mn-p").innerHTML=plotXY({xr:[0,xm],yr:[0,v.g*1.05],series:[{f:L=>v.e+v.f*L,col:"--branch"},{f:L=>v.e+2*v.f*L,col:"--exam",w:2},{f:L=>v.g-v.h*L,col:"--line"},{f:L=>v.g-2*v.h*L,col:"--muted",dash:"5 4",w:2}],hlines:v.wmin>0?[{y:v.wmin,col:"--bad",dash:"0",w:2}]:[],points:[{x:R.Lc,y:R.wc,label:"competencia",col:"--muted"},{x:R.Lm,y:R.wm,label:"monopsonio"},{x:R.Lu,y:R.wu,label:"sindicato",col:"--line"}],xl:"trabajo L",yl:"salario",label:"Monopsonio y monopolio bilateral"});
+    $("mn-st").innerHTML=stp(1,"Monopsonio: CMF = IPMg",`<div class="eq al">Gasto = wL = ${fm(v.e)}L + ${fm(v.f)}L² ⟹ CMF = ${fm(v.e)} + ${fm(2*v.f)}L<br>${fm(v.e)} + ${fm(2*v.f)}L = ${fm(v.g)} − ${fm(v.h)}L ⟹ L = <b>${n2(R.Lm)}</b>; salario de la oferta: w = ${n2(R.wm)} (el IPMg es ${n2(R.IPMg_m)})</div>`)
+      +stp(2,"Monopolio bilateral",`<p>El sindicato quiere el salario donde el ingreso marginal de la demanda de trabajo (${fm(v.g)} − ${fm(2*v.h)}L) iguala la oferta: w = ${n2(R.wu)}. La empresa quiere ${n2(R.wm)}. El salario negociado queda entre <b>${n2(R.wm)}</b> y <b>${n2(R.wu)}</b>.</p>${v.wmin>0?`<p>Con un salario mínimo de ${fm(v.wmin)}: ${v.wmin<R.wm?"no obliga (está por debajo del de monopsonio).":v.wmin<=R.wc?`el empleo sube a ${n2(R.Lw)}: hasta ese salario el CMF es plano.`:`el empleo cae a ${n2(R.Lw)}: el mínimo supera el salario competitivo.`}</p>`:""}`)};
+  bindCtl(["mn-e","mn-f","mn-g","mn-h","mn-w"],run);run()};
+
+// ---------- Monopolio en cadena
+SIMS.cadena=function(){
+  $("sim").innerHTML=`<div class="ctr">${demCtl("ca")}${ctl("ca-c","Costo del productor del insumo",0,200,1,20)}${ctl("ca-cd","Otro costo del distribuidor por unidad",0,200,1,0)}</div><div class="res" id="ca-res"></div><div id="ca-st"></div>`;
+  const run=()=>{const v={a:V("ca-a"),b:V("ca-b"),c:V("ca-c"),cd:V("ca-cd")};if(!okAll(Object.values(v))||v.c+v.cd>=v.a)return;const R=M1.cadena(v);
+    $("ca-res").innerHTML=tiles([["Precio del insumo w",n2(R.w)],["Q en cadena",n2(R.Q)],["P final en cadena",n2(R.P)],["Q integrada",n2(R.QI)],["P integrada",n2(R.PI),"okt"]]);
+    $("ca-st").innerHTML=stp(1,"Distribuidor",`<div class="eq al">IMg = ${fm(v.a)} − ${fm(2*v.b)}Q = w + ${fm(v.cd)} ⟹ Q = (${fm(v.a)} − ${fm(v.cd)} − w)/${fm(2*v.b)}</div>`)
+      +stp(2,"Productor del insumo",`<div class="eq al">Máx (w − ${fm(v.c)})·(${fm(v.a)} − ${fm(v.cd)} − w)/${fm(2*v.b)} ⟹ w = (${fm(v.a)} − ${fm(v.cd)} + ${fm(v.c)})/2 = <b>${n2(R.w)}</b><br>Q = <b>${n2(R.Q)}</b>, P = ${n2(R.P)} · beneficios: productor ${n2(R.piU)}, distribuidor ${n2(R.piD)}, suma ${n2(R.piU+R.piD)}</div>`)
+      +stp(3,"Integrados",`<div class="eq al">IMg = ${fm(v.c)} + ${fm(v.cd)} ⟹ Q = ${n2(R.QI)}, P = ${n2(R.PI)}, beneficio ${n2(R.piI)}</div><p>La doble marginalización reduce la cantidad a la mitad y sube el precio en ${n2(R.P-R.PI)}: la integración beneficia a las empresas y a los consumidores.</p>`)};
+  bindCtl(["ca-a","ca-b","ca-c","ca-cd"],run);run()};
+
+// ---------- Oligopolio en cantidades
+SIMS.olig=function(){
+  $("sim").innerHTML=tabsBox("ol",[["dos","Duopolio: comparación de modelos"],["n","Cournot con n empresas"]]);const B=$("ol-b");
+  tabsRun("ol",{
+   dos(){B.innerHTML=`<div class="ctr">${demCtl("od")}${ctl("od-c1","Costo marginal empresa 1",0,200,1,10)}${ctl("od-c2","Costo marginal empresa 2",0,200,1,10)}</div><div class="res" id="od-res"></div>${legend([["--line","Reacción de la empresa 1"],["--branch","Reacción de la empresa 2"]])}<div id="od-p"></div><div id="od-st"></div>`;
+    const run=()=>{const v={a:V("od-a"),b:V("od-b"),c1:V("od-c1"),c2:V("od-c2")};if(!okAll(Object.values(v))||Math.max(v.c1,v.c2)>=v.a){$("od-res").innerHTML=err("los costos marginales deben ser menores que a.");return}
+      const C=M1.cournot(v),S=M1.stackelberg(v),K=M1.colusion(v),Bh=M1.bertrandHom(v),T=Math.abs(v.c1-v.c2)<1e-9?M1.trampa({a:v.a,b:v.b,c:v.c1}):null;
+      $("od-res").innerHTML=tiles([["Cournot: P",n2(C.P)],["Stackelberg: P",n2(S.P)],["Colusión: P",n2(K.P)],["Bertrand: P",n2(Bh.P)]]);
+      const m=(v.a-Math.min(v.c1,v.c2))/v.b;
+      $("od-p").innerHTML=plotXY({xr:[0,m*0.75],yr:[0,m*0.75],series:[{f:q1=>(v.a-v.c2-v.b*q1)/(2*v.b),col:"--branch"},{pts:[...Array(101)].map((_,i)=>{const q2=m*0.75*i/100;return[Math.max(0,(v.a-v.c1-v.b*q2)/(2*v.b)),q2]}),col:"--line"}],points:[{x:C.q1,y:C.q2,label:"Cournot"},{x:S.q1,y:S.q2,label:"Stackelberg",col:"--exam"},{x:K.q1,y:K.q2,label:"colusión",col:"--good"}],xl:"q₁",yl:"q₂",label:"Funciones de reacción"});
+      const row=(n,R,pi)=>`<tr><td>${n}</td><td class="num">${n2(R.q1)}</td><td class="num">${n2(R.q2)}</td><td class="num">${n2(R.q1+R.q2)}</td><td class="num">${n2(R.P)}</td><td class="num">${n2(R.pi1)}</td><td class="num">${n2(R.pi2)}</td></tr>`;
+      $("od-st").innerHTML=stp(1,"Funciones de reacción y Cournot",`<div class="eq al">q₁ = (${fm(v.a)} − ${fm(v.c1)} − ${fm(v.b)}q₂)/${fm(2*v.b)} · q₂ = (${fm(v.a)} − ${fm(v.c2)} − ${fm(v.b)}q₁)/${fm(2*v.b)}<br>q₁* = (a − 2c₁ + c₂)/(3b) = <b>${n2(C.q1)}</b> · q₂* = (a − 2c₂ + c₁)/(3b) = <b>${n2(C.q2)}</b></div>`)
+        +stp(2,"Comparación",`<div class="tbl"><table><tr><th>Modelo</th><th class="num">q₁</th><th class="num">q₂</th><th class="num">Q</th><th class="num">P</th><th class="num">π₁</th><th class="num">π₂</th></tr>${row("Colusión (monopolio conjunto)",K)}${row("Cournot",C)}${row("Stackelberg (líder: empresa 1)",S)}${row("Bertrand (producto homogéneo)",Bh)}</table></div>
+          <p class="hint">Stackelberg: la líder usa la reacción de la seguidora: q₁ = (a − 2c₁ + c₂)/(2b) = ${n2(S.q1)}. ${Math.abs(v.c1-v.c2)>1e-9?"Con costos distintos, la colusión pone toda la producción en la empresa de menor costo (habría que compensar a la otra).":""}</p>`)
+        +(T?stp(3,"¿Hace trampa en el cartel?",`<div class="eq al">Cuota del cartel: ${n2(T.qCartel)} cada una, beneficio ${n2(T.piCartel)}<br>Si la empresa 2 respeta la cuota, la mejor respuesta de la 1 es q₁ = (${fm(v.a)} − ${fm(v.c1)} − ${fm(v.b)}·${n2(T.qCartel)})/${fm(2*v.b)} = <b>${n2(T.qd)}</b> y gana <b>${n2(T.piDesv)}</b> &gt; ${n2(T.piCartel)} (la otra cae a ${n2(T.piOtra)})</div><p>Por eso el cartel es inestable: es un dilema del prisionero.</p>`):"")};
+    bindCtl(["od-a","od-b","od-c1","od-c2"],run);run()},
+   n(){B.innerHTML=`<div class="ctr">${demCtl("on")}${ctl("on-c","Costo marginal",0,200,1,10)}${ctl("on-n","Número de empresas n",1,50,1,2)}</div><div class="res" id="on-res"></div>${legend([["--line","Precio de Cournot según n"]])}<div id="on-p"></div><div id="on-st"></div>`;
+    const run=()=>{const v={a:V("on-a"),b:V("on-b"),c:V("on-c"),n:Math.round(V("on-n"))};if(!okAll(Object.values(v))||v.c>=v.a)return;const R=M1.cournotN(v);
+      $("on-res").innerHTML=tiles([["q por empresa",n2(R.q)],["Q",n2(R.Q)],["P",n2(R.P)],["Beneficio por empresa",n2(R.pi)],["Lerner",n4(R.lerner)]]);
+      $("on-p").innerHTML=plotXY({xr:[1,50],yr:[0,(v.a+v.c)/2*1.05],series:[{pts:[...Array(50)].map((_,i)=>[i+1,M1.cournotN({...v,n:i+1}).P]),col:"--line"}],hlines:[{y:v.c}],points:[{x:v.n,y:R.P,label:"n = "+v.n}],xl:"número de empresas",yl:"precio",label:"Convergencia a competencia"});
+      $("on-st").innerHTML=stp(1,"Cálculo",`<div class="eq al">q = (a − c)/(b(n + 1)) = (${fm(v.a)} − ${fm(v.c)})/(${fm(v.b)}·${v.n+1}) = <b>${n2(R.q)}</b><br>P = (a + nc)/(n + 1) = <b>${n2(R.P)}</b> → tiende a c = ${fm(v.c)} cuando n crece</div>`)};
+    bindCtl(["on-a","on-b","on-c","on-n"],run);run()}})};
+
+// ---------- Oligopolio en precios
+SIMS.oligp=function(){
+  $("sim").innerHTML=tabsBox("op",[["dif","Bertrand diferenciado"],["dom","Empresa dominante"],["kink","Demanda quebrada"]]);const B=$("op-b");
+  tabsRun("op",{
+   dif(){B.innerHTML=`<p class="hint">q<sub>i</sub> = α − β·p<sub>i</sub> + γ·p<sub>j</sub>.</p><div class="ctr">${ctl("bd-al","α",10,500,1,100)}${ctl("bd-be","β",0.1,10,0.1,2)}${ctl("bd-ga","γ (sustituibilidad)",0,9,0.1,1)}${ctl("bd-c1","c₁",0,200,1,10)}${ctl("bd-c2","c₂",0,200,1,10)}</div><div class="res" id="bd-res"></div>${legend([["--line","Reacción de la empresa 1"],["--branch","Reacción de la empresa 2"]])}<div id="bd-p"></div><div id="bd-st"></div>`;
+    const run=()=>{const v={al:V("bd-al"),be:V("bd-be"),ga:V("bd-ga"),c1:V("bd-c1"),c2:V("bd-c2")};if(!okAll(Object.values(v)))return;if(v.ga>=2*v.be){$("bd-res").innerHTML=err("γ debe ser menor que 2β para que haya equilibrio.");return}const R=M1.bertrandDif(v);
+      $("bd-res").innerHTML=tiles([["p₁",n2(R.p1)],["p₂",n2(R.p2)],["q₁",n2(R.q1)],["q₂",n2(R.q2)],["π₁",n2(R.pi1)],["π₂",n2(R.pi2)]]);
+      const m=Math.max(R.p1,R.p2)*2;
+      $("bd-p").innerHTML=plotXY({xr:[0,m],yr:[0,m],series:[{pts:[...Array(101)].map((_,i)=>{const p2=m*i/100;return[(v.al+v.be*v.c1+v.ga*p2)/(2*v.be),p2]}),col:"--line"},{f:p1=>(v.al+v.be*v.c2+v.ga*p1)/(2*v.be),col:"--branch"}],points:[{x:R.p1,y:R.p2,label:"Nash"}],xl:"p₁",yl:"p₂",label:"Reacciones en precios"});
+      $("bd-st").innerHTML=stp(1,"Cálculo",`<div class="eq al">p₁ = (${fm(v.al)} + ${fm(v.be)}·${fm(v.c1)} + ${fm(v.ga)}p₂)/${fm(2*v.be)} · p₂ = (${fm(v.al)} + ${fm(v.be)}·${fm(v.c2)} + ${fm(v.ga)}p₁)/${fm(2*v.be)}<br>Resolviendo: p₁ = <b>${n2(R.p1)}</b>, p₂ = <b>${n2(R.p2)}</b></div><p class="hint">Las reacciones tienen pendiente positiva: los precios son complementos estratégicos. Con γ = 0 cada empresa es un monopolio; cuanto mayor γ, más se parece a Bertrand homogéneo.</p>`)};
+    bindCtl(["bd-al","bd-be","bd-ga","bd-c1","bd-c2"],run);run()},
+   dom(){B.innerHTML=`<p class="hint">Demanda de mercado Q = A − B·p; oferta de la franja competitiva S = s·p; costo marginal de la dominante c.</p><div class="ctr">${ctl("dd-A","A",10,1000,1,200)}${ctl("dd-B","B",0.1,20,0.1,2)}${ctl("dd-s","s",0,20,0.1,2)}${ctl("dd-c","c",0,200,1,10)}</div><div class="res" id="dd-res"></div>${legend([["--ink","Demanda de mercado"],["--line","Demanda residual"],["--branch","Oferta de la franja"],["--exam","IMg residual"]])}<div id="dd-p"></div><div id="dd-st"></div>`;
+    const run=()=>{const v={A:V("dd-A"),B:V("dd-B"),s:V("dd-s"),c:V("dd-c")};if(!okAll(Object.values(v)))return;const R=M1.dominante(v),pm=v.A/v.B,K=v.B+v.s;
+      $("dd-res").innerHTML=tiles([["Precio",n2(R.p)],["Vende la dominante",n2(R.Qd)],["Vende la franja",n2(R.franja)],["Cuota de la dominante",fmt(100*R.cuota,1)+" %"],["Beneficio de la dominante",n2(R.pi)]]);
+      const crv=g=>[...Array(161)].map((_,i)=>{const p=pm*i/160;return[g(p),p]});
+      $("dd-p").innerHTML=plotXY({xr:[0,v.A*1.02],yr:[0,pm*1.05],series:[{pts:crv(p=>v.A-v.B*p),col:"--ink"},{pts:crv(p=>Math.max(0,v.A-K*p)),col:"--line"},{pts:crv(p=>v.s*p),col:"--branch",w:2},{f:q=>(v.A-2*q)/K,col:"--exam",w:2}],hlines:[{y:v.c}],points:[{x:R.Qd,y:R.p,label:"dominante"},{x:R.Q,y:R.p,label:"mercado",col:"--muted"}],xl:"cantidad",yl:"precio",label:"Liderazgo de precios"});
+      $("dd-st").innerHTML=stp(1,"Cálculo",`<div class="eq al">Demanda residual: D<sub>r</sub> = (${fm(v.A)} − ${fm(v.B)}p) − ${fm(v.s)}p = ${fm(v.A)} − ${fm(K)}p<br>IMg residual = c ⟹ p = (A/(B + s) + c)/2 = (${n2(v.A/K)} + ${fm(v.c)})/2 = <b>${n2(R.p)}</b><br>Franja: ${fm(v.s)}·${n2(R.p)} = ${n2(R.franja)} · dominante: ${n2(R.Qd)} · mercado: ${n2(R.Q)}</div>`)};
+    bindCtl(["dd-A","dd-B","dd-s","dd-c"],run);run()},
+   kink(){B.innerHTML=`<div class="ctr">${ctl("dk-P","Precio actual P₀",1,200,1,50)}${ctl("dk-Q","Cantidad actual Q₀",1,200,1,40)}${ctl("dk-b1","Pendiente arriba (si sube, nadie la sigue)",0.05,5,0.05,0.25)}${ctl("dk-b2","Pendiente abajo (si baja, todas la siguen)",0.1,10,0.1,1.5)}${ctl("dk-c","Costo marginal",0,200,1,25)}</div><div class="res" id="dk-res"></div>${legend([["--ink","Demanda quebrada"],["--exam","Ingreso marginal"],["--branch","Costo marginal"]])}<div id="dk-p"></div><div id="dk-st"></div>`;
+    const run=()=>{const v={P0:V("dk-P"),Q0:V("dk-Q"),b1:V("dk-b1"),b2:V("dk-b2")},c=V("dk-c");if(!okAll([...Object.values(v),c]))return;const R=M1.quebrada(v),dentro=c<=R.IMgArriba&&c>=R.IMgAbajo,a1=v.P0+v.b1*v.Q0,a2=v.P0+v.b2*v.Q0;
+      $("dk-res").innerHTML=tiles([["IMg justo antes del quiebre",n2(R.IMgArriba)],["IMg justo después",n2(R.IMgAbajo)],["Salto",n2(R.IMgArriba-R.IMgAbajo)],["¿Cambia el precio?",dentro?"no":"sí",dentro?"okt":"badt"]]);
+      const xm=Math.min(a2/v.b2,v.Q0*2);
+      $("dk-p").innerHTML=plotXY({xr:[0,xm],yr:[Math.min(0,R.IMgAbajo-5),a1*1.1],series:[{f:q=>q<=v.Q0?a1-v.b1*q:a2-v.b2*q,col:"--ink"},{f:q=>q<v.Q0?a1-2*v.b1*q:NaN,col:"--exam",w:2},{f:q=>q>v.Q0?a2-2*v.b2*q:NaN,col:"--exam",w:2},{f:()=>c,col:"--branch",w:2}],vlines:[{x:v.Q0}],points:[{x:v.Q0,y:v.P0,label:"quiebre"}],xl:"Q",yl:"P",label:"Demanda quebrada de Sweezy"});
+      $("dk-st").innerHTML=stp(1,"Lectura",`<div class="eq al">Arriba: P = ${n2(a1)} − ${fm(v.b1)}Q ⟹ IMg en Q₀ = ${n2(R.IMgArriba)}<br>Abajo: P = ${n2(a2)} − ${fm(v.b2)}Q ⟹ IMg en Q₀ = ${n2(R.IMgAbajo)}</div><p>${dentro?`El costo marginal (${fm(c)}) está dentro del salto: el precio se queda en ${fm(v.P0)} aunque el costo cambie.`:`El costo marginal (${fm(c)}) está fuera del salto: a la empresa le conviene mover el precio.`}</p>`)};
+    bindCtl(["dk-P","dk-Q","dk-b1","dk-b2","dk-c"],run);run()}})};
+
+// ---------- Juego cooperativo
+SIMS.shapley=function(){
+  const K=[["1","v(1)",0],["2","v(2)",0],["3","v(3)",0],["12","v(12)",60],["13","v(13)",60],["23","v(23)",60],["123","v(123)",90]];
+  $("sim").innerHTML=`<p class="hint">Escribe el valor de cada coalición de un juego de 3 jugadores.</p><div class="calcf">${K.map(([k,l,v])=>nin("sh-"+k,l,v)).join("")}</div><div class="res" id="sh-res"></div><div id="sh-st"></div>`;
+  const run=()=>{const v={};K.forEach(([k])=>v[k]=N("sh-"+k));if(!okAll(Object.values(v)))return;const R=M1.shapley(v);
+    $("sh-res").innerHTML=tiles([["φ₁",n2(R.phi[1])],["φ₂",n2(R.phi[2])],["φ₃",n2(R.phi[3])],["Núcleo",R.coreVacio?"vacío":"no vacío",R.coreVacio?"badt":"okt"]]);
+    $("sh-st").innerHTML=stp(1,"Contribuciones marginales en cada orden de llegada",`<div class="tbl"><table><tr><th>Orden</th><th class="num">Jugador 1</th><th class="num">Jugador 2</th><th class="num">Jugador 3</th></tr>${R.tabla.map(r=>`<tr><td>${r.o.join(" → ")}</td><td class="num">${n2(r[1])}</td><td class="num">${n2(r[2])}</td><td class="num">${n2(r[3])}</td></tr>`).join("")}<tr><td><b>Promedio (Shapley)</b></td><td class="num"><b>${n2(R.phi[1])}</b></td><td class="num"><b>${n2(R.phi[2])}</b></td><td class="num"><b>${n2(R.phi[3])}</b></td></tr></table></div>`)
+      +stp(2,"Núcleo",`<div class="eq al">Condición: v(12) + v(13) + v(23) = ${n2(v[12]+v[13]+v[23])} ${R.coreVacio?">":"≤"} 2·v(123) = ${n2(2*v[123])}</div><p>${R.coreVacio?"El núcleo está vacío: cualquier reparto deja a alguna pareja con incentivo a irse sola.":R.shapleyEnCore?"El valor de Shapley está en el núcleo: ninguna coalición puede mejorar por su cuenta.":"El núcleo no está vacío, pero el valor de Shapley no está en él."}</p>`)};
+  onIn(K.map(([k])=>"sh-"+k),run);run()};
+
+// ---------- Hoja de fórmulas
+SIMS.hoja=function(){
+  const F=[["Costos","Índice de escala","S = CMe/CMg (> 1: economías de escala)"],["Costos","Mínimo del CMe","C = F + cq + dq² ⟹ q = √(F/d)"],["Monopolio","Condición","IMg = CMg; IMg = P(1 − 1/|ε|)"],["Monopolio","Lineal","P = a − bQ ⟹ IMg = a − 2bQ"],["Monopolio","Lerner","(P − CMg)/P = 1/|ε|"],["Monopolio","Multiplanta","IMg = CMg₁ = CMg₂"],
+    ["Monopolio natural","Primer óptimo","P = CMg, subsidio = F"],["Monopolio natural","Segundo óptimo","P = CMe"],["Disuasión","Producción límite","Q_L = (a − c_E − 2√(bF_E))/b"],["Discriminación","Tercer grado","IMg₁ = IMg₂ = CMg"],["Discriminación","Dos partes","p = CMg; cuota = excedente"],["Competencia monopolística","Largo plazo","P = CMe (tangencia), P > CMg"],
+    ["Regulación","Ramsey","(Pᵢ − CMgᵢ)/Pᵢ = k/|εᵢ|"],["Regulación","Precio tope","Pₜ = Pₜ₋₁(1 + IPC − X)"],["Factores","Ingreso del producto marginal","IPMg = IMg·PMg"],["Factores","Monopsonio","CMF = IPMg; w de la oferta"],["Factores","Doble marginalización","w = (a + c)/2; Q = (a − c)/(4b)"],
+    ["Oligopolio","Reacción de Cournot","q₁ = (a − c₁ − bq₂)/(2b)"],["Oligopolio","Cournot","q₁ = (a − 2c₁ + c₂)/(3b)"],["Oligopolio","Cournot con n","q = (a − c)/(b(n+1)); P = (a + nc)/(n+1)"],["Oligopolio","Stackelberg (líder)","q₁ = (a − 2c₁ + c₂)/(2b)"],["Oligopolio","Colusión","Q = (a − c)/(2b)"],
+    ["Oligopolio","Bertrand diferenciado","pᵢ = (α + βcᵢ + γpⱼ)/(2β)"],["Oligopolio","Empresa dominante","p = (A/(B + s) + c)/2"],["Juegos","Shapley","φᵢ = promedio de contribuciones marginales"],["Juegos","Núcleo (3 jugadores)","v(12) + v(13) + v(23) ≤ 2v(123)"]];
+  $("sim").innerHTML=`<div class="calcf"><label for="h-q">Buscar fórmula<input id="h-q" type="search" placeholder="Por ejemplo: Cournot"></label></div><div class="tbl"><table id="h-t"></table></div>`;
+  const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th></tr>`+(rows.length?rows.map(([a,b,c])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td></tr>`).join(""):`<tr><td colspan="3">No hay fórmulas con esa palabra.</td></tr>`)};
+  $("h-q").addEventListener("input",run);run()};
