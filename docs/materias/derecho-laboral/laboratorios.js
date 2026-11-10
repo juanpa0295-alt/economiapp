@@ -68,7 +68,7 @@ function guardados(key,{get,set,label,restore}){const K="eco-guard-"+key,KL="eco
     else if(b.dataset.g==="del"){const x=a.splice(+b.dataset.i,1)[0];wr(K,a);draw(`Borraste «${esc(x.n)}».`);box.open=true}});
   draw();$("sim").prepend(box);
   // lo último que se hizo: se restaura al volver, salvo que se llegue desde un taller con datos cargados
-  let tm=null;const saveLast=()=>{clearTimeout(tm);tm=setTimeout(()=>wr(KL,get()),400)};
+  let tm=null;const saveLast=()=>{clearTimeout(tm);tm=setTimeout(()=>{try{wr(KL,get())}catch(e){}},400)};
   $("sim").addEventListener("input",saveLast);$("sim").addEventListener("change",saveLast);$("sim").addEventListener("click",e=>{if(e.target.closest(".pre button,[data-k]"))saveLast()});
   const last=rd(KL);if(restore&&last){try{set(last);draw("Se cargó lo último que hiciste aquí.")}catch(e){}}else saveLast()}
 const formGet=ids=>()=>Object.fromEntries(ids.filter(i=>$(i)).map(i=>[i,$(i).type==="checkbox"?$(i).checked:$(i).value]));

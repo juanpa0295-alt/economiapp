@@ -485,6 +485,12 @@ ol.trunk li.tparte:first-child{padding-top:2px}
 .cbar{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:color-mix(in srgb,var(--line) 6%,transparent)}
 .cbar .cb-t{font-size:14px}.cbar .cb-t small{display:block;color:var(--muted);margin-top:2px}
 .cbar .cb-b{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.cbar .cb-m{margin:4px 0 0;font-size:12.5px;color:var(--good)}.cbar .cb-m:empty{display:none}
+.mx{display:inline-grid;vertical-align:middle;margin:2px 4px;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:5px;padding:1px 3px;font-family:var(--f-mono);font-size:13px;line-height:1.5}
+.mx>span{padding:1px 7px;text-align:right;white-space:nowrap}.mx>span.mx-aug{border-left:1px dashed var(--muted)}
+.mxsteps li{margin:6px 0;overflow-x:auto}.mxsteps code{font-size:12.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+tr.hl td{background:color-mix(in srgb,var(--good) 12%,transparent)}
+.nt{text-transform:none;letter-spacing:0}
 
 .calcf select{font-family:var(--f-body);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .calcf input[type=date],.calcf input[type=time]{font-family:var(--f-mono)}
