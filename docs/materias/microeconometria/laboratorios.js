@@ -1,0 +1,221 @@
+// Microeconometría · laboratorios interactivos
+// ===================== AYUDAS COMUNES DE LOS LABORATORIOS DE MICROECONOMÍA =====================
+const SIMS={};
+let CLIP=0;
+function plotXY({xr,yr,series=[],points=[],vlines=[],hlines=[],xl,yl,H=300,label,areas=[]}){
+  const W=600,f=frame(W,H,xr,yr,ticks(xr[0],xr[1],nice((xr[1]-xr[0])/5)),ticks(yr[0],yr[1],nice((yr[1]-yr[0])/4)),xl,yl),id="cp"+(++CLIP);
+  let b="";
+  areas.forEach(a=>{const d=a.pts.map(([x,y],i)=>(i?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(y).toFixed(1)).join("")+"Z";b+=`<path d="${d}" fill="var(${a.col})" fill-opacity="${a.op||.22}" stroke="none"/>`});
+  series.forEach(s=>{const pts=s.pts||[...Array(241)].map((_,i)=>{const x=xr[0]+(xr[1]-xr[0])*i/240;const y=s.f(x);return[x,y==null?NaN:y]});
+    let d="",pen=false;pts.forEach(([x,y])=>{if(!isFinite(y)){pen=false;return}d+=(pen?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(Math.max(yr[0]-(yr[1]-yr[0]),Math.min(yr[1]+(yr[1]-yr[0]),y))).toFixed(1);pen=true});
+    b+=`<path d="${d}" fill="none" stroke="var(${s.col||"--ink"})" stroke-width="${s.w||2.5}" ${s.dash?`stroke-dasharray="${s.dash}"`:""}/>`});
+  vlines.forEach(v=>b+=`<line x1="${f.sx(v.x)}" x2="${f.sx(v.x)}" y1="${f.sy(yr[0])}" y2="${f.sy(yr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  hlines.forEach(v=>b+=`<line y1="${f.sy(v.y)}" y2="${f.sy(v.y)}" x1="${f.sx(xr[0])}" x2="${f.sx(xr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  let p="";points.forEach(q=>{if(!isFinite(q.x)||!isFinite(q.y))return;const x=f.sx(q.x),y=f.sy(q.y),anc=x>W*.7?"end":"start";
+    p+=`<circle cx="${x}" cy="${y}" r="6" fill="var(${q.col||"--ink"})" stroke="var(--card)" stroke-width="2"/>${q.label?`<text x="${x+(anc==="end"?-9:9)}" y="${y-9}" font-size="12" font-weight="600" text-anchor="${anc}" fill="var(${q.col||"--ink"})">${q.label}</text>`:""}`});
+  return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label||"Gráfico"}"><defs><clipPath id="${id}"><rect x="${f.L}" y="${f.T}" width="${W-f.L-f.R}" height="${H-f.T-f.B}"/></clipPath></defs>${f.g}<g clip-path="url(#${id})">${b}</g>${p}</svg></div>`}
+const legend=items=>`<div class="legend">${items.map(([c,t,d])=>`<span><i style="background:var(${c})${d?";opacity:.55":""}"></i>${t}</span>`).join("")}</div>`;
+const okAll=a=>a.every(x=>isFinite(x)),n2=v=>fmt(v,2),n4=v=>fmt(v,4);
+const tabsBox=(id,opts)=>`<div style="margin-bottom:10px">${seg(id,"Herramienta",opts,opts[0][0])}</div><div id="${id}-b"></div>`;
+function tabsRun(id,M){const go=k=>M[k]();bindSeg(id,go);go(Object.keys(M)[0])}
+const nin=(id,l,v,st)=>`<label for="${id}">${l}<input type="number" id="${id}" value="${v}" ${st?`step="${st}"`:""} inputmode="decimal"></label>`;
+const N=id=>{const e=$(id);return e?parseFloat(String(e.value).replace(",",".")):NaN};
+const onIn=(ids,run)=>ids.forEach(id=>{const e=$(id);if(e)e.addEventListener("input",run)});
+
+
+
+// ===================== HERRAMIENTAS COMUNES DE LAS GUÍAS DE ESTUDIO =====================
+// Cada materia de tipo guía define en su contenido: GL (glosario), MCQ (preguntas de opción múltiple),
+// ABIERTAS (preguntas abiertas con esquema de respuesta) y TL (línea de tiempo), todas con el número de unidad.
+const GSTORE={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const gShuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+const gUnits=arr=>[...new Set(arr.map(x=>x.u))].sort((a,b)=>a-b);
+const gSeg=(id,arr,u0)=>seg(id,"Unidad",[["0","Todas"],...gUnits(arr).map(u=>[String(u),"Unidad "+u])],u0||"0");
+const gCurU=()=>{try{const id=decodeURIComponent(location.hash.slice(1)),x=[...TRUNK,...WORKSHOPS].find(t=>t.id===id);return x&&x.u?String(x.u):"0"}catch(e){return"0"}};
+const gUnitName=u=>(typeof UNIDADES!=="undefined"&&UNIDADES[u])?UNIDADES[u]:"Unidad "+u;
+
+// ---------- Tarjetas de conceptos
+SIMS.tarjetas=function(){
+  let u=gCurU(),ord=[],k=0,show=false;
+  $("sim").innerHTML=`${gSeg("tj-u",GL,u)}<div class="card-q" id="tj-card" aria-live="polite"></div>
+  <div class="chips pre"><button type="button" class="btn" id="tj-rev">Revelar definición</button><button type="button" class="btn" id="tj-next">Siguiente concepto</button></div>
+  <p class="hint" id="tj-pos"></p><details class="pdet"><summary><b>Ver el glosario completo</b></summary><dl class="glos" id="tj-all"></dl></details>`;
+  const pool=()=>GL.filter(g=>u==="0"||String(g.u)===u);
+  const shuffle=()=>{ord=gShuffle(pool().map((_,i)=>i));k=0;show=false};
+  const draw=()=>{const P=pool();if(!P.length){$("tj-card").innerHTML=`<p class="hint">No hay conceptos en esta unidad.</p>`;return}const g=P[ord[k]];
+    $("tj-card").innerHTML=`<p class="lbl">${esc(gUnitName(g.u))}</p><p class="gq">${g.t}</p>${show?`<p>${g.d}</p>`:`<p class="hint">Di o escribe tu definición en dos líneas y luego revélala.</p>`}`;
+    $("tj-pos").textContent=`Concepto ${k+1} de ${P.length}`;$("tj-rev").disabled=show;
+    $("tj-all").innerHTML=P.slice().sort((a,b)=>a.t.localeCompare(b.t,"es")).map(g=>`<dt>${g.t}</dt><dd>${g.d}</dd>`).join("")};
+  bindSeg("tj-u",v=>{u=v;shuffle();draw()});
+  $("tj-rev").onclick=()=>{show=true;draw()};
+  $("tj-next").onclick=()=>{k=(k+1)%ord.length;if(k===0)shuffle();show=false;draw()};
+  shuffle();draw()};
+
+// ---------- Autoevaluación de opción múltiple
+SIMS.quiz=function(){
+  let u=gCurU(),Q=[],ans={};
+  $("sim").innerHTML=`${gSeg("qz-u",MCQ,u)}<div class="res" id="qz-res"></div><div id="qz-l"></div><div class="chips pre"><button type="button" class="btn" id="qz-new">Barajar de nuevo</button></div>`;
+  const score=()=>{const n=Object.keys(ans).length,ok=Object.entries(ans).filter(([i,a])=>Q[i].ok===a).length;$("qz-res").innerHTML=tiles([["Respondidas",`${n} de ${Q.length}`],["Correctas",String(ok),n&&ok===n?"okt":""],["Puntaje",n?fmt(ok/n*5,1)+" / 5":"—"]])};
+  const draw=()=>{$("qz-l").innerHTML=Q.map((q,i)=>{const a=ans[i];return`<div class="stepc qz" data-i="${i}"><p class="lbl">${esc(gUnitName(q.u))}</p><p><b>${i+1}. ${q.q}</b></p><div class="qz-o">${q.o.map((o,j)=>`<button type="button" class="qz-b${a!==undefined?(j===q.ok?" ok":j===a?" no":""):""}" data-j="${j}"${a!==undefined?" disabled":""}>${String.fromCharCode(97+j)}) ${o}</button>`).join("")}</div>${a!==undefined?`<p class="qz-f ${a===q.ok?"qz-si":"qz-no"}"><b>${a===q.ok?"Correcto.":"No es esa."}</b> ${q.e}</p>`:""}</div>`}).join("");score()};
+  const nuevo=()=>{Q=gShuffle(MCQ.filter(q=>u==="0"||String(q.u)===u)).slice(0,10).map(q=>{const idx=gShuffle(q.o.map((_,j)=>j));return{...q,o:idx.map(j=>q.o[j]),ok:idx.indexOf(q.ok)}});ans={};draw()};
+  $("qz-l").addEventListener("click",e=>{const b=e.target.closest("button.qz-b");if(!b)return;const i=+b.closest(".qz").dataset.i;if(ans[i]!==undefined)return;ans[i]=+b.dataset.j;draw()});
+  bindSeg("qz-u",v=>{u=v;nuevo()});$("qz-new").onclick=nuevo;nuevo()};
+
+// ---------- Preguntas abiertas con esquema de respuesta
+SIMS.abiertas=function(){
+  const K="guia-"+(typeof GUIA_ID!=="undefined"?GUIA_ID:"x")+"-ab-";let u=gCurU();
+  $("sim").innerHTML=`${gSeg("ab-u",ABIERTAS,u)}<p class="hint">Escribe tu respuesta (se guarda en este navegador) y luego compárala con el esquema: una buena respuesta toca todas las ideas clave, con fechas y ejemplos.</p><div id="ab-l"></div>`;
+  const draw=()=>{const L=ABIERTAS.map((q,i)=>({...q,i})).filter(q=>u==="0"||String(q.u)===u);
+    $("ab-l").innerHTML=L.map(q=>`<div class="stepc"><p class="lbl">${esc(gUnitName(q.u))}</p><p><b>${q.q}</b></p><label class="vh" for="ab-t${q.i}">Tu respuesta</label><textarea id="ab-t${q.i}" rows="4" style="width:100%" placeholder="Tu respuesta…">${esc(GSTORE.get(K+q.i)||"")}</textarea><details class="pdet"><summary><b>Esquema de respuesta</b></summary><ul>${q.a.map(x=>`<li>${x}</li>`).join("")}</ul></details></div>`).join("");
+    L.forEach(q=>$("ab-t"+q.i).addEventListener("input",e=>GSTORE.set(K+q.i,e.target.value)))};
+  bindSeg("ab-u",v=>{u=v;draw()});draw()};
+
+// ---------- Línea de tiempo
+SIMS.tiempo=function(){
+  let u=gCurU();
+  $("sim").innerHTML=`${gSeg("tl-u",TL,u)}<div class="calcf"><label for="tl-q">Buscar en la línea de tiempo<input id="tl-q" type="search" placeholder="Por ejemplo: patrón oro"></label></div><ol class="tline" id="tl-l"></ol>`;
+  const nz=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  const draw=()=>{const q=nz($("tl-q").value.trim()),L=TL.filter(x=>(u==="0"||String(x.u)===u)&&(!q||nz(x.a+" "+x.t+" "+x.d).includes(q)));
+    $("tl-l").innerHTML=L.length?L.map(x=>`<li><span class="tl-a">${x.a}</span><div><b>${x.t}</b><br><span>${x.d}</span></div></li>`).join(""):`<li><span></span><div class="hint">No hay hechos con ese filtro.</div></li>`};
+  bindSeg("tl-u",v=>{u=v;draw()});$("tl-q").addEventListener("input",draw);draw()};
+
+
+// ===================== LABORATORIOS DE MICROECONOMETRÍA =====================
+const d3=v=>isFinite(v)?fmt(Math.abs(v)<5e-5?0:v,3).replace(/^-/,"−"):"—",d4=v=>isFinite(v)?fmt(Math.abs(v)<5e-6?0:v,4).replace(/^-/,"−"):"—",pc=v=>isFinite(v)?fmt(v*100,1)+" %":"—";
+const tl=a=>tiles(a.map(([s,...r])=>[`<span class="nt">${s}</span>`,...r]));
+const rbox=code=>`<details class="pdet"><summary><b>Código en R</b></summary><pre class="code"><code>${code.replace(/</g,"&lt;")}</code></pre></details>`;
+const Phi=x=>{const t=1/(1+0.3275911*Math.abs(x)/Math.SQRT2),y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x/2);return x>=0?(1+y)/2:(1-y)/2};
+const phi=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI),Lam=z=>1/(1+Math.exp(-z));
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length,sd=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1))},median=a=>{const b=a.slice().sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2};
+const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+const robust=(X,o)=>{const n=X.length,k=X[0].length,M=[...Array(k)].map(()=>Array(k).fill(0));X.forEach((x,i)=>{const e2=o.e[i]**2;for(let a=0;a<k;a++)for(let b=0;b<k;b++)M[a][b]+=e2*x[a]*x[b]});const V=TS.mm(TS.mm(o.XtXi,M),o.XtXi).map(r=>r.map(v=>v*n/(n-k)));return V.map((r,i)=>Math.sqrt(r[i]))};
+const tsls=(X,Z,y)=>{const Zt=TS.tr(Z),ZZi=TS.inv(TS.mm(Zt,Z));if(!ZZi)return null;const XZ=TS.mm(TS.tr(X),Z),A=TS.mm(TS.mm(XZ,ZZi),TS.tr(XZ)),Ai=TS.inv(A);if(!Ai)return null;const Zy=TS.mm(Zt,y.map(v=>[v])),b=TS.mm(Ai,TS.mm(TS.mm(XZ,ZZi),Zy)).map(r=>r[0]),e=y.map((v,i)=>v-dot(X[i],b)),s2=e.reduce((s,v)=>s+v*v,0)/(y.length-X[0].length);return{b,e,se:Ai.map((r,i)=>Math.sqrt(s2*r[i])),Ai}};
+const gmm2=(X,Z,y)=>{const s1=tsls(X,Z,y);if(!s1)return null;const n=y.length,L=Z[0].length,S=[...Array(L)].map(()=>Array(L).fill(0));Z.forEach((z,i)=>{const e2=s1.e[i]**2;for(let a=0;a<L;a++)for(let b=0;b<L;b++)S[a][b]+=e2*z[a]*z[b]/n});const W=TS.inv(S);if(!W)return null;
+  const XZ=TS.mm(TS.tr(X),Z),Zy=TS.mm(TS.tr(Z),y.map(v=>[v])),A=TS.mm(TS.mm(XZ,W),TS.tr(XZ)),Ai=TS.inv(A),b=TS.mm(Ai,TS.mm(TS.mm(XZ,W),Zy)).map(r=>r[0]),e=y.map((v,i)=>v-dot(X[i],b)),g=[...Array(L)].map((_,a)=>Z.reduce((s,z,i)=>s+z[a]*e[i],0)/n),J=n*dot(g,TS.mm(W,g.map(v=>[v])).map(r=>r[0]));
+  return{b,se:Ai.map((r,i)=>Math.sqrt(r[i]*n)),J,df:L-X[0].length,s1}};
+const mleBin=(X,y,tipo)=>{const k=X[0].length;let b=Array(k).fill(0);for(let it=0;it<60;it++){const g=Array(k).fill(0),H=[...Array(k)].map(()=>Array(k).fill(0));X.forEach((x,i)=>{const z=dot(x,b);let s,w;if(tipo==="logit"){const p=Lam(z);s=y[i]-p;w=p*(1-p)}else{const P=Math.min(1-1e-12,Math.max(1e-12,Phi(z))),f=phi(z);s=f*(y[i]-P)/(P*(1-P));w=f*f/(P*(1-P))}for(let a=0;a<k;a++){g[a]+=s*x[a];for(let c=0;c<k;c++)H[a][c]+=w*x[a]*x[c]}});const Hi=TS.inv(H);if(!Hi)break;const d=TS.mm(Hi,g.map(v=>[v])).map(r=>r[0]);b=b.map((v,i)=>v+d[i]);if(Math.max(...d.map(Math.abs))<1e-9){const F=tipo==="logit"?Lam:Phi;const ll=X.reduce((s,x,i)=>{const p=Math.min(1-1e-12,Math.max(1e-12,F(dot(x,b))));return s+(y[i]?Math.log(p):Math.log(1-p))},0);return{b,se:Hi.map((r,j)=>Math.sqrt(r[j])),ll}}}return null};
+const nmax=(f,x0,it=80)=>{let x=x0.slice();const k=x.length,h=1e-4;for(let r=0;r<it;r++){const g=x.map((_,i)=>{const a=x.slice(),c=x.slice();a[i]+=h;c[i]-=h;return(f(a)-f(c))/(2*h)}),H=x.map((_,i)=>x.map((_,j)=>{const pp=x.slice(),pm=x.slice(),mp=x.slice(),mm=x.slice();pp[i]+=h;pp[j]+=h;pm[i]+=h;pm[j]-=h;mp[i]-=h;mp[j]+=h;mm[i]-=h;mm[j]-=h;return(f(pp)-f(pm)-f(mp)+f(mm))/(4*h*h)}));const Hi=TS.inv(H.map(r=>r.map(v=>-v)));if(!Hi)break;let d=TS.mm(Hi,g.map(v=>[v])).map(r=>r[0]),st=1;const f0=f(x);while(st>1e-4&&!(f(x.map((v,i)=>v+st*d[i]))>=f0))st/=2;x=x.map((v,i)=>v+st*d[i]);if(Math.max(...d.map(v=>Math.abs(v*st)))<1e-8)return{x,Hi};}return{x,Hi:null}};
+const tbl=(rows,head)=>`<div class="tbl"><table><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+const reseed=id=>{let s=1;$(id).onclick=()=>{s++;$(id).dataset.s=s;$(id).dispatchEvent(new Event("seed"))};return()=>+($(id).dataset.s||1)};
+
+// ---------- MCO: Monte Carlo
+SIMS.mco=function(){
+  $("sim").innerHTML=`<p class="hint">y = 1 + 0,5x + ε. Se repite la muestra 500 veces para ver la distribución de β̂₁ y el desempeño de los errores estándar.</p>${ctl("mc-n","Tamaño de la muestra n",10,500,10,50)}<div style="margin:6px 0 10px">${seg("mc-h","Errores",[["h","Homocedásticos"],["x","Heterocedásticos (σ crece con x)"]],"h")}</div><div class="res" id="mc-res"></div><div id="mc-gr"></div><div id="mc-o"></div>`;
+  let het=false;
+  const run=()=>{const n=V("mc-n"),R=TS.rng(11),B=[],SEc=[],SEr=[];let rc=0,rr=0;for(let r=0;r<500;r++){const X=[],y=[];for(let i=0;i<n;i++){const x=R.n()*1.5,e=R.n()*(het?0.3+0.8*Math.abs(x):1);X.push([1,x]);y.push(1+0.5*x+e)}const o=TS.ols(X,y),sr=robust(X,o);B.push(o.b[1]);SEc.push(o.se[1]);SEr.push(sr[1]);if(Math.abs((o.b[1]-0.5)/o.se[1])>1.96)rc++;if(Math.abs((o.b[1]-0.5)/sr[1])>1.96)rr++}
+    const lo=Math.min(...B),hi=Math.max(...B),nb=30,w=(hi-lo)/nb,cnt=Array(nb).fill(0);B.forEach(b=>cnt[Math.min(nb-1,Math.floor((b-lo)/w))]++);
+    $("mc-res").innerHTML=tl([["Media de β̂₁ (verdadero 0,5)",d4(mean(B)),"okt"],["Desviación real de β̂₁",d4(sd(B))],["Promedio del error estándar clásico",d4(mean(SEc)),het&&Math.abs(mean(SEc)-sd(B))/sd(B)>0.1?"badt":""],["Promedio del error estándar robusto",d4(mean(SEr))],["Rechazo de H₀ verdadera (clásico)",pc(rc/500),Math.abs(rc/500-0.05)>0.025?"badt":"okt"],["Rechazo de H₀ verdadera (robusto)",pc(rr/500),Math.abs(rr/500-0.05)>0.025?"badt":"okt"]]);
+    $("mc-gr").innerHTML=plotXY({xr:[lo,hi],yr:[0,Math.max(...cnt)/(500*w)*1.15],areas:cnt.map((c,i)=>({pts:[[lo+i*w,0],[lo+(i+1)*w,0],[lo+(i+1)*w,c/(500*w)],[lo+i*w,c/(500*w)]],col:"--line",op:.55})),series:[{f:x=>phi((x-mean(B))/sd(B))/sd(B),col:"--ink"}],vlines:[{x:0.5,col:"--exam"}],xl:"β̂₁",yl:"Densidad",label:"Distribución muestral de β̂₁"});
+    $("mc-o").innerHTML=stp(1,"Lectura",`<p>MCO es ${Math.abs(mean(B)-0.5)<0.02?"insesgado":"casi insesgado"} en ambos casos: la media de las 500 estimaciones es ${d4(mean(B))}. Al subir n, la distribución se concentra alrededor de 0,5 (consistencia). ${het?`Con heterocedasticidad, el error estándar clásico (${d4(mean(SEc))}) no coincide con la dispersión real (${d4(sd(B))}): las pruebas rechazan una hipótesis verdadera el ${pc(rc/500)} de las veces en lugar del 5 %. El robusto corrige el problema.`:"Con errores homocedásticos, ambos errores estándar coinciden con la dispersión real y las pruebas rechazan alrededor del 5 %."}</p>`)+rbox(`library(sandwich); library(lmtest)\nmodelo <- lm(y ~ x, data = d)\ncoeftest(modelo)                                  # errores clásicos\ncoeftest(modelo, vcov = vcovHC(modelo, "HC1"))    # robustos de White`)};
+  bindSeg("mc-h",v=>{het=v==="x";run()});bindCtl(["mc-n"],run);run()};
+
+// ---------- Variables instrumentales
+SIMS.iv=function(){
+  $("sim").innerHTML=`<p class="hint">y = 1 + 1·x + ε, con x = π·z + v y Corr(ε, v) = ρ. El instrumento z es exógeno.</p>${ctl("iv-r","Endogeneidad ρ",0,0.9,0.05,0.6)}${ctl("iv-p","Fuerza del instrumento π",0.02,1,0.02,0.5)}${ctl("iv-n","n",50,2000,50,300)}<div class="res" id="iv-res"></div><div id="iv-gr"></div><div id="iv-o"></div>`;
+  const draw=(R,n,rho,pi)=>{const X=[],Z=[],y=[],Xf=[];for(let i=0;i<n;i++){const z=R.n(),v=R.n(),e=rho*v+Math.sqrt(1-rho*rho)*R.n(),x=pi*z+v;X.push([1,x]);Z.push([1,z]);y.push(1+x+e);Xf.push(x)}return{X,Z,y,Xf}};
+  const run=()=>{const rho=V("iv-r"),pi=V("iv-p"),n=V("iv-n"),R=TS.rng(5),D=draw(R,n,rho,pi),o=TS.ols(D.X,D.y),iv=tsls(D.X,D.Z,D.y),fs=TS.ols(D.Z,D.Xf),F=fs.t[1]**2;
+    const MO=[],MI=[];for(let r=0;r<300;r++){const d=draw(R,n,rho,pi);MO.push(TS.ols(d.X,d.y).b[1]);const t=tsls(d.X,d.Z,d.y);if(t)MI.push(t.b[1])}
+    $("iv-res").innerHTML=tl([["MCO: β̂ (ee)",`${d3(o.b[1])} (${d3(o.se[1])})`,Math.abs(o.b[1]-1)>2*o.se[1]?"badt":""],["MC2E: β̂ (ee)",`${d3(iv.b[1])} (${d3(iv.se[1])})`,"okt"],["F de la primera etapa",d3(F),F<10?"badt":"okt"],["Mediana de 300 muestras: MCO / MC2E",`${d3(median(MO))} / ${d3(median(MI))}`]]);
+    const all=[...MO,...MI].filter(v=>v>-3&&v<5),lo=Math.min(...all),hi=Math.max(...all),nb=40,w=(hi-lo)/nb,h=A=>{const c=Array(nb).fill(0);A.forEach(v=>{if(v>=lo&&v<=hi)c[Math.min(nb-1,Math.floor((v-lo)/w))]++});return c},cO=h(MO),cI=h(MI),ym=Math.max(...cO,...cI)/(300*w)*1.1;
+    $("iv-gr").innerHTML=plotXY({xr:[lo,hi],yr:[0,ym],areas:[...cO.map((c,i)=>({pts:[[lo+i*w,0],[lo+(i+1)*w,0],[lo+(i+1)*w,c/(300*w)],[lo+i*w,c/(300*w)]],col:"--exam",op:.4})),...cI.map((c,i)=>({pts:[[lo+i*w,0],[lo+(i+1)*w,0],[lo+(i+1)*w,c/(300*w)],[lo+i*w,c/(300*w)]],col:"--line",op:.45}))],vlines:[{x:1,col:"--ink"}],xl:"β̂",yl:"Densidad",label:"300 muestras"})+legend([["--exam","MCO"],["--line","MC2E"],["--ink","Valor verdadero"]]);
+    $("iv-o").innerHTML=stp(1,"Primera y segunda etapa",`<div class="eq al">Primera etapa: x̂ = ${d3(fs.b[0])} + ${d3(fs.b[1])}·z, F = t² = ${d3(F)}<br>Segunda etapa: β̂_MC2E = Σ(z − z̄)(y − ȳ)/Σ(z − z̄)(x − x̄) = ${d3(iv.b[1])}</div><p>MCO converge a 1 + Cov(x, ε)/Var(x) = ${d3(1+rho/(pi*pi+1))}: está sesgado y el sesgo no desaparece con n. MC2E se centra en 1. ${F<10?"Con un instrumento débil (F &lt; 10), MC2E se dispersa mucho y su mediana se acerca a la de MCO: el instrumento no sirve.":"Con un instrumento fuerte, MC2E es confiable, aunque menos preciso que MCO."}</p>`)+rbox(`library(AER)\nprimera <- lm(x ~ z, data = d); summary(primera)       # F de la primera etapa\nmc2e <- ivreg(y ~ x | z, data = d)\nsummary(mc2e, diagnostics = TRUE)                       # débil, Wu-Hausman, Sargan`)};
+  bindCtl(["iv-r","iv-p","iv-n"],run);run()};
+
+// ---------- GMM
+SIMS.gmm=function(){
+  $("sim").innerHTML=`<p class="hint">y = 1 + 1·x + ε, x endógena, dos instrumentos: z₁ válido y z₂ que viola la exclusión en δ (Cov(z₂, ε) ≠ 0 si δ ≠ 0). Errores heterocedásticos.</p>${ctl("gm-d","Invalidez de z₂: δ",0,0.5,0.01,0)}${ctl("gm-n","n",100,3000,100,800)}<div class="res" id="gm-res"></div><div id="gm-o"></div>`;
+  const run=()=>{const dl=V("gm-d"),n=V("gm-n"),R=TS.rng(9),X=[],Z=[],y=[];for(let i=0;i<n;i++){const z1=R.n(),z2=R.n(),v=R.n(),e=(0.5*v+0.85*R.n())*(0.5+Math.abs(z1))+dl*z2,x=0.5*z1+0.5*z2+v;X.push([1,x]);Z.push([1,z1,z2]);y.push(1+x+e)}
+    const s=tsls(X,Z,y),g=gmm2(X,Z,y),p=TS.pchi(g.J,g.df);
+    $("gm-res").innerHTML=tl([["MC2E: β̂ (ee)",`${d3(s.b[1])} (${d3(s.se[1])})`],["GMM eficiente: β̂ (ee robusto)",`${d3(g.b[1])} (${d3(g.se[1])})`,"okt"],["J de Hansen",`${d3(g.J)} (gl = ${g.df})`],["Valor p",d4(p),p<0.05?"badt":"okt"]]);
+    $("gm-o").innerHTML=stp(1,"Dos etapas",`<div class="eq al">1) MC2E con W = (Z'Z)⁻¹ ⟹ residuos e<br>2) Ŝ = (1/n)Σ eᵢ² zᵢzᵢ'; W = Ŝ⁻¹ ⟹ β̂ = (X'Z W Z'X)⁻¹X'Z W Z'y = ${d3(g.b[1])}<br>J = n·ḡ'Ŝ⁻¹ḡ = ${d3(g.J)} ~ χ²(${g.df})</div><p>${dl===0?"Ambos instrumentos son válidos: la prueba J no rechaza (salvo por azar en el 5 % de las muestras).":p<0.05?`Con δ = ${d3(dl)}, las dos condiciones de momento son incompatibles y la prueba J lo detecta (p = ${d4(p)}). Ojo: no dice cuál instrumento falla.`:`Con δ = ${d3(dl)} la invalidez todavía no se detecta; sube δ o n.`} Con heterocedasticidad, GMM eficiente tiene errores estándar menores o iguales que MC2E.</p>`)+rbox(`library(gmm)\nmodelo <- gmm(y ~ x, ~ z1 + z2, data = d, type = "twoStep")\nsummary(modelo)      # incluye la prueba J de Hansen\n# Alternativa: AER::ivreg(y ~ x | z1 + z2) con summary(..., diagnostics = TRUE) da Sargan`)};
+  bindCtl(["gm-d","gm-n"],run);run()};
+
+// ---------- Panel
+SIMS.panel=function(){
+  $("sim").innerHTML=`<p class="hint">y_it = 2 + 1,5·x_it + α_i + ε_it. La correlación entre x y el efecto individual α se controla con ρ.</p>${ctl("pn-n","Individuos N",10,200,5,40)}${ctl("pn-t","Periodos T",2,20,1,6)}${ctl("pn-r","Correlación de x con α: ρ",0,1.5,0.05,0.6)}${ctl("pn-s","Desviación del efecto individual σ_α",0,3,0.1,1)}<div class="res" id="pn-res"></div><div id="pn-o"></div>`;
+  const run=()=>{const N=V("pn-n"),T=V("pn-t"),rho=V("pn-r"),su=V("pn-s"),d=TS.simPanel({N,T,beta:1.5,rho,su,se:1,seed:4}),P=TS.panel(d);
+    $("pn-res").innerHTML=tl([["MCO agrupado",`${d3(P.pool.b[1])} (${d3(P.pool.se[1])})`,Math.abs(P.pool.b[1]-1.5)>2*P.pool.se[1]?"badt":""],["Efectos fijos",`${d3(P.fe.b[0])} (${d3(P.fe.se[0])})`,"okt"],["Efectos aleatorios",`${d3(P.re.b[1])} (${d3(P.re.se[1])})`],["Hausman",`${d3(P.haus.H)}, p = ${d4(P.haus.p)}`,P.haus.p<0.05?"badt":"okt"],["F efectos individuales",`p = ${d4(P.fF.p)}`],["LM Breusch-Pagan",`p = ${d4(P.bp.p)}`]]);
+    $("pn-o").innerHTML=stp(1,"Comparación",tbl([["MCO agrupado",d3(P.pool.b[1]),d3(P.pool.se[1]),"Ignora α; sesgado si ρ ≠ 0"],["Efectos fijos (within)",d3(P.fe.b[0]),d3(P.fe.se[0]),"Elimina α restando medias"],["Efectos aleatorios",d3(P.re.b[1]),d3(P.re.se[1]),`θ = ${d3(P.re.theta)}; supone Cov(x, α) = 0`]],["Estimador","β̂ (verdadero 1,5)","Error estándar","Nota"]))
+      +stp(2,"Pruebas y decisión",`<ul><li>F de efectos individuales: F = ${d3(P.fF.F)}, p = ${d4(P.fF.p)} ⟹ ${P.fF.p<0.05?"hay efectos individuales; el agrupado no sirve":"no hay evidencia de efectos individuales"}.</li><li>LM de Breusch-Pagan: ${d3(P.bp.LM)}, p = ${d4(P.bp.p)}.</li><li>Hausman: ${d3(P.haus.H)}, p = ${d4(P.haus.p)} ⟹ ${P.haus.p<0.05?"<b>efectos fijos</b>: los aleatorios son inconsistentes porque x está correlacionada con α":"no se rechaza; <b>efectos aleatorios</b> es consistente y más eficiente"}.</li></ul>`)+rbox(`library(plm)\npd <- pdata.frame(d, index = c("id", "t"))\nfe <- plm(y ~ x, data = pd, model = "within")\nre <- plm(y ~ x, data = pd, model = "random")\npool <- plm(y ~ x, data = pd, model = "pooling")\npFtest(fe, pool); plmtest(pool, type = "bp"); phtest(fe, re)`)};
+  bindCtl(["pn-n","pn-t","pn-r","pn-s"],run);run()};
+
+// ---------- Panel dinámico
+SIMS.nickell=function(){
+  $("sim").innerHTML=`<p class="hint">y_it = ρ·y_i,t−1 + α_i + ε_it con N = 200 individuos. Se comparan efectos fijos y el estimador de Anderson-Hsiao (primeras diferencias instrumentadas con y_i,t−2) en 100 muestras.</p>${ctl("nk-r","ρ verdadero",0,0.95,0.05,0.5)}${ctl("nk-t","Periodos T",3,20,1,5)}<div class="res" id="nk-res"></div><div id="nk-o"></div>`;
+  const run=()=>{const rho=V("nk-r"),T=V("nk-t"),N=200,R=TS.rng(21),FE=[],AH=[],PO=[];
+    for(let r=0;r<100;r++){const Y=[];for(let i=0;i<N;i++){const a=R.n();let y=a/(1-rho)+R.n()/Math.sqrt(1-rho*rho);for(let b=0;b<20;b++)y=rho*y+a+R.n();const s=[y];for(let t=1;t<=T;t++){y=rho*y+a+R.n();s.push(y)}Y.push(s)}
+      let num=0,den=0,np=0,dp=0,mx,my;Y.forEach(s=>{const x=s.slice(0,T),yy=s.slice(1);mx=mean(x);my=mean(yy);x.forEach((v,t)=>{num+=(v-mx)*(yy[t]-my);den+=(v-mx)**2})});FE.push(num/den);
+      let ny=0,dy=0;Y.forEach(s=>{for(let t=2;t<=T;t++){const dY=s[t]-s[t-1],dX=s[t-1]-s[t-2],z=s[t-2];ny+=z*dY;dy+=z*dX}});AH.push(ny/dy);
+      let sx=0,sy=0,sxx=0,sxy=0,c=0;Y.forEach(s=>{for(let t=1;t<=T;t++){sx+=s[t-1];sy+=s[t];sxx+=s[t-1]**2;sxy+=s[t-1]*s[t];c++}});PO.push((sxy-sx*sy/c)/(sxx-sx*sx/c))}
+    const nb=-(1+rho)/(T-1);
+    $("nk-res").innerHTML=tl([["MCO agrupado (media)",d3(mean(PO)),"badt"],["Efectos fijos (media)",d3(mean(FE)),"badt"],["Sesgo de Nickell aproximado",d3(nb)],["Anderson-Hsiao (mediana)",d3(median(AH)),"okt"]]);
+    $("nk-o").innerHTML=stp(1,"Lectura",`<p>El valor verdadero es ${d3(rho)}. MCO agrupado lo sobreestima (${d3(mean(PO))}) porque el rezago contiene el efecto individual. Efectos fijos lo subestima (${d3(mean(FE))}), cerca de lo que predice Nickell, ρ − (1 + ρ)/(T − 1) = ${d3(rho+nb)}; el sesgo se reduce al aumentar T. El estimador en diferencias instrumentado con y_(t−2) se centra en el valor verdadero (mediana ${d3(median(AH))}), aunque con más dispersión; Arellano-Bond gana precisión usando todos los rezagos disponibles como instrumentos.</p>`)+rbox(`library(plm)\nab <- pgmm(y ~ lag(y, 1) | lag(y, 2:99), data = pd, effect = "individual", model = "twosteps")\nsummary(ab)   # incluye Sargan y pruebas de autocorrelación AR(1) y AR(2)`)};
+  bindCtl(["nk-r","nk-t"],run);run()};
+
+// ---------- Elección binaria
+SIMS.binaria=function(){
+  $("sim").innerHTML=`<p class="hint">Participación laboral simulada: y* = −1 + 0,1·educación + 0,8·urbano − 0,5·hijos + ε, con ε normal estándar; y = 1 si y* &gt; 0.</p>${ctl("bn-n","n",100,3000,100,1000)}<div class="chips pre"><button type="button" class="btn" id="bn-s">Nueva muestra</button></div><div class="res" id="bn-res"></div><div id="bn-gr"></div><div id="bn-o"></div>`;
+  let seed=3;$("bn-s").onclick=()=>{seed++;run()};
+  const run=()=>{const n=V("bn-n"),R=TS.rng(seed),X=[],y=[];for(let i=0;i<n;i++){const ed=Math.max(0,Math.round(11+3.5*R.n())),ur=R.u()<0.7?1:0,hi=Math.min(5,Math.floor(-Math.log(R.u()+1e-12)*1.2));X.push([1,ed,ur,hi]);y.push(-1+0.1*ed+0.8*ur-0.5*hi+R.n()>0?1:0)}
+    const lpm=TS.ols(X,y),P=mleBin(X,y,"probit"),L=mleBin(X,y,"logit"),p0=mean(y),ll0=n*(p0*Math.log(p0)+(1-p0)*Math.log(1-p0));if(!P||!L){$("bn-res").innerHTML=err("no convergió; prueba otra muestra.");return}
+    const ame=(b,f)=>b.map((_,j)=>mean(X.map(x=>f(dot(x,b))))*b[j]),aP=ame(P.b,phi),aL=ame(L.b,z=>Lam(z)*(1-Lam(z))),nm=["Constante","Educación","Urbano","Hijos"],acc=mean(X.map((x,i)=>(Phi(dot(x,P.b))>0.5?1:0)===y[i]?1:0)),out=lpm.fit.filter(v=>v<0||v>1).length;
+    $("bn-res").innerHTML=tl([["Proporción que participa",pc(p0)],["Pseudo R² (probit)",d4(1-P.ll/ll0)],["LR (probit)",`${d3(2*(P.ll-ll0))}, p = ${d4(TS.pchi(2*(P.ll-ll0),3))}`],["Aciertos (probit)",pc(acc)],["MLP: predicciones fuera de [0, 1]",String(out),out?"badt":""]]);
+    $("bn-o").innerHTML=stp(1,"Coeficientes",tbl(nm.map((v,j)=>[v,`${d3(lpm.b[j])} (${d3(lpm.se[j])})`,`${d3(P.b[j])} (${d3(P.se[j])})`,`${d3(L.b[j])} (${d3(L.se[j])})`,j?d3(L.b[j]/P.b[j]):""]),["Variable","Lineal (MCO)","Probit","Logit","Logit/probit"]))
+      +stp(2,"Efectos marginales promedio",tbl(nm.slice(1).map((v,i)=>[v,d4(lpm.b[i+1]),d4(aP[i+1]),d4(aL[i+1]),d3(Math.exp(L.b[i+1]))]),["Variable","Lineal","Probit","Logit","Razón de odds (logit)"])+`<p>Los coeficientes de los tres modelos son distintos, pero los efectos marginales promedio son casi iguales: un año más de educación sube la probabilidad de participar en ${pc(aP[1])} según el probit. Los coeficientes del logit son unas ${d3(L.b[1]/P.b[1])} veces los del probit. Valores verdaderos del probit: −1; 0,1; 0,8; −0,5.</p>`)
+      +rbox(`probit <- glm(y ~ educ + urbano + hijos, family = binomial(link = "probit"), data = d)\nlogit  <- glm(y ~ educ + urbano + hijos, family = binomial(link = "logit"),  data = d)\nlibrary(margins); summary(margins(probit))     # efectos marginales promedio\nexp(coef(logit))                               # razones de odds\n1 - logLik(probit) / logLik(update(probit, . ~ 1))   # pseudo R² de McFadden`);
+    const xs=[...Array(41)].map((_,i)=>i*0.5);$("bn-gr").innerHTML=plotXY({xr:[0,20],yr:[-0.1,1.1],series:[{f:e=>dot([1,e,1,1],lpm.b),col:"--muted"},{f:e=>Phi(dot([1,e,1,1],P.b)),col:"--line"},{f:e=>Lam(dot([1,e,1,1],L.b)),col:"--exam",dash:"6 4"}],hlines:[{y:0,col:"--muted"},{y:1,col:"--muted"}],xl:"Años de educación (urbano, un hijo)",yl:"P(participa)",label:"Probabilidad predicha"})+legend([["--muted","Lineal"],["--line","Probit"],["--exam","Logit",1]])};
+  bindCtl(["bn-n"],run);run()};
+
+// ---------- Tobit
+SIMS.tobit=function(){
+  $("sim").innerHTML=`<p class="hint">Gasto en bienes durables: y* = −2 + 1·x + ε, ε ~ N(0, 2²); se observa y = max(0, y*).</p>${ctl("tb-n","n",100,2000,100,500)}${ctl("tb-c","Desplazamiento de la constante (más ceros si es negativo)",-3,3,0.25,0)}<div class="res" id="tb-res"></div><div id="tb-gr"></div><div id="tb-o"></div>`;
+  const run=()=>{const n=V("tb-n"),c0=-2+V("tb-c"),R=TS.rng(8),X=[],y=[];for(let i=0;i<n;i++){const x=R.u()*6;X.push([1,x]);y.push(Math.max(0,c0+x+2*R.n()))}
+    const o=TS.ols(X,y),Xp=X.filter((_,i)=>y[i]>0),yp=y.filter(v=>v>0),tr=Xp.length>2?TS.ols(Xp,yp):null,ceros=n-yp.length;
+    const ll=p=>{const b=[p[0],p[1]],s=Math.exp(p[2]);return X.reduce((S,x,i)=>{const m=dot(x,b);return S+(y[i]>0?Math.log(phi((y[i]-m)/s))-Math.log(s):Math.log(Math.max(1e-300,1-Phi(m/s))))},0)};
+    const M=nmax(ll,[o.b[0],o.b[1],Math.log(Math.sqrt(o.s2))]),bt=M.x,se=M.Hi?M.Hi.map((r,i)=>Math.sqrt(r[i])):[NaN,NaN,NaN],sg=Math.exp(bt[2]),xm=mean(X.map(x=>x[1])),me=Phi((bt[0]+bt[1]*xm)/sg)*bt[1];
+    $("tb-res").innerHTML=tl([["Observaciones en cero",`${ceros} (${pc(ceros/n)})`],["MCO con todos: pendiente",d3(o.b[1]),"badt"],["MCO solo positivos: pendiente",tr?d3(tr.b[1]):"—","badt"],["Tobit: pendiente (ee)",`${d3(bt[1])} (${d3(se[1])})`,"okt"],["Tobit: σ",d3(sg)],["Efecto marginal en E[y] (en x̄)",d3(me)]]);
+    $("tb-gr").innerHTML=plotXY({xr:[0,6],yr:[-1,Math.max(...y)*1.05],series:[{f:x=>o.b[0]+o.b[1]*x,col:"--exam"},...(tr?[{f:x=>tr.b[0]+tr.b[1]*x,col:"--muted",dash:"5 4"}]:[]),{f:x=>bt[0]+bt[1]*x,col:"--line"}],points:X.slice(0,250).map((x,i)=>({x:x[1],y:y[i],col:"--ink"})),hlines:[{y:0,col:"--muted"}],xl:"x",yl:"y",label:"Datos censurados en cero"})+legend([["--exam","MCO con todos"],["--muted","MCO solo positivos",1],["--line","Tobit (latente)"]]);
+    $("tb-o").innerHTML=stp(1,"Lectura",`<p>La pendiente verdadera de la latente es 1. MCO con todos los datos (${d3(o.b[1])}) la subestima porque los ceros aplanan la relación; MCO solo con los positivos (${tr?d3(tr.b[1]):"—"}) también, porque al truncar se pierden las observaciones con errores negativos cuando x es baja. El tobit, por máxima verosimilitud, recupera ${d3(bt[1])}. El efecto sobre el gasto observado esperado es menor: Φ(x̄'β/σ)·β = ${d3(me)}.</p>`)+rbox(`library(AER)\ntob <- tobit(y ~ x, left = 0, data = d)\nsummary(tob)\n# Truncado: library(truncreg); truncreg(y ~ x, point = 0, direction = "left", data = subset(d, y > 0))`)};
+  bindCtl(["tb-n","tb-c"],run);run()};
+
+// ---------- Heckman
+SIMS.heckman=function(){
+  $("sim").innerHTML=`<p class="hint">Participación: s = 1[0,5 + 0,8·z − 0,6·hijos + u &gt; 0]. Salario: ln w = 1 + 0,1·educ + ε, observado si s = 1. Corr(u, ε) = ρ, σ_ε = 0,5. La variable hijos afecta la participación pero no el salario (exclusión).</p>${ctl("hk-r","ρ",-0.9,0.9,0.05,0.6)}${ctl("hk-n","n",300,4000,100,1500)}<div class="res" id="hk-res"></div><div id="hk-o"></div>`;
+  const run=()=>{const rho=V("hk-r"),n=V("hk-n"),R=TS.rng(13),Zs=[],s=[],Xo=[],yo=[];
+    for(let i=0;i<n;i++){const ed=Math.max(0,11+3*R.n()),z=(ed-11)/3,hi=Math.floor(R.u()*3),u=R.n(),e=0.5*(rho*u+Math.sqrt(1-rho*rho)*R.n()),si=0.5+0.8*z-0.6*hi+u>0?1:0;Zs.push([1,z,hi]);s.push(si);if(si){Xo.push([1,ed]);yo.push(1+0.1*ed+e)}}
+    const pr=mleBin(Zs,s,"probit");if(!pr){$("hk-res").innerHTML=err("el probit no convergió.");return}const lam=[];Zs.forEach((z,i)=>{if(s[i]){const v=dot(z,pr.b);lam.push(phi(v)/Phi(v))}});
+    const o=TS.ols(Xo,yo),h=TS.ols(Xo.map((x,i)=>[...x,lam[i]]),yo);
+    $("hk-res").innerHTML=tl([["Participan",`${yo.length} de ${n}`],["MCO en seleccionados: educación",`${d4(o.b[1])} (${d4(o.se[1])})`,Math.abs(o.b[1]-0.1)>2*o.se[1]?"badt":""],["Heckman: educación",`${d4(h.b[1])} (${d4(h.se[1])})`,"okt"],["Coeficiente de λ (= ρσ_ε)",`${d4(h.b[2])} (${d4(h.se[2])})`,Math.abs(h.b[2]/h.se[2])>1.96?"okt":""],["Valor verdadero de ρσ_ε",d4(rho*0.5)]]);
+    $("hk-o").innerHTML=stp(1,"Primera etapa: probit de participación",`<div class="eq al">P(s = 1) = Φ(${d3(pr.b[0])} + ${d3(pr.b[1])}·z ${pr.b[2]<0?"−":"+"} ${d3(Math.abs(pr.b[2]))}·hijos) ⟹ λᵢ = φ(zᵢ'γ̂)/Φ(zᵢ'γ̂)</div>`)
+      +stp(2,"Segunda etapa: MCO con λ",`<div class="eq al">ln w = ${d4(h.b[0])} + ${d4(h.b[1])}·educ ${h.b[2]<0?"−":"+"} ${d4(Math.abs(h.b[2]))}·λ</div><p>${Math.abs(rho)<0.05?"Con ρ ≈ 0 no hay selección por no observables: MCO y Heckman coinciden.":`Con ρ = ${d3(rho)} quienes trabajan tienen, en promedio, ${rho>0?"errores salariales más altos":"errores salariales más bajos"}; como la educación también aumenta la participación, MCO en la muestra seleccionada sesga su efecto (${d4(o.b[1])} frente a 0,1). La corrección de Heckman se acerca al valor verdadero.`} Los errores estándar de la segunda etapa mostrados no corrigen por la estimación de λ; en la práctica se usan los que reporta el paquete.</p>`)+rbox(`library(sampleSelection)\nhk <- heckit(selection = trabaja ~ z + hijos, outcome = lnw ~ educ, data = d)\nsummary(hk)          # dos etapas; selection(..., method = "ml") para máxima verosimilitud`)};
+  bindCtl(["hk-r","hk-n"],run);run()};
+
+// ---------- Efectos de tratamiento
+SIMS.trat=function(){
+  $("sim").innerHTML=`<p class="hint">Programa de capacitación. Ingreso Y₀ = 10 + 2·X + ε; el efecto del tratamiento es 3 para todos. X (por ejemplo, experiencia) también aumenta la probabilidad de inscribirse.</p>${ctl("tr-s","Fuerza de la autoselección por X",0,3,0.1,1.5)}${ctl("tr-n","n",200,5000,100,2000)}<div style="margin:6px 0 10px">${seg("tr-a","Asignación",[["s","Autoselección"],["r","Aleatoria"]],"s")}</div><div class="res" id="tr-res"></div><div id="tr-o"></div>`;
+  let rnd=false;
+  const run=()=>{const g=V("tr-s"),n=V("tr-n"),R=TS.rng(17),D=[],Y=[],X=[];for(let i=0;i<n;i++){const x=R.n(),d=rnd?(R.u()<0.5?1:0):(Phi(g*x)>R.u()?1:0),y0=10+2*x+R.n();D.push(d);X.push(x);Y.push(y0+3*d)}
+    const m1=mean(Y.filter((_,i)=>D[i])),m0=mean(Y.filter((_,i)=>!D[i])),reg=TS.ols(D.map((d,i)=>[1,d,X[i]]),Y),bias=2*(mean(X.filter((_,i)=>D[i]))-mean(X.filter((_,i)=>!D[i])));
+    $("tr-res").innerHTML=tl([["Efecto verdadero",d3(3)],["Diferencia de medias",d3(m1-m0),Math.abs(m1-m0-3)>0.3?"badt":"okt"],["Sesgo de selección",d3(bias)],["Regresión con X",`${d3(reg.b[1])} (${d3(reg.se[1])})`,"okt"]]);
+    $("tr-o").innerHTML=stp(1,"Descomposición",`<div class="eq al">E[Y|D = 1] − E[Y|D = 0] = ${d3(m1)} − ${d3(m0)} = ${d3(m1-m0)} = ATT (3) + sesgo de selección (${d3(bias)})</div><p>${rnd?"Con asignación aleatoria, tratados y controles tienen la misma distribución de X: la diferencia de medias estima el efecto sin sesgo.":"Con autoselección, quienes se inscriben tienen más X y habrían ganado más aun sin el programa: la diferencia de medias exagera el efecto. Si X es observable, controlar por X en la regresión (o emparejar por el puntaje de propensión) elimina el sesgo; si la selección depende de no observables, se necesita un instrumento, diferencias en diferencias o una discontinuidad."}</p>`)+rbox(`lm(y ~ d, data = d)          # diferencia de medias\nlm(y ~ d + x, data = d)      # ajuste por regresión\nlibrary(MatchIt); m <- matchit(d ~ x, data = d, method = "nearest")\nsummary(lm(y ~ d, data = match.data(m), weights = weights))`)};
+  bindSeg("tr-a",v=>{rnd=v==="r";run()});bindCtl(["tr-s","tr-n"],run);run()};
+
+// ---------- Duración
+SIMS.km=function(){
+  $("sim").innerHTML=`<p class="hint">Duración del desempleo (meses) con riesgo constante λ y censura: el estudio termina a los C meses.</p>${ctl("km-l","Riesgo verdadero λ (por mes)",0.02,0.5,0.01,0.1)}${ctl("km-c","Fin del estudio C (meses)",3,60,1,18)}${ctl("km-n","n",20,1000,10,200)}<div class="res" id="km-res"></div><div id="km-gr"></div><div id="km-o"></div>`;
+  const run=()=>{const lam=V("km-l"),C=V("km-c"),n=V("km-n"),R=TS.rng(31),Dd=[];for(let i=0;i<n;i++){const t=-Math.log(1-R.u())/lam,c=C*R.u()*0.5+C*0.5;Dd.push(t<=c?{t,e:1}:{t:c,e:0})}
+    Dd.sort((a,b)=>a.t-b.t);let S=1,risk=n;const pts=[[0,1]];Dd.forEach(d=>{if(d.e){pts.push([d.t,S]);S*=1-1/risk;pts.push([d.t,S])}risk--});pts.push([C,S]);
+    const ev=Dd.filter(d=>d.e).length,TT=Dd.reduce((s,d)=>s+d.t,0),lh=ev/TT,naive=1/mean(Dd.filter(d=>d.e).map(d=>d.t));
+    $("km-res").innerHTML=tl([["Eventos / censurados",`${ev} / ${n-ev}`],["λ̂ = eventos / tiempo total",d4(lh),"okt"],["λ ignorando la censura",d4(naive),"badt"],["Duración media estimada 1/λ̂",d3(1/lh)+" meses"]]);
+    $("km-gr").innerHTML=plotXY({xr:[0,C],yr:[0,1.02],series:[{pts,col:"--line"},{f:t=>Math.exp(-lh*t),col:"--exam",dash:"6 4"},{f:t=>Math.exp(-lam*t),col:"--muted",dash:"3 4"}],xl:"Meses",yl:"S(t)",label:"Función de supervivencia"})+legend([["--line","Kaplan-Meier"],["--exam","Exponencial estimada",1],["--muted","Verdadera",1]]);
+    $("km-o").innerHTML=stp(1,"Estimación con censura",`<div class="eq al">Kaplan-Meier: Ŝ(t) = Π (1 − dⱼ/nⱼ) · Exponencial: λ̂ = ${ev}/${d3(TT)} = ${d4(lh)}</div><p>Ignorar la censura (promediar solo las duraciones terminadas) sobreestima el riesgo (${d4(naive)}) porque descarta a quienes siguen desempleados al final, que son justo los de duraciones largas. La verosimilitud con censura usa a todos: los eventos aportan f(t) y los censurados S(t).</p>`)+rbox(`library(survival)\nkm <- survfit(Surv(t, evento) ~ 1, data = d); plot(km)\nexp_ <- survreg(Surv(t, evento) ~ 1, dist = "exponential", data = d)\nweib <- survreg(Surv(t, evento) ~ x, dist = "weibull", data = d)\ncox  <- coxph(Surv(t, evento) ~ x, data = d)`)};
+  bindCtl(["km-l","km-c","km-n"],run);run()};
+
+// ---------- Hoja de fórmulas
+SIMS.hoja=function(){
+  const F=[["MCO","Estimador","β̂ = (X'X)⁻¹X'y","lm()"],["MCO","Robusto","(X'X)⁻¹(Σeᵢ²xᵢxᵢ')(X'X)⁻¹","sandwich::vcovHC()"],["VI","MC2E","(X'P_Z X)⁻¹X'P_Z y","AER::ivreg()"],["VI","Instrumento débil","F de primera etapa < 10","summary(ivreg, diagnostics = TRUE)"],["GMM","Estimador","(X'ZWZ'X)⁻¹X'ZWZ'y; W óptima = Ŝ⁻¹","gmm::gmm()"],["GMM","J de Hansen","n·ḡ'Ŝ⁻¹ḡ ~ χ²(L − K)","gmm::specTest()"],["Panel","Efectos fijos","MCO sobre y − ȳᵢ, x − x̄ᵢ","plm(model = \"within\")"],["Panel","Efectos aleatorios","θ = 1 − √(σ²ε/(σ²ε + Tσ²α))","plm(model = \"random\")"],["Panel","Hausman","(b_FE − b_RE)'[V_FE − V_RE]⁻¹(b_FE − b_RE)","plm::phtest()"],["Panel dinámico","Arellano-Bond","Δy instrumentado con y_(t−2), y_(t−3), …","plm::pgmm()"],
+    ["Binaria","Probit","P = Φ(x'β); efecto φ(x'β)β","glm(binomial(\"probit\"))"],["Binaria","Logit","P = Λ(x'β); odds e^β","glm(binomial(\"logit\"))"],["Binaria","McFadden","1 − ln L/ln L₀",""],["Censura","Tobit","Σ_(y=0) ln[1 − Φ(x'β/σ)] + Σ_(y>0) ln[φ((y − x'β)/σ)/σ]","AER::tobit()"],["Selección","Heckman","E[y|s = 1] = x'β + ρσλ(z'γ)","sampleSelection::heckit()"],["Tratamiento","Descomposición","Diferencia de medias = ATT + sesgo de selección","MatchIt::matchit()"],["Duración","Kaplan-Meier","Ŝ(t) = Π(1 − dⱼ/nⱼ)","survival::survfit()"],["Duración","Exponencial","λ̂ = eventos/tiempo total","survreg(dist = \"exponential\")"],["Duración","Cox","h(t|x) = h₀(t)e^(x'β)","survival::coxph()"]];
+  $("sim").innerHTML=`<div class="calcf"><label for="h-q">Buscar<input id="h-q" type="search" placeholder="Por ejemplo: Hausman"></label></div><div class="tbl"><table id="h-t"></table></div>`;
+  const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th><th>En R</th></tr>`+(rows.length?rows.map(([a,b,c,r])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td><td class="mono">${r}</td></tr>`).join(""):`<tr><td colspan="4">No hay resultados.</td></tr>`)};
+  $("h-q").addEventListener("input",run);run()};
