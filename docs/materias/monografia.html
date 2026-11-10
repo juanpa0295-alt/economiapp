@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Monografía de Grado · Economiapp</title>
+<meta name="description" content="Guía para la monografía de grado: elegir el tema y el asesor, formular la propuesta, revisión de literatura, datos y estrategia empírica, estructura del documento, normas de citación, ética de la investigación y sustentación.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#264653;--line-soft:#d8e7ec}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#7fb3c4;--line-soft:#0d1d23}}
+:root[data-theme="dark"]{--line:#7fb3c4;--line-soft:#0d1d23}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Monografía de Grado</div>
+    <h1>Monografía de Grado</h1>
+    <p>Guía práctica para la monografía de grado (1503732). Se apoya en lo visto en <a href="fuentes-investigacion.html">Fuentes y Técnicas de Investigación</a>, <a href="lectoescritura.html">Lectoescritura Económica</a> y las rutas de econometría. Las normas específicas (formato, plazos, jurados) las fija el reglamento vigente de la Facultad: verifícalas con la coordinación del programa.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las etapas del trabajo de grado</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-mo-done";</script>
+<script src="monografia/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="monografia/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>

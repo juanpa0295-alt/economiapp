@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Economía y Políticas Públicas: Salud · Economiapp</title>
+<meta name="description" content="Programa 1503803 (opción I, énfasis en economía de la salud): salud y desarrollo, fallas de mercado en salud (Arrow), la Ley 100 de 1993, el aseguramiento, la Sentencia T-760 de 2008, la Ley 1438 de 2011 y la Ley Estatutaria 1751 de 2015, demanda de salud (Grossman), oferta, riesgo moral y selección adversa.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#0e7c7b;--line-soft:#d5efef}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#6fc2c1;--line-soft:#033534}}
+:root[data-theme="dark"]{--line:#6fc2c1;--line-soft:#033534}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Economía y Políticas Públicas: Salud</div>
+    <h1>Economía y Políticas Públicas: Salud</h1>
+    <p>Resumen y guía de estudio del programa 1503803, que en esta versión se centra en la economía de la salud como caso de política pública.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las unidades del programa</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-pps-done";</script>
+<script src="politicas-publicas-salud/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="politicas-publicas-salud/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>
