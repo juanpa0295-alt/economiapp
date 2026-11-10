@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Matemáticas II · Economiapp</title>
+<meta name="description" content="Programa 1504102: método de Newton, extremos, crecimiento y concavidad, valor medio, optimización económica, antiderivadas, sumas de Riemann, teorema fundamental, integración numérica, excedentes, crecimiento exponencial y cálculo de varias variables con Lagrange.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../comun/ruta.css">
+<style>
+/* color de la línea de esta materia */
+:root{--line:#9a3d22;--line-soft:#f5ddd3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#e69a7d;--line-soft:#3a1a10}}
+:root[data-theme="dark"]{--line:#e69a7d;--line-soft:#3a1a10}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{const l=document.getElementById("lesson");if(!l)return;
+    const crudo=()=>{const w=document.createTreeWalker(l,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(/\\\(|\\\[/.test(n.nodeValue)&&!n.parentElement.closest("pre,code,textarea,script,mjx-container"))return true;return false};
+    const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="../index.html">← Todas las materias</a>
+    <div class="lbl">Economiapp · Matemáticas II</div>
+    <h1>Matemáticas II</h1>
+    <p>El tronco sigue las cuatro unidades del programa (1504102): aplicaciones de la derivada, la integral definida, funciones trascendentes y funciones de varias variables. Las calculadoras usan SymPy en tu navegador: analizan la curva completa, integran mostrando cada regla y clasifican extremos de dos variables; otras son numéricas e interactivas, como Newton, Riemann, Simpson y las curvas de nivel.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco: las cuatro unidades del programa</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+<script>window.RUTA_KEY="ruta-mat2-done";</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.3/lib/browser/math.js"></script>
+<script src="../comun/simbolico.js"></script>
+<script src="matematicas-2/contenido.js"></script>
+<script src="../comun/ruta.js"></script>
+<script src="matematicas-2/laboratorios.js"></script>
+<script>RUTA_START();</script>
+</body>
+</html>
