@@ -1,0 +1,236 @@
+// Finanzas Corporativas · laboratorios interactivos
+// ===================== AYUDAS COMUNES DE LOS LABORATORIOS DE MICROECONOMÍA =====================
+const SIMS={};
+let CLIP=0;
+function plotXY({xr,yr,series=[],points=[],vlines=[],hlines=[],xl,yl,H=300,label,areas=[]}){
+  const W=600,f=frame(W,H,xr,yr,ticks(xr[0],xr[1],nice((xr[1]-xr[0])/5)),ticks(yr[0],yr[1],nice((yr[1]-yr[0])/4)),xl,yl),id="cp"+(++CLIP);
+  let b="";
+  areas.forEach(a=>{const d=a.pts.map(([x,y],i)=>(i?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(y).toFixed(1)).join("")+"Z";b+=`<path d="${d}" fill="var(${a.col})" fill-opacity="${a.op||.22}" stroke="none"/>`});
+  series.forEach(s=>{const pts=s.pts||[...Array(241)].map((_,i)=>{const x=xr[0]+(xr[1]-xr[0])*i/240;const y=s.f(x);return[x,y==null?NaN:y]});
+    let d="",pen=false;pts.forEach(([x,y])=>{if(!isFinite(y)){pen=false;return}d+=(pen?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(Math.max(yr[0]-(yr[1]-yr[0]),Math.min(yr[1]+(yr[1]-yr[0]),y))).toFixed(1);pen=true});
+    b+=`<path d="${d}" fill="none" stroke="var(${s.col||"--ink"})" stroke-width="${s.w||2.5}" ${s.dash?`stroke-dasharray="${s.dash}"`:""}/>`});
+  vlines.forEach(v=>b+=`<line x1="${f.sx(v.x)}" x2="${f.sx(v.x)}" y1="${f.sy(yr[0])}" y2="${f.sy(yr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  hlines.forEach(v=>b+=`<line y1="${f.sy(v.y)}" y2="${f.sy(v.y)}" x1="${f.sx(xr[0])}" x2="${f.sx(xr[1])}" stroke="var(${v.col||"--muted"})" stroke-width="${v.w||1.5}" stroke-dasharray="${v.dash||"5 4"}"/>`);
+  let p="";points.forEach(q=>{if(!isFinite(q.x)||!isFinite(q.y))return;const x=f.sx(q.x),y=f.sy(q.y),anc=x>W*.7?"end":"start";
+    p+=`<circle cx="${x}" cy="${y}" r="6" fill="var(${q.col||"--ink"})" stroke="var(--card)" stroke-width="2"/>${q.label?`<text x="${x+(anc==="end"?-9:9)}" y="${y-9}" font-size="12" font-weight="600" text-anchor="${anc}" fill="var(${q.col||"--ink"})">${q.label}</text>`:""}`});
+  return `<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label||"Gráfico"}"><defs><clipPath id="${id}"><rect x="${f.L}" y="${f.T}" width="${W-f.L-f.R}" height="${H-f.T-f.B}"/></clipPath></defs>${f.g}<g clip-path="url(#${id})">${b}</g>${p}</svg></div>`}
+const legend=items=>`<div class="legend">${items.map(([c,t,d])=>`<span><i style="background:var(${c})${d?";opacity:.55":""}"></i>${t}</span>`).join("")}</div>`;
+const okAll=a=>a.every(x=>isFinite(x)),n2=v=>fmt(v,2),n4=v=>fmt(v,4);
+const tabsBox=(id,opts)=>`<div style="margin-bottom:10px">${seg(id,"Herramienta",opts,opts[0][0])}</div><div id="${id}-b"></div>`;
+function tabsRun(id,M){const go=k=>M[k]();bindSeg(id,go);go(Object.keys(M)[0])}
+const nin=(id,l,v,st)=>`<label for="${id}">${l}<input type="number" id="${id}" value="${v}" ${st?`step="${st}"`:""} inputmode="decimal"></label>`;
+const N=id=>{const e=$(id);return e?parseFloat(String(e.value).replace(",",".")):NaN};
+const onIn=(ids,run)=>ids.forEach(id=>{const e=$(id);if(e)e.addEventListener("input",run)});
+
+
+
+// ===================== HERRAMIENTAS COMUNES DE LAS GUÍAS DE ESTUDIO =====================
+// Cada materia de tipo guía define en su contenido: GL (glosario), MCQ (preguntas de opción múltiple),
+// ABIERTAS (preguntas abiertas con esquema de respuesta) y TL (línea de tiempo), todas con el número de unidad.
+const GSTORE={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const gShuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+const gUnits=arr=>[...new Set(arr.map(x=>x.u))].sort((a,b)=>a-b);
+const gSeg=(id,arr,u0)=>seg(id,"Unidad",[["0","Todas"],...gUnits(arr).map(u=>[String(u),"Unidad "+u])],u0||"0");
+const gCurU=()=>{try{const id=decodeURIComponent(location.hash.slice(1)),x=[...TRUNK,...WORKSHOPS].find(t=>t.id===id);return x&&x.u?String(x.u):"0"}catch(e){return"0"}};
+const gUnitName=u=>(typeof UNIDADES!=="undefined"&&UNIDADES[u])?UNIDADES[u]:"Unidad "+u;
+
+// ---------- Tarjetas de conceptos
+SIMS.tarjetas=function(){
+  let u=gCurU(),ord=[],k=0,show=false;
+  $("sim").innerHTML=`${gSeg("tj-u",GL,u)}<div class="card-q" id="tj-card" aria-live="polite"></div>
+  <div class="chips pre"><button type="button" class="btn" id="tj-rev">Revelar definición</button><button type="button" class="btn" id="tj-next">Siguiente concepto</button></div>
+  <p class="hint" id="tj-pos"></p><details class="pdet"><summary><b>Ver el glosario completo</b></summary><dl class="glos" id="tj-all"></dl></details>`;
+  const pool=()=>GL.filter(g=>u==="0"||String(g.u)===u);
+  const shuffle=()=>{ord=gShuffle(pool().map((_,i)=>i));k=0;show=false};
+  const draw=()=>{const P=pool();if(!P.length){$("tj-card").innerHTML=`<p class="hint">No hay conceptos en esta unidad.</p>`;return}const g=P[ord[k]];
+    $("tj-card").innerHTML=`<p class="lbl">${esc(gUnitName(g.u))}</p><p class="gq">${g.t}</p>${show?`<p>${g.d}</p>`:`<p class="hint">Di o escribe tu definición en dos líneas y luego revélala.</p>`}`;
+    $("tj-pos").textContent=`Concepto ${k+1} de ${P.length}`;$("tj-rev").disabled=show;
+    $("tj-all").innerHTML=P.slice().sort((a,b)=>a.t.localeCompare(b.t,"es")).map(g=>`<dt>${g.t}</dt><dd>${g.d}</dd>`).join("")};
+  bindSeg("tj-u",v=>{u=v;shuffle();draw()});
+  $("tj-rev").onclick=()=>{show=true;draw()};
+  $("tj-next").onclick=()=>{k=(k+1)%ord.length;if(k===0)shuffle();show=false;draw()};
+  shuffle();draw()};
+
+// ---------- Autoevaluación de opción múltiple
+SIMS.quiz=function(){
+  let u=gCurU(),Q=[],ans={};
+  $("sim").innerHTML=`${gSeg("qz-u",MCQ,u)}<div class="res" id="qz-res"></div><div id="qz-l"></div><div class="chips pre"><button type="button" class="btn" id="qz-new">Barajar de nuevo</button></div>`;
+  const score=()=>{const n=Object.keys(ans).length,ok=Object.entries(ans).filter(([i,a])=>Q[i].ok===a).length;$("qz-res").innerHTML=tiles([["Respondidas",`${n} de ${Q.length}`],["Correctas",String(ok),n&&ok===n?"okt":""],["Puntaje",n?fmt(ok/n*5,1)+" / 5":"—"]])};
+  const draw=()=>{$("qz-l").innerHTML=Q.map((q,i)=>{const a=ans[i];return`<div class="stepc qz" data-i="${i}"><p class="lbl">${esc(gUnitName(q.u))}</p><p><b>${i+1}. ${q.q}</b></p><div class="qz-o">${q.o.map((o,j)=>`<button type="button" class="qz-b${a!==undefined?(j===q.ok?" ok":j===a?" no":""):""}" data-j="${j}"${a!==undefined?" disabled":""}>${String.fromCharCode(97+j)}) ${o}</button>`).join("")}</div>${a!==undefined?`<p class="qz-f ${a===q.ok?"qz-si":"qz-no"}"><b>${a===q.ok?"Correcto.":"No es esa."}</b> ${q.e}</p>`:""}</div>`}).join("");score()};
+  const nuevo=()=>{Q=gShuffle(MCQ.filter(q=>u==="0"||String(q.u)===u)).slice(0,10).map(q=>{const idx=gShuffle(q.o.map((_,j)=>j));return{...q,o:idx.map(j=>q.o[j]),ok:idx.indexOf(q.ok)}});ans={};draw()};
+  $("qz-l").addEventListener("click",e=>{const b=e.target.closest("button.qz-b");if(!b)return;const i=+b.closest(".qz").dataset.i;if(ans[i]!==undefined)return;ans[i]=+b.dataset.j;draw()});
+  bindSeg("qz-u",v=>{u=v;nuevo()});$("qz-new").onclick=nuevo;nuevo()};
+
+// ---------- Preguntas abiertas con esquema de respuesta
+SIMS.abiertas=function(){
+  const K="guia-"+(typeof GUIA_ID!=="undefined"?GUIA_ID:"x")+"-ab-";let u=gCurU();
+  $("sim").innerHTML=`${gSeg("ab-u",ABIERTAS,u)}<p class="hint">Escribe tu respuesta (se guarda en este navegador) y luego compárala con el esquema: una buena respuesta toca todas las ideas clave, con fechas y ejemplos.</p><div id="ab-l"></div>`;
+  const draw=()=>{const L=ABIERTAS.map((q,i)=>({...q,i})).filter(q=>u==="0"||String(q.u)===u);
+    $("ab-l").innerHTML=L.map(q=>`<div class="stepc"><p class="lbl">${esc(gUnitName(q.u))}</p><p><b>${q.q}</b></p><label class="vh" for="ab-t${q.i}">Tu respuesta</label><textarea id="ab-t${q.i}" rows="4" style="width:100%" placeholder="Tu respuesta…">${esc(GSTORE.get(K+q.i)||"")}</textarea><details class="pdet"><summary><b>Esquema de respuesta</b></summary><ul>${q.a.map(x=>`<li>${x}</li>`).join("")}</ul></details></div>`).join("");
+    L.forEach(q=>$("ab-t"+q.i).addEventListener("input",e=>GSTORE.set(K+q.i,e.target.value)))};
+  bindSeg("ab-u",v=>{u=v;draw()});draw()};
+
+// ---------- Línea de tiempo
+SIMS.tiempo=function(){
+  let u=gCurU();
+  $("sim").innerHTML=`${gSeg("tl-u",TL,u)}<div class="calcf"><label for="tl-q">Buscar en la línea de tiempo<input id="tl-q" type="search" placeholder="Por ejemplo: patrón oro"></label></div><ol class="tline" id="tl-l"></ol>`;
+  const nz=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  const draw=()=>{const q=nz($("tl-q").value.trim()),L=TL.filter(x=>(u==="0"||String(x.u)===u)&&(!q||nz(x.a+" "+x.t+" "+x.d).includes(q)));
+    $("tl-l").innerHTML=L.length?L.map(x=>`<li><span class="tl-a">${x.a}</span><div><b>${x.t}</b><br><span>${x.d}</span></div></li>`).join(""):`<li><span></span><div class="hint">No hay hechos con ese filtro.</div></li>`};
+  bindSeg("tl-u",v=>{u=v;draw()});$("tl-q").addEventListener("input",draw);draw()};
+
+
+// ===================== LABORATORIOS DE FINANZAS CORPORATIVAS =====================
+const f2=v=>isFinite(v)?fmt(Math.abs(v)<5e-3?0:v,2).replace(/^-/,"−"):"—",pc=v=>isFinite(v)?f2(v*100)+" %":"—",m0=v=>isFinite(v)?fmt(Math.round(v),0).replace(/^-/,"−"):"—";
+const tl=a=>tiles(a.map(([s,...r])=>[`<span class="nt">${s}</span>`,...r]));
+const fail=(p,m)=>{$(p+"-res").innerHTML=err(m);["-g","-o"].forEach(x=>{const e=document.getElementById(p+x);if(e&&e.tagName!=="INPUT")e.innerHTML=""})};
+const xl=s=>`<code class="xl">${s}</code>`;
+
+// ---------- Agencia
+SIMS.agencia=function(){
+  $("sim").innerHTML=`<p class="hint">El gerente posee una fracción α de la empresa. Cada peso de beneficios privados P (oficinas, viajes, empleados de más) cuesta un peso de valor, pero le da k·ln(P) de utilidad. Maximiza α(V₀ − P) + k·ln P ⟹ P* = k/α.</p>${ctl("ag-a","Participación del gerente α",0.05,1,0.05,1)}<div class="calcf">${nin("ag-v","Valor sin beneficios privados V₀",1000)}${nin("ag-k","Gusto por los beneficios privados k",20)}</div><div class="res" id="ag-res"></div><div id="ag-g"></div><div id="ag-o"></div>`;
+  const run=()=>{const a=V("ag-a"),V0=N("ag-v"),k=N("ag-k");if(!(V0>0&&k>=0))return fail("ag","datos no válidos.");const P=Math.min(V0,k/a),P1=Math.min(V0,k);
+    $("ag-res").innerHTML=tl([["Beneficios privados P*",f2(P)],["Valor de la empresa",f2(V0-P),a<1?"badt":"okt"],["Pérdida residual frente a α = 1",f2(P-P1),"badt"],["Costo para el gerente",f2(a*P)],["Costo para los demás accionistas",f2((1-a)*P)]]);
+    $("ag-g").innerHTML=plotXY({xr:[0.05,1],yr:[0,Math.min(V0,k/0.05)*1.05],series:[{f:x=>Math.min(V0,k/x),col:"--exam"}],points:[{x:a,y:P,label:"α actual"}],xl:"participación del gerente α",yl:"beneficios privados P*",label:"Dilución y costos de agencia"});
+    $("ag-o").innerHTML=stp(1,"Lectura",`<p>Con α = ${f2(a)}, el gerente solo soporta el ${pc(a)} del costo de cada peso de beneficios privados; el resto (${pc(1-a)}) lo pagan los otros accionistas. Por eso consume más: P* = k/α = ${f2(P)}. Cuando el dueño-gerente vende acciones (α baja), el problema crece: es la dilución de Jensen y Meckling. Los compradores lo anticipan y pagan menos por las acciones, así que el costo termina recayendo en el gerente: de ahí su interés en vincularse (garantías, auditorías, remuneración con acciones).</p>`)};
+  bindCtl(["ag-a"],run);onIn(["ag-v","ag-k"],run);run()};
+
+// ---------- Ciclo de efectivo y PDC
+SIMS.ccc=function(){
+  $("sim").innerHTML=`<div class="calcf">${nin("cc-v","Ventas anuales",12000)}${nin("cc-cv","Costo de ventas",7200)}${nin("cc-co","Compras anuales",7500)}${nin("cc-x","Cartera (cuentas por cobrar)",1800)}${nin("cc-i","Inventarios",1400)}${nin("cc-p","Proveedores",900)}${nin("cc-e","EBITDA",1800)}${nin("cc-g","Crecimiento esperado de ventas (%)",20,"1")}</div><div class="res" id="cc-res"></div><div id="cc-o"></div>`;
+  const run=()=>{const[v,cv,co,x,i,p,e,g]=["cc-v","cc-cv","cc-co","cc-x","cc-i","cc-p","cc-e","cc-g"].map(N);if(![v,cv,co].every(z=>z>0)||![x,i,p,e,g].every(isFinite))return fail("cc","datos no válidos.");
+    const di=i/cv*365,dc=x/v*365,dp=p/co*365,cce=di+dc-dp,kt=x+i-p,pkt=kt/v,me=e/v,pdc=me/pkt,dv=v*g/100,nkt=dv*pkt,ne=dv*me;
+    $("cc-res").innerHTML=tl([["Días de inventario",fmt(di,1)],["Días de cartera",fmt(dc,1)],["Días de proveedores",fmt(dp,1)],["Ciclo de efectivo",fmt(cce,1)+" días","okt"],["KTNO",m0(kt)],["PKT",f2(pkt)],["Margen EBITDA",pc(me)],["Palanca de crecimiento",f2(pdc),pdc>=1?"okt":"badt"]]);
+    $("cc-o").innerHTML=stp(1,"Cálculo",`<div class="eq al">Inventario: ${m0(i)}/${m0(cv)}·365 = ${fmt(di,1)} · Cartera: ${m0(x)}/${m0(v)}·365 = ${fmt(dc,1)} · Proveedores: ${m0(p)}/${m0(co)}·365 = ${fmt(dp,1)}<br>CCE = ${fmt(di,1)} + ${fmt(dc,1)} − ${fmt(dp,1)} = <b>${fmt(cce,1)} días</b><br>KTNO = ${m0(x)} + ${m0(i)} − ${m0(p)} = ${m0(kt)} · PKT = ${m0(kt)}/${m0(v)} = ${f2(pkt)} · PDC = ${pc(me)}/${f2(pkt)} = <b>${f2(pdc)}</b></div>`)
+      +stp(2,"¿Qué pasa si las ventas crecen?",`<p>Con un crecimiento de ${f2(g)} % (${m0(dv)} más de ventas), la empresa necesita ${m0(nkt)} adicionales de capital de trabajo y genera ${m0(ne)} adicionales de EBITDA. ${pdc>=1?"El EBITDA cubre el capital de trabajo: el crecimiento se autofinancia.":`Falta ${m0(nkt-ne)}: crecer le exige financiamiento externo o mejorar la rotación de cartera e inventarios. Es el caso de empresas rentables que se quedan sin caja al crecer.`}</p><p class="hint">En Excel: =C/V*365 para los días; =EBITDA/V/(KTNO/V) para la palanca.</p>`)};
+  onIn(["cc-v","cc-cv","cc-co","cc-x","cc-i","cc-p","cc-e","cc-g"],run);run()};
+
+// ---------- Crédito comercial, EOQ, Baumol y políticas
+SIMS.credito=function(){
+  $("sim").innerHTML=tabsBox("cr",[["desc","Descuento por pronto pago"],["pol","Políticas de financiación"],["eoq","Lote económico"],["bau","Saldo de efectivo (Baumol)"]]);const B=$("cr-b");
+  tabsRun("cr",{
+   desc(){B.innerHTML=`<div class="calcf">${nin("cd-d","Descuento d (%)",2,"0.5")}${nin("cd-dp","Días del descuento",10,"1")}${nin("cd-n","Plazo neto N (días)",30,"1")}${nin("cd-b","Tasa del crédito bancario (% E.A.)",18,"0.5")}</div><div class="res" id="cd-res"></div><div id="cd-o"></div>`;
+    const run=()=>{const[d0,dp,n,b]=["cd-d","cd-dp","cd-n","cd-b"].map(N);if(!(d0>0&&d0<100&&n>dp))return fail("cd","el plazo neto debe superar los días del descuento.");const d=d0/100,r=d/(1-d),nom=r*365/(n-dp),ef=Math.pow(1+r,365/(n-dp))-1;
+      $("cd-res").innerHTML=tl([["Costo por periodo",pc(r)],["Costo nominal anual",pc(nom)],["Costo efectivo anual",pc(ef),"okt"],["Decisión",ef>b/100?"tomar el descuento (endeudarse en el banco si hace falta)":"no tomar el descuento",ef>b/100?"okt":""]]);
+      $("cd-o").innerHTML=stp(1,"Cálculo",`<div class="eq al">d/(1 − d) = ${f2(d*100)}/${f2(100-d0)} = ${pc(r)} por ${f2(n-dp)} días<br>Nominal = ${pc(r)}·365/${f2(n-dp)} = ${pc(nom)} · Efectivo = (1 + ${f2(r)})^(365/${f2(n-dp)}) − 1 = <b>${pc(ef)}</b></div><p class="hint">En Excel: =(1+d/(1-d))^(365/(N-DP))-1. No tomar el descuento equivale a pedir prestado el ${pc(1-d)} de la factura durante ${f2(n-dp)} días pagando el ${pc(d)}.</p>`)};
+    onIn(["cd-d","cd-dp","cd-n","cd-b"],run);run()},
+   pol(){B.innerHTML=`<p class="hint">Activos corrientes a lo largo del año: una parte permanente más un pico estacional. Compara cuánto se financia con corto y largo plazo.</p>${ctl("pp-p","Activos corrientes permanentes",100,1000,10,400)}${ctl("pp-e","Pico estacional",0,600,10,300)}${ctl("pp-l","Financiación de largo plazo (incluye activos fijos de 500)",500,2000,10,900)}<div class="calcf">${nin("pp-cs","Costo del corto plazo (%)",14,"0.5")}${nin("pp-cl","Costo del largo plazo (%)",17,"0.5")}</div><div class="res" id="pp-res"></div><div id="pp-g"></div>`;
+    const run=()=>{const p=V("pp-p"),e=V("pp-e"),L=V("pp-l"),cs=N("pp-cs")/100,cl=N("pp-cl")/100,AF=500,need=m=>AF+p+e*Math.max(0,Math.sin(Math.PI*(m-1)/11)),ms=[...Array(12)].map((_,i)=>i+1),cp=ms.map(m=>Math.max(0,need(m)-L)),ex=ms.map(m=>Math.max(0,L-need(m)));
+      const tipo=L>AF+p+e*.99?"conservadora":L<AF+p-1?"agresiva":Math.abs(L-(AF+p))<=1?"de calce":"conservadora moderada",costo=L*cl+cp.reduce((s,v)=>s+v,0)/12*cs-ex.reduce((s,v)=>s+v,0)/12*cs*0;
+      $("pp-res").innerHTML=tl([["Política",tipo,"okt"],["Crédito de corto plazo promedio",m0(cp.reduce((s,v)=>s+v,0)/12)],["Excedente de liquidez promedio",m0(ex.reduce((s,v)=>s+v,0)/12)],["Costo financiero anual aproximado",m0(costo)]]);
+      $("pp-g").innerHTML=plotXY({xr:[1,12],yr:[0,AF+p+e+300],series:[{f:need,col:"--line"},{f:()=>L,col:"--exam",dash:"6 4"},{f:()=>AF+p,col:"--muted",dash:"2 3",w:1.5}],xl:"mes",yl:"activos y financiación",label:"Política de capital de trabajo"})+legend([["--line","Activos totales (fijos + corrientes)"],["--exam","Financiación de largo plazo",1],["--muted","Activos fijos + corrientes permanentes",1]])+`<p class="hint">Por encima de la línea de largo plazo, la empresa usa crédito de corto plazo; por debajo, le sobra liquidez que debe invertir. Con calce, la línea de largo plazo coincide con la punteada gris.</p>`};
+    bindCtl(["pp-p","pp-e","pp-l"],run);onIn(["pp-cs","pp-cl"],run);run()},
+   eoq(){B.innerHTML=`<div class="calcf">${nin("eo-d","Demanda anual D (unidades)",12000)}${nin("eo-s","Costo por pedido S",150)}${nin("eo-h","Costo anual de mantener una unidad H",3)}</div><div class="res" id="eo-res"></div><div id="eo-g"></div>`;
+    const run=()=>{const[D,S,H]=["eo-d","eo-s","eo-h"].map(N);if(!(D>0&&S>0&&H>0))return fail("eo","datos positivos.");const Q=Math.sqrt(2*D*S/H),CT=q=>D/q*S+q/2*H;
+      $("eo-res").innerHTML=tl([["Lote económico Q*",m0(Q),"okt"],["Pedidos al año",f2(D/Q)],["Costo total mínimo",m0(CT(Q))]]);
+      $("eo-g").innerHTML=plotXY({xr:[Q*.2,Q*3],yr:[0,CT(Q*.2)*1.05],series:[{f:CT,col:"--line"},{f:q=>D/q*S,col:"--exam",dash:"6 4",w:1.6},{f:q=>q/2*H,col:"--good",dash:"6 4",w:1.6}],points:[{x:Q,y:CT(Q),label:"Q*"}],xl:"tamaño del pedido Q",yl:"costo anual",label:"Lote económico"})+legend([["--line","Costo total"],["--exam","Costo de pedir",1],["--good","Costo de mantener",1]])+`<p class="hint">Q* = √(2DS/H) = √(2·${m0(D)}·${m0(S)}/${f2(H)}). En el óptimo, el costo de pedir iguala al de mantener.</p>`};
+    onIn(["eo-d","eo-s","eo-h"],run);run()},
+   bau(){B.innerHTML=`<div class="calcf">${nin("ba-t","Necesidad anual de efectivo T",2400000)}${nin("ba-b","Costo fijo por conversión b",20)}${nin("ba-i","Rentabilidad de las inversiones temporales i (%)",9,"0.5")}</div><div class="res" id="ba-res"></div>`;
+    const run=()=>{const[T,b,i0]=["ba-t","ba-b","ba-i"].map(N),i=i0/100;if(!(T>0&&b>0&&i>0))return fail("ba","datos positivos.");const C=Math.sqrt(2*b*T/i);
+      $("ba-res").innerHTML=tl([["Retiro óptimo C*",m0(C),"okt"],["Saldo promedio de efectivo",m0(C/2)],["Conversiones al año",f2(T/C)],["Costo total",m0(T/C*b+C/2*i)]])+`<p class="hint">C* = √(2bT/i): el mismo razonamiento del lote económico, donde el «inventario» es el efectivo y el costo de mantenerlo es el rendimiento que se deja de ganar.</p>`};
+    onIn(["ba-t","ba-b","ba-i"],run);run()}})};
+
+// ---------- Apalancamiento
+SIMS.apal=function(){
+  $("sim").innerHTML=tabsBox("ap",[["gr","Grados de apalancamiento"],["ind","UAII-UPA"]]);const B=$("ap-b");
+  tabsRun("ap",{
+   gr(){B.innerHTML=`<div class="calcf">${nin("ga-q","Unidades vendidas",10000)}${nin("ga-p","Precio unitario",50)}${nin("ga-cv","Costo variable unitario",30)}${nin("ga-cf","Costos fijos operativos",120000)}${nin("ga-i","Intereses",30000)}${nin("ga-t","Tasa de impuestos (%)",35,"1")}${nin("ga-n","Acciones en circulación",10000)}${nin("ga-dv","Variación de ventas a simular (%)",10,"1")}</div><div class="res" id="ga-res"></div><div id="ga-o"></div>`;
+    const run=()=>{const[q,p,cv,cf,I,t0,n,dv]=["ga-q","ga-p","ga-cv","ga-cf","ga-i","ga-t","ga-n","ga-dv"].map(N),t=t0/100;if(!(q>0&&n>0))return fail("ga","datos no válidos.");
+      const er=Q=>{const mc=Q*(p-cv),uaii=mc-cf,upa=(uaii-I)*(1-t)/n;return{mc,uaii,upa}},a=er(q),b=er(q*(1+dv/100)),gao=a.mc/a.uaii,gaf=a.uaii/(a.uaii-I),pe=cf/(p-cv);
+      $("ga-res").innerHTML=tl([["UAII",m0(a.uaii)],["UPA",f2(a.upa)],["GAO",f2(gao),"okt"],["GAF",f2(gaf),"okt"],["GAT",f2(gao*gaf),"okt"],["Punto de equilibrio operativo",m0(pe)+" unidades"]]);
+      $("ga-o").innerHTML=stp(1,"Cálculo",`<div class="eq al">MC = ${m0(q)}·(${f2(p)} − ${f2(cv)}) = ${m0(a.mc)} · UAII = ${m0(a.mc)} − ${m0(cf)} = ${m0(a.uaii)}<br>GAO = MC/UAII = ${f2(gao)} · GAF = UAII/(UAII − I) = ${m0(a.uaii)}/${m0(a.uaii-I)} = ${f2(gaf)} · GAT = ${f2(gao*gaf)}</div>`)
+        +stp(2,`Comprobación con ventas ${dv>=0?"+":""}${f2(dv)} %`,`<div class="tbl"><table><tr><th></th><th>Base</th><th>Nuevo</th><th>Cambio %</th><th>Predicho</th></tr><tr><td>Ventas (unidades)</td><td>${m0(q)}</td><td>${m0(q*(1+dv/100))}</td><td>${f2(dv)} %</td><td>—</td></tr><tr><td>UAII</td><td>${m0(a.uaii)}</td><td>${m0(b.uaii)}</td><td>${pc(b.uaii/a.uaii-1)}</td><td>GAO × ${f2(dv)} % = ${f2(gao*dv)} %</td></tr><tr><td>UPA</td><td>${f2(a.upa)}</td><td>${f2(b.upa)}</td><td>${pc(b.upa/a.upa-1)}</td><td>GAT × ${f2(dv)} % = ${f2(gao*gaf*dv)} %</td></tr></table></div>`)};
+    onIn(["ga-q","ga-p","ga-cv","ga-cf","ga-i","ga-t","ga-n","ga-dv"],run);run()},
+   ind(){B.innerHTML=`<p class="hint">Plan A: más acciones. Plan B: más deuda.</p><div class="calcf">${nin("ui-i1","Intereses plan A",20000)}${nin("ui-n1","Acciones plan A",15000)}${nin("ui-i2","Intereses plan B",80000)}${nin("ui-n2","Acciones plan B",10000)}${nin("ui-t","Impuestos (%)",35,"1")}${nin("ui-e","UAII esperada",300000)}</div><div class="res" id="ui-res"></div><div id="ui-g"></div>`;
+    const run=()=>{const[i1,n1,i2,n2,t0,E]=["ui-i1","ui-n1","ui-i2","ui-n2","ui-t","ui-e"].map(N),t=t0/100;if(!(n1>0&&n2>0)||n1===n2)return fail("ui","el número de acciones debe ser positivo y distinto entre planes.");
+      const u1=x=>(x-i1)*(1-t)/n1,u2=x=>(x-i2)*(1-t)/n2,X=(i2*n1-i1*n2)/(n1-n2);
+      $("ui-res").innerHTML=tl([["UAII de indiferencia",m0(X),"okt"],["UPA en ese punto",f2(u1(X))],["UPA plan A con la UAII esperada",f2(u1(E))],["UPA plan B con la UAII esperada",f2(u2(E))],["Mejor plan",u2(E)>u1(E)?"B (deuda)":"A (acciones)","okt"]]);
+      const xm=Math.max(E,X)*1.5;$("ui-g").innerHTML=plotXY({xr:[0,xm],yr:[Math.min(u1(0),u2(0)),Math.max(u1(xm),u2(xm))],series:[{f:u1,col:"--line"},{f:u2,col:"--exam"}],points:[{x:X,y:u1(X),label:"indiferencia"}],vlines:[{x:E,col:"--good"}],hlines:[{y:0,col:"--muted"}],xl:"UAII",yl:"UPA",label:"Análisis UAII-UPA"})+legend([["--line","Plan A (acciones)"],["--exam","Plan B (deuda)"],["--good","UAII esperada"]])+`<p class="hint">UAII* = (I₂N₁ − I₁N₂)/(N₁ − N₂). La recta del plan con deuda es más empinada: por encima del punto de indiferencia gana, por debajo pierde.</p>`};
+    onIn(["ui-i1","ui-n1","ui-i2","ui-n2","ui-t","ui-e"],run);run()}})};
+
+// ---------- Costo de las fuentes
+SIMS.ke=function(){
+  $("sim").innerHTML=tabsBox("k",[["capm","CAPM y beta"],["gor","Gordon"],["kd","Deuda"]]);const B=$("k-b");
+  tabsRun("k",{
+   capm(){B.innerHTML=`<div class="calcf">${nin("kc-rf","Tasa libre de riesgo rf (%)",4.5,"0.1")}${nin("kc-pm","Prima de mercado Rm − rf (%)",6,"0.1")}${nin("kc-rp","Prima de riesgo país (%)",2.5,"0.1")}${nin("kc-bu","Beta desapalancada βU (comparables)",0.8,"0.05")}${nin("kc-de","D/E de la empresa",0.6,"0.05")}${nin("kc-t","Impuestos (%)",35,"1")}</div><div class="res" id="kc-res"></div><div id="kc-o"></div>`;
+    const run=()=>{const[rf,pm,rp,bu,de,t0]=["kc-rf","kc-pm","kc-rp","kc-bu","kc-de","kc-t"].map(N),t=t0/100;if(![rf,pm,rp,bu,de,t].every(isFinite))return fail("kc","faltan datos.");const bl=bu*(1+(1-t)*de),ke=rf+bl*pm+rp;
+      $("kc-res").innerHTML=tl([["Beta apalancada βL",f2(bl)],["Ke (CAPM + riesgo país)",f2(ke)+" %","okt"],["Ke sin deuda (Ku)",f2(rf+bu*pm+rp)+" %"]]);
+      $("kc-o").innerHTML=stp(1,"Cálculo",`<div class="eq al">βL = βU[1 + (1 − t)D/E] = ${f2(bu)}[1 + ${f2(1-t)}·${f2(de)}] = ${f2(bl)}<br>Ke = rf + βL(Rm − rf) + RP = ${f2(rf)} + ${f2(bl)}·${f2(pm)} + ${f2(rp)} = <b>${f2(ke)} %</b></div><p class="hint">En Excel: =rf+bu*(1+(1-t)*DE)*pm+rp. Si las tasas de referencia están en dólares, el Ke resultante es en dólares; para pasarlo a pesos se ajusta por la diferencia de inflación esperada: (1 + Ke_USD)(1 + π_COP)/(1 + π_USD) − 1.</p>`)};
+    onIn(["kc-rf","kc-pm","kc-rp","kc-bu","kc-de","kc-t"],run);run()},
+   gor(){B.innerHTML=`<div class="calcf">${nin("kg-d0","Dividendo recién pagado D₀",500)}${nin("kg-g","Crecimiento g (%)",5,"0.1")}${nin("kg-p","Precio de la acción P₀",8000)}${nin("kg-f","Costo de emisión (% del precio, para acciones nuevas)",0,"0.5")}</div><div class="res" id="kg-res"></div>`;
+    const run=()=>{const[d0,g0,P,f0]=["kg-d0","kg-g","kg-p","kg-f"].map(N),g=g0/100,f=f0/100;if(!(P>0))return fail("kg","precio positivo.");const d1=d0*(1+g),ke=d1/(P*(1-f))+g;
+      $("kg-res").innerHTML=tl([["D₁ = D₀(1 + g)",f2(d1)],["Ke",pc(ke),"okt"]])+`<p class="hint">Ke = D₁/[P₀(1 − f)] + g = ${f2(d1)}/${m0(P*(1-f))} + ${pc(g)}. Solo es válido si g es estable y menor que Ke.</p>`};
+    onIn(["kg-d0","kg-g","kg-p","kg-f"],run);run()},
+   kd(){B.innerHTML=`<div class="calcf">${nin("kd-r","Tasa nominal del crédito (%)",14,"0.1")}${nin("kd-m","Capitalizaciones por año",12,"1")}${nin("kd-t","Impuestos (%)",35,"1")}</div><div class="res" id="kd-res"></div>`;
+    const run=()=>{const[r,m,t0]=["kd-r","kd-m","kd-t"].map(N);if(!(m>0))return fail("kd","capitalizaciones positivas.");const ea=Math.pow(1+r/100/m,m)-1;
+      $("kd-res").innerHTML=tl([["Kd efectiva anual",pc(ea)],["Kd después de impuestos",pc(ea*(1-t0/100)),"okt"]])+`<p class="hint">En Excel: =INT.EFECTIVO(${f2(r)}%;${m0(m)}) y luego ×(1 − t).</p>`};
+    onIn(["kd-r","kd-m","kd-t"],run);run()}})};
+
+// ---------- WACC y estructura
+SIMS.wacc=function(){
+  $("sim").innerHTML=tabsBox("w",[["calc","WACC"],["mm","Estructura de capital"]]);const B=$("w-b");
+  tabsRun("w",{
+   calc(){B.innerHTML=`<div class="calcf">${nin("wc-e","Patrimonio a valor de mercado E",600)}${nin("wc-ke","Ke (%)",15,"0.1")}${nin("wc-d","Deuda D",400)}${nin("wc-kd","Kd antes de impuestos (%)",10,"0.1")}${nin("wc-p","Acciones preferentes P",0)}${nin("wc-kp","Kp (%)",12,"0.1")}${nin("wc-t","Impuestos (%)",35,"1")}</div><div class="res" id="wc-res"></div><div id="wc-o"></div>`;
+    const run=()=>{const[E,ke,D,kd,P,kp,t]=["wc-e","wc-ke","wc-d","wc-kd","wc-p","wc-kp","wc-t"].map(N);const Vt=E+D+P;if(!(Vt>0))return fail("wc","la suma de las fuentes debe ser positiva.");const w=(E*ke+D*kd*(1-t/100)+P*kp)/Vt;
+      $("wc-res").innerHTML=tl([["E/V",pc(E/Vt)],["D/V",pc(D/Vt)],["WACC",f2(w)+" %","okt"]]);
+      $("wc-o").innerHTML=stp(1,"Cálculo",`<div class="tbl"><table><tr><th>Fuente</th><th>Monto</th><th>Peso</th><th>Costo</th><th>Costo después de impuestos</th><th>Aporte</th></tr><tr><td>Patrimonio</td><td>${m0(E)}</td><td>${pc(E/Vt)}</td><td>${f2(ke)} %</td><td>${f2(ke)} %</td><td>${f2(E/Vt*ke)} %</td></tr><tr><td>Deuda</td><td>${m0(D)}</td><td>${pc(D/Vt)}</td><td>${f2(kd)} %</td><td>${f2(kd*(1-t/100))} %</td><td>${f2(D/Vt*kd*(1-t/100))} %</td></tr>${P?`<tr><td>Preferentes</td><td>${m0(P)}</td><td>${pc(P/Vt)}</td><td>${f2(kp)} %</td><td>${f2(kp)} %</td><td>${f2(P/Vt*kp)} %</td></tr>`:""}<tr><td colspan="5"><b>WACC</b></td><td><b>${f2(w)} %</b></td></tr></table></div><p class="hint">En Excel: =SUMAPRODUCTO(pesos; costos después de impuestos).</p>`)};
+    onIn(["wc-e","wc-ke","wc-d","wc-kd","wc-p","wc-kp","wc-t"],run);run()},
+   mm(){B.innerHTML=`${ctl("mm-ku","Ku: costo del capital sin deuda (%)",6,25,0.5,14)}${ctl("mm-kd","Kd (%)",3,20,0.5,9)}${ctl("mm-t","Impuestos (%)",0,50,1,35)}${ctl("mm-q","Costo de quiebra: intensidad",0,3,0.1,1)}<div class="res" id="mm-res"></div><div id="mm-g"></div>`;
+    const run=()=>{const ku=V("mm-ku"),kd=V("mm-kd"),t=V("mm-t")/100,q=V("mm-q"),dv=x=>x;const ke=x=>ku+(ku-kd)*(1-t)*x/(1-x),w0=x=>(1-x)*ke(x)+x*kd*(1-t),wq=x=>w0(x)+q*Math.pow(x,3)*8;
+      let best=0,bv=1e9;for(let x=0;x<=0.9;x+=0.005){if(wq(x)<bv){bv=wq(x);best=x}}
+      $("mm-res").innerHTML=tl([["WACC sin deuda",f2(ku)+" %"],["WACC con D/V = 50 % (MM con impuestos)",f2(w0(.5))+" %"],["Estructura óptima con costos de quiebra",pc(best)+" de deuda","okt"],["WACC mínimo",f2(bv)+" %"]]);
+      $("mm-g").innerHTML=plotXY({xr:[0,0.9],yr:[0,Math.max(ke(.8),ku)*1.1],series:[{f:ke,col:"--exam"},{f:x=>kd*(1-t),col:"--muted",dash:"5 4",w:1.6},{f:w0,col:"--line",dash:"6 4"},{f:wq,col:"--line"}],points:[{x:best,y:bv,label:"óptimo"}],xl:"D/V",yl:"costo (%)",label:"Estructura de capital"})+legend([["--exam","Ke (MM con impuestos)"],["--muted","Kd(1 − t)",1],["--line","WACC de MM con impuestos",1],["--line","WACC con costos de quiebra"]])+`<p class="hint">MM con impuestos: Ke = Ku + (Ku − Kd)(1 − t)D/E y el WACC cae sin límite con la deuda. Al agregar costos de quiebra crecientes (forma ilustrativa), aparece un óptimo interior: la teoría del equilibrio.</p>`};
+    bindCtl(["mm-ku","mm-kd","mm-t","mm-q"],run);run()}})};
+
+// ---------- EVA
+SIMS.eva=function(){
+  $("sim").innerHTML=`<div class="calcf">${nin("ev-u","UAII",180)}${nin("ev-t","Impuestos (%)",35,"1")}${nin("ev-k","KTNO",300)}${nin("ev-a","Activos fijos netos",700)}${nin("ev-w","WACC (%)",11,"0.1")}${nin("ev-g","Crecimiento del EVA a perpetuidad para el MVA (%)",0,"0.5")}</div><div class="res" id="ev-res"></div><div id="ev-o"></div>`;
+  const run=()=>{const[u,t,k,a,w0,g0]=["ev-u","ev-t","ev-k","ev-a","ev-w","ev-g"].map(N),w=w0/100,g=g0/100,C=k+a;if(!(C>0)||!(w>g))return fail("ev","el capital debe ser positivo y el WACC mayor que g.");const no=u*(1-t/100),roic=no/C,eva=no-w*C,mva=eva*(1+g)/(w-g);
+    $("ev-res").innerHTML=tl([["UODI (NOPAT)",f2(no)],["Capital operativo",m0(C)],["ROIC",pc(roic)],["WACC",pc(w)],["EVA",f2(eva),eva>=0?"okt":"badt"],["MVA",f2(mva),mva>=0?"okt":"badt"]]);
+    $("ev-o").innerHTML=stp(1,"Cálculo",`<div class="eq al">UODI = ${f2(u)}·(1 − ${f2(t/100)}) = ${f2(no)} · ROIC = ${f2(no)}/${m0(C)} = ${pc(roic)}<br>EVA = UODI − WACC·Capital = ${f2(no)} − ${f2(w)}·${m0(C)} = <b>${f2(eva)}</b> = (${pc(roic)} − ${pc(w)})·${m0(C)}<br>MVA = EVA(1 + g)/(WACC − g) = ${f2(mva)}</div><p>${eva>=0?"El ROIC supera al WACC: la empresa crea valor; crecer con proyectos de la misma rentabilidad lo aumenta.":"El ROIC es menor que el WACC: la empresa destruye valor aunque tenga utilidades contables; crecer así empeora el problema."}</p>`)};
+  onIn(["ev-u","ev-t","ev-k","ev-a","ev-w","ev-g"],run);run()};
+
+// ---------- Valoración por FCD
+SIMS.dcf=function(){
+  $("sim").innerHTML=`<p class="hint">Proyección de 5 años. Ventas que crecen a una tasa constante; márgenes y necesidades de inversión como porcentaje de las ventas.</p><div class="calcf">${nin("dc-v","Ventas del año 0",10000)}${nin("dc-gv","Crecimiento de ventas años 1 a 5 (%)",8,"0.5")}${nin("dc-m","Margen UAII (%)",15,"0.5")}${nin("dc-t","Impuestos (%)",35,"1")}${nin("dc-dp","Depreciación (% de ventas)",4,"0.5")}${nin("dc-cx","Inversión en activos fijos (% de ventas)",6,"0.5")}${nin("dc-pk","PKT: KTNO/ventas (%)",20,"1")}${nin("dc-w","WACC (%)",12,"0.1")}${nin("dc-g","g a perpetuidad (%)",3.5,"0.1")}${nin("dc-dn","Deuda financiera neta",2500)}${nin("dc-n","Acciones",1000)}</div><div class="res" id="dc-res"></div><div id="dc-o"></div>`;
+  const run=()=>{const[v0,gv0,m0p,t0,dp0,cx0,pk0,w0,g0,dn,na]=["dc-v","dc-gv","dc-m","dc-t","dc-dp","dc-cx","dc-pk","dc-w","dc-g","dc-dn","dc-n"].map(N);const[gv,mg,t,dp,cx,pk,w,g]=[gv0,m0p,t0,dp0,cx0,pk0,w0,g0].map(x=>x/100);if(!(w>g))return fail("dc","el WACC debe ser mayor que g.");
+    const rows=[];let vPrev=v0;for(let y=1;y<=6;y++){const v=y<=5?vPrev*(1+gv):vPrev*(1+g),no=v*mg*(1-t),d=v*dp,c=v*cx,dk=(v-vPrev)*pk,fcl=no+d-c-dk;rows.push({y,v,no,d,c,dk,fcl,df:Math.pow(1+w,-Math.min(y,5))});vPrev=v}
+    const pv=rows.slice(0,5).reduce((s,r)=>s+r.fcl*r.df,0),tv=rows[5].fcl/(w-g),pvtv=tv*rows[4].df,ev=pv+pvtv,eq=ev-dn;
+    $("dc-res").innerHTML=tl([["VP de los flujos (años 1 a 5)",m0(pv)],["Valor terminal en el año 5",m0(tv)],["VP del valor terminal",m0(pvtv)],["Valor de la empresa",m0(ev),"okt"],["Peso del valor terminal",pc(pvtv/ev)],["Valor del patrimonio",m0(eq),"okt"],["Valor por acción",f2(eq/na)],["EV/EBITDA implícito (año 1)",f2(ev/(rows[0].v*mg+rows[0].d))]]);
+    $("dc-o").innerHTML=stp(1,"Flujo de caja libre",`<div class="tbl"><table><tr><th>Año</th>${rows.map(r=>`<th>${r.y}${r.y===6?" (base VT)":""}</th>`).join("")}</tr><tr><td>Ventas</td>${rows.map(r=>`<td>${m0(r.v)}</td>`).join("")}</tr><tr><td>UODI</td>${rows.map(r=>`<td>${m0(r.no)}</td>`).join("")}</tr><tr><td>+ Depreciación</td>${rows.map(r=>`<td>${m0(r.d)}</td>`).join("")}</tr><tr><td>− Inversión en activos fijos</td>${rows.map(r=>`<td>${m0(r.c)}</td>`).join("")}</tr><tr><td>− Aumento del KTNO</td>${rows.map(r=>`<td>${m0(r.dk)}</td>`).join("")}</tr><tr><td><b>FCL</b></td>${rows.map(r=>`<td><b>${m0(r.fcl)}</b></td>`).join("")}</tr><tr><td>Factor de descuento</td>${rows.slice(0,5).map(r=>`<td>${fmt(r.df,4)}</td>`).join("")}<td>—</td></tr></table></div>`)
+      +stp(2,"Valor",`<div class="eq al">VT = FCL₆/(WACC − g) = ${m0(rows[5].fcl)}/(${pc(w)} − ${pc(g)}) = ${m0(tv)}<br>VE = Σ FCLₜ/(1 + WACC)^t + VT/(1 + WACC)⁵ = ${m0(pv)} + ${m0(pvtv)} = <b>${m0(ev)}</b><br>Patrimonio = VE − deuda neta = ${m0(ev)} − ${m0(dn)} = <b>${m0(eq)}</b></div><p class="hint">En Excel: =VNA(WACC; FCL1:FCL5) + VT/(1+WACC)^5. ${pvtv/ev>.7?"El valor terminal pesa más del 70 %: el resultado es muy sensible a g y al WACC.":""}</p>`)};
+  onIn(["dc-v","dc-gv","dc-m","dc-t","dc-dp","dc-cx","dc-pk","dc-w","dc-g","dc-dn","dc-n"],run);run()};
+
+// ---------- Dividendos
+SIMS.div=function(){
+  $("sim").innerHTML=tabsBox("dv",[["lin","Modelo de Lintner"],["mm","Dividendo o recompra (MM)"]]);const B=$("dv-b");
+  tabsRun("dv",{
+   lin(){B.innerHTML=`${ctl("li-p","Razón de pago objetivo p",0.1,1,0.05,0.5)}${ctl("li-c","Velocidad de ajuste c",0.05,1,0.05,0.3)}<div class="calcf"><label for="li-e">Utilidades por acción por año (una por línea)<textarea id="li-e" rows="4" style="width:100%">100\n120\n90\n140\n160\n110\n170\n180</textarea></label>${nin("li-d0","Dividendo inicial",40)}</div><div class="res" id="li-res"></div><div id="li-g"></div>`;
+    const run=()=>{const p=V("li-p"),c=V("li-c"),E=$("li-e").value.split(/[\s;]+/).map(s=>parseFloat(s.replace(",","."))).filter(isFinite),d0=N("li-d0");if(E.length<2||!isFinite(d0))return fail("li","escribe al menos dos utilidades.");const D=[];let d=d0;E.forEach(e=>{d=d+c*(p*e-d);D.push(d)});
+      const sd=x=>{const m=TSm(x);return Math.sqrt(x.reduce((s,v)=>s+(v-m)**2,0)/(x.length-1))},TSm=x=>x.reduce((s,v)=>s+v,0)/x.length;
+      $("li-res").innerHTML=tl([["Variabilidad de las utilidades (desv. est.)",f2(sd(E))],["Variabilidad de los dividendos",f2(sd(D)),"okt"],["Dividendo del último año",f2(D[D.length-1])]]);
+      $("li-g").innerHTML=plotXY({xr:[1,E.length],yr:[0,Math.max(...E)*1.1],series:[{pts:E.map((v,i)=>[i+1,v]),col:"--muted",w:1.8},{pts:E.map((v,i)=>[i+1,p*v]),col:"--exam",dash:"5 4",w:1.6},{pts:D.map((v,i)=>[i+1,v]),col:"--line",w:2.6}],xl:"año",yl:"por acción",label:"Lintner"})+legend([["--muted","Utilidad"],["--exam","Dividendo objetivo pE",1],["--line","Dividendo pagado"]])+`<p class="hint">Dₜ = Dₜ₋₁ + c(pEₜ − Dₜ₋₁). Con c bajo, el dividendo se mueve poco ante cambios transitorios de las utilidades: las empresas evitan recortes que el mercado leería como mala señal.</p>`};
+    bindCtl(["li-p","li-c"],run);onIn(["li-e","li-d0"],run);run()},
+   mm(){B.innerHTML=`<div class="calcf">${nin("mr-v","Valor de la empresa antes de repartir (incluye caja)",10000)}${nin("mr-c","Caja a repartir",1000)}${nin("mr-n","Acciones",100)}${nin("mr-a","Acciones del inversionista",10)}</div><div class="res" id="mr-res"></div>`;
+    const run=()=>{const[Vv,C,n,a]=["mr-v","mr-c","mr-n","mr-a"].map(N);if(!(n>0&&Vv>C))return fail("mr","datos no válidos.");const P0=Vv/n,Pex=(Vv-C)/n,nr=C/P0;
+      $("mr-res").innerHTML=tl([["Precio antes",f2(P0)],["Dividendo: precio ex-dividendo",f2(Pex)],["Dividendo: riqueza del inversionista",f2(a*Pex+a*C/n),"okt"],["Recompra: acciones recompradas",f2(nr)],["Recompra: precio después",f2((Vv-C)/(n-nr))],["Recompra: riqueza del inversionista",f2(a*P0),"okt"]])+`<p class="hint">Con dividendo, el precio cae lo mismo que el dividendo; con recompra, el precio no cambia y hay menos acciones. En ambos casos la riqueza del inversionista es ${f2(a*P0)}: la irrelevancia de Miller y Modigliani. Las diferencias reales vienen de impuestos, costos de transacción y señales.</p>`};
+    onIn(["mr-v","mr-c","mr-n","mr-a"],run);run()}})};
+
+// ---------- Fusiones
+SIMS.fus=function(){
+  $("sim").innerHTML=`<div class="calcf">${nin("fu-va","Valor de A (comprador)",500)}${nin("fu-na","Acciones de A",50)}${nin("fu-vb","Valor de B (objetivo)",200)}${nin("fu-s","Sinergia esperada",80)}${nin("fu-c","Pago en efectivo por B",250)}${nin("fu-x","Acciones nuevas de A entregadas a los accionistas de B (pago en acciones)",23)}</div><div class="res" id="fu-res"></div><div id="fu-o"></div>`;
+  const run=()=>{const[VA,nA,VB,S,cash,x]=["fu-va","fu-na","fu-vb","fu-s","fu-c","fu-x"].map(N);if(!(nA>0&&x>=0))return fail("fu","datos no válidos.");const VAB=VA+VB+S,prem=cash-VB,npvC=S-prem,frac=x/(nA+x),costS=frac*VAB-VB,npvS=S-costS,pA=VA/nA;
+    $("fu-res").innerHTML=tl([["Valor combinado",m0(VAB)],["Prima en efectivo",m0(prem)],["VPN para A (efectivo)",f2(npvC),npvC>=0?"okt":"badt"],["Fracción de B en la combinada",pc(frac)],["Costo real del pago en acciones",f2(costS)],["VPN para A (acciones)",f2(npvS),npvS>=0?"okt":"badt"]]);
+    $("fu-o").innerHTML=stp(1,"Efectivo",`<div class="eq al">Sinergia = V_AB − (V_A + V_B) = ${m0(VAB)} − ${m0(VA+VB)} = ${m0(S)}<br>Prima = ${m0(cash)} − ${m0(VB)} = ${m0(prem)} ⟹ VPN_A = ${m0(S)} − ${m0(prem)} = <b>${f2(npvC)}</b></div>`)
+      +stp(2,"Acciones",`<div class="eq al">Los accionistas de B reciben ${m0(x)} de ${m0(nA+x)} acciones = ${pc(frac)} de ${m0(VAB)} = ${f2(frac*VAB)}<br>Costo = ${f2(frac*VAB)} − ${m0(VB)} = ${f2(costS)} ⟹ VPN_A = ${f2(npvS)}<br>Precio de A después: ${f2(VAB/(nA+x))} (antes ${f2(pA)})</div><p>Con acciones, los accionistas de B comparten la sinergia: si resulta menor de lo esperado, también pierden. Con efectivo, el comprador asume todo el riesgo de la sinergia. La relación de canje que no destruye valor para A es como máximo ${f2((VB+S)/(VA)*nA)} acciones.</p>`)};
+  onIn(["fu-va","fu-na","fu-vb","fu-s","fu-c","fu-x"],run);run()};
+
+// ---------- Hoja de fórmulas
+SIMS.hoja=function(){
+  const F=[["Capital de trabajo","KTNO","Cartera + inventarios − proveedores","=CxC+Inv-CxP"],["Capital de trabajo","Ciclo de efectivo","Días inventario + días cartera − días proveedores","=Inv/CV*365+CxC/V*365-CxP/Compras*365"],["Capital de trabajo","Palanca de crecimiento","Margen EBITDA / (KTNO/Ventas)","=(EBITDA/V)/(KTNO/V)"],["Crédito comercial","Costo de no tomar el descuento","(1 + d/(1 − d))^(365/(N − DP)) − 1","=(1+d/(1-d))^(365/(N-DP))-1"],["Inventarios","Lote económico","√(2DS/H)","=RAIZ(2*D*S/H)"],["Efectivo","Baumol","√(2bT/i)","=RAIZ(2*b*T/i)"],
+    ["Apalancamiento","Operativo","MC/UAII","=MC/UAII"],["Apalancamiento","Financiero","UAII/(UAII − I)","=UAII/(UAII-I)"],["Apalancamiento","Indiferencia","(I₂N₁ − I₁N₂)/(N₁ − N₂)","=(I2*N1-I1*N2)/(N1-N2)"],["Costo de capital","CAPM","rf + β(Rm − rf) + RP","=rf+beta*prima+rp"],["Costo de capital","Hamada","βL = βU[1 + (1 − t)D/E]","=bu*(1+(1-t)*D/E)"],["Costo de capital","Gordon","D₁/P₀ + g","=D0*(1+g)/P0+g"],["Costo de capital","WACC","E/V·Ke + D/V·Kd(1 − t)","=SUMAPRODUCTO(pesos;costos)"],["Estructura","MM con impuestos","V_L = V_U + tD; Ke = Ku + (Ku − Kd)(1 − t)D/E","—"],
+    ["Valor","UODI","UAII(1 − t)","=UAII*(1-t)"],["Valor","EVA","UODI − WACC·Capital","=UODI-WACC*Capital"],["Valor","FCL","UODI + depreciación − CAPEX − ΔKTNO","—"],["Valor","Valor terminal","FCL(n+1)/(WACC − g)","=FCL6/(WACC-g)"],["Valor","Valor de la empresa","Σ FCL/(1 + WACC)^t + VT/(1 + WACC)^n","=VNA(WACC;FCL)+VT/(1+WACC)^n"],["Dividendos","Lintner","Dₜ − Dₜ₋₁ = c(pEₜ − Dₜ₋₁)","—"],["Fusiones","VPN del comprador","Sinergia − prima","=Sinergia-(Pago-VB)"]];
+  $("sim").innerHTML=`<div class="calcf"><label for="h-q">Buscar fórmula<input id="h-q" type="search" placeholder="Por ejemplo: WACC"></label></div><div class="tbl"><table id="h-t"></table></div>`;
+  const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th><th>Excel</th></tr>`+(rows.length?rows.map(([a,b,c,d])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td><td class="mono">${d}</td></tr>`).join(""):`<tr><td colspan="4">No hay fórmulas con esa palabra.</td></tr>`)};
+  $("h-q").addEventListener("input",run);run()};
