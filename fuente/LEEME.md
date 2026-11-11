@@ -41,6 +41,10 @@ ECONOMIAPP_OUT=/tmp/prueba python3 fuente/sitio/build.py
 
 En cada materia, `content.js` tiene las estaciones (tronco, ramas, talleres) y `labs.js` los laboratorios. Los archivos `extra.js` y `labs_extra.js` agregan las estaciones que alinean un módulo con su programa.
 
+## App instalable y uso sin internet
+
+`build.py` genera `manifest.webmanifest`, copia los íconos de `sitio/iconos/` y escribe `docs/sw.js` a partir de `sitio/sw.js`, con la lista de todos los archivos y una versión calculada del contenido. Cada vez que el contenido cambia, la versión cambia y la app instalada se actualiza sola; si la persona había descargado todo, la nueva versión se vuelve a descargar en segundo plano. La portada tiene los botones «Instalar», «Descargar para usar sin internet» y «Exportar/Importar progreso» (respalda las claves `ruta-`, `eco-`, `guia-` y `hpe-` del almacenamiento del navegador).
+
 ## Estadísticas de visitas
 
 El sitio puede enviar visitas a Google Analytics 4. Para activarlas, pega el ID de medición (empieza por `G-`) en `ANALYTICS_ID` dentro de `sitio/build.py`, o pásalo al generar:

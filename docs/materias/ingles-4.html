@@ -35,6 +35,12 @@ const t=document.querySelector("h2")&&h?document.title.split(" · ")[0]+" · "+(
 gtag("event","page_view",{page_location:location.origin+p,page_title:t})};
 setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
 </script>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#1b2430">
+<link rel="icon" type="image/png" href="../iconos/favicon-48.png">
+<link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Economiapp">
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("../sw.js").catch(()=>{}))</script>
 </head>
 <body>
 <div class="wrap">
