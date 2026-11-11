@@ -105,9 +105,9 @@ qs:[{q:"Calcula la TMS de u = x1² x2 en (2, 4).",a:String.raw`\(\text{TMS}=\fra
 <div class="mj">\[x_1^*=\frac{a}{a+b}\,\frac{m}{p_1},\qquad x_2^*=\frac{b}{a+b}\,\frac{m}{p_2}\]</div>
 <p>El consumidor gasta siempre la fracción \(a/(a+b)\) de su ingreso en el bien 1.</p></section>
 <section><h3>Esquinas y otros casos</h3>
-<ul><li><b>Sustitutos perfectos:</b> compra solo el bien con mayor utilidad marginal por peso: si \(p_1/p_2<a/b\), todo en \(x_1\) (\(x_1=m/p_1\)).</li>
+<ul><li><b>Sustitutos perfectos:</b> compra solo el bien con mayor utilidad marginal por peso: si \(p_1/p_2&lt;a/b\), todo en \(x_1\) (\(x_1=m/p_1\)).</li>
 <li><b>Complementarios perfectos:</b> consume en el vértice, \(ax_1=bx_2\): \(x_1=\frac{bm}{bp_1+ap_2}\).</li>
-<li><b>Cuasilineales:</b> \(x_1=a\,p_2/p_1\) no depende del ingreso (si alcanza); si \(m<a\,p_2\), solución de esquina con \(x_2=0\).</li></ul>
+<li><b>Cuasilineales:</b> \(x_1=a\,p_2/p_1\) no depende del ingreso (si alcanza); si \(m&lt;a\,p_2\), solución de esquina con \(x_2=0\).</li></ul>
 <p>En una esquina no se cumple la tangencia: \(\text{TMS}\ne p_1/p_2\).</p></section>
 <section><h3>Dualidad: minimizar el gasto</h3>
 <p>El problema dual es gastar lo menos posible para alcanzar una utilidad \(\bar u\). Su solución son las <b>demandas hicksianas</b> (compensadas) \(h_i(p_1,p_2,\bar u)\) y la <b>función de gasto</b> \(e(p_1,p_2,\bar u)\). Las demandas marshallianas \(x_i(p,m)\) y la <b>función de utilidad indirecta</b> \(v(p,m)\) resuelven el problema original. Se cumple \(e(p,v(p,m))=m\) y \(h_i(p,\bar u)=x_i(p,e(p,\bar u))\). Lema de Shephard: \(\partial e/\partial p_i=h_i\).</p></section>
@@ -181,7 +181,7 @@ qs:[{q:"Si un agricultor que vende café ve subir su precio, ¿por qué puede co
 <section><h3>La idea</h3><p class="lead">El consumidor reparte su consumo entre hoy y mañana. Puede ahorrar o endeudarse a la tasa de interés \(r\), que es el precio relativo del consumo presente.</p></section>
 <section><h3>La restricción intertemporal</h3>
 <div class="mj">\[c_1+\frac{c_2}{1+r}=m_1+\frac{m_2}{1+r}\qquad\text{(valor presente)}\qquad\Longleftrightarrow\qquad(1+r)c_1+c_2=(1+r)m_1+m_2\quad\text{(valor futuro)}\]</div>
-<p>La recta pasa por la dotación \((m_1,m_2)\) y tiene pendiente \(-(1+r)\). Si \(c_1<m_1\) el consumidor es <b>prestamista</b> (ahorra); si \(c_1>m_1\), <b>prestatario</b>.</p></section>
+<p>La recta pasa por la dotación \((m_1,m_2)\) y tiene pendiente \(-(1+r)\). Si \(c_1&lt;m_1\) el consumidor es <b>prestamista</b> (ahorra); si \(c_1>m_1\), <b>prestatario</b>.</p></section>
 <section><h3>Estática comparativa</h3>
 <ul><li>Si sube \(r\), un prestamista sigue siendo prestamista (y queda mejor); un prestatario puede cambiar a prestamista o quedar peor.</li>
 <li>Slutsky intertemporal: el efecto sustitución reduce \(c_1\); el efecto renta depende de si es prestamista (\(m_1-c_1>0\): sube \(c_1\)) o prestatario.</li>
@@ -196,7 +196,7 @@ qs:[{q:"¿Cuál es el valor presente de recibir 110 dentro de un año si r = 10 
 <section><h3>La idea</h3><p class="lead">La función de producción \(q=f(L,K)\) dice cuánto se puede producir como máximo con cada combinación de trabajo y capital. En el <b>corto plazo</b> algún factor está fijo; en el <b>largo plazo</b> todos son variables.</p></section>
 <section><h3>Corto plazo: producto medio y marginal</h3>
 <div class="mj">\[PMe_L=\frac{q}{L}\qquad PMg_L=\frac{\partial q}{\partial L}\]</div>
-<p><b>Ley de los rendimientos decrecientes:</b> si se agregan unidades de un factor manteniendo los demás fijos, tarde o temprano el producto marginal disminuye. Relación media-marginal: si \(PMg>PMe\), el medio sube; si \(PMg<PMe\), baja; el marginal corta al medio en su máximo.</p>
+<p><b>Ley de los rendimientos decrecientes:</b> si se agregan unidades de un factor manteniendo los demás fijos, tarde o temprano el producto marginal disminuye. Relación media-marginal: si \(PMg>PMe\), el medio sube; si \(PMg&lt;PMe\), baja; el marginal corta al medio en su máximo.</p>
 <p>Con \(q=6L^2-0{,}2L^3\): \(PMg=12L-0{,}6L^2\) es máximo en \(L=10\); \(PMe=6L-0{,}2L^2\) es máximo en \(L=15\) (ahí \(PMg=PMe=45\)); el producto total es máximo en \(L=20\), donde \(PMg=0\). Una empresa racional produce en la etapa II (entre \(L=15\) y \(L=20\)).</p></section>
 <section><h3>Largo plazo: isocuantas</h3>
 <p>Una isocuanta reúne las combinaciones de \(L\) y \(K\) que producen lo mismo. Su pendiente es la <b>relación marginal de sustitución técnica</b>:</p>
@@ -261,7 +261,7 @@ qs:[{q:"¿Por qué el beneficio es cero en el largo plazo en competencia perfect
 <tr><td>Aumentan las dos</td><td>Ambiguo</td><td>Sube</td></tr></table></div>
 <p>Qué tanto se mueven precio y cantidad depende de las elasticidades: con oferta muy inelástica, un choque de demanda mueve sobre todo el precio.</p></section>
 <section><h3>El teorema de la telaraña</h3>
-<p>Si los productores deciden cuánto ofrecer con el precio del período anterior (agricultura), \(Q^s_t=c+dp_{t-1}\) y el precio se ajusta para vender todo: \(p_t=(a-Q^s_t)/b\). El precio oscila alrededor del equilibrio y converge si \(d<b\) (la oferta reacciona menos que la demanda); diverge si \(d>b\).</p></section>
+<p>Si los productores deciden cuánto ofrecer con el precio del período anterior (agricultura), \(Q^s_t=c+dp_{t-1}\) y el precio se ajusta para vender todo: \(p_t=(a-Q^s_t)/b\). El precio oscila alrededor del equilibrio y converge si \(d&lt;b\) (la oferta reacciona menos que la demanda); diverge si \(d>b\).</p></section>
 <section><h3>Ejemplo</h3><p>Con \(Q^d=100-2p\) y \(Q^s=10+3p\): \(p^*=90/5=18\), \(Q^*=64\). Elasticidades en el equilibrio: demanda \(-2\cdot18/64=-0{,}56\), oferta \(3\cdot18/64=0{,}84\). Como \(d=3>b=2\), la telaraña diverge.</p></section>
 ${LAB}`,
 qs:[{q:"Con Qd = 120 − 3p y Qs = 4p − 20, ¿cuál es el equilibrio?",a:"120 − 3p = 4p − 20 ⇒ p = 20, Q = 60."}]},

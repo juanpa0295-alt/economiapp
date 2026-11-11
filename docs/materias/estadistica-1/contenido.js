@@ -69,9 +69,9 @@ qs:[{q:"P(A) = 0,4, P(B) = 0,5 y P(A ∩ B) = 0,2. ¿Son independientes?",a:"Sí
 <section><h3>Discretas</h3><p>Función de probabilidad \(p(x)=P(X=x)\), con \(p(x)\ge0\) y \(\sum_xp(x)=1\). Función de distribución acumulada \(F(x)=P(X\le x)=\sum_{t\le x}p(t)\): escalonada, no decreciente, de 0 a 1.</p></section>
 <section><h3>Continuas</h3>
 <p>Función de densidad \(f(x)\ge0\) con \(\int_{-\infty}^{\infty}f(x)\,dx=1\). Las probabilidades son áreas:</p>
-<div class="mj">\[P(a<X<b)=\int_a^bf(x)\,dx=F(b)-F(a)\qquad F(x)=\int_{-\infty}^xf(t)\,dt\qquad f(x)=F'(x)\]</div>
+<div class="mj">\[P(a&lt;X&lt;b)=\int_a^bf(x)\,dx=F(b)-F(a)\qquad F(x)=\int_{-\infty}^xf(t)\,dt\qquad f(x)=F'(x)\]</div>
 <p>Para una continua, \(P(X=a)=0\), así que da igual escribir \(<\) o \(\le\). La densidad no es una probabilidad: puede ser mayor que 1.</p></section>
-<section><h3>Ejemplo</h3><p>\(f(x)=kx^2\) en \([0,3]\): \(\int_0^3kx^2dx=9k=1\Rightarrow k=1/9\). \(F(x)=x^3/27\). \(P(1<X<2)=(8-1)/27=0{,}259\). \(E(X)=\int_0^3x\cdot\frac{x^2}9dx=\frac{81}{36}=2{,}25\).</p></section>
+<section><h3>Ejemplo</h3><p>\(f(x)=kx^2\) en \([0,3]\): \(\int_0^3kx^2dx=9k=1\Rightarrow k=1/9\). \(F(x)=x^3/27\). \(P(1&lt;X<2)=(8-1)/27=0{,}259\). \(E(X)=\int_0^3x\cdot\frac{x^2}9dx=\frac{81}{36}=2{,}25\).</p></section>
 ${LAB}`,
 qs:[{q:"Si F(x) = 1 − e^(−2x) para x ≥ 0, ¿cuál es la densidad?",a:"f(x) = F′(x) = 2e^(−2x) para x ≥ 0: una exponencial con λ = 2."}]},
 
@@ -94,9 +94,9 @@ qs:[{q:"Si Cov(X, Y) = 0, ¿X y Y son independientes?",a:"No necesariamente: cov
 <section><h3>Propiedades</h3>
 <div class="mj">\[E(aX+bY+c)=aE(X)+bE(Y)+c\]</div>
 <div class="mj">\[V(aX+bY+c)=a^2V(X)+b^2V(Y)+2ab\,\text{Cov}(X,Y)\]</div>
-<p>La constante \(c\) no cambia la varianza. Si son independientes, la covarianza es cero y las varianzas se suman (también cuando se restan: \(V(X-Y)=V(X)+V(Y)\)). Para \(n\) variables: \(V(\sum a_iX_i)=\sum a_i^2V(X_i)+2\sum_{i<j}a_ia_j\text{Cov}(X_i,X_j)\). Aplicación: la varianza de un portafolio.</p></section>
+<p>La constante \(c\) no cambia la varianza. Si son independientes, la covarianza es cero y las varianzas se suman (también cuando se restan: \(V(X-Y)=V(X)+V(Y)\)). Para \(n\) variables: \(V(\sum a_iX_i)=\sum a_i^2V(X_i)+2\sum_{i&lt;j}a_ia_j\text{Cov}(X_i,X_j)\). Aplicación: la varianza de un portafolio.</p></section>
 <section><h3>Teorema de Chebyshev</h3>
-<div class="mj">\[P(|X-\mu|<k\sigma)\ge1-\frac1{k^2}\]</div>
+<div class="mj">\[P(|X-\mu|&lt;k\sigma)\ge1-\frac1{k^2}\]</div>
 <p>Vale para <b>cualquier</b> distribución con varianza finita: al menos 75 % de la probabilidad está a menos de 2 desviaciones de la media, y al menos 88,9 % a menos de 3. Es una cota conservadora: en la normal esas probabilidades son 95,4 % y 99,7 %.</p></section>
 ${LAB}`,
 qs:[{q:"X y Y independientes con V(X) = 4 y V(Y) = 9. ¿V(2X − Y)?",a:"4·4 + 9 = 25."},{q:"Según Chebyshev, ¿qué fracción mínima está a menos de 4 desviaciones de la media?",a:"1 − 1/16 = 93,75 %."}]},

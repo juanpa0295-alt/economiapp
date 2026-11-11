@@ -120,7 +120,7 @@ qs:[{q:"¿Por qué para un bien público se suman verticalmente los beneficios m
 <div class="mj">\[UE=\sum_s\pi_s\,u(x_s)\]</div>
 <p>Von Neumann y Morgenstern mostraron que, si las preferencias sobre loterías cumplen ciertos axiomas (en especial el de independencia), se pueden representar con la utilidad esperada. El <b>equivalente cierto</b> \(EC\) es el pago seguro con la misma utilidad: \(u(EC)=UE\). La <b>prima de riesgo</b> es \(VE-EC\).</p></section>
 <section><h3>Actitudes y medidas del riesgo</h3>
-<div class="tbl"><table><tr><th>Actitud</th><th>Utilidad</th><th>Relación</th></tr><tr><td>Aversión</td><td>Cóncava</td><td>\(EC<VE\), prima positiva</td></tr><tr><td>Neutralidad</td><td>Lineal</td><td>\(EC=VE\)</td></tr><tr><td>Amor al riesgo</td><td>Convexa</td><td>\(EC>VE\)</td></tr></table></div>
+<div class="tbl"><table><tr><th>Actitud</th><th>Utilidad</th><th>Relación</th></tr><tr><td>Aversión</td><td>Cóncava</td><td>\(EC&lt;VE\), prima positiva</td></tr><tr><td>Neutralidad</td><td>Lineal</td><td>\(EC=VE\)</td></tr><tr><td>Amor al riesgo</td><td>Convexa</td><td>\(EC>VE\)</td></tr></table></div>
 <p>Medida de Arrow-Pratt: aversión absoluta \(r(x)=-u''(x)/u'(x)\); relativa \(x\,r(x)\). La varianza y el coeficiente de variación miden la dispersión de la lotería. Un averso al riesgo compra seguro: con un seguro de prima actuarialmente justa (precio por peso asegurado igual a la probabilidad de pérdida), se asegura por completo.</p></section>
 <section><h3>Paradojas y teoría prospectiva</h3>
 <p><b>Allais:</b> muchas personas prefieren 1 millón seguro a una lotería con 10 % de 5 millones, 89 % de 1 millón y 1 % de nada, pero a la vez prefieren 10 % de 5 millones a 11 % de 1 millón. Esa combinación viola el axioma de independencia. <b>Ellsberg:</b> la gente prefiere apostar con probabilidades conocidas que desconocidas (aversión a la ambigüedad).</p>
@@ -136,7 +136,7 @@ qs:[{q:"Con u = √x y una lotería 50 % de 100 y 50 % de 0, ¿cuál es el equiv
 <ul><li><b>Señalización (Spence, 1973):</b> la parte informada hace algo costoso que es más barato para el tipo bueno. La educación puede servir de señal aunque no aumente la productividad: hay un equilibrio separador si a los trabajadores de baja productividad no les conviene imitar a los de alta.</li>
 <li><b>Filtrado (screening):</b> la parte no informada ofrece un menú de contratos para que cada tipo se autoseleccione (deducibles altos y bajos en los seguros).</li>
 <li>Garantías, reputación, certificaciones y seguros obligatorios.</li></ul>
-<p>Con educación \(e\) de costo \(c_i\) por unidad y productividades \(a_1<a_2\), un nivel \(e^*\) separa a los tipos si \(\frac{a_2-a_1}{c_1}\le e^*\le\frac{a_2-a_1}{c_2}\).</p></section>
+<p>Con educación \(e\) de costo \(c_i\) por unidad y productividades \(a_1&lt;a_2\), un nivel \(e^*\) separa a los tipos si \(\frac{a_2-a_1}{c_1}\le e^*\le\frac{a_2-a_1}{c_2}\).</p></section>
 ${LAB}`,
 qs:[{q:"¿Por qué la educación puede ser una señal aunque no aumente la productividad?",a:"Porque es más costosa para los trabajadores menos productivos; si el costo de imitar supera la ganancia salarial, solo los productivos la adquieren y el empleador puede distinguirlos."}]},
 

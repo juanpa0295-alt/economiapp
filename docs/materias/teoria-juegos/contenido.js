@@ -574,7 +574,7 @@ enun:String.raw`<p>Cada pescador \(i\) trabaja \(h_i\) horas; \(H=\sum h_i\). El
 saber:[String.raw`El planificador internaliza que mis horas bajan el retorno de <i>todos</i>; cada pescador solo el de sus propias horas.`],
 sol:String.raw`<ol class="steps"><li><b>a)</b> \(\max_{h_1,\dots,h_n}\sum_{i=1}^n\left[\rho(H)\,h_i-c(h_i)\right]\). Derivando respecto a \(h_i\): \(\rho(H)+\rho'(H)\sum_jh_j-c'(h_i)=0\), es decir \(\rho(H)+\rho'(H)\,H=c'(h_i)\). Por simetría, \(h_i^{**}=H^{**}/n\).</li>
 <li><b>b)</b> \(G(\Gamma)=\{N=\{1,\dots,n\},\;S_i=[0,T],\;U_i\}\). Cada uno resuelve \(\max_{h_i}\rho(h_i+H_{-i})h_i-c(h_i)\): \(\rho(H^*)+\rho'(H^*)\,h_i^*=c'(h_i^*)\).</li>
-<li>Comparación: como \(\rho'<0\) y \(h_i<H\), el término \(\rho'(H)h_i\) es menos negativo que \(\rho'(H)H\). A cada pescador le parece más barato trabajar una hora más de lo que realmente le cuesta al grupo: \(H^*>H^{**}\).</li></ol>`,
+<li>Comparación: como \(\rho'<0\) y \(h_i&lt;H\), el término \(\rho'(H)h_i\) es menos negativo que \(\rho'(H)H\). A cada pescador le parece más barato trabajar una hora más de lo que realmente le cuesta al grupo: \(H^*>H^{**}\).</li></ol>`,
 res:String.raw`<p>En el equilibrio se pesca de más: más horas totales y menor retorno por hora que en el óptimo. Es la tragedia de los comunes.</p>`},
 
 {id:"t2-2",n:"2",t:"Cournot con tres niveles de producción",tipo:"Cournot finito",temas:["finitos","nash"],tool:RT("c3"),
@@ -587,7 +587,7 @@ sol:String.raw`<ol class="steps"><li>Pagos \((\pi_1,\pi_2)\):<div class="tbl"><t
 res:String.raw`<p>EN: \((1,3)\), \((2,2)\) y \((3,1)\). El simétrico \((2,2)\) es el Cournot continuo: \(q^*=(7-1)/3=2\).</p>`},
 
 {id:"t2-3",n:"3",t:"Cournot con N empresas",tipo:"Estrategias continuas",temas:["continuas"],tool:{id:"continuas",lbl:"Ir a Cournot y Bertrand"},
-enun:String.raw`<p>\(N\) empresas, \(P(Q)=a-bQ\), costo \(c\,q_i\), \(c<a\), deciden simultáneamente sus cantidades. ¿Cuál es el equilibrio de Nash? ¿Qué ocurre si \(N\to\infty\)?</p>`,
+enun:String.raw`<p>\(N\) empresas, \(P(Q)=a-bQ\), costo \(c\,q_i\), \(c&lt;a\), deciden simultáneamente sus cantidades. ¿Cuál es el equilibrio de Nash? ¿Qué ocurre si \(N\to\infty\)?</p>`,
 saber:[String.raw`Juego simétrico: se resuelve la condición de primer orden de una firma y se impone \(q_i^*=q^*\) para todas.`],
 sol:String.raw`<ol class="steps"><li>\(\pi_i=(a-bQ)\,q_i-c\,q_i\). Condición de primer orden: \(a-bQ_{-i}-2bq_i-c=0\), así que \(r_i(Q_{-i})=\frac{a-c-bQ_{-i}}{2b}\).</li>
 <li>Con simetría \(Q_{-i}=(N-1)q^*\): \(a-c-b(N-1)q^*-2bq^*=0\Rightarrow q^*=\dfrac{a-c}{(N+1)b}\).</li>
@@ -597,7 +597,7 @@ res:String.raw`<p>\(q^*=\frac{a-c}{(N+1)b}\) y \(P^*=\frac{a+Nc}{N+1}\). Con muc
 
 {id:"t2-4",n:"4",t:"Bertrand en Gibbons (sección 1.2.B)",tipo:"Estrategias continuas",temas:["bertrand","continuas"],tool:{id:"bertrand",lbl:"Ir a Bertrand"},
 enun:String.raw`<p>Estudie el modelo de duopolio de Bertrand (Gibbons, cap. 1, sección 1.2.B): su forma estratégica y el equilibrio de Nash en puras.</p>`,
-saber:[String.raw`En Gibbons los productos son diferenciados: \(q_i(p_i,p_j)=a-p_i+b\,p_j\), con \(0<b<2\) y costo marginal \(c<a\).`],
+saber:[String.raw`En Gibbons los productos son diferenciados: \(q_i(p_i,p_j)=a-p_i+b\,p_j\), con \(0&lt;b<2\) y costo marginal \(c&lt;a\).`],
 sol:String.raw`<ol class="steps"><li>Forma estratégica: \(N=\{1,2\}\), \(S_i=[0,\infty)\) y \(\pi_i(p_i,p_j)=(p_i-c)(a-p_i+b\,p_j)\).</li>
 <li>Condición de primer orden: \(a-2p_i+b\,p_j+c=0\), así que \(r_i(p_j)=\frac{a+b\,p_j+c}{2}\): pendiente positiva, los precios son complementos estratégicos.</li>
 <li>Equilibrio simétrico: \(p^*=\frac{a+bp^*+c}{2}\Rightarrow p^*=\dfrac{a+c}{2-b}\).</li></ol>`,
@@ -662,7 +662,7 @@ saber:[String.raw`Mejor respuesta: \(\partial u_i/\partial e_i=0\) y se despeja 
 sol:String.raw`<ol class="steps"><li><b>a.</b> \(\partial u_1/\partial e_1=c+e_2-2e_1=0\Rightarrow r_1(e_2)=\frac{c+e_2}{2}\); igual, \(r_2(e_1)=\frac{c+e_1}{2}\). Son rectas de pendiente 1/2 que parten de \(c/2\).</li>
 <li><b>b.</b> \(e_1=\frac{c+e_2}{2}\) y \(e_2=\frac{c+e_1}{2}\Rightarrow e_1^*=e_2^*=c\): el cruce de las dos rectas.</li>
 <li><b>c.</b> \(u_1^*=c(c+c-c)=c^2=u_2^*\).</li></ol>`,
-res:String.raw`<p>EN: \(e_1^*=e_2^*=c\), con bienestar \(c^2\) cada uno. Si ambos pusieran \(c+k\) con \(0<k<c\), tendrían \((c+k)c>c^2\): en equilibrio se esfuerzan menos de lo que les convendría a los dos.</p>`},
+res:String.raw`<p>EN: \(e_1^*=e_2^*=c\), con bienestar \(c^2\) cada uno. Si ambos pusieran \(c+k\) con \(0&lt;k&lt;c\), tendrían \((c+k)c>c^2\): en equilibrio se esfuerzan menos de lo que les convendría a los dos.</p>`},
 
 {id:"t2-12",n:"12",t:"Bertrand con productos diferenciados",tipo:"Estrategias continuas",temas:["bertrand","continuas"],tool:{id:"bertrand",lbl:"Ir a Bertrand"},
 enun:String.raw`<p>\(q_1=a-p_1+p_2\) y \(q_2=a-p_2+p_1\), costo marginal \(c\), sin costos fijos. <b>(a)</b> Represente el juego en forma estratégica. <b>(b)</b> Halle y grafique las mejores respuestas. <b>(c)</b> Calcule el equilibrio de Nash.</p>`,
@@ -718,7 +718,7 @@ ins("ebp",[
 <li><b>Semiseparador:</b> algún tipo mezcla entre señales.</li></ul>
 <p>Fuera de la trayectoria de equilibrio las creencias son libres; los refinamientos (criterio intuitivo de Cho y Kreps) descartan creencias poco razonables.</p></section>
 <section><h3>El modelo de Spence (1973)</h3>
-<p>Los trabajadores de tipo alto (\(\theta_H\)) y bajo (\(\theta_L\)) eligen educación \(e\), que no aumenta la productividad pero cuesta \(c_H e\) o \(c_L e\), con \(c_H<c_L\). Las empresas pagan la productividad esperada. En un equilibrio separador con umbral \(e^*\) (salario \(\theta_H\) si \(e\ge e^*\)):</p>
+<p>Los trabajadores de tipo alto (\(\theta_H\)) y bajo (\(\theta_L\)) eligen educación \(e\), que no aumenta la productividad pero cuesta \(c_H e\) o \(c_L e\), con \(c_H&lt;c_L\). Las empresas pagan la productividad esperada. En un equilibrio separador con umbral \(e^*\) (salario \(\theta_H\) si \(e\ge e^*\)):</p>
 <div class="mj">\[\theta_H-c_He^*\ge\theta_L\quad\text{y}\quad\theta_L\ge\theta_H-c_Le^*\;\Longrightarrow\;\frac{\theta_H-\theta_L}{c_L}\le e^*\le\frac{\theta_H-\theta_L}{c_H}\]</div>
 <p>La señal funciona porque es más costosa para el tipo bajo. El separador menos costoso (Riley) usa el menor \(e^*\) posible.</p></section>
 ${LAB}`,

@@ -36,7 +36,7 @@ qs:[{q:"Si F(x, y) = x² + xy + y² − 7 = 0, ¿cuánto vale dy/dx en (1, 2)?",
 {id:"islm", parte:U1, t:"Estática comparativa general: IS-LM y economía abierta", sim:"islm", html:String.raw`
 <section><h3>Modelo IS-LM con funciones generales</h3><p>Equilibrio del mercado de bienes (IS) y del mercado de dinero (LM):</p>
 <div class="mj">\[Y-C(Y-T)-I(r)-G=0\qquad L(Y,r)-M_s/P=0\]</div>
-<p>con \(0<C'<1\), \(I'<0\), \(L_Y>0\), \(L_r<0\). Diferenciando totalmente:</p>
+<p>con \(0&lt;C'<1\), \(I'<0\), \(L_Y>0\), \(L_r<0\). Diferenciando totalmente:</p>
 <div class="mj">\[\begin{pmatrix}1-C'&-I'\\L_Y&L_r\end{pmatrix}\begin{pmatrix}dY\\dr\end{pmatrix}=\begin{pmatrix}dG-C'dT\\dM_s/P\end{pmatrix}\qquad |J|=(1-C')L_r+I'L_Y<0\]</div>
 <p>Por Cramer: \(\dfrac{\partial Y^*}{\partial G}=\dfrac{L_r}{|J|}>0\), \(\dfrac{\partial r^*}{\partial G}=\dfrac{-L_Y}{|J|}>0\), \(\dfrac{\partial Y^*}{\partial M_s}=\dfrac{I'}{P|J|}>0\), \(\dfrac{\partial r^*}{\partial M_s}=\dfrac{1-C'}{P|J|}<0\). Solo con signos (sin formas funcionales) el modelo ya predice la dirección de cada efecto.</p></section>
 <section><h3>Economía abierta</h3><p>Se añaden exportaciones \(X\) y una propensión a importar \(m\): la IS queda \(Y=C(Y-T)+I(r)+G+X-M(Y)\). El primer elemento del jacobiano pasa a ser \(1-C'+M'\): las importaciones son una «filtración» más y el multiplicador fiscal es menor.</p></section>

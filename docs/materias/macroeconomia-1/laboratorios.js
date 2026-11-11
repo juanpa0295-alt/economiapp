@@ -78,7 +78,7 @@ SIMS.nper=function(){let N=3;const ys=[1000,1000,1000,1000,1000,1000,1000,1000,1
 
 // ---- Inversión neoclásica
 SIMS.inv=function(){
-  const mg=marginal("v-d",[["r","Tasa (r)"],["delta","Depreciación (δ)"],["Y","Producción (Y)"]],k=>{const v=vals(),R=MAC.inversion(v);
+  const mg=marginal("v-mg",[["r","Tasa (r)"],["delta","Depreciación (δ)"],["Y","Producción (Y)"]],k=>{const v=vals(),R=MAC.inversion(v);
     return k==="Y"?`<div class="eq">∂K*/∂Y = α/(r + δ) = ${fm(v.alpha)}/${fm(R.uc)} = <b>${fmt(R.dK_dY,3)}</b><span class="note">Por cada peso adicional de producción esperada, el capital deseado sube ${fmt(R.dK_dY,3)} pesos.</span></div>`
       :`<div class="eq">∂K*/∂${k==="r"?"r":"δ"} = −αY/(r + δ)² = −${fm(v.alpha)} · ${n0(v.Y)} / ${fm(R.uc)}² = <b>${n0(R.dK_dr)}</b><span class="note">Si ${k==="r"?"la tasa":"la depreciación"} sube un punto porcentual, el capital deseado cae unos ${n0(-R.dK_dr*0.01)}.</span></div>`});
   $("sim").innerHTML=`<div class="ctr">${ctl("v-Y","Producción esperada (Y)",1e7,3e9,1e7,5e8)}${ctl("v-a","Participación del capital (α)",0.05,0.95,0.01,0.33)}${ctl("v-r","Tasa de interés (r)",0,0.4,0.005,0.05)}${ctl("v-d","Depreciación (δ)",0,0.4,0.005,0.1)}${ctl("v-K","Capital previo (Kₜ₋₁)",0,5e9,1e7,1e9)}${ctl("v-P","Producto marginal del capital (PMgK)",0,0.6,0.005,0.15)}</div>

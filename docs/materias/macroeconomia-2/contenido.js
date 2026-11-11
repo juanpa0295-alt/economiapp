@@ -347,7 +347,7 @@ const BRANCHES=[
  {id:"politicas", t:"Política y choques en EMB–EMA", sim:"krug", html:String.raw`
 <section><h3>Tres fases</h3><p class="lead">(1) Impacto: un solo mercado se desequilibra. (2) Ajuste. (3) Efecto final. Estas son las cadenas de las notas del 10-09 al 13-10.</p></section>
 <section><h3>Política monetaria</h3><p><b>M11, dos canales desde la tasa:</b> ∆+M frente a L̄ → EOM → ∆-i (dados ī* y Ēᵉ). Canal del gasto: ∆+I → ∆+A → ∆+DA → ∆+Y. Canal cambiario: DR ˂ 0 → ∆-F → EDD → ∆+E.</p>
-<p><b>M12, expansión con flexible:</b> impacto en activos: ∆+M/P → EOM → ∆-i → DR ˂ 0 → EDD → E salta a E₀’ con y₀ fijo. Ajuste en bienes: ∆+TCR → ∆+XN → EDB → ∆+y → ∆+L → EDM → ∆+i → DR > 0 → EOD → E baja en parte. Final: \(E_0<E_1<E_0'\) y \(y_1>y_0\). Efectiva.</p>
+<p><b>M12, expansión con flexible:</b> impacto en activos: ∆+M/P → EOM → ∆-i → DR ˂ 0 → EDD → E salta a E₀’ con y₀ fijo. Ajuste en bienes: ∆+TCR → ∆+XN → EDB → ∆+y → ∆+L → EDM → ∆+i → DR > 0 → EOD → E baja en parte. Final: \(E_0&lt;E_1&lt;E_0'\) y \(y_1>y_0\). Efectiva.</p>
 <p><b>M13, expansión con fijo:</b> … EDD → presión para que suba E → el BC vende dólares → ∆-RI ⟺ ∆-M → la EMA vuelve a su sitio. y y E sin cambio, menos reservas. Inefectiva: el banco deshace con la mano izquierda lo que hizo con la derecha.</p>
 <p><b>M18, el BR sube su tasa:</b> ∆-M → EDM → ∆+i → DR > 0 → EOD → ∆-E → ∆-TCR → ∆-XN; además ∆-I → ∆-A. Cae la DA: bajan y y P (control de la inflación). Con tipo fijo, el EOD obligaría a comprar dólares y anularía la subida.</p></section>
 <section><h3>Política fiscal</h3><p><b>M14, ∆+G:</b> ∆+A → ∆+DA → ∆+y → ∆+L frente a M̄/P̄ → EDM → ∆+i → DR > 0 → EOD. <i>Flexible:</i> baja E → ∆-TCR → ∆-XN: la producción crece menos (desplazamiento parcial vía tipo de cambio). <i>Fijo:</i> el BC compra dólares → ∆+RI → ∆+M → la EMA se desplaza a la derecha: la producción sube por completo.</p>
@@ -366,7 +366,7 @@ const BRANCHES=[
 {g:"Mundell-Fleming", from:"mundell", items:[
  {id:"zonas", t:"Zonas de desequilibrio", sim:"mfz", html:String.raw`
 <section><h3>Cómo identificarlas</h3><p class="lead">Para saber qué pasa en un punto fuera de una curva, se usa la ecuación de esa curva y se mueve una sola variable.</p>
-<ul><li><b>EMB:</b> \(Y=C+I+G+XN\). Si desde un punto de la curva sube i con Y dado, cae la inversión: \(DA<Y\), exceso de oferta de bienes (EOB). Arriba y a la derecha de la EMB hay EOB.</li><li><b>EMM:</b> \(M/P=L(i,Y)\). Si sube i con Y dado, cae la demanda de dinero: exceso de oferta monetaria (EOM). Arriba y a la izquierda de la EMM hay EOM.</li><li><b>BP:</b> \(B(TCR,Y^*,Y)+F(i,i^*,E^e/E)\). Si sube i, entran capitales: superávit (EOD). Si sube Y, suben las importaciones: déficit (EDD). Arriba y a la izquierda de la BP hay superávit; abajo y a la derecha, déficit. Sin movilidad, a la derecha de la BP vertical hay déficit.</li></ul></section>
+<ul><li><b>EMB:</b> \(Y=C+I+G+XN\). Si desde un punto de la curva sube i con Y dado, cae la inversión: \(DA&lt;Y\), exceso de oferta de bienes (EOB). Arriba y a la derecha de la EMB hay EOB.</li><li><b>EMM:</b> \(M/P=L(i,Y)\). Si sube i con Y dado, cae la demanda de dinero: exceso de oferta monetaria (EOM). Arriba y a la izquierda de la EMM hay EOM.</li><li><b>BP:</b> \(B(TCR,Y^*,Y)+F(i,i^*,E^e/E)\). Si sube i, entran capitales: superávit (EOD). Si sube Y, suben las importaciones: déficit (EDD). Arriba y a la izquierda de la BP hay superávit; abajo y a la derecha, déficit. Sin movilidad, a la derecha de la BP vertical hay déficit.</li></ul></section>
 <section><h3>Laboratorio</h3><p>Activa «Explorar zonas con un clic» y toca el gráfico.</p><div class="sim" id="sim"></div></section>`}]},
 {g:"SA-DA", from:"sada", items:[
  {id:"petroleo", t:"Choque petrolero y estanflación", sim:"sadaoil", html:String.raw`
@@ -474,7 +474,7 @@ ins("esteril",[
 <section><h3>La idea</h3><p class="lead">Dornbusch (1976): si los precios de los bienes se ajustan lento pero los mercados financieros se ajustan al instante, una expansión monetaria hace que el tipo de cambio se deprecie <b>más</b> de lo que se depreciará en el largo plazo, y luego se aprecie gradualmente.</p></section>
 <section><h3>El mecanismo</h3><ol>
 <li>En el largo plazo el dinero es neutral: si \(M\) sube 10 %, \(P\) y \(E\) suben 10 %.</li>
-<li>En el corto plazo \(P\) está fijo: más dinero real baja la tasa de interés doméstica \(i<i^*\).</li>
+<li>En el corto plazo \(P\) está fijo: más dinero real baja la tasa de interés doméstica \(i&lt;i^*\).</li>
 <li>Por la paridad no cubierta, \(i=i^*+\frac{E^e-E}{E}\): para que los inversionistas acepten un rendimiento menor, deben esperar una <b>apreciación</b>. Eso solo es posible si \(E\) salta hoy por encima de su nuevo valor de largo plazo.</li>
 <li>Con el tiempo los precios suben, la tasa de interés vuelve a \(i^*\) y el tipo de cambio se aprecia hasta su nuevo nivel de largo plazo.</li></ol>
 <div class="mj">\[\text{Sobrerreacción: }\frac{\Delta e_0}{\Delta m}=1+\frac{1}{\lambda\theta}>1\]</div>

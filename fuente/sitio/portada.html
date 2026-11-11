@@ -184,7 +184,7 @@ function card(m,p,est){
       <div class="meta"><b>${pct} %</b><small>${n} de ${lessons.length} temas dominados</small></div>
       <div class="track" aria-label="${m.t.length} estaciones en el tronco">${m.t.map(([id,t])=>`<span class="${done[id]?"done":""}" title="${esc(t)}"><i></i></span>`).join("")}</div>
       <div class="ends"><span>${esc(m.t[0][1])}</span><span>${esc(m.t[m.t.length-1][1])}</span></div>
-      <div class="go">${lt?`<span>Continuar en <strong>${esc(lt[1])}</strong> →</span>`:`<span><strong>Empezar la ruta</strong> →</span>`}<span class="chips"><span>${m.t.length} estaciones</span><span>${m.b.length} ramas</span><span>${m.w.length} ${m.w.length===1?"taller":"talleres"}</span></span></div>
+      <div class="go">${lt?`<span>Continuar en <strong>${esc(lt[1])}</strong> →</span>`:`<span><strong>Empezar la ruta</strong> →</span>`}<span class="chips"><span>${m.t.length} estaciones</span><span>${m.b.length} ${m.b.length===1?"rama":"ramas"}</span><span>${m.w.length} ${m.w.length===1?"taller":"talleres"}</span></span></div>
     </a></div>`}
 function render(){
   const S=getS(),hay=PLAN.filter(p=>p.slug&&BYSLUG[p.slug]).length,apr=PLAN.filter(p=>S[idOf(p)]==="aprobada").length,cur=PLAN.filter(p=>S[idOf(p)]==="cursando").length;

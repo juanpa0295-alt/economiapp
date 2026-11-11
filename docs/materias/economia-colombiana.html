@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../comun/ruta.css">
 <style>
 /* color de la línea de esta materia */
-:root{--line:#b8860b;--line-soft:#f7eed6}
+:root{--line:#916a09;--line-soft:#f7eed6}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line:#e6c56b;--line-soft:#4d3804}}
 :root[data-theme="dark"]{--line:#e6c56b;--line-soft:#4d3804}
 </style>
@@ -55,7 +55,7 @@ setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
     <div class="lbl">Economiapp · Economía Colombiana</div>
     <h1>Economía Colombiana</h1>
     <p>Resumen y guía de estudio del programa 1503715. Los datos cambian: verifica siempre las cifras recientes en el DANE, el Banco de la República y el Ministerio de Hacienda. Complementa con las rutas de macroeconomía y con Historia Económica de Colombia.</p>
-    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span class="kh">· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
   </header>
   <div class="grid">
     <nav class="map" aria-label="Mapa de temas">
@@ -76,8 +76,9 @@ setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
     <article id="lesson" aria-live="polite"></article>
   </div>
 </div>
-<script>window.RUTA_KEY="ruta-eco-done";</script>
+<script>window.RUTA_KEY="ruta-ecol-done";</script>
 <script src="economia-colombiana/contenido.js"></script>
+<script>(function(){try{var n="ruta-ecol-done";if(localStorage.getItem(n))return;var o=JSON.parse(localStorage.getItem("ruta-eco-done")||"{}")||{},r={},k=0;TRUNK.concat(BRANCHES.flatMap(function(g){return g.items}),WORKSHOPS).forEach(function(s){if(o[s.id]){r[s.id]=o[s.id];k++}});if(k)localStorage.setItem(n,JSON.stringify(r))}catch(e){}})();</script>
 <script src="../comun/ruta.js"></script>
 <script src="economia-colombiana/laboratorios.js"></script>
 <script>RUTA_START();</script>

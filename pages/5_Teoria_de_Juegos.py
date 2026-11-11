@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import sympy as sp
 import scipy.stats as stats
-import google.generativeai as genai
 import base64
 import diseno
 

@@ -23,7 +23,7 @@ ${LAB}`},
 <section><h3>Pobreza absoluta y relativa</h3><p class="lead">Medir la pobreza exige dos pasos (Sen): <b>identificar</b> a los pobres con una línea de pobreza \(z\) y <b>agregar</b> su situación en un índice. La línea puede ser <b>absoluta</b> (costo de una canasta básica de alimentos y otros bienes; la línea internacional del Banco Mundial en dólares PPA diarios) o <b>relativa</b> (por ejemplo, 50 % o 60 % de la mediana del ingreso).</p>
 <p>Enfoques alternativos: necesidades básicas insatisfechas (NBI), pobreza multidimensional (Alkire-Foster: privaciones simultáneas en educación, salud, vivienda, trabajo) y el enfoque de capacidades.</p></section>
 <section><h3>La familia Foster-Greer-Thorbecke (1984)</h3>
-<div class="mj">\[P_\alpha=\frac1n\sum_{y_i<z}\left(\frac{z-y_i}{z}\right)^\alpha\]</div>
+<div class="mj">\[P_\alpha=\frac1n\sum_{y_i&lt;z}\left(\frac{z-y_i}{z}\right)^\alpha\]</div>
 <ul><li>\(P_0\): <b>incidencia</b> (proporción de pobres). No cambia si un pobre se empobrece más.</li><li>\(P_1\): <b>brecha</b>. \(P_1\cdot z\cdot n\) es el costo mínimo de eliminar la pobreza con transferencias perfectamente focalizadas.</li><li>\(P_2\): <b>severidad</b>. Pondera más a los más pobres: es sensible a la desigualdad entre los pobres y cumple el axioma de transferencia.</li></ul></section>
 <section><h3>Desnutrición y trampas</h3><p>Ray (cap. 8 y 13) muestra cómo la relación entre nutrición y capacidad de trabajo puede generar trampas: quien está mal nutrido produce poco, gana poco y sigue mal nutrido. La pobreza no es solo falta de ingreso sino una restricción que se reproduce.</p></section>
 ${LAB}`},

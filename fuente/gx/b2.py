@@ -55,7 +55,7 @@ guide(dict(slug="fuentes-investigacion",dir="ft",h1="Fuentes y Técnicas de Inve
 U={1:"Unidad 1 · Etapas y dimensiones",2:"Unidad 2 · Comportamiento individual y proyecto de vida",3:"Unidad 3 · Comportamiento grupal",4:"Unidad 4 · Individuo, trabajo y sociedad"}
 guide(dict(slug="desarrollo-humano",dir="dh",h1="Desarrollo Humano",nombre="Desarrollo Humano",cod="1501782",
   desc="Programa 1501782: etapas del desarrollo y dimensiones del ser humano, autoestima, valores, personalidad, percepción, inteligencia emocional, proyecto de vida, comunicación, trabajo en equipo, conflicto y negociación, y la relación entre individuo, trabajo y sociedad.",
-  colors=["#b5651d","#f8e8d8","#e8b07a","#4d2a0b"],trunk="Tronco: las cuatro unidades del programa",
+  colors=["#a85e1b","#f8e8d8","#e8b07a","#4d2a0b"],trunk="Tronco: las cuatro unidades del programa",
   intro="Resumen y guía de estudio del programa 1501782, con Goleman (inteligencia emocional), Gardner (inteligencias múltiples), Covey (los siete hábitos) y Drucker (gestionarse a uno mismo).",
   res="Etapas del desarrollo, inteligencia emocional, inteligencias múltiples, proyecto de vida, comunicación asertiva, equipos y negociación."),U,[
  ("etapas",1,"Etapas del desarrollo y dimensiones del ser humano","tarjetas",[
