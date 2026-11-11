@@ -57,11 +57,13 @@ function brOn(G,I,J){const S=GT.sub(G,I,J),b=GT.bestResponses(S),r1={},r2={};J.f
 // ---------- Gráfico de correspondencias de mejor respuesta (eje x: σ de la columna 1, eje y: σ de la fila 1)
 function brGraph(M,xl,yl){const W=320,H=300,L=46,R=16,T=16,B=40,sx=x=>L+x*(W-L-R),sy=y=>T+(1-y)*(H-T-B);
   let g=`<rect x="${sx(0)}" y="${sy(1)}" width="${sx(1)-sx(0)}" height="${sy(0)-sy(1)}" fill="none" stroke="var(--rule)"/>`;
+  // dentro de un <svg> no puede ir <sub>: el navegador cierra el gráfico ahí y las líneas quedan por fuera. Se usa <tspan>.
+  const svgSub=t=>String(t).replace(/<sub>(.*?)<\/sub>/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">\u200b</tspan>');
   const tk=(v,ax)=>ax==="x"?`<text x="${sx(v)}" y="${H-22}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${v.s?v.s():v}</text>`:`<text x="${L-6}" y="${sy(v.num?v.num():v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${v.s?v.s():v}</text>`;
   g+=tk(0,"x")+tk(1,"x")+tk(0,"y")+tk(1,"y");
   if(M.t1&&M.t1.gt(0)&&M.t1.lt(1))g+=`<text x="${sx(M.t1.num())}" y="${H-22}" text-anchor="middle" font-size="11" fill="var(--line)" font-family="var(--f-mono)">${M.t1.s()}</text>`;
   if(M.t2&&M.t2.gt(0)&&M.t2.lt(1))g+=`<text x="${L-6}" y="${sy(M.t2.num())+4}" text-anchor="end" font-size="11" fill="var(--branch)" font-family="var(--f-mono)">${M.t2.s()}</text>`;
-  g+=`<text x="${W-R}" y="${H-4}" text-anchor="end" font-size="12" fill="var(--muted)">${xl}</text><text x="${L+4}" y="${T-4}" font-size="12" fill="var(--muted)">${yl}</text>`;
+  g+=`<text x="${W-R}" y="${H-4}" text-anchor="end" font-size="12" fill="var(--muted)">${svgSub(xl)}</text><text x="${L+4}" y="${T-4}" font-size="12" fill="var(--muted)">${svgSub(yl)}</text>`;
   // ρ1: y en función de x
   const seg=(ts,sg,draw)=>{const bp=[0];const t=ts;if(t&&t.gt(0)&&t.lt(1))bp.push(t.num());bp.push(1);let d="";
     for(let k=0;k+1<bp.length;k++){const m=(bp[k]+bp[k+1])/2,s=sg(new GT.Q(Math.round(m*1e6),1e6));d+=draw(bp[k],bp[k+1],s,k)}return d};

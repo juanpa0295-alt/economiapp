@@ -264,7 +264,7 @@ ${NOT}</section>
 <p>En el diagrama se grafican la inversión \(\bar sY\) (cóncava, por los rendimientos decrecientes) y la depreciación \(\bar dK\) (una recta). Donde se cortan, \(\Delta K=0\):</p>
 <div class="mj">\[\bar s\bar AK^{*1/3}\bar L^{2/3}=\bar dK^*\;\Longrightarrow\;K^*=\left(\frac{\bar s\bar A}{\bar d}\right)^{3/2}\bar L\]</div>
 <div class="mj">\[Y^*=\bar A^{3/2}\left(\frac{\bar s}{\bar d}\right)^{1/2}\bar L\qquad\Longrightarrow\qquad y^*=\frac{Y^*}{\bar L}=\bar A^{3/2}\left(\frac{\bar s}{\bar d}\right)^{1/2}\]</div>
-<p>Si \(K<K^*\), la inversión supera a la depreciación y el capital crece; si \(K>K^*\), decrece. Cualquiera que sea el punto de partida, la economía converge a \(K^*\).</p></section>
+<p>Si \(K&lt;K^*\), la inversión supera a la depreciación y el capital crece; si \(K>K^*\), decrece. Cualquiera que sea el punto de partida, la economía converge a \(K^*\).</p></section>
 <section><h3>Lecciones del modelo</h3>
 <ol><li><b>No hay crecimiento de largo plazo</b> por acumulación de capital: en el estado estacionario \(y\) es constante.</li>
 <li><b>Diferencias de ingreso:</b> los países con más ahorro y menos depreciación son más ricos, pero con exponente \(1/2\): duplicar \(\bar s\) eleva \(y^*\) solo en \(\sqrt2=1{,}41\) veces.</li>

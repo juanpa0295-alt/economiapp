@@ -57,7 +57,19 @@ gtag("event","page_view",{{page_location:location.origin+p+location.search,page_
 setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))}})();
 </script>'''
 
+# Dentro de una fórmula \\( … \\) o \\[ … \\], un «<» pegado a una letra (PMg<PMe) se lee como etiqueta HTML
+# y el navegador se come el resto del párrafo. Aquí se cambia por &lt;, que MathJax entiende igual.
+_TEX = re.compile(r"\\\((?:(?!\\\(|\\\)).){1,600}?\\\)|\\\[(?:(?!\\\[|\\\]).){1,1200}?\\\]", re.S)
+TEX_LT = []
+def tex_lt(txt):
+    def f(m):
+        t = re.sub(r"<(?=[A-Za-z])", "&lt;", m.group(0))
+        if t != m.group(0): TEX_LT.append(m.group(0))
+        return t
+    return _TEX.sub(f, txt)
+
 def wr(rel, txt):
+    if rel.endswith("/contenido.js"): txt = tex_lt(txt)
     p = os.path.join(OUT, rel); os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w", encoding="utf-8").write(txt)
 
@@ -82,6 +94,8 @@ css += """
 .home{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:10px}
 .home:hover{color:var(--line)}
 .home:focus-visible{outline:2px solid var(--line);outline-offset:3px;border-radius:4px}
+/* la pista «Navega con ← →» solo se muestra donde hay teclado */
+@media (hover:none),(pointer:coarse){.prog .kh{display:none}}
 """
 wr("comun/ruta.css", css)
 
@@ -274,7 +288,7 @@ def body(lbl, h1, intro, trunk_lbl):
     <div class="lbl">{lbl}</div>
     <h1>{h1}</h1>
     <p>{intro}</p>
-    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span class="kh">· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
   </header>
   <div class="grid">
     <nav class="map" aria-label="Mapa de temas">
@@ -386,7 +400,7 @@ MATERIAS = [
        desc="Programa 1503704: forma estratégica y extensiva, dominancia, equilibrio de Nash en puras y mixtas, suma cero, Cournot y Bertrand, bienes públicos y suscripción, equilibrio perfecto en subjuegos, juegos repetidos y teorema de Folk, Bayes-Nash, bayesiano perfecto y señalización, con resolvedores paso a paso.",
        colors=("#6b3fa0", "#ebe1f6", "#c3a6f0", "#2e2244"),
        lbl="Economiapp · Teoría de Juegos", h1="Teoría de Juegos", trunk="Tronco: las cuatro unidades del programa",
-       intro='Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, las aplicaciones con estrategias continuas, los juegos dinámicos (EPS) y los de información incompleta (Bayes-Nash y EBP), con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub>, σ y μ. El primer y el segundo taller están resueltos punto por punto en «Talleres resueltos», y cada lección muestra qué puntos le corresponden. Los resolvedores traen todos los puntos con tabla o árbol, agrupados por taller y en orden, y muestran cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.'),
+       intro='Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, las aplicaciones con estrategias continuas, los juegos dinámicos (EPS) y los de información incompleta (Bayes-Nash y EBP), con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub>, σ y μ. El primer y el segundo taller están resueltos punto por punto en «Talleres resueltos», y cada lección muestra qué puntos le corresponden. Los resolvedores traen todos los puntos con tabla o árbol, agrupados por taller y en orden, y muestran cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> se agregó hace poco.'),
 ]
 MATERIAS += [
   dict(slug="derecho-laboral", key="ruta-lab-done", title="Derecho Laboral y Comercial · Economiapp", lib="laboral.js", mathjax=True,
@@ -399,7 +413,7 @@ MATERIAS += [
        desc="Álgebra, límites, derivadas, integrales y optimización con restricciones, con calculadoras paso a paso.",
        colors=("#b5501c", "#f6e2d6", "#f0a070", "#3d2618"),
        lbl="Economiapp · Matemáticas", h1="Matemáticas", trunk="Tronco: módulos de la app",
-       intro='<b>Esta ruta se reemplazó por <a href="matematicas-1.html">Matemáticas I</a>, <a href="matematicas-2.html">Matemáticas II</a> y <a href="matematicas-3.html">Matemáticas III</a>, cada una con su programa.</b> Se conserva como repaso rápido. Los módulos de Economiapp ordenados por tema: álgebra, límites, derivadas e integrales, más una estación nueva de optimización con restricciones. Las calculadoras usan SymPy, el mismo motor de la app, corriendo en tu navegador. Lo marcado como <span class="tag nw">Nuevo</span> no estaba en la app original.'),
+       intro='<b>Esta ruta se reemplazó por <a href="matematicas-1.html">Matemáticas I</a>, <a href="matematicas-2.html">Matemáticas II</a> y <a href="matematicas-3.html">Matemáticas III</a>, cada una con su programa.</b> Se conserva como repaso rápido. Los módulos de Economiapp ordenados por tema: álgebra, límites, derivadas e integrales, más una estación nueva de optimización con restricciones. Las calculadoras usan SymPy, el mismo motor de la app, corriendo en tu navegador. Lo marcado como <span class="tag nw">Nuevo</span> se agregó hace poco.'),
   dict(slug="principios-micro", key="ruta-pmic-done", title="Principios de Microeconomía · Economiapp", lib=["micro.js"],
        desc="Programa 1503701: supuestos y herramientas matemáticas; teoría del consumidor (presupuesto, preferencias, elección, Slutsky, excedentes, demanda, dotaciones, elección intertemporal); teoría del productor (tecnología, costos, beneficio, oferta) y equilibrio competitivo con bienestar, controles de precios e impuestos.",
        colors=("#1f6f6b", "#d8efec", "#7cc7bf", "#123b39"),
@@ -419,7 +433,7 @@ MATERIAS += [
        desc="Programa 1503710: medición del PIB, precios, empleo y ciclos; crecimiento, modelo de producción, Solow, mercado laboral e inflación; corto plazo con IS, política monetaria, curva de Phillips y OA-DA, con laboratorios.",
        colors=("#9e2a3e", "#f5dde1", "#ec8a9c", "#3d1a21"),
        lbl="Economiapp · Principios de Macroeconomía", h1="Principios de Macroeconomía", trunk="Tronco: programa del curso",
-       intro='El tronco sigue el programa del curso (1503710) y la notación de Jones, <i>Macroeconomics</i>: preliminares (medición del PIB, los precios, el empleo y los ciclos), largo plazo (crecimiento, modelo de producción, Solow, mercado laboral e inflación) y corto plazo (brecha del producto, Gran Recesión, IS, política monetaria con curva de Phillips y OA-DA). Cada estación tiene un laboratorio que resuelve el modelo paso a paso, y las de Solow, IS-MP y OA-DA tienen gráficos que se arrastran. El modelo keynesiano, el mercado de dinero y el IS-LM de la app original quedaron como ramas.'),
+       intro='El tronco sigue el programa del curso (1503710) y la notación de Jones, <i>Macroeconomics</i>: preliminares (medición del PIB, los precios, el empleo y los ciclos), largo plazo (crecimiento, modelo de producción, Solow, mercado laboral e inflación) y corto plazo (brecha del producto, Gran Recesión, IS, política monetaria con curva de Phillips y OA-DA). Cada estación tiene un laboratorio que resuelve el modelo paso a paso, y las de Solow, IS-MP y OA-DA tienen gráficos que se arrastran. El modelo keynesiano, el mercado de dinero y el IS-LM quedaron como ramas.'),
   dict(slug="macroeconomia-2", key="ruta-macro2-done", title="Macroeconomía II · Economiapp", lib=["macro2.js","visual.js"], mathjax=True,
        desc="Programa 1503712: balanza de pagos, paridades, mercado de divisas, creación de dinero, Krugman, Mundell-Fleming, SA-DA, esterilización, sobrerreacción de Dornbusch, tipo de cambio real y Balassa-Samuelson, política monetaria, regímenes cambiarios y crisis, con laboratorios.",
        colors=("#1f5f8b", "#dcebf5", "#7fb8e0", "#16324a"),
@@ -447,7 +461,13 @@ MATERIAS += [
        lbl="Econometría I · de R desde cero al programa completo", h1="Econometría I", trunk="Tronco: las seis unidades del programa",
        intro="Pensada para empezar de cero: la primera estación instala R y enseña lo básico, y cada lección trae un manual paso a paso donde cada explicación tiene su par fórmula | código R, probado con las bases del libro de Wooldridge. El tronco sigue las seis unidades del programa (1504110): repaso del modelo lineal, pruebas de diagnóstico, MCG, variables instrumentales, GMM y variable dependiente discreta; las ramas profundizan en cambio estructural, panel y series. Los talleres del curso están resueltos punto por punto, y cada lección muestra qué puntos le corresponden y resuelve uno de ejemplo. Para tus propios números hay dos herramientas: la Calculadora (si el enunciado trae SCR, R² o matrices) y el Laboratorio de datos (si trae la tabla o un archivo)."),
 ]
-MATERIAS += [dict(slug=g["slug"], key="ruta-" + g["dir"] + "-done", title=g["h1"] + " · Economiapp", desc=g["desc"], colors=tuple(g["colors"]), lbl="Economiapp · " + g["h1"], h1=g["h1"], trunk=g["trunk"], intro=g["intro"]) for g in GMETA]
+# Economía Colombiana (dir «eco») compartía la clave ruta-eco-done con Econometría I: ahora tiene la suya,
+# y «pre_js» copia una sola vez el avance que la persona ya tenía guardado con la clave vieja.
+KEY_GUIA = {"eco": "ruta-ecol-done"}
+MIGRA = {"eco": '(function(){try{var n="ruta-ecol-done";if(localStorage.getItem(n))return;var o=JSON.parse(localStorage.getItem("ruta-eco-done")||"{}")||{},r={},k=0;TRUNK.concat(BRANCHES.flatMap(function(g){return g.items}),WORKSHOPS).forEach(function(s){if(o[s.id]){r[s.id]=o[s.id];k++}});if(k)localStorage.setItem(n,JSON.stringify(r))}catch(e){}})();'}
+MATERIAS += [dict(slug=g["slug"], key=KEY_GUIA.get(g["dir"], "ruta-" + g["dir"] + "-done"), pre_js=MIGRA.get(g["dir"], ""), title=g["h1"] + " · Economiapp", desc=g["desc"], colors=tuple(g["colors"]), lbl="Economiapp · " + g["h1"], h1=g["h1"], trunk=g["trunk"], intro=g["intro"]) for g in GMETA]
+_keys = [m["key"] for m in MATERIAS]
+assert len(set(_keys)) == len(_keys), "claves de progreso repetidas: " + ", ".join(sorted({k for k in _keys if _keys.count(k) > 1}))
 for m in MATERIAS:
     l, ls, d, ds = m["colors"]
     mj = MATHJAX if m.get("mathjax", True) else ""
@@ -460,7 +480,7 @@ for m in MATERIAS:
     libs = m.get("lib") or []
     libs = [libs] if isinstance(libs, str) else libs
     lib = "".join(f'<script src="{u}"></script>\n' for u in m.get("ext", [])) + "".join(f'<script src="../comun/{x}"></script>\n' for x in libs)
-    html += f'<script>window.RUTA_KEY="{m["key"]}";{m.get("extra_js", "")}</script>\n{lib}<script src="{m["slug"]}/contenido.js"></script>\n<script src="../comun/ruta.js"></script>\n<script src="{m["slug"]}/laboratorios.js"></script>\n<script>RUTA_START();</script>\n</body>\n</html>\n'
+    html += f'<script>window.RUTA_KEY="{m["key"]}";{m.get("extra_js", "")}</script>\n{lib}<script src="{m["slug"]}/contenido.js"></script>\n{"<script>" + m["pre_js"] + "</script>" + chr(10) if m.get("pre_js") else ""}<script src="../comun/ruta.js"></script>\n<script src="{m["slug"]}/laboratorios.js"></script>\n<script>RUTA_START();</script>\n</body>\n</html>\n'
     wr(f"materias/{m['slug']}.html", html)
 
 # ---------- catálogo para la portada (temas, progreso y buscador)

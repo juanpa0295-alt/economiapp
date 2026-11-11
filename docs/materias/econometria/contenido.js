@@ -1374,7 +1374,7 @@ sol:String.raw`<h5>a) Interpretación</h5><ol class="steps">
 <li>\(LR=29\ln\dfrac{0{,}364}{0{,}336}=2{,}321\).</li>
 <li>\(LM=29\,\dfrac{0{,}364-0{,}336}{0{,}364}=2{,}231\).</li>
 <li>\(\chi^2_{0{,}05}(1)=3{,}841\). Las tres son menores, así que no se rechaza H₀. Se cumple W ≥ LR ≥ LM.</li>
-<li>F exacta: \(F=\dfrac{0{,}028/1}{0{,}336/24}=2{,}00<F_{0{,}05}(1,24)=4{,}26\). La misma conclusión.</li></ol>`,
+<li>F exacta: \(F=\dfrac{0{,}028/1}{0{,}336/24}=2{,}00&lt;F_{0{,}05}(1,24)=4{,}26\). La misma conclusión.</li></ol>`,
 res:String.raw`<p>W = 2,417, LR = 2,321 y LM = 2,231, todos menores que χ²(1) = 3,84 (y F = 2,0 &lt; 4,26). No se rechaza la homogeneidad de grado uno en precios, así que el modelo 2 es aceptable y corrige el signo del precio del capital.</p>`},
 
 {id:"ep3-13", n:"13", t:"Reforma laboral de 2020: dummy en el intercepto", tipo:"Planteamiento", temas:["dicotomicas"],
@@ -1507,7 +1507,7 @@ sol:String.raw`<ol class="steps">
 <li>Sin aumento (n = 5): \(\hat Y=16{,}762+0{,}6986X\) y SCR = 57,193. Con aumento (n = 7): \(\hat Y=10{,}306+0{,}7452X\) y SCR = 247,900. \(SCR_{NR}=305{,}094\).</li>
 <li>Restringido: \(\hat Y=13{,}013+0{,}7285X\) y \(SCR_R=310{,}969\).</li>
 <li>\(F=\dfrac{(310{,}969-305{,}094)/2}{305{,}094/8}=\dfrac{2{,}938}{38{,}137}=0{,}077\sim F(2,8)\), con crítico 4,459 y p = 0,93. No se rechaza H₀.</li>
-<li>Solo intercepto distinto: \(\hat Y=12{,}892-0{,}374D+0{,}731X\), SCR = 310,653 y \(F=\dfrac{(310{,}969-310{,}653)/1}{310{,}653/9}=0{,}009<F(1,9)=5{,}117\).</li></ol>`,
+<li>Solo intercepto distinto: \(\hat Y=12{,}892-0{,}374D+0{,}731X\), SCR = 310,653 y \(F=\dfrac{(310{,}969-310{,}653)/1}{310{,}653/9}=0{,}009&lt;F(1,9)=5{,}117\).</li></ol>`,
 res:String.raw`<p>F = 0,077 (p = 0,93): las familias que tuvieron aumento de ingreso no se comportan distinto. Tampoco difiere el consumo autónomo (F = 0,009).</p>`},
 
 {id:"d-48", n:"4.8", t:"Función de producción: estabilidad entre 1929-1948 y 1949-1967", tipo:"Chow con s", temas:["chow"], tool:{id:"t-calc",pre:"rss:d48",lbl:"Abrir en la Calculadora (SCR o s)"},

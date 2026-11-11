@@ -518,3 +518,5 @@ tr.hl td{background:color-mix(in srgb,var(--good) 12%,transparent)}
 .home{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:10px}
 .home:hover{color:var(--line)}
 .home:focus-visible{outline:2px solid var(--line);outline-offset:3px;border-radius:4px}
+/* la pista «Navega con ← →» solo se muestra donde hay teclado */
+@media (hover:none),(pointer:coarse){.prog .kh{display:none}}

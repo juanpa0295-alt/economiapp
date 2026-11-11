@@ -55,7 +55,7 @@ guide(dict(slug="epistemologia",dir="epi",h1="Epistemología de las Ciencias Eco
 U={1:"Unidad 1 · Crecimiento y política económica",2:"Unidad 2 · Sector externo",3:"Unidad 3 · Finanzas públicas y política monetaria",4:"Unidad 4 · Mercado laboral, pobreza y desigualdad"}
 guide(dict(slug="economia-colombiana",dir="eco",h1="Economía Colombiana",nombre="Economía Colombiana",cod="1503715",
   desc="Programa 1503715: crecimiento de largo plazo y sus motores, ciclos económicos y políticos, sector externo y dependencia minero-energética, tasa de cambio, finanzas públicas y regla fiscal, inflación objetivo, mercado laboral, informalidad, pobreza y desigualdad en Colombia.",
-  colors=["#b8860b","#f7eed6","#e6c56b","#4d3804"],trunk="Tronco: las unidades del programa",
+  colors=["#916a09","#f7eed6","#e6c56b","#4d3804"],trunk="Tronco: las unidades del programa",
   intro="Resumen y guía de estudio del programa 1503715. Los datos cambian: verifica siempre las cifras recientes en el DANE, el Banco de la República y el Ministerio de Hacienda. Complementa con las rutas de macroeconomía y con Historia Económica de Colombia.",
   res="Crecimiento, ciclos, sector externo, tasa de cambio, regla fiscal, inflación objetivo, informalidad, pobreza y desigualdad en Colombia."),U,[
  ("crecimiento",1,"Crecimiento de largo plazo y política económica","tarjetas",[
@@ -120,7 +120,7 @@ guide(dict(slug="politicas-publicas-salud",dir="pps",h1="Economía y Políticas 
 U={1:"Unidad 1 · Emprendimiento",2:"Unidad 2 · Espíritu emprendedor",3:"Unidad 3 · Ideas y oportunidades",4:"Unidad 4 · Modelo de negocio",5:"Unidad 5 · Plan de negocios y financiación"}
 guide(dict(slug="negocios-emprendimiento",dir="ne",h1="Negocios y Emprendimiento",nombre="Opción II: Negocios y Emprendimiento",cod="1503800",
   desc="Programa 1503800 (opción II): emprendimiento y desarrollo económico (Schumpeter, GEM), perfil emprendedor, creatividad, oportunidades y design thinking, Business Model Canvas y propuesta de valor, validación, plan de negocios y fuentes de financiación en Colombia.",
-  colors=["#d1495b","#fae0e3","#ee9aa5","#521a22"],trunk="Tronco: las cinco unidades del programa",
+  colors=["#c24455","#fae0e3","#ee9aa5","#521a22"],trunk="Tronco: las cinco unidades del programa",
   intro='Resumen y guía de estudio del programa 1503800. Para los estudios de mercado, técnico y financiero del plan de negocios usa las calculadoras de <a href="evaluacion-proyectos.html">Evaluación de Proyectos</a>.',
   res="Schumpeter, GEM, perfil emprendedor, design thinking, Canvas, propuesta de valor, validación, plan de negocios y financiación."),U,[
  ("emprendimiento",1,"Emprendimiento y desarrollo económico","tarjetas",[

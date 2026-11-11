@@ -2,54 +2,47 @@
 
 Rutas de estudio interactivas para las materias de Economía. Es un sitio estático: solo usa HTML, CSS y JavaScript, sin servidor, así que se puede publicar gratis con GitHub Pages.
 
+> **Esta carpeta se genera sola.** No edites `docs/` a mano: los cambios se hacen en `fuente/` y el sitio se vuelve a armar con `python3 fuente/sitio/build.py` (ver `fuente/LEEME.md`). Cualquier cambio hecho aquí se pierde en la siguiente generación.
+
 ## Estructura
 
 ```
 docs/
-├── index.html                    Portada: materias, progreso y buscador de temas
+├── index.html                    Portada: plan de estudios por semestre, progreso y buscador de temas
+├── sw.js, manifest.webmanifest   App instalable y uso sin internet
 ├── comun/
 │   ├── ruta.css                  Diseño compartido por todas las rutas
 │   ├── ruta.js                   Motor: mapa de metro, lecciones, progreso, gráficos
-│   ├── estadistica.js            Distribuciones (reemplazan a scipy.stats)
-│   ├── juegos.js                 Teoría de juegos con fracciones exactas (incluye EN, EPS y EBP en árboles)
-│   ├── extensiva.js              Árboles de juego: editor, subjuegos y EPS con azar
-│   ├── laboral.js                Derecho Laboral: tabla LEY (actualizar cada año) y cálculos
-│   ├── macro.js                  Cálculos de Macroeconomía 1
-│   ├── macro2.js                 Macroeconomía 2: Mundell-Fleming, Krugman, SA-DA, modelo i-P, transables y no transables
-│   ├── visual.js                 Motor de los visuales de cambios (data-vis); las escenas viven en el laboratorios.js de cada materia
-│   (econometría) eco/rmanual.js: manual «fórmula | código R» que se agrega a cada lección; código probado con R 4.3 y los datos de wooldridge
-│   ├── principios.js             Cálculos de Principios de Macroeconomía
-│   └── simbolico.js              SymPy en el navegador (Pyodide) y respaldo numérico
-└── materias/
-    ├── econometria.html          Cada materia: una página corta…
-    ├── econometria/
-    │   ├── contenido.js          …su contenido (estaciones, ramas, preguntas)…
-    │   └── laboratorios.js       …y sus laboratorios
-    ├── matematicas.html     + matematicas/
-    ├── principios-macro.html + principios-macro/
-    ├── estadistica-2.html  + estadistica-2/
-    ├── macroeconomia-1.html + macroeconomia-1/
-    ├── macroeconomia-2.html + macroeconomia-2/
-    ├── teoria-juegos.html  + teoria-juegos/
-    └── derecho-laboral.html + derecho-laboral/
+│   ├── app.js                    Botones «Compartir» y «Opinar»
+│   └── *.js                      Librerías de cálculo de cada área (estadística, juegos, laboral, macro, micro, finanzas…)
+├── materias/
+│   ├── <materia>.html            Cada materia: una página corta…
+│   └── <materia>/
+│       ├── contenido.js          …su contenido (estaciones, ramas, talleres)…
+│       └── laboratorios.js       …y sus laboratorios
+├── og/                           Imágenes de vista previa al compartir
+└── iconos/
 ```
+
+El sitio cubre las 49 materias del plan 2015-I; la lista completa está en `MATERIAS` y `PLAN` dentro de `fuente/sitio/build.py`.
 
 ## Publicar con GitHub Pages
 
-1. En el repositorio `economiapp`, entra a **Add file → Upload files** y arrastra la carpeta `docs` completa (con sus subcarpetas). Confirma con **Commit changes**.
-2. Ve a **Settings → Pages**.
-3. En **Build and deployment**, elige **Deploy from a branch**, la rama **main** y la carpeta **/docs**. Guarda.
-4. Espera uno o dos minutos. El sitio queda en `https://economiapp.app/` (dominio propio; la dirección vieja de github.io redirige sola).
+1. Genera el sitio: `python3 fuente/sitio/build.py`.
+2. Revisa los cambios con `git status`, haz commit y push a la rama `main`.
+3. GitHub Pages publica la carpeta `/docs` de `main` (Settings → Pages → Deploy from a branch). En uno o dos minutos queda en `https://economiapp.app/`.
 
-Para actualizarlo después, sube de nuevo los archivos que cambiaron dentro de `docs`. Los archivos de Streamlit (`Inicio.py`, `pages/`, `datos/`) siguen funcionando igual; GitHub Pages solo publica lo que está en `docs`.
+Los archivos de Streamlit (`Inicio.py`, `pages/`, `datos/`) son la versión anterior de la app y no se publican aquí.
 
 ## Agregar una materia
 
-1. Copia `materias/macroeconomia-1.html` con el nombre de la materia nueva y cambia el título, los textos del encabezado, los colores de `--line` y la clave `RUTA_KEY` (debe ser única, por ejemplo `ruta-micro1-done`).
-2. Crea la carpeta de la materia con `contenido.js` (las listas `TRUNK`, `BRANCHES` y `WORKSHOPS`) y `laboratorios.js` (el objeto `SIMS`).
-3. Agrega la materia a la constante `MATERIAS` al final de `index.html` (nombre, color, clave de progreso y lista de temas).
+1. Crea su carpeta en `fuente/` con `content.js` (las listas `TRUNK`, `BRANCHES` y `WORKSHOPS`) y `labs.js` (el objeto `SIMS`).
+2. En `fuente/sitio/build.py`, agrega las líneas que escriben su `contenido.js` y `laboratorios.js`, su entrada en `MATERIAS` (título, textos, colores y una clave de progreso única, por ejemplo `ruta-micro1-done`; el generador se detiene si la clave se repite) y su fila en `PLAN`.
+3. Ejecuta `build.py`, luego `og.py` para su imagen de vista previa, y otra vez `build.py`.
 
 Cada lección del contenido acepta estos campos: `id`, `t` (título), `html`, `qs` (preguntas con respuesta), `deep` (apartados para profundizar), `py` (código Python), `sim` (nombre del laboratorio) y `nuevo`.
+
+En las fórmulas puedes escribir `<` con normalidad (por ejemplo `\(r<g\)`): el generador lo convierte para que el navegador no lo confunda con una etiqueta.
 
 ## Calculadoras de Matemáticas
 
@@ -57,7 +50,7 @@ Las calculadoras de límites, derivadas e integrales usan SymPy, igual que la ap
 
 ## Derecho Laboral: actualización anual
 
-En `comun/laboral.js`, la tabla `LEY` guarda el salario mínimo, el auxilio de transporte, la jornada máxima, el recargo dominical y la hora de inicio de la jornada nocturna, cada uno con la fecha desde la que rige. Cada enero hay que agregar la fila del nuevo salario mínimo y auxilio de transporte. El 1 de julio de 2027 el recargo dominical pasa al 100 % (ya está cargado).
+En `fuente/lab/laboral.js` (publicado como `comun/laboral.js`), la tabla `LEY` guarda el salario mínimo, el auxilio de transporte, la jornada máxima, el recargo dominical y la hora de inicio de la jornada nocturna, cada uno con la fecha desde la que rige. Cada enero hay que agregar la fila del nuevo salario mínimo y auxilio de transporte. El 1 de julio de 2027 el recargo dominical pasa al 100 % (ya está cargado).
 
 ## Progreso de los estudiantes
 

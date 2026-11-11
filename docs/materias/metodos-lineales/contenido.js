@@ -25,7 +25,7 @@ qs:[{q:"Si A es 2×3 y B es 3×4, ¿de qué tamaño es AB? ¿Existe BA?",a:"AB e
 <p>No cambian las soluciones. <b>Gauss</b> lleva la matriz a forma escalonada (ceros debajo de cada pivote) y despeja hacia atrás; <b>Gauss-Jordan</b> sigue hasta la forma escalonada <b>reducida</b>: pivotes iguales a 1 y ceros encima y debajo.</p></section>
 <section><h3>Rango y tipos de solución (Rouché-Frobenius)</h3>
 <p>El <b>rango</b> es el número de pivotes (filas no nulas de la forma escalonada).</p>
-<div class="tbl"><table><tr><th>Caso</th><th>Soluciones</th></tr><tr><td>\(r(A)<r([A\mid b])\)</td><td>Ninguna (inconsistente): aparece una fila \(0=c\ne0\)</td></tr><tr><td>\(r(A)=r([A\mid b])=n\)</td><td>Única</td></tr><tr><td>\(r(A)=r([A\mid b])<n\)</td><td>Infinitas, con \(n-r\) variables libres</td></tr></table></div></section>
+<div class="tbl"><table><tr><th>Caso</th><th>Soluciones</th></tr><tr><td>\(r(A)&lt;r([A\mid b])\)</td><td>Ninguna (inconsistente): aparece una fila \(0=c\ne0\)</td></tr><tr><td>\(r(A)=r([A\mid b])=n\)</td><td>Única</td></tr><tr><td>\(r(A)=r([A\mid b])&lt;n\)</td><td>Infinitas, con \(n-r\) variables libres</td></tr></table></div></section>
 <section><h3>Ejemplo</h3><p>\(2x+y-z=8\), \(-3x-y+2z=-11\), \(-2x+y+2z=-3\). Gauss-Jordan lleva a \(x=2\), \(y=3\), \(z=-1\). El laboratorio muestra cada operación por filas.</p></section>
 ${ENTRADA}${LAB}`,
 qs:[{q:"Un sistema homogéneo tiene 3 ecuaciones y 5 incógnitas. ¿Puede tener solución única?",a:"No: el rango es como mucho 3 < 5, así que hay al menos 2 variables libres e infinitas soluciones."}]},
@@ -110,7 +110,7 @@ qs:[{q:"A es 3×5 con rango 2. ¿Dimensiones de los cuatro subespacios?",a:"Colu
 {id:"ortogonal", parte:"Unidad 3 · Bases ortogonales, valores y vectores propios", t:"Bases ortonormales, Gram-Schmidt, proyecciones y distancias", sim:"gs", html:String.raw`
 <section><h3>Bases ortogonales y ortonormales</h3><p>Una base es <b>ortogonal</b> si sus vectores son perpendiculares dos a dos, y <b>ortonormal</b> si además son unitarios. En una base ortonormal, las coordenadas son productos punto: \(\mathbf x=\sum(\mathbf x\cdot\mathbf q_i)\mathbf q_i\). Una matriz con columnas ortonormales cumple \(Q^TQ=I\).</p></section>
 <section><h3>Proceso de Gram-Schmidt</h3>
-<div class="mj">\[\mathbf w_1=\mathbf v_1,\qquad\mathbf w_k=\mathbf v_k-\sum_{j<k}\frac{\mathbf v_k\cdot\mathbf w_j}{\mathbf w_j\cdot\mathbf w_j}\,\mathbf w_j,\qquad\mathbf q_k=\frac{\mathbf w_k}{\|\mathbf w_k\|}\]</div>
+<div class="mj">\[\mathbf w_1=\mathbf v_1,\qquad\mathbf w_k=\mathbf v_k-\sum_{j&lt;k}\frac{\mathbf v_k\cdot\mathbf w_j}{\mathbf w_j\cdot\mathbf w_j}\,\mathbf w_j,\qquad\mathbf q_k=\frac{\mathbf w_k}{\|\mathbf w_k\|}\]</div>
 <p>A cada vector se le quitan sus proyecciones sobre los anteriores. Si algún \(\mathbf w_k\) sale 0, el vector \(\mathbf v_k\) dependía de los anteriores.</p></section>
 <section><h3>Complementos ortogonales y proyecciones</h3><p>El complemento ortogonal \(W^\perp\) reúne los vectores perpendiculares a todo \(W\). Todo \(\mathbf x\) se descompone en \(\mathbf x=\text{proy}_W\mathbf x+(\mathbf x-\text{proy}_W\mathbf x)\). Con \(W=C(A)\): \(\text{proy}=A(A^TA)^{-1}A^T\mathbf x\), la base de mínimos cuadrados de la econometría.</p></section>
 <section><h3>Distancias</h3>

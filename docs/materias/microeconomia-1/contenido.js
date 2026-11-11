@@ -12,7 +12,7 @@ const TRUNK=[
 <section><h3>Funciones de costos y escala</h3>
 <p>Con \(C(q)=F+cq+dq^2\): \(CMg=c+2dq\), \(CMe=F/q+c+dq\), mínimo del costo medio en \(q=\sqrt{F/d}\).</p>
 <p>El <b>índice de economías de escala</b> es \(S=\dfrac{CMe}{CMg}\): si \(S>1\), el costo medio baja con la producción (economías de escala); si \(S<1\), sube (deseconomías). Con una sola tecnología homogénea de grado \(k\), \(S=k\): rendimientos crecientes equivalen a economías de escala.</p>
-<p>Una función de costos es <b>subaditiva</b> en \(Q\) si producir todo en una empresa cuesta menos que repartirlo: \(C(Q)<C(q_1)+C(q_2)\) con \(q_1+q_2=Q\). Es la definición moderna de monopolio natural.</p></section>
+<p>Una función de costos es <b>subaditiva</b> en \(Q\) si producir todo en una empresa cuesta menos que repartirlo: \(C(Q)&lt;C(q_1)+C(q_2)\) con \(q_1+q_2=Q\). Es la definición moderna de monopolio natural.</p></section>
 <section><h3>Competencia perfecta y eficiencia de Pareto</h3>
 <p>Supuestos: muchas empresas precio-aceptantes, bien homogéneo, información perfecta, libre entrada y salida, sin externalidades. Conclusiones: en el corto plazo \(P=CMg\); en el largo plazo \(P=CMg=\min CMe\) y beneficio cero. La asignación es <b>eficiente en el sentido de Pareto</b>: no se puede mejorar a nadie sin empeorar a otro. Cada estructura de mercado del curso se compara con este punto.</p></section>
 ${LAB}`,
@@ -121,10 +121,10 @@ qs:[{q:"Según Ramsey, ¿qué servicio de una empresa regulada debe tener un mar
 // ===================== UNIDAD 5 =====================
 {id:"monopsonio", parte:"Unidad 5 · Mercado de factores", t:"Monopsonio, demanda de factores y monopolio bilateral", sim:"monops", html:String.raw`
 <section><h3>La idea</h3><p class="lead">El monopsonista es el único comprador de un factor (por ejemplo, la única empresa que contrata en un pueblo). Para contratar un trabajador más debe subir el salario de todos, así que el costo marginal del factor es mayor que el salario.</p></section>
-<section><h3>Demanda de factores</h3><p>Una empresa contrata hasta que el ingreso que genera el último trabajador iguala lo que le cuesta. Ese ingreso es el <b>ingreso del producto marginal</b>: \(IPMg_L=IMg\cdot PMg_L\). En competencia en el producto, \(IMg=P\) y es el valor del producto marginal \(P\cdot PMg_L\). Un monopolista en el producto contrata menos, porque \(IMg<P\).</p></section>
+<section><h3>Demanda de factores</h3><p>Una empresa contrata hasta que el ingreso que genera el último trabajador iguala lo que le cuesta. Ese ingreso es el <b>ingreso del producto marginal</b>: \(IPMg_L=IMg\cdot PMg_L\). En competencia en el producto, \(IMg=P\) y es el valor del producto marginal \(P\cdot PMg_L\). Un monopolista en el producto contrata menos, porque \(IMg&lt;P\).</p></section>
 <section><h3>Monopsonio</h3>
 <p>Con oferta de trabajo \(w=e+fL\), el gasto es \(wL\) y el <b>costo marginal del factor</b> es \(CMF=e+2fL\). El monopsonista contrata donde \(CMF=IPMg\) y paga el salario de la oferta en ese punto:</p>
-<div class="mj">\[e+2fL=IPMg(L)\qquad w_m=e+fL_m<IPMg(L_m)\]</div>
+<div class="mj">\[e+2fL=IPMg(L)\qquad w_m=e+fL_m&lt;IPMg(L_m)\]</div>
 <p>Contrata menos y paga menos que en competencia. Un <b>salario mínimo</b> entre \(w_m\) y el salario competitivo puede <i>aumentar</i> el empleo, porque aplana el costo marginal del factor.</p></section>
 <section><h3>Monopolio bilateral</h3><p>Si frente al monopsonista hay un sindicato que actúa como monopolista del trabajo, el sindicato querría el salario donde el ingreso marginal de la demanda de trabajo iguala la oferta (salario alto) y la empresa el de monopsonio (salario bajo). El resultado queda <b>indeterminado</b> entre ambos y depende del poder de negociación.</p></section>
 <section><h3>Ejemplo</h3><p>Oferta \(w=10+L\) e \(IPMg=100-L\). Competencia: \(L=45\), \(w=55\). Monopsonio: \(10+2L=100-L\Rightarrow L=30\), \(w=40\) (aunque el trabajador 30 produce 70). Sindicato: \(100-2L=10+L\Rightarrow L=30\), \(w=70\). El salario negociado queda entre 40 y 70.</p></section>

@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sympy as sp
-import google.generativeai as genai
 import diseno
 
 diseno.cargar_estilos_premium()

@@ -99,7 +99,7 @@ qs:[{q:"¿Por qué los críticos de Engle-Granger son más negativos que los de 
 
 {id:"johansen", parte:U2, t:"VEC y prueba de Johansen", sim:"joh", html:String.raw`
 <section><h3>El modelo VEC</h3><div class="mj">\[\Delta\mathbf y_t=\mathbf c+\Pi\mathbf y_{t-1}+\sum_{i=1}^{p-1}\Gamma_i\Delta\mathbf y_{t-i}+\mathbf u_t,\qquad \Pi=\alpha\beta'\]</div>
-<p>El <b>rango</b> de \(\Pi\) es el número de relaciones de cointegración \(r\): si \(r=0\), VAR en diferencias; si \(r=K\), las series son estacionarias; si \(0<r<K\), hay \(r\) vectores de cointegración (columnas de \(\beta\)) y \(\alpha\) contiene las velocidades de ajuste.</p></section>
+<p>El <b>rango</b> de \(\Pi\) es el número de relaciones de cointegración \(r\): si \(r=0\), VAR en diferencias; si \(r=K\), las series son estacionarias; si \(0&lt;r&lt;K\), hay \(r\) vectores de cointegración (columnas de \(\beta\)) y \(\alpha\) contiene las velocidades de ajuste.</p></section>
 <section><h3>Prueba de Johansen</h3><p>Se estiman por máxima verosimilitud los valores propios \(\hat\lambda_1>\dots>\hat\lambda_K\) de un problema de correlaciones canónicas entre \(\Delta\mathbf y_t\) y \(\mathbf y_{t-1}\):</p>
 <div class="mj">\[\lambda_{traza}(r)=-T\sum_{i=r+1}^{K}\ln(1-\hat\lambda_i)\qquad \lambda_{max}(r)=-T\ln(1-\hat\lambda_{r+1})\]</div>
 <p>Se prueba secuencialmente \(H_0:r=0\), luego \(r\le1\), … y se detiene en la primera que no se rechaza. Los valores críticos (Osterwald-Lenum) dependen de cómo entran la constante y la tendencia. Ventaja frente a Engle-Granger: detecta varios vectores y no depende de qué variable se normaliza.</p></section>

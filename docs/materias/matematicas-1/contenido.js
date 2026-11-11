@@ -30,7 +30,7 @@ ${LAB}`,qs:[{q:"Pendiente de la recta perpendicular a y = 2x + 1.",a:"−1/2."}]
 ${LAB}`,qs:[{q:"Resuelve x + y = 10, x − y = 2.",a:"Sumando: 2x = 12 ⟹ x = 6, y = 4."}]},
 {id:"desigualdades",parte:U3,t:"Desigualdades y valor absoluto",sim:"des",html:String.raw`
 <section><h3>Desigualdades</h3><p class="lead">Se resuelven como ecuaciones, con una regla: al <b>multiplicar o dividir por un negativo, el sentido se invierte</b>. Las no lineales (polinómicas o racionales) se resuelven con la <b>tabla de signos</b>: se hallan los puntos críticos (ceros del numerador y del denominador), se divide la recta en intervalos y se prueba el signo en cada uno. La solución se escribe en notación de intervalos.</p>
-<p><b>Valor absoluto:</b> \(|x|<a\iff -a<x<a\); \(|x|>a\iff x<-a\ \text{o}\ x>a\) (con \(a>0\)).</p></section>
+<p><b>Valor absoluto:</b> \(|x|&lt;a\iff -a&lt;x&lt;a\); \(|x|>a\iff x<-a\ \text{o}\ x>a\) (con \(a>0\)).</p></section>
 ${SINT}${LAB}`,qs:[{q:"Resuelve |x − 3| < 2.",a:"−2 < x − 3 < 2 ⟹ 1 < x < 5: el intervalo (1, 5)."}]},
 {id:"funciones",parte:U3,t:"Funciones: dominio, rango, composición e inversa",sim:"fun",html:String.raw`
 <section><h3>Conceptos</h3><p class="lead">Una función asigna a cada \(x\) del dominio un único \(f(x)\). <b>Dominio:</b> se excluyen ceros de denominadores, radicandos negativos (raíces pares) y argumentos no positivos de logaritmos. <b>Rango:</b> conjunto de valores que toma \(f\).</p><ul><li><b>Par:</b> \(f(-x)=f(x)\) (simétrica respecto al eje y); <b>impar:</b> \(f(-x)=-f(x)\) (simétrica respecto al origen).</li><li><b>Composición:</b> \((f\circ g)(x)=f(g(x))\).</li><li><b>Inversa:</b> existe si \(f\) es inyectiva; se despeja \(x\) en \(y=f(x)\) y se intercambian las variables. Su gráfica es la reflexión respecto a \(y=x\).</li></ul>
@@ -44,7 +44,7 @@ ${LAB}`,qs:[{q:"¿Cómo se obtiene la gráfica de (x − 3)² + 1 desde x²?",a:
 <p><b>Identidades fundamentales:</b> \(\sin^2\theta+\cos^2\theta=1\), \(1+\tan^2\theta=\sec^2\theta\), \(\sin2\theta=2\sin\theta\cos\theta\), \(\cos2\theta=\cos^2\theta-\sin^2\theta\). En economía se usan para modelar ciclos y estacionalidad: \(y=A\sin(\omega t+\varphi)+c\).</p></section>
 ${SINT}${LAB}`,qs:[{q:"¿Cuánto vale sen(π/6)?",a:"1/2."}]},
 {id:"explog",parte:U4,t:"Funciones exponenciales y logarítmicas",sim:"explog",html:String.raw`
-<section><h3>Propiedades</h3><p class="lead">\(f(x)=a^x\) (\(a>0,a\ne1\)) crece si \(a>1\) y decrece si \(0<a<1\). Su inversa es \(\log_ax\): \(y=\log_ax\iff a^y=x\). El logaritmo natural usa la base \(e\approx2{,}71828\).</p>
+<section><h3>Propiedades</h3><p class="lead">\(f(x)=a^x\) (\(a>0,a\ne1\)) crece si \(a>1\) y decrece si \(0&lt;a<1\). Su inversa es \(\log_ax\): \(y=\log_ax\iff a^y=x\). El logaritmo natural usa la base \(e\approx2{,}71828\).</p>
 <p>\(\log(xy)=\log x+\log y\), \(\log(x/y)=\log x-\log y\), \(\log x^r=r\log x\), cambio de base \(\log_ax=\ln x/\ln a\). Al resolver ecuaciones logarítmicas hay que verificar que las soluciones estén en el dominio.</p>
 <p>Aplicaciones: interés compuesto \(A=P(1+r/m)^{mt}\), continuo \(A=Pe^{rt}\); tiempo para duplicar \(t=\ln2/r\).</p></section>
 ${SINT}${LAB}`,qs:[{q:"Resuelve 2^(x+1) = 16.",a:"2^(x+1) = 2⁴ ⟹ x = 3."}]},

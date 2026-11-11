@@ -44,7 +44,7 @@ qs:[{q:"Según Sargent y Wallace, ¿qué efecto tiene una expansión monetaria a
 <p>El déficit total se financia con deuda o con emisión. Si se excluyen los intereses se habla de <b>balance primario</b>. Iterando hacia adelante se obtiene la <b>restricción intertemporal</b>: el valor presente de los superávits primarios futuros debe cubrir la deuda actual (condición de no-Ponzi).</p></section>
 <section><h3>Dinámica de la razón deuda/PIB</h3><div class="mj">\[d_t=\frac{1+r}{1+g}\,d_{t-1}-s_t\qquad\Rightarrow\qquad \Delta d_t\approx(r-g)\,d_{t-1}-s_t\]</div>
 <p>\(d\) es deuda/PIB, \(r\) la tasa de interés real, \(g\) el crecimiento real y \(s\) el superávit primario en % del PIB. Para <b>estabilizar</b> la deuda en \(d\):</p><div class="mj">\[s^*=\frac{r-g}{1+g}\,d\]</div>
-<p>Si \(r>g\), hace falta un superávit primario; si \(r<g\), la deuda puede estabilizarse incluso con déficit primario. El «efecto bola de nieve» es el término \((r-g)d\). La deuda es <b>sostenible</b> si el superávit requerido es política y económicamente factible.</p></section>
+<p>Si \(r>g\), hace falta un superávit primario; si \(r&lt;g\), la deuda puede estabilizarse incluso con déficit primario. El «efecto bola de nieve» es el término \((r-g)d\). La deuda es <b>sostenible</b> si el superávit requerido es política y económicamente factible.</p></section>
 ${LAB}`,
 qs:[{q:"Con d = 60 %, r = 4 % y g = 2 %, ¿qué superávit primario estabiliza la deuda?",a:"s* = (0,04 − 0,02)/1,02 × 60 ≈ 1,18 % del PIB."}]},
 

@@ -52,7 +52,7 @@ qs:[{q:"Si sube la productividad z, ¿qué pasa con w* y con el empleo de equili
 {id:"consumo", parte:"Unidad 2 · Microfundamentos de la demanda agregada", t:"La función de consumo", sim:"consumo", html:String.raw`
 <section><h3>La idea</h3>
 <p class="lead">La función de consumo keynesiana dice que los hogares gastan una parte fija, el <b>consumo autónomo</b> \(C_0\), más una fracción \(c_1\) de su ingreso disponible \(Y-T\).</p>
-<div class="mj">\[C=C_0+c_1\,(Y-T),\qquad 0<c_1<1\]</div></section>
+<div class="mj">\[C=C_0+c_1\,(Y-T),\qquad 0&lt;c_1<1\]</div></section>
 <section><h3>Conceptos clave</h3>
 <div class="tbl"><table><tr><th>Concepto</th><th>Fórmula</th><th>Lectura</th></tr>
 <tr><td>Ingreso disponible</td><td>\(Y_d=Y-T\)</td><td>Lo que queda después de impuestos</td></tr>
@@ -82,7 +82,7 @@ qs:[{q:"Con C₀ = 500, c₁ = 0,8, Y = 2.000 y T = 400, ¿cuánto vale el ahorr
 <p class="lead">El hogar decide cuánto consumir hoy y mañana sabiendo que puede ahorrar o endeudarse a la tasa \(r\). Lo que importa no es el ingreso de cada período sino la <b>riqueza</b>: el valor presente de todos sus ingresos.</p></section>
 <section><h3>Restricción presupuestaria</h3>
 <div class="mj">\[C_1+\frac{C_2}{1+r}=Y_1+\frac{Y_2}{1+r}=W\]</div>
-<p>Si \(C_1<Y_1\) el hogar ahorra \(S_1=Y_1-C_1\) y mañana recibe \((1+r)S_1\).</p></section>
+<p>Si \(C_1&lt;Y_1\) el hogar ahorra \(S_1=Y_1-C_1\) y mañana recibe \((1+r)S_1\).</p></section>
 <section><h3>Ecuación de Euler</h3>
 <p>En el óptimo, sacrificar una unidad de consumo hoy debe dar exactamente la misma utilidad que consumir \(1+r\) unidades mañana, descontadas a la tasa de impaciencia \(\rho\):</p>
 <div class="mj">\[u'(C_1)=\frac{1+r}{1+\rho}\,u'(C_2)\quad\Longrightarrow\quad C_2=C_1\left(\frac{1+r}{1+\rho}\right)^{1/\theta}\]</div>
@@ -231,7 +231,7 @@ qs:[{q:"Bajo equivalencia ricardiana, ¿qué pasa con el ahorro nacional si el g
 <p>\(r\) es la tasa de interés real, \(g\) el crecimiento real del PIB y \(s\) el superávit primario en porcentaje del PIB.</p></section>
 <section><h3>Sostenibilidad</h3>
 <div class="mj">\[b_{t+1}=b_t\iff s^*=\frac{r-g}{1+g}\,b\]</div>
-<ul><li>Si \(r>g\), la deuda crece sola: se necesita un superávit primario para estabilizarla, mayor cuanto más alta sea la deuda.</li><li>Si \(r<g\), el crecimiento licúa la deuda; pero el diferencial puede revertirse rápido en una crisis (prima de riesgo, devaluación de la deuda en dólares).</li><li>La <b>condición de no Ponzi</b>: el valor presente de la deuda en el infinito debe ser cero, es decir, la deuda de hoy se paga con superávits primarios futuros.</li></ul>
+<ul><li>Si \(r>g\), la deuda crece sola: se necesita un superávit primario para estabilizarla, mayor cuanto más alta sea la deuda.</li><li>Si \(r&lt;g\), el crecimiento licúa la deuda; pero el diferencial puede revertirse rápido en una crisis (prima de riesgo, devaluación de la deuda en dólares).</li><li>La <b>condición de no Ponzi</b>: el valor presente de la deuda en el infinito debe ser cero, es decir, la deuda de hoy se paga con superávits primarios futuros.</li></ul>
 <p>En Colombia la regla fiscal (Ley 1473 de 2011, reformada por la Ley 2155 de 2021) fija un ancla de deuda neta y una meta de balance primario neto estructural, y la vigila el Comité Autónomo de la Regla Fiscal.</p></section>
 ${LAB}`,
 qs:[{q:"Con deuda de 60 % del PIB, r = 5 % y g = 2 %, ¿qué superávit primario estabiliza la deuda?",a:"s* = (0,05 − 0,02)/1,02 × 60 % ≈ 1,76 % del PIB."}]},
@@ -359,7 +359,7 @@ qs:[{q:"Si gY = 4 %, gK = 5 %, gL = 2 % y α = 0,4, ¿cuánto creció la PTF?",a
 <div class="mj">\[\frac{\dot c}{c}=\frac{f'(k)-\delta-\rho}{\theta}\qquad\lim_{t\to\infty}e^{-(\rho-n)t}\,u'(c)\,k=0\]</div>
 <p>La primera es la ecuación de Euler (o regla de Keynes-Ramsey): el consumo crece si el rendimiento del capital supera la tasa de descuento; \(1/\theta\) mide cuánto se está dispuesto a sustituir consumo entre períodos. La segunda es la condición de transversalidad.</p></section>
 <section><h3>El diagrama de fases</h3>
-<p>\(\dot c=0\) es una recta vertical en \(f'(k^*)=\delta+\rho\); \(\dot k=0\) es la curva \(c=f(k)-(n+\delta)k\), con máximo en la regla de oro. El estado estacionario es un <b>punto de silla</b>: hay una única senda estable. Con \(\rho>n\), \(k^*<k_{oro}\) (regla de oro modificada): la impaciencia hace que nunca convenga acumular hasta la regla de oro, y no hay ineficiencia dinámica.</p></section>
+<p>\(\dot c=0\) es una recta vertical en \(f'(k^*)=\delta+\rho\); \(\dot k=0\) es la curva \(c=f(k)-(n+\delta)k\), con máximo en la regla de oro. El estado estacionario es un <b>punto de silla</b>: hay una única senda estable. Con \(\rho>n\), \(k^*&lt;k_{oro}\) (regla de oro modificada): la impaciencia hace que nunca convenga acumular hasta la regla de oro, y no hay ineficiencia dinámica.</p></section>
 ${LAB}`,
 qs:[{q:"Si los hogares se vuelven más pacientes (ρ baja), ¿qué pasa al momento del cambio?",a:"El capital no puede saltar, así que el consumo cae de golpe hasta la nueva senda de silla; luego consumo y capital crecen hacia un estado estacionario más alto."}]}
 ];
