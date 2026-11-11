@@ -9,6 +9,16 @@ ECO = os.path.join(SCR, "eco/original.html")
 rd = lambda p: open(os.path.join(SCR, p), encoding="utf-8").read()
 
 # ---------------------------------------------------------------------
+# App instalable (PWA): manifiesto, íconos y service worker para usarla sin internet.
+def pwa_tags(base):
+    return (f'\n<link rel="manifest" href="{base}manifest.webmanifest">'
+            f'\n<meta name="theme-color" content="#1b2430">'
+            f'\n<link rel="icon" type="image/png" href="{base}iconos/favicon-48.png">'
+            f'\n<link rel="apple-touch-icon" href="{base}iconos/apple-touch-icon.png">'
+            f'\n<meta name="apple-mobile-web-app-title" content="Economiapp">'
+            f'\n<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("{base}sw.js").catch(()=>{{}}))</script>')
+
+# ---------------------------------------------------------------------
 # Estadísticas de visitas (Google Analytics 4). Pega aquí el «ID de medición»
 # de tu propiedad (empieza por G-). Vacío = el sitio no carga ninguna analítica.
 ANALYTICS_ID = os.environ.get("ECONOMIAPP_GA", "G-7BHLT18DZR")
@@ -235,7 +245,7 @@ HEAD = '''<!doctype html>
 @media (prefers-color-scheme: dark){{:root:not([data-theme="light"]){{--line:{d};--line-soft:{ds}}}}}
 :root[data-theme="dark"]{{--line:{d};--line-soft:{ds}}}
 </style>
-{mathjax}{analytics}
+{mathjax}{analytics}{pwa}
 </head>
 <body>
 '''
@@ -423,7 +433,7 @@ MATERIAS += [dict(slug=g["slug"], key="ruta-" + g["dir"] + "-done", title=g["h1"
 for m in MATERIAS:
     l, ls, d, ds = m["colors"]
     mj = MATHJAX if m.get("mathjax", True) else ""
-    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, analytics=analytics_tag(), l=l, ls=ls, d=d, ds=ds)
+    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, analytics=analytics_tag(), pwa=pwa_tags("../"), l=l, ls=ls, d=d, ds=ds)
     if m.get("css"):
         marker = ":root[data-theme=\"dark\"]{--line:" + d + ";--line-soft:" + ds + "}\n</style>"
         assert marker in html
@@ -546,7 +556,40 @@ proximas = []
 idx = open(os.path.join(S, "portada.html"), encoding="utf-8").read()
 idx = idx.replace("/*CATALOGO*/", "const MATERIAS=" + json.dumps(cat, ensure_ascii=False) + ";\nconst PROXIMAS=" + json.dumps(proximas, ensure_ascii=False) + ";\nconst PLAN=" + json.dumps(PLANJ, ensure_ascii=False) + ";")
 idx = idx.replace("</head>", analytics_tag().lstrip() + "\n</head>", 1) if ANALYTICS_ID else idx
+idx = idx.replace("</head>", pwa_tags("./").lstrip() + "\n</head>", 1)
 wr("index.html", idx)
 wr(".nojekyll", "")
 shutil.copy(os.path.join(S, "LEEME.md"), os.path.join(OUT, "LEEME.md"))
 print({c["slug"]: (len(c["t"]), len(c["b"]), len(c["w"])) for c in cat})
+
+# ---------------------------------------------------------------------
+# App instalable: íconos, manifiesto y service worker (con la lista de todo el sitio)
+import hashlib, re as _re
+os.makedirs(os.path.join(OUT, "iconos"), exist_ok=True)
+for _f in sorted(os.listdir(os.path.join(S, "iconos"))):
+    shutil.copy(os.path.join(S, "iconos", _f), os.path.join(OUT, "iconos", _f))
+wr("manifest.webmanifest", json.dumps({
+    "name": "Economiapp · Rutas de estudio de Economía", "short_name": "Economiapp",
+    "description": "Las materias de Economía como líneas de metro: lecciones, laboratorios y simulacros.",
+    "lang": "es-CO", "dir": "ltr", "start_url": "./?fuente=app", "scope": "./", "id": "./",
+    "display": "standalone", "orientation": "any", "background_color": "#edf0ea", "theme_color": "#1b2430",
+    "categories": ["education", "productivity"],
+    "icons": [{"src": "iconos/icon-192.png", "sizes": "192x192", "type": "image/png"},
+              {"src": "iconos/icon-512.png", "sizes": "512x512", "type": "image/png"},
+              {"src": "iconos/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+              {"src": "iconos/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}]
+}, ensure_ascii=False, indent=1))
+_files, _ext, _h = [], set(), hashlib.sha256()
+for _d, _, _fs in sorted(os.walk(OUT)):
+    for _f in sorted(_fs):
+        _p = os.path.join(_d, _f); _r = os.path.relpath(_p, OUT).replace(os.sep, "/")
+        if _r in ("sw.js", "LEEME.md"):
+            continue
+        _files.append("./" + ("" if _r == "index.html" else _r)); _h.update(_r.encode()); _h.update(open(_p, "rb").read())
+        if _r.endswith(".html"):
+            for _u in _re.findall(r'<script[^>]+src="(https://[^"]+)"', open(_p, encoding="utf-8").read()):
+                if "googletagmanager" not in _u and "pyodide" not in _u:
+                    _ext.add(_u)
+_sw = open(os.path.join(S, "sw.js"), encoding="utf-8").read()
+_sw = _sw.replace("__VERSION__", _h.hexdigest()[:12]).replace("__ARCHIVOS__", json.dumps(_files + sorted(_ext), ensure_ascii=False))
+wr("sw.js", _sw)

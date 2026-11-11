@@ -106,6 +106,14 @@ header p{margin:0;max-width:60ch;color:var(--muted);font-size:16.5px}
 .how div{display:flex;flex-direction:column;gap:4px}
 .how h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:18px}
 .how p{margin:0;color:var(--muted);font-size:14.5px}
+.app{border:1.5px solid var(--rule);background:var(--card);border-radius:16px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.app h3{margin:0 0 4px;font-size:16px}.app p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.45}
+.app .bt{display:flex;flex-wrap:wrap;gap:8px}
+.app button,.app label.b{font:inherit;font-size:13.5px;font-weight:600;border:1.5px solid var(--ink);background:var(--ink);color:var(--card);border-radius:99px;padding:6px 14px;cursor:pointer;min-height:36px;display:inline-flex;align-items:center}
+.app button.sec,.app label.b{background:transparent;color:var(--ink)}
+.app button:disabled{opacity:.5;cursor:default}
+.app .msg{font-size:13px;color:var(--muted);margin-top:8px;min-height:1em}
+.app .msg b{color:var(--ink)}
 footer{border-top:1px solid var(--rule);padding-top:16px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
 @media (max-width:560px){.line{grid-template-columns:minmax(0,1fr)}.line .meta{align-items:flex-start;text-align:left;flex-direction:row;gap:8px;align-items:baseline}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -139,7 +147,16 @@ footer{border-top:1px solid var(--rule);padding-top:16px;color:var(--muted);font
     <div><h3>Marca lo que dominas</h3><p>Tu avance se guarda en este navegador y aparece aquí, en cada línea. Con el botón de cada materia puedes marcarla como cursando o aprobada.</p></div>
   </section>
 
-  <footer><span>Economiapp</span><span>El progreso se guarda solo en este dispositivo.</span></footer>
+  <section class="app" aria-label="Instalar y respaldar">
+    <div><h3>Úsala como app</h3><p>Instálala en tu celular o computador: abre sin barra del navegador y, si descargas el contenido, funciona sin internet.</p>
+      <div class="bt"><button type="button" id="app-inst" hidden>Instalar Economiapp</button><button type="button" class="sec" id="app-off">Descargar para usar sin internet</button></div>
+      <div class="msg" id="app-msg1"></div></div>
+    <div><h3>Respalda tu progreso</h3><p>Tu avance vive en este navegador. Guarda un archivo de respaldo para pasarlo a otro dispositivo o no perderlo si borras los datos.</p>
+      <div class="bt"><button type="button" id="app-exp">Exportar progreso</button><label class="b" for="app-imp">Importar respaldo</label><input type="file" id="app-imp" accept=".json,application/json" hidden></div>
+      <div class="msg" id="app-msg2"></div></div>
+  </section>
+
+  <footer><span>Economiapp</span><span>El progreso se guarda en este dispositivo; usa «Exportar progreso» para respaldarlo.</span></footer>
 </div>
 <script>
 /*CATALOGO*/
@@ -198,6 +215,51 @@ $("q").addEventListener("keydown",e=>{if(e.key==="Enter"){const a=$("res").query
 window.addEventListener("pageshow",render);
 window.addEventListener("storage",render);
 render();
+
+/* ---------- app instalable, descarga sin internet y respaldo del progreso ---------- */
+(function(){
+const ev=(n,p)=>{try{window.gtag&&gtag("event",n,p||{})}catch(e){}};
+const m1=$("app-msg1"),m2=$("app-msg2"),inst=$("app-inst"),off=$("app-off");
+const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+let prompt=null;
+if(standalone){m1.innerHTML="<b>Ya la estás usando como app.</b>"}
+else if(ios){m1.innerHTML="En iPhone: toca <b>Compartir</b> y luego <b>Agregar a inicio</b>."}
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();prompt=e;inst.hidden=false});
+inst.addEventListener("click",async()=>{if(!prompt)return;prompt.prompt();const r=await prompt.userChoice;ev("instalar_app",{resultado:r.outcome});prompt=null;inst.hidden=true;if(r.outcome==="accepted")m1.innerHTML="<b>¡Instalada!</b> Búscala entre tus aplicaciones."});
+addEventListener("appinstalled",()=>{inst.hidden=true;ev("app_instalada")});
+const offK="eco-offline";
+try{const d=localStorage.getItem(offK);if(d&&!standalone&&!ios)m1.textContent="Contenido descargado el "+d+"."}catch(e){}
+if(!("serviceWorker" in navigator)){off.disabled=true;m1.textContent="Este navegador no permite usarla sin internet."}
+off.addEventListener("click",async()=>{off.disabled=true;m1.textContent="Preparando…";
+  try{const reg=await navigator.serviceWorker.ready;const ch=new MessageChannel();
+    ch.port1.onmessage=e=>{const {hechos,total,fallos}=e.data;m1.innerHTML=`Descargando… <b>${Math.round(100*hechos/total)} %</b>`;
+      if(hechos===total){m1.innerHTML=fallos?`Descarga incompleta: ${fallos} archivos fallaron. Revisa tu conexión e inténtalo otra vez.`:"<b>Listo:</b> todas las materias funcionan sin internet en este dispositivo.";off.disabled=false;
+        if(!fallos){const d=new Date().toLocaleDateString("es-CO");try{localStorage.setItem(offK,d)}catch(e){}ev("descarga_offline")}}};
+    (reg.active||reg.waiting||reg.installing).postMessage({tipo:"descargar-todo"},[ch.port2]);
+  }catch(e){m1.textContent="No se pudo descargar. Recarga la página e inténtalo de nuevo.";off.disabled=false}});
+const PREF=/^(ruta|eco|guia|hpe)-/;
+const datos=()=>{const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(PREF.test(k))o[k]=localStorage.getItem(k)}}catch(e){}return o};
+$("app-exp").addEventListener("click",()=>{const d=datos(),n=Object.keys(d).length;if(!n){m2.textContent="Todavía no hay progreso para respaldar.";return}
+  const f=new Date(),fs=f.toISOString().slice(0,10),blob=new Blob([JSON.stringify({app:"economiapp",version:1,fecha:f.toISOString(),datos:d},null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`economiapp-progreso-${fs}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  m2.innerHTML=`<b>Respaldo descargado</b> (${n} registros). Guárdalo en tu nube o envíalo a tu otro dispositivo.`;ev("exportar_progreso",{registros:n})});
+$("app-imp").addEventListener("change",e=>{const file=e.target.files[0];e.target.value="";if(!file)return;const rd=new FileReader();
+  rd.onload=()=>{let j;try{j=JSON.parse(rd.result)}catch(err){m2.textContent="Ese archivo no es un respaldo de Economiapp.";return}
+    if(!j||j.app!=="economiapp"||typeof j.datos!=="object"){m2.textContent="Ese archivo no es un respaldo de Economiapp.";return}
+    const ks=Object.keys(j.datos).filter(k=>PREF.test(k)),fecha=j.fecha?new Date(j.fecha).toLocaleDateString("es-CO"):"fecha desconocida";
+    m2.innerHTML=`Respaldo del ${esc(fecha)} con ${ks.length} registros. <span class="bt" style="margin-top:8px"><button type="button" id="imp-mez">Combinar con lo actual</button><button type="button" class="sec" id="imp-rem">Reemplazar todo</button><button type="button" class="sec" id="imp-no">Cancelar</button></span>`;
+    const aplicar=reemplazar=>{try{if(reemplazar)Object.keys(datos()).forEach(k=>localStorage.removeItem(k));
+        ks.forEach(k=>{const v=String(j.datos[k]);const cur=localStorage.getItem(k);
+          if(reemplazar||cur===null){localStorage.setItem(k,v);return}
+          try{const x=JSON.parse(cur),y=JSON.parse(v);
+            if(Array.isArray(x)&&Array.isArray(y)){localStorage.setItem(k,JSON.stringify([...new Set([...x,...y])]));return}
+            if(x&&y&&typeof x==="object"&&typeof y==="object"){localStorage.setItem(k,JSON.stringify(Object.assign({},x,y)));return}}catch(e){}});
+        ev("importar_progreso",{registros:ks.length,modo:reemplazar?"reemplazar":"combinar"});m2.innerHTML="<b>Progreso restaurado.</b> Actualizando…";setTimeout(()=>location.reload(),700)}
+      catch(err){m2.textContent="No se pudo guardar: el navegador no permite almacenamiento en este modo."}};
+    $("imp-mez").onclick=()=>aplicar(false);$("imp-rem").onclick=()=>aplicar(true);$("imp-no").onclick=()=>{m2.textContent=""}};
+  rd.readAsText(file)});
+})();
 </script>
 </body>
 </html>
