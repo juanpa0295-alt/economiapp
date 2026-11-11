@@ -63,9 +63,9 @@ header p{margin:0;max-width:60ch;color:var(--muted);font-size:16.5px}
 .line .meta small{font-size:12px;color:var(--muted)}
 .track{grid-column:1/-1;display:flex;align-items:center;margin-top:10px;position:relative;height:22px}
 .track::before{content:"";position:absolute;left:8px;right:8px;top:50%;height:5px;margin-top:-2.5px;background:var(--cc);border-radius:3px;opacity:.9}
-.track span{position:relative;flex:1;display:flex;justify-content:center}
+.track span{position:relative;flex:1;min-width:0;display:flex;justify-content:center}
 .track span:first-child{justify-content:flex-start}.track span:last-child{justify-content:flex-end}
-.track span i{width:16px;height:16px;border-radius:50%;background:var(--card);border:3.5px solid var(--cc);display:block}
+.track span i{width:clamp(9px,100%,16px);aspect-ratio:1;height:auto;box-sizing:border-box;border-radius:50%;background:var(--card);border:3.5px solid var(--cc);display:block;flex-shrink:0}
 .track span.done i{background:var(--cc)}
 .ends{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
 .ends span:last-child{text-align:right}
@@ -106,6 +106,7 @@ header p{margin:0;max-width:60ch;color:var(--muted);font-size:16.5px}
 .how div{display:flex;flex-direction:column;gap:4px}
 .how h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:18px}
 .how p{margin:0;color:var(--muted);font-size:14.5px}
+html,body{overflow-x:clip}
 .app{border:1.5px solid var(--rule);background:var(--card);border-radius:16px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 .app h3{margin:0 0 4px;font-size:16px}.app p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.45}
 .app .bt{display:flex;flex-wrap:wrap;gap:8px}

@@ -7,7 +7,9 @@
   const materia = () => (document.title.split(" · ")[0] || "Portada").trim();
   const PEND = "eco-opiniones-pendientes";
 
-  const css = `.eco-fab{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));z-index:60;display:flex;gap:8px}
+  const css = `.eco-fab{position:fixed;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));z-index:60;display:flex;justify-content:center;gap:10px;padding:0 12px;pointer-events:none}
+.eco-fab button{pointer-events:auto}
+@media(min-width:900px){.eco-fab{left:auto;right:max(18px,env(safe-area-inset-right));padding:0}}
 .eco-fab button{font:600 13.5px/1 var(--f-body,system-ui,sans-serif);border:1.5px solid var(--ink,#1b2430);border-radius:99px;padding:9px 14px;min-height:40px;cursor:pointer;background:var(--card,#f8f9f5);color:var(--ink,#1b2430);box-shadow:0 2px 10px rgba(0,0,0,.14)}
 .eco-fab button.pri{background:var(--ink,#1b2430);color:var(--card,#f8f9f5)}
 .eco-ov{position:fixed;inset:0;z-index:70;background:rgba(10,14,20,.45);display:flex;align-items:flex-end;justify-content:center;padding:12px}
