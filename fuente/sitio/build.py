@@ -12,7 +12,10 @@ rd = lambda p: open(os.path.join(SCR, p), encoding="utf-8").read()
 # App instalable (PWA): manifiesto, íconos y service worker para usarla sin internet.
 # Formulario de opiniones (Google Forms). «action» termina en /formResponse; «campos» son los entry.NNN de cada pregunta.
 # Vacío = el botón «Opinar» no aparece.
-FORM = json.loads(os.environ["ECONOMIAPP_FORM"]) if os.environ.get("ECONOMIAPP_FORM") else {"action": "", "campos": {}}
+FORM = json.loads(os.environ["ECONOMIAPP_FORM"]) if os.environ.get("ECONOMIAPP_FORM") else {
+    "action": "https://docs.google.com/forms/d/e/1FAIpQLSf_Muwartu_Od-3A5lhfVu5djis4J4CmnA9RR5VClaW0YpHIg/formResponse",
+    "campos": {"materia": "entry.332894674", "utilidad": "entry.467103254", "falta": "entry.1719251696",
+               "pago": "entry.1755850544", "contacto": "entry.1508511471"}}
 
 def pwa_tags(base):
     return (f'\n<link rel="manifest" href="{base}manifest.webmanifest">'
