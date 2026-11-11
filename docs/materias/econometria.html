@@ -47,6 +47,17 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
     const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BHLT18DZR"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag("js",new Date());gtag("config","G-7BHLT18DZR",{send_page_view:false,anonymize_ip:true});
+/* una «vista» por página y por estación: /materias/estadistica-2.html#tlc se registra como /materias/estadistica-2/tlc,
+   para que el informe «Páginas y pantallas» muestre qué temas se estudian más */
+(function(){let last="";const v=()=>{const h=location.hash.replace(/^#/,"").split(/[?&]/)[0],p=h?location.pathname.replace(/\.html$/,"")+"/"+encodeURIComponent(h):location.pathname;if(p===last)return;last=p;
+const t=document.querySelector("h2")&&h?document.title.split(" · ")[0]+" · "+(document.querySelector("h2").textContent||h):document.title;
+gtag("event","page_view",{page_location:location.origin+p,page_title:t})};
+setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
+</script>
 </head>
 <body>
 <div class="wrap">

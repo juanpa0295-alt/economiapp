@@ -11,7 +11,7 @@ rd = lambda p: open(os.path.join(SCR, p), encoding="utf-8").read()
 # ---------------------------------------------------------------------
 # Estadísticas de visitas (Google Analytics 4). Pega aquí el «ID de medición»
 # de tu propiedad (empieza por G-). Vacío = el sitio no carga ninguna analítica.
-ANALYTICS_ID = os.environ.get("ECONOMIAPP_GA", "")
+ANALYTICS_ID = os.environ.get("ECONOMIAPP_GA", "G-7BHLT18DZR")
 def analytics_tag():
     if not ANALYTICS_ID:
         return ""
@@ -21,10 +21,12 @@ def analytics_tag():
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}
 gtag("js",new Date());gtag("config","{g}",{{send_page_view:false,anonymize_ip:true}});
-/* una «vista» por página y por estación (#estacion), para saber qué temas se estudian más */
-(function(){{let last="";const v=()=>{{const p=location.pathname+location.hash;if(p===last)return;last=p;
-gtag("event","page_view",{{page_location:location.href,page_path:p,page_title:document.title}})}};
-v();addEventListener("hashchange",v)}})();
+/* una «vista» por página y por estación: /materias/estadistica-2.html#tlc se registra como /materias/estadistica-2/tlc,
+   para que el informe «Páginas y pantallas» muestre qué temas se estudian más */
+(function(){{let last="";const v=()=>{{const h=location.hash.replace(/^#/,"").split(/[?&]/)[0],p=h?location.pathname.replace(/\\.html$/,"")+"/"+encodeURIComponent(h):location.pathname;if(p===last)return;last=p;
+const t=document.querySelector("h2")&&h?document.title.split(" · ")[0]+" · "+(document.querySelector("h2").textContent||h):document.title;
+gtag("event","page_view",{{page_location:location.origin+p,page_title:t}})}};
+setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))}})();
 </script>'''
 
 def wr(rel, txt):
