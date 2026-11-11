@@ -10,7 +10,7 @@ Desde la raíz del repositorio:
 python3 fuente/sitio/build.py
 ```
 
-Esto reescribe `docs/` completo (portada, páginas de cada materia, `comun/` y `materias/`). Solo usa la biblioteca estándar de Python 3. Después, revisa los cambios con `git status`, haz commit y push. GitHub Pages publica `docs/` desde la rama `main`.
+Esto reescribe `docs/` completo (portada, páginas de cada materia, `comun/` y `materias/`). Solo usa la biblioteca estándar de Python 3. Después, revisa los cambios con `git status`, haz commit y push. GitHub Pages publica `docs/` desde la rama `main` en **https://economiapp.app** (el archivo `docs/CNAME` lo escribe el generador; el dominio está registrado en Dynadot y apunta a GitHub Pages con 4 registros A, 4 AAAA y un CNAME `www`).
 
 Para generar en otra carpeta (por ejemplo, para probar sin tocar `docs/`):
 
