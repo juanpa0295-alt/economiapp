@@ -1,0 +1,1409 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ruta de Econometría</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: mapa tipo línea de metro (tronco + ramas) a la izquierda, lección a la derecha; en celular se apilan */
+:root{
+  --paper:#edf0ea; --card:#f8f9f5; --ink:#1b2430; --muted:#5c6670; --rule:#cfd5cb;
+  --line:#2546a8; --line-soft:#dbe2f5; --branch:#b07a12; --branch-soft:#f3e7cc;
+  --good:#2d7a4a; --bad:#b23a3a; --exam:#9b2c6b; --exam-soft:#f5dfeb; --code:#e3e8e0;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-math:"STIX Two Text","Cambria Math",Georgia,serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742;
+  --line:#7f9cf0; --line-soft:#22305a; --branch:#e0aa45; --branch-soft:#3a2e15;
+  --good:#5fc285; --bad:#ec7b7b; --exam:#e58bbd; --exam-soft:#3d1f31; --code:#10151b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742;
+  --line:#7f9cf0; --line-soft:#22305a; --branch:#e0aa45; --branch-soft:#3a2e15;
+  --good:#5fc285; --bad:#ec7b7b; --exam:#e58bbd; --exam-soft:#3d1f31; --code:#10151b; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+*{box-sizing:border-box}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,5vw,44px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
+.prog{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.bar{flex:0 1 220px;height:6px;background:var(--rule);border-radius:3px;overflow:hidden;min-width:120px}
+.bar i{display:block;height:100%;background:var(--line);width:0;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--rule);border-radius:4px;padding:0 5px}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+nav.map{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 24px);overflow-y:auto;padding-right:4px}
+@media (max-width:860px){nav.map{position:static;max-height:none;overflow:visible}}
+.lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.trunkbox{position:relative}
+.track,.fill{position:absolute;left:13px;top:14px;width:4px;border-radius:2px}
+.track{bottom:14px;background:var(--rule)}
+.fill{background:var(--line);height:0;transition:height .6s cubic-bezier(.2,.7,.2,1)}
+.train{position:absolute;left:7px;width:16px;height:16px;border-radius:50%;background:var(--line);box-shadow:0 0 0 4px var(--line-soft);top:6px;transition:top .6s cubic-bezier(.2,.7,.2,1);z-index:2;pointer-events:none}
+ol.trunk{list-style:none;margin:0;padding:0;position:relative}
+.st{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;padding:6px 8px 6px 0;color:var(--ink);font:inherit;cursor:pointer;border-radius:8px}
+.st:hover .nm{text-decoration:underline;text-decoration-color:var(--line)}
+.st:focus-visible{outline:2px solid var(--line);outline-offset:2px}
+.dot{flex:0 0 30px;height:30px;border-radius:50%;background:var(--card);border:4px solid var(--line);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--line);z-index:1;transition:background .3s,color .3s}
+.st.done .dot{background:var(--line);color:var(--card)}
+.st.on .nm{font-weight:600}
+.nm{font-size:14.5px;line-height:1.3;min-width:0}
+.tag{margin-left:auto;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--exam);background:var(--exam-soft);padding:2px 7px;border-radius:99px;white-space:nowrap}
+.tag.br{color:var(--branch);background:var(--branch-soft);margin-left:0}
+.branches{display:flex;flex-direction:column;gap:14px}
+.bgrp{border-left:4px dashed var(--branch);padding-left:12px}
+.bgrp h4{margin:0;font-size:13px;font-weight:600}
+.bgrp small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.bgrp .chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:12.5px;border:1px solid var(--branch);background:var(--branch-soft);color:var(--ink);padding:3px 9px;border-radius:99px;cursor:pointer;transition:background .2s,color .2s}
+.chip.done::before{content:"✓ ";font-weight:600}
+.chip.on{background:var(--branch);color:var(--card)}
+.chip:focus-visible{outline:2px solid var(--branch);outline-offset:2px}
+article{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,3vw,34px);min-width:0;display:flex;flex-direction:column;gap:22px;overflow:hidden}
+article>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes rise{from{opacity:.2;transform:translateY(12px)}}
+.eyebrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+article h2{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,3.4vw,34px);line-height:1.1;margin:4px 0 0;text-wrap:balance}
+article h3{font-family:var(--f-display);font-weight:500;font-size:19px;margin:0 0 8px}
+article p,article li{max-width:68ch}
+article p{margin:0 0 10px}
+article ul,article ol{margin:0 0 10px;padding-left:20px}
+.lead{font-size:16.5px;color:var(--ink)}
+.m{font-family:var(--f-math);font-style:italic;font-size:1.08em;white-space:nowrap}
+.eq{font-family:var(--f-math);font-size:1.18em;background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;overflow-x:auto;line-height:1.9;text-align:center;margin-bottom:10px}
+.eq .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 4px}
+.eq .frac>span:first-child{border-bottom:1px solid var(--ink);padding:0 4px}
+.eq .note{display:block;font-family:var(--f-body);font-style:normal;font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.tbl{overflow-x:auto;margin-bottom:10px}
+table{border-collapse:collapse;font-size:14px;min-width:100%}
+th,td{border-bottom:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.warn{border-left:4px solid var(--bad);padding:8px 14px;background:var(--paper);border-radius:0 8px 8px 0;margin:0}
+.warn b{color:var(--bad)}
+.link{border-left:4px solid var(--line);padding:8px 14px;background:var(--line-soft);border-radius:0 8px 8px 0;margin:0}
+.quiz{border:1px solid var(--rule);border-radius:10px;padding:14px 16px}
+.quiz button,.btn{font:inherit;font-size:14px;font-weight:600;border:1.5px solid var(--line);color:var(--line);background:none;border-radius:8px;padding:6px 14px;cursor:pointer}
+.quiz button:hover,.btn:hover{background:var(--line-soft)}
+.btn.solid{background:var(--line);color:var(--card)}
+.btn.solid:hover{filter:brightness(1.1)}
+.quiz .ans{margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);animation:rise .35s both}
+.foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;border-top:1px solid var(--rule);padding-top:16px}
+.foot label{display:flex;gap:8px;align-items:center;cursor:pointer;font-weight:600}
+.foot input{width:18px;height:18px;accent-color:var(--line)}
+.steps{counter-reset:s;list-style:none;padding:0!important}
+.steps li{counter-increment:s;position:relative;padding-left:34px;margin-bottom:8px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--line);color:var(--card);font-family:var(--f-mono);font-size:12px;display:grid;place-items:center}
+/* profundizar */
+.deep{display:flex;flex-direction:column;gap:8px}
+.dp{border:1px solid var(--rule);border-radius:10px;background:var(--paper)}
+.dp>button{all:unset;box-sizing:border-box;display:flex;gap:12px;align-items:center;width:100%;padding:12px 14px;cursor:pointer;font-weight:600}
+.dp>button:focus-visible{outline:2px solid var(--line);outline-offset:-2px;border-radius:10px}
+.dp>button .k{flex:0 0 auto;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--line);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.dp>button .chev{margin-left:auto;transition:transform .3s;color:var(--muted)}
+.dp.open>button .chev{transform:rotate(90deg)}
+.dpb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s cubic-bezier(.2,.7,.2,1)}
+.dp.open .dpb{grid-template-rows:1fr}
+.dpb>div{overflow:hidden;min-width:0}
+.dpb>div>div{padding:0 14px 14px}
+.tabs{display:flex;gap:4px;margin-bottom:8px}
+.tabs button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--rule);background:var(--card);color:var(--muted);border-radius:6px;padding:3px 12px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+pre{margin:0;background:var(--code);border-radius:8px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.55;color:var(--ink)}
+.cp{float:right;font:inherit;font-size:12px;border:1px solid var(--rule);background:var(--card);color:var(--muted);border-radius:6px;padding:2px 10px;cursor:pointer}
+/* simuladores */
+.sim{border:1px solid var(--rule);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--paper)}
+.sim>p{margin:0;font-size:14px}
+.ctr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px}
+.ctr label{display:flex;flex-direction:column;font-size:13px;gap:2px}
+.ctr label span{display:flex;justify-content:space-between;gap:8px}
+.ctr output{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.ctr input{width:100%;accent-color:var(--line)}
+.plot{overflow-x:auto}
+.plot svg{display:block;width:100%;min-width:320px;height:auto}
+.plot svg *{transition:cx .35s,cy .35s,x1 .35s,x2 .35s,y1 .35s,y2 .35s}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.res div{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:8px 10px}
+.res small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.res b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:16px}
+.verdict{font-weight:600;padding:10px 14px;border-radius:8px;border:1.5px solid}
+.verdict.rej{color:var(--bad);border-color:var(--bad)}
+.verdict.acc{color:var(--good);border-color:var(--good)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px}
+.tag.ws{color:var(--line);background:var(--line-soft);margin-left:0}
+.wsgrp{border-left:4px solid var(--line);padding-left:12px}
+.wsgrp small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.wsgrp .chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip.ws-chip{border-color:var(--line);background:var(--line-soft)}
+.chip.ws-chip.on{background:var(--line);color:var(--card)}
+.relws{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.relws .btn{font-size:13px}
+.mscroll{overflow-x:auto;padding-bottom:6px;max-width:100%}
+.mrow{display:flex;flex-wrap:nowrap;gap:12px;align-items:center;width:max-content}
+.mx{display:inline-flex;flex-direction:column;gap:4px;flex:0 0 auto}
+.mx .cap{font-family:var(--f-math);font-style:italic;font-size:15px;text-align:center;white-space:nowrap}
+.mx .cap small{font-family:var(--f-body);font-style:normal;color:var(--muted);font-size:11px;margin-left:4px}
+.mg{display:grid;gap:2px;padding:3px 9px;position:relative;font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.mg::before,.mg::after{content:"";position:absolute;top:0;bottom:0;width:6px;border:1.5px solid var(--ink)}
+.mg::before{left:0;border-right:0}
+.mg::after{right:0;border-left:0}
+.mg span{padding:2px 6px;text-align:right;border-radius:4px;min-width:3em;white-space:nowrap}
+.mg span.b1{background:var(--line-soft)}
+.mg span.b2{background:var(--branch-soft)}
+.mg span.b3{background:var(--exam-soft)}
+.mg span.cl{cursor:pointer}
+.mg span.cl:hover,.mg span.hl{outline:2px solid var(--line);outline-offset:-1px}
+.op{font-family:var(--f-math);font-size:22px;color:var(--muted);flex:0 0 auto}
+.dtable table{min-width:0}
+.dtable td,.dtable th{padding:3px 8px}
+.dtable input{width:4.8em;font-family:var(--f-mono);font-size:13px;padding:3px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink);text-align:right}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:8px;overflow:hidden;align-self:flex-start;max-width:100%}
+.seg button{font:inherit;font-size:13.5px;font-weight:600;border:0;background:var(--card);color:var(--muted);padding:6px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.seg button:focus-visible{outline:2px solid var(--line);outline-offset:-2px}
+.stepc{border:1px solid var(--rule);border-radius:10px;padding:14px;background:var(--card);display:flex;flex-direction:column;gap:10px;min-width:0}
+.stepc.fresh{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.stepc h4{margin:0;font-size:15px;display:flex;gap:10px;align-items:center}
+.stepc h4 .n{width:24px;height:24px;border-radius:50%;background:var(--line);color:var(--card);font-family:var(--f-mono);font-size:12px;display:grid;place-items:center;flex:0 0 auto}
+.stepc p{margin:0}
+.stepc .eq{margin:0}
+.expl{font-family:var(--f-mono);font-size:12.5px;background:var(--paper);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+canvas.c3{display:block;width:100%;height:min(440px,75vw);min-height:260px;touch-action:none;cursor:grab;border-radius:10px;background:var(--card);border:1px solid var(--rule)}
+canvas.c3:active{cursor:grabbing}
+.hint{font-size:12.5px;color:var(--muted)}
+.calcf{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.calcf label{display:flex;flex-direction:column;font-size:13px;gap:3px}
+.calcf input,.calcf select{font-family:var(--f-mono);font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink)}
+.ok{color:var(--good);font-weight:600}
+.bad{color:var(--bad);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media (prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="lbl">Econometría · de las variables a las ramas avanzadas</div>
+    <h1>Ruta de Econometría</h1>
+    <p>Cada estación se apoya en la anterior. El tronco azul llega hasta cambio estructural y prueba de Chow; las líneas punteadas son las ramas que salen de él. En cada lección hay una sección para profundizar y código en R, Stata y Python. Los talleres tienen calculadoras y visualizaciones en 3D para practicar.</p>
+    <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span>· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
+  </header>
+  <div class="grid">
+    <nav class="map" aria-label="Mapa de temas">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Tronco principal</div>
+        <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Ramas</div>
+        <div class="branches" id="branches"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Talleres interactivos</div>
+        <div id="talleres"></div>
+      </div>
+    </nav>
+    <article id="lesson" aria-live="polite"></article>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// CONTENIDO. Para agregar un tema: añade un objeto a TRUNK o a un grupo de BRANCHES.
+// Campos: id, t (título), html, q/a (pregunta y respuesta), deep (profundizar), code {r, stata, py}, sim (laboratorio)
+// =====================================================================
+const TRUNK = [
+{id:"variables", t:"Variables y escalas", html:`
+<section><h3>La idea</h3>
+<p class="lead">Una variable es una característica que cambia de una observación a otra: el salario de una persona, el precio de un producto, el PIB de un año. En un modelo siempre hay una <b>variable dependiente</b> <span class="m">y</span> (la que queremos explicar) y una o varias <b>independientes</b> o regresoras <span class="m">x</span> (las que la explican).</p></section>
+<section><h3>Tipos y escalas de medición</h3>
+<div class="tbl"><table><tr><th>Escala</th><th>Qué permite</th><th>Ejemplo</th><th>En el modelo</th></tr>
+<tr><td>Nominal</td><td>Solo clasificar</td><td>Departamento, sexo</td><td>Variables dicotómicas</td></tr>
+<tr><td>Ordinal</td><td>Clasificar y ordenar</td><td>Estrato 1–6, nivel educativo</td><td>Dicotómicas por categoría</td></tr>
+<tr><td>Intervalo</td><td>Restar; el cero es arbitrario</td><td>Temperatura °C, año</td><td>Numérica</td></tr>
+<tr><td>Razón</td><td>Restar y dividir; cero real</td><td>Ingreso, horas trabajadas</td><td>Numérica, admite logaritmos</td></tr></table></div>
+<p>Las cuantitativas pueden ser <b>continuas</b> (ingreso) o <b>discretas</b> (número de hijos).</p></section>
+<section><h3>Formas funcionales y cómo se leen</h3>
+<div class="tbl"><table><tr><th>Modelo</th><th>Lectura de <span class="m">β₁</span></th></tr>
+<tr><td><span class="m">y = β₀ + β₁x</span></td><td>Si x sube 1 unidad, y cambia β₁ unidades</td></tr>
+<tr><td><span class="m">ln y = β₀ + β₁x</span></td><td>Si x sube 1 unidad, y cambia aprox. 100·β₁ %</td></tr>
+<tr><td><span class="m">y = β₀ + β₁ ln x</span></td><td>Si x sube 1 %, y cambia β₁/100 unidades</td></tr>
+<tr><td><span class="m">ln y = β₀ + β₁ ln x</span></td><td>Elasticidad: si x sube 1 %, y cambia β₁ %</td></tr></table></div></section>
+<p class="warn"><b>Error común:</b> codificar una variable nominal como 1, 2, 3 y meterla como número. El modelo asumiría que la distancia entre la categoría 1 y la 2 es igual a la de la 2 y la 3, lo cual no tiene sentido.</p>`,
+deep:[
+{k:"Intuición", t:"Por qué el logaritmo se lee como porcentaje", html:`<p>Para cambios pequeños, <span class="m">Δln y ≈ Δy / y</span>, que es el cambio relativo. Por eso en <span class="m">ln y = β₀ + β₁x</span>, un aumento de una unidad en x cambia y en aproximadamente <span class="m">100·β₁ %</span>.</p><p>La aproximación se degrada cuando β₁ es grande. El cambio exacto es:</p><div class="eq">%Δy = 100·(e<sup>β₁</sup> − 1)<span class="note">Con β₁ = 0,05 la aproximación da 5 % y el exacto 5,13 %. Con β₁ = 0,40 da 40 % contra 49,2 %.</span></div>`},
+{k:"Práctica", t:"Variables de control y variables proxy", html:`<p>Una <b>variable de control</b> se incluye para que el efecto de la variable de interés se mida ceteris paribus, aunque su coeficiente no nos interese. Una <b>proxy</b> reemplaza algo que no se puede medir: el puntaje de una prueba como proxy de habilidad, el consumo de energía como proxy de actividad económica.</p><p>Una buena proxy debe estar muy correlacionada con la variable inobservable. Si no lo está, el sesgo por variable omitida se reduce poco.</p>`}],
+code:{r:String.raw`df$ln_y   <- log(df$y)
+df$estrato <- factor(df$estrato)   # R crea las dicotómicas solo
+m <- lm(ln_y ~ log(x) + estrato, data = df)
+summary(m)`, stata:String.raw`gen ln_y = ln(y)
+gen ln_x = ln(x)
+reg ln_y ln_x i.estrato   // i. crea dicotómicas y omite la base`, py:String.raw`import numpy as np
+import statsmodels.formula.api as smf
+
+df["ln_y"] = np.log(df["y"])
+m = smf.ols("ln_y ~ np.log(x) + C(estrato)", data=df).fit()
+print(m.summary())`},
+q:"El estrato socioeconómico va de 1 a 6. ¿Qué escala es y cómo lo incluirías en una regresión de gasto en servicios?",
+a:"Es ordinal: hay orden, pero la distancia entre estratos no es constante. Lo más seguro es crear dicotómicas para cada estrato y omitir una como categoría base (por ejemplo, estrato 1). Cada coeficiente se lee como la diferencia promedio frente a ese estrato base."},
+
+{id:"datos", t:"Estructura y formato de los datos", html:`
+<section><h3>Los cuatro tipos de base de datos</h3>
+<div class="tbl"><table><tr><th>Estructura</th><th>Índice</th><th>Ejemplo</th></tr>
+<tr><td>Corte transversal</td><td><span class="m">i</span></td><td>500 hogares encuestados en marzo de 2026</td></tr>
+<tr><td>Serie de tiempo</td><td><span class="m">t</span></td><td>Inflación mensual de Colombia 2000–2026</td></tr>
+<tr><td>Cortes transversales agrupados (pooled)</td><td><span class="m">i, t</span> con individuos distintos</td><td>Encuesta de hogares 2024 y 2025, con hogares diferentes cada año</td></tr>
+<tr><td>Panel (datos longitudinales)</td><td><span class="m">i, t</span> con los mismos individuos</td><td>Las mismas 100 empresas seguidas durante 8 años</td></tr></table></div>
+<p>En series de tiempo <b>el orden importa</b>: cada fila es un momento y no se puede barajar. En corte transversal el orden es irrelevante.</p></section>
+<section><h3>Formato largo y formato ancho</h3>
+<p>En formato <b>largo</b> cada fila es una combinación individuo-periodo (empresa 1 año 2020, empresa 1 año 2021…). En formato <b>ancho</b> cada fila es un individuo y cada periodo es una columna (ventas_2020, ventas_2021…). Para estimar modelos casi siempre se necesita el formato largo, porque así cada fila se convierte en una fila de la matriz <span class="m">X</span>.</p></section>
+<p class="link"><b>Conexión con el parcial:</b> la prueba de Chow nace justamente de los datos agrupados y de las series de tiempo: ¿la relación entre las variables es la misma antes y después de un evento, o en dos grupos distintos?</p>`,
+deep:[
+{k:"Práctica", t:"Del formato ancho al largo, con un ejemplo", html:`<div class="tbl"><table><tr><th>empresa</th><th>ventas_2024</th><th>ventas_2025</th></tr><tr><td>A</td><td class="num">120</td><td class="num">135</td></tr><tr><td>B</td><td class="num">80</td><td class="num">78</td></tr></table></div><p>se convierte en</p><div class="tbl"><table><tr><th>empresa</th><th>año</th><th>ventas</th></tr><tr><td>A</td><td class="num">2024</td><td class="num">120</td></tr><tr><td>A</td><td class="num">2025</td><td class="num">135</td></tr><tr><td>B</td><td class="num">2024</td><td class="num">80</td></tr><tr><td>B</td><td class="num">2025</td><td class="num">78</td></tr></table></div><p>El código de la pestaña «En el software» hace exactamente este cambio.</p>`},
+{k:"Conceptos", t:"Panel balanceado y no balanceado", html:`<p>Un panel es <b>balanceado</b> si todos los individuos aparecen en todos los periodos (n individuos × T periodos = nT filas). Es <b>no balanceado</b> si faltan algunas combinaciones, por ejemplo empresas que cierran o entran a la muestra. Los métodos de panel funcionan con ambos, pero si la salida de la muestra depende de la variable dependiente (las empresas que quiebran son las de peores ventas) aparece sesgo de selección por desgaste.</p>`}],
+code:{r:String.raw`library(tidyr)
+largo <- pivot_longer(ancho, cols = starts_with("ventas_"),
+                      names_to = "anio", names_prefix = "ventas_",
+                      values_to = "ventas")`, stata:String.raw`reshape long ventas_, i(empresa) j(anio)
+rename ventas_ ventas
+xtset empresa anio   // declara el panel
+* para una sola serie de tiempo: tsset anio`, py:String.raw`largo = ancho.melt(id_vars="empresa", var_name="anio", value_name="ventas")
+largo["anio"] = largo["anio"].str.replace("ventas_", "").astype(int)
+largo = largo.sort_values(["empresa", "anio"])`},
+q:"Tienes la Gran Encuesta Integrada de Hogares de 2023 y de 2024, con personas distintas en cada año. ¿Qué estructura es?",
+a:"Cortes transversales agrupados (pooled), no panel, porque no se sigue a las mismas personas. Con esta base sí puedes preguntar si los coeficientes cambiaron entre 2023 y 2024, que es exactamente lo que evalúa la prueba de Chow."},
+
+{id:"matrices", t:"Notación matricial", html:`
+<section><h3>Del renglón a la matriz</h3>
+<p class="lead">Cada observación cumple <span class="m">yᵢ = β₀ + β₁xᵢ₁ + … + βₖ₋₁xᵢ,ₖ₋₁ + uᵢ</span>. Si apilamos las <span class="m">n</span> observaciones obtenemos un solo sistema:</p>
+<div class="eq">y = Xβ + u<span class="note">y: n×1 · X: n×k (primera columna de unos para el intercepto) · β: k×1 · u: n×1</span></div></section>
+<section><h3>Ejemplo con 4 observaciones y una regresora</h3>
+<div class="tbl"><table><tr><th>Obs.</th><th>y (ventas)</th><th>1</th><th>x (publicidad)</th></tr>
+<tr><td>1</td><td class="num">12</td><td class="num">1</td><td class="num">2</td></tr>
+<tr><td>2</td><td class="num">15</td><td class="num">1</td><td class="num">3</td></tr>
+<tr><td>3</td><td class="num">20</td><td class="num">1</td><td class="num">5</td></tr>
+<tr><td>4</td><td class="num">22</td><td class="num">1</td><td class="num">6</td></tr></table></div>
+<p>Las dos columnas de la derecha forman <span class="m">X</span> (4×2). Entonces <span class="m">X′X</span> es 2×2 y contiene <span class="m">n</span>, <span class="m">Σx</span> y <span class="m">Σx²</span>.</p></section>
+<section><h3>Operaciones que vas a usar</h3>
+<ul><li><b>Transpuesta</b> <span class="m">X′</span>: filas pasan a columnas.</li>
+<li><b>Producto</b>: (n×k)·(k×1) da n×1. Las dimensiones internas deben coincidir.</li>
+<li><b>Inversa</b> <span class="m">(X′X)⁻¹</span>: existe solo si ninguna columna de <span class="m">X</span> es combinación lineal exacta de otras (rango completo).</li></ul></section>
+<p class="warn"><b>Error común:</b> olvidar la columna de unos. Sin ella el modelo se fuerza a pasar por el origen.</p>`,
+deep:[
+{k:"Cálculo", t:"Resolver el ejemplo a mano con matrices", html:`<div class="eq">X′X = [ 4 &nbsp; 16 ; 16 &nbsp; 74 ] &nbsp;&nbsp; X′y = [ 69 ; 301 ]<span class="note">n = 4, Σx = 16, Σx² = 74, Σy = 69, Σxy = 301</span></div><div class="eq">det(X′X) = 4·74 − 16² = 40 &nbsp;&nbsp; (X′X)⁻¹ = <span class="frac"><span>1</span><span>40</span></span>[ 74 &nbsp; −16 ; −16 &nbsp; 4 ]</div><div class="eq">β̂ = (X′X)⁻¹X′y = <span class="frac"><span>1</span><span>40</span></span>[ 74·69 − 16·301 ; −16·69 + 4·301 ] = [ 7,25 ; 2,5 ]</div><p>Es el mismo resultado que obtendrás con las fórmulas de la regresión simple en la estación siguiente.</p>`},
+{k:"Conceptos", t:"Rango, inversa y multicolinealidad perfecta", html:`<p>El <b>rango</b> de X es el número de columnas linealmente independientes. Si rango(X) = k, entonces X′X es invertible y β̂ es único. Si una columna se puede escribir exactamente como combinación de otras (por ejemplo, incluir ingreso en pesos y en miles de pesos), el rango cae, det(X′X) = 0 y no existe la inversa. Eso es la multicolinealidad perfecta, y por eso aparece como supuesto de MCO.</p>`}],
+code:{r:String.raw`X <- cbind(1, c(2, 3, 5, 6))
+y <- c(12, 15, 20, 22)
+t(X) %*% X
+solve(t(X) %*% X) %*% t(X) %*% y   # 7.25 y 2.5`, stata:String.raw`mata:
+X = (1,2 \ 1,3 \ 1,5 \ 1,6)
+y = (12 \ 15 \ 20 \ 22)
+X'X
+invsym(X'X) * X'y
+end`, py:String.raw`import numpy as np
+X = np.column_stack([np.ones(4), [2, 3, 5, 6]])
+y = np.array([12, 15, 20, 22])
+X.T @ X
+np.linalg.inv(X.T @ X) @ X.T @ y   # array([7.25, 2.5])`},
+q:"Con n = 50 observaciones, 3 regresoras e intercepto, ¿qué dimensiones tienen X y X′X?",
+a:"k = 4 (tres regresoras más el intercepto). X es 50×4 y X′X es 4×4."},
+
+{id:"mco-simple", t:"Regresión simple por MCO", sim:"mco", html:`
+<section><h3>Qué hace MCO</h3>
+<p class="lead">Mínimos cuadrados ordinarios elige la recta que hace más pequeña la suma de los residuos al cuadrado, <span class="m">Σûᵢ²</span>. El residuo es la distancia vertical entre el dato y la recta estimada.</p>
+<div class="eq">β̂₁ = <span class="frac"><span>Σ(xᵢ − x̄)(yᵢ − ȳ)</span><span>Σ(xᵢ − x̄)²</span></span>&nbsp;&nbsp;&nbsp; β̂₀ = ȳ − β̂₁x̄</div></section>
+<section><h3>Laboratorio: intenta ganarle a MCO</h3><div class="sim" id="sim"></div></section>
+<section><h3>Descomposición de la variación</h3>
+<div class="eq">SCT = SCE + SCR &nbsp;&nbsp;&nbsp; R² = <span class="frac"><span>SCE</span><span>SCT</span></span> = 1 − <span class="frac"><span>SCR</span><span>SCT</span></span><span class="note">SCT: suma de cuadrados total · SCE: explicada · SCR: de los residuos</span></div>
+<p>Guarda bien la <b>SCR</b>: es la pieza central de la prueba F y de la prueba de Chow.</p></section>
+<p class="warn"><b>Error común:</b> leer un R² alto como prueba de causalidad. El R² solo dice qué tanto de la variación de y acompaña a la de x dentro de la muestra.</p>`,
+deep:[
+{k:"Demostración", t:"De dónde salen las fórmulas", html:`<p>Minimizamos <span class="m">S = Σ(yᵢ − β₀ − β₁xᵢ)²</span>. Derivando e igualando a cero:</p><div class="eq">∂S/∂β₀ = −2Σûᵢ = 0 &nbsp;&nbsp;&nbsp; ∂S/∂β₁ = −2Σxᵢûᵢ = 0</div><p>La primera condición da <span class="m">ȳ = β̂₀ + β̂₁x̄</span>. Sustituyendo en la segunda y despejando se obtiene β̂₁. Estas dos condiciones implican propiedades que siempre se cumplen con intercepto: los residuos suman cero, no están correlacionados con x, y la recta pasa por el punto (x̄, ȳ).</p>`},
+{k:"Conceptos", t:"El R² ajustado", html:`<div class="eq">R̄² = 1 − <span class="frac"><span>SCR / (n − k)</span><span>SCT / (n − 1)</span></span></div><p>El R² nunca baja al agregar una variable, aunque sea irrelevante. El R² ajustado penaliza cada parámetro adicional y puede bajar. Sirve para comparar modelos con la misma variable dependiente y distinto número de regresoras, no para decidir si una variable es significativa (para eso está la prueba t).</p>`}],
+code:{r:String.raw`m <- lm(ventas ~ publicidad, data = df)
+summary(m)          # coeficientes, R², prueba F
+sum(resid(m)^2)     # SCR`, stata:String.raw`reg ventas publicidad
+display e(rss)      // SCR
+display e(r2)       // R²`, py:String.raw`m = smf.ols("ventas ~ publicidad", data=df).fit()
+m.params, m.ssr, m.rsquared`},
+q:"Con los datos de la estación anterior (x̄ = 4, ȳ = 17,25), Σ(x−x̄)(y−ȳ) = 25 y Σ(x−x̄)² = 10. Calcula β̂₁ y β̂₀.",
+a:"β̂₁ = 25/10 = 2,5. β̂₀ = 17,25 − 2,5·4 = 7,25. Cada unidad adicional de publicidad se asocia con 2,5 unidades más de ventas."},
+
+{id:"mco-matricial", t:"Regresión múltiple en forma matricial", html:`
+<section><h3>El estimador</h3>
+<div class="eq">β̂ = (X′X)⁻¹X′y<span class="note">Sale de minimizar u′u = (y − Xβ)′(y − Xβ) y despejar β</span></div>
+<p class="lead">Cada <span class="m">β̂ⱼ</span> se lee <b>ceteris paribus</b>: el efecto de <span class="m">xⱼ</span> sobre <span class="m">y</span> manteniendo constantes las demás regresoras.</p></section>
+<section><h3>Varianza y error estándar</h3>
+<div class="eq">Var(β̂) = σ²(X′X)⁻¹ &nbsp;&nbsp;&nbsp; σ̂² = <span class="frac"><span>SCR</span><span>n − k</span></span><span class="note">La raíz de cada elemento de la diagonal de σ̂²(X′X)⁻¹ es el error estándar de ese coeficiente</span></div></section>
+<section><h3>Grados de libertad</h3>
+<p>Se pierde un grado de libertad por cada parámetro estimado. Por eso se divide entre <span class="m">n − k</span> y no entre <span class="m">n</span>. Este mismo conteo aparece en el denominador de la prueba de Chow como <span class="m">n − 2k</span>, porque ahí se estiman dos modelos.</p></section>`,
+deep:[
+{k:"Demostración", t:"Derivación de β̂ en una línea", html:`<div class="eq">u′u = y′y − 2β′X′y + β′X′Xβ</div><div class="eq">∂(u′u)/∂β = −2X′y + 2X′Xβ = 0 &nbsp;⇒&nbsp; X′Xβ̂ = X′y &nbsp;⇒&nbsp; β̂ = (X′X)⁻¹X′y</div><p>Las ecuaciones <span class="m">X′Xβ̂ = X′y</span> se llaman <b>ecuaciones normales</b>. Equivalen a <span class="m">X′û = 0</span>: los residuos son ortogonales a cada columna de X.</p>`},
+{k:"Intuición", t:"Teorema de Frisch-Waugh-Lovell", html:`<p>¿Qué significa exactamente "manteniendo constantes las demás"? El teorema lo responde: el β̂₁ de la regresión múltiple es igual al que obtienes en dos pasos:</p><ol><li>Regresa x₁ sobre las demás regresoras y guarda el residuo r̂₁ (la parte de x₁ que las otras no explican).</li><li>Regresa y sobre r̂₁.</li></ol><p>Así, β̂₁ usa solo la variación de x₁ que no comparte con las demás. Por eso, si x₁ casi no tiene variación propia (multicolinealidad), su estimación es imprecisa.</p>`}],
+code:{r:String.raw`m <- lm(y ~ x1 + x2 + x3, data = df)
+vcov(m)       # σ̂²(X'X)⁻¹
+sigma(m)^2    # σ̂² = SCR/(n−k)`, stata:String.raw`reg y x1 x2 x3
+matrix list e(V)     // matriz de varianzas
+display e(rmse)^2    // σ̂²`, py:String.raw`m = smf.ols("y ~ x1 + x2 + x3", data=df).fit()
+m.cov_params()   # σ̂²(X'X)⁻¹
+m.mse_resid      # σ̂²`},
+q:"¿Por qué en la prueba de Chow el denominador tiene n − 2k grados de libertad?",
+a:"Porque el modelo no restringido se estima por separado en las dos submuestras, y cada una gasta k parámetros. En total se estiman 2k parámetros con n observaciones."},
+
+{id:"supuestos", t:"Supuestos de Gauss-Markov", html:`
+<section><h3>Lo que necesita MCO para funcionar bien</h3>
+<div class="tbl"><table><tr><th>Supuesto</th><th>Si falla…</th><th>Rama</th></tr>
+<tr><td>1. Lineal en los parámetros</td><td>Hay que cambiar de método</td><td>Elección discreta</td></tr>
+<tr><td>2. Muestreo aleatorio</td><td>Sesgo de selección</td><td>—</td></tr>
+<tr><td>3. Sin multicolinealidad perfecta</td><td>(X′X) no se puede invertir</td><td>Multicolinealidad</td></tr>
+<tr><td>4. Media condicional cero: E(u|X) = 0</td><td>β̂ sesgado e inconsistente</td><td>Especificación, VI</td></tr>
+<tr><td>5. Homocedasticidad: Var(u|X) = σ²</td><td>Errores estándar incorrectos</td><td>Heterocedasticidad</td></tr>
+<tr><td>6. Sin autocorrelación (series)</td><td>Errores estándar incorrectos</td><td>Autocorrelación</td></tr>
+<tr><td>7. Normalidad de u</td><td>t y F solo valen en muestras grandes</td><td>—</td></tr></table></div>
+<p>Con los supuestos 1 a 6, MCO es <b>MELI</b>: el mejor estimador lineal insesgado.</p></section>
+<p class="link"><b>Conexión con Chow:</b> la prueba de Chow también asume que la varianza del error es la misma en las dos submuestras. Si no lo es, el estadístico F no sigue la distribución que creemos.</p>`,
+deep:[
+{k:"Demostración", t:"Insesgadez en dos líneas", html:`<div class="eq">β̂ = (X′X)⁻¹X′(Xβ + u) = β + (X′X)⁻¹X′u</div><div class="eq">E(β̂|X) = β + (X′X)⁻¹X′E(u|X) = β &nbsp;&nbsp; si E(u|X) = 0</div><p>Solo se usaron los supuestos 1, 3 y 4. La homocedasticidad no hace falta para la insesgadez; hace falta para que <span class="m">Var(β̂) = σ²(X′X)⁻¹</span> sea la fórmula correcta y para la eficiencia.</p>`},
+{k:"Conceptos", t:"Insesgadez frente a consistencia", html:`<p><b>Insesgado</b>: en promedio, sobre muchas muestras del mismo tamaño, acierta. <b>Consistente</b>: a medida que n crece, el estimador se concentra en el valor verdadero. Un estimador puede ser sesgado en muestras pequeñas y aun así consistente (VI y logit son ejemplos). Si E(u|X) ≠ 0 por variable omitida, MCO no es ni lo uno ni lo otro: más datos no arreglan el problema.</p>`}],
+code:{r:String.raw`par(mfrow = c(2, 2)); plot(m)   # residuos vs ajustados, QQ, etc.
+shapiro.test(resid(m))           # normalidad`, stata:String.raw`reg y x1 x2
+rvfplot, yline(0)     // residuos vs ajustados
+predict uhat, resid
+swilk uhat            // normalidad`, py:String.raw`import matplotlib.pyplot as plt
+from scipy import stats
+plt.scatter(m.fittedvalues, m.resid); plt.axhline(0)
+stats.shapiro(m.resid)`},
+q:"Si hay heterocedasticidad, ¿los coeficientes MCO quedan sesgados?",
+a:"No. Siguen siendo insesgados. Lo que se daña es la varianza estimada: los errores estándar y, por tanto, las pruebas t y F dejan de ser confiables. Ya no son MELI."},
+
+{id:"inferencia", t:"Inferencia: pruebas t y F", exam:true, html:`
+<section><h3>Prueba t: un solo coeficiente</h3>
+<div class="eq">t = <span class="frac"><span>β̂ⱼ − βⱼ⁰</span><span>ee(β̂ⱼ)</span></span> ~ t(n − k)</div></section>
+<section><h3>Prueba F: varias restricciones a la vez</h3>
+<p class="lead">Comparas un modelo <b>restringido</b> (imponiendo la hipótesis nula) con uno <b>no restringido</b>. Si al imponer la restricción la SCR crece mucho, la restricción no es creíble.</p>
+<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / q</span><span>SCR<sub>NR</sub> / (n − k)</span></span> ~ F(q, n − k)<span class="note">q: número de restricciones · k: parámetros del modelo no restringido</span></div>
+<p>Regla: si <span class="m">F &gt; F<sub>crítico</sub></span> (o p-valor &lt; α), se rechaza H₀.</p></section>
+<p class="link"><b>Clave para el parcial:</b> la prueba de Chow <b>es</b> esta prueba F. El modelo restringido es "los mismos coeficientes para todos" y el no restringido es "coeficientes distintos en cada submuestra".</p>`,
+deep:[
+{k:"Fórmula", t:"La prueba F en términos de R²", html:`<div class="eq">F = <span class="frac"><span>(R²<sub>NR</sub> − R²<sub>R</sub>) / q</span><span>(1 − R²<sub>NR</sub>) / (n − k)</span></span></div><p>Sale de dividir numerador y denominador entre SCT. Solo vale si los dos modelos tienen <b>la misma variable dependiente</b>. Para la significancia global (todas las pendientes iguales a cero), R²<sub>R</sub> = 0 y queda <span class="m">F = [R²/(k−1)] / [(1−R²)/(n−k)]</span>.</p>`},
+{k:"Conceptos", t:"p-valor, errores tipo I y II", html:`<p>El <b>p-valor</b> es la probabilidad de observar un estadístico tan extremo como el obtenido si H₀ fuera cierta. No es la probabilidad de que H₀ sea cierta.</p><div class="tbl"><table><tr><th></th><th>H₀ cierta</th><th>H₀ falsa</th></tr><tr><td>Rechazo H₀</td><td>Error tipo I (prob. α)</td><td>Correcto (potencia)</td></tr><tr><td>No rechazo</td><td>Correcto</td><td>Error tipo II</td></tr></table></div><p>"No rechazar" no es lo mismo que "aceptar": puede que simplemente no haya suficiente información para detectar el efecto.</p>`}],
+code:{r:String.raw`library(car)
+linearHypothesis(m, c("x1 = 0", "x2 = 0"))
+anova(m_restringido, m)   # F con las SCR`, stata:String.raw`reg y x1 x2 x3
+test x1 x2          // H0: b1 = b2 = 0
+test x1 = x2        // H0: b1 = b2`, py:String.raw`m.f_test("x1 = 0, x2 = 0")
+m.compare_f_test(m_restringido)   # (F, p, q)`},
+q:"En y = β₀ + β₁x₁ + β₂x₂ + u, ¿cuántas restricciones tiene H₀: β₁ = β₂ = 0?",
+a:"q = 2. Se estima el modelo restringido solo con intercepto y se compara su SCR con la del modelo completo."},
+
+{id:"dicotomicas", t:"Variables dicotómicas e interacciones", exam:true, html:`
+<section><h3>Cambio en el intercepto</h3>
+<p class="lead">Una dicotómica <span class="m">D</span> vale 1 si la observación pertenece a un grupo o periodo y 0 si no.</p>
+<div class="eq">y = β₀ + δ₀D + β₁x + u<span class="note">Grupo D = 0: intercepto β₀ · Grupo D = 1: intercepto β₀ + δ₀ · misma pendiente</span></div></section>
+<section><h3>Cambio en la pendiente: interacción</h3>
+<div class="eq">y = β₀ + δ₀D + β₁x + δ₁(D·x) + u<span class="note">Grupo D = 1: intercepto β₀ + δ₀ y pendiente β₁ + δ₁</span></div>
+<p>Con este único modelo puedes probar si cambió el intercepto (δ₀), la pendiente (δ₁) o ambos.</p></section>
+<p class="warn"><b>Trampa de las dicotómicas:</b> con m categorías e intercepto, se incluyen m − 1 dicotómicas. Si metes las m, la suma de ellas es igual a la columna de unos y X′X no se puede invertir.</p>`,
+deep:[
+{k:"Fórmula", t:"Dicotómicas en modelos con logaritmo", html:`<p>En <span class="m">ln y = β₀ + δ₀D + β₁x + u</span>, el efecto de pertenecer al grupo D = 1 es aproximadamente <span class="m">100·δ₀ %</span>. El exacto:</p><div class="eq">%Δy = 100·(e<sup>δ₀</sup> − 1)</div><p>Ejemplo: δ₀ = −0,15 en una ecuación de salarios para mujeres. Aproximado: −15 %. Exacto: 100·(e<sup>−0,15</sup> − 1) = −13,9 %.</p>`},
+{k:"Aplicación", t:"Diferencias en diferencias", html:`<p>Con dos grupos (tratado T y control) y dos periodos (antes y después P):</p><div class="eq">y = β₀ + δ₀T + δ₁P + δ₂(T·P) + u</div><p><span class="m">δ₂</span> es el efecto del tratamiento: cuánto más cambió el grupo tratado que el de control. Funciona si, sin tratamiento, ambos grupos habrían seguido tendencias paralelas. Es una de las herramientas más usadas en evaluación de políticas públicas.</p>`}],
+code:{r:String.raw`df$D <- as.numeric(df$anio >= 2020)
+m <- lm(y ~ x * D, data = df)   # incluye x, D y x:D
+summary(m)`, stata:String.raw`gen D = (anio >= 2020)
+reg y c.x##i.D      // x, D y la interacción`, py:String.raw`df["D"] = (df["anio"] >= 2020).astype(int)
+m = smf.ols("y ~ x * D", data=df).fit()`},
+q:"Quieres controlar por trimestre en un modelo con intercepto. ¿Cuántas dicotómicas incluyes?",
+a:"Tres. El trimestre omitido queda como base, y cada coeficiente mide la diferencia frente a ese trimestre."},
+
+{id:"chow", t:"Cambio estructural y prueba de Chow", exam:true, sim:"chow", html:`
+<section><h3>La pregunta</h3>
+<p class="lead">¿Los coeficientes del modelo son los mismos en dos submuestras? Por ejemplo, antes y después de una reforma tributaria, de la pandemia, o entre hombres y mujeres. Si no lo son, hay <b>cambio estructural</b> y un solo modelo para toda la muestra sería engañoso.</p>
+<div class="eq">H₀: β<sup>(1)</sup> = β<sup>(2)</sup> &nbsp;(no hay cambio) &nbsp;&nbsp;&nbsp; H₁: β<sup>(1)</sup> ≠ β<sup>(2)</sup></div></section>
+<section><h3>El estadístico</h3>
+<div class="eq">F = <span class="frac"><span>[SCR<sub>R</sub> − (SCR₁ + SCR₂)] / k</span><span>(SCR₁ + SCR₂) / (n − 2k)</span></span> ~ F(k, n − 2k)<span class="note">SCR<sub>R</sub>: modelo con toda la muestra · SCR₁, SCR₂: cada submuestra por separado · k: parámetros incluido el intercepto</span></div></section>
+<section><h3>Paso a paso para el examen</h3>
+<ol class="steps">
+<li>Estima el modelo con <b>toda</b> la muestra y anota SCR<sub>R</sub> (n observaciones).</li>
+<li>Estima el mismo modelo en la submuestra 1 (n₁ obs.) y en la 2 (n₂ obs.). Anota SCR₁ y SCR₂.</li>
+<li>Suma: SCR<sub>NR</sub> = SCR₁ + SCR₂.</li>
+<li>Calcula F con k restricciones y n − 2k grados de libertad en el denominador.</li>
+<li>Busca F crítico en la tabla F(k, n − 2k) al nivel α (o usa el p-valor).</li>
+<li>Concluye: si F &gt; F crítico, rechazas H₀ y hay evidencia de cambio estructural.</li></ol></section>
+<section><h3>Ejemplo resuelto</h3>
+<p>n = 30 (15 + 15), modelo simple (k = 2). SCR<sub>R</sub> = 420, SCR₁ = 120, SCR₂ = 150.</p>
+<div class="eq">F = <span class="frac"><span>(420 − 270) / 2</span><span>270 / 26</span></span> = <span class="frac"><span>75</span><span>10,385</span></span> ≈ 7,22<span class="note">F crítico al 5 % con (2, 26) ≈ 3,37 → 7,22 &gt; 3,37: se rechaza H₀</span></div></section>
+<section><h3>Laboratorio: mueve el quiebre y mira qué pasa</h3>
+<div class="sim" id="sim"></div></section>
+<section><h3>Versión con dicotómicas (equivalente)</h3>
+<div class="eq">y = β₀ + δ₀D + β₁x + δ₁(D·x) + u &nbsp;&nbsp;&nbsp; H₀: δ₀ = δ₁ = 0</div>
+<p>La prueba F conjunta sobre δ₀ y δ₁ da exactamente el mismo F que la de Chow. Su ventaja es que además te dice <b>dónde</b> está el cambio: en el intercepto, en la pendiente o en ambos.</p></section>
+<section><h3>Supuestos y variantes</h3>
+<ul><li><b>El punto de quiebre se conoce de antemano</b> (una fecha o un grupo definido por teoría). Si se elige mirando los datos, el F sale inflado.</li>
+<li><b>Misma varianza del error</b> en ambas submuestras. Se puede revisar con F = σ̂₁² / σ̂₂².</li>
+<li><b>Chow predictiva</b>: si una submuestra tiene menos observaciones que parámetros (n₂ &lt; k), no se puede estimar por separado y se usa F = [(SCR<sub>R</sub> − SCR₁)/n₂] / [SCR₁/(n₁ − k)] ~ F(n₂, n₁ − k).</li></ul></section>
+<p class="warn"><b>Error común:</b> usar k = número de regresoras. En Chow, k cuenta también el intercepto: con 3 regresoras, k = 4 y los grados de libertad son (4, n − 8).</p>`,
+deep:[
+{k:"Demostración", t:"Por qué Chow es una prueba F restringida", html:`<p>El modelo no restringido permite coeficientes distintos en cada submuestra; con dicotómicas se escribe con 2k parámetros. Su SCR es exactamente SCR₁ + SCR₂, porque estimar el modelo con todas las interacciones equivale a estimar cada submuestra por separado.</p><p>El restringido impone k igualdades (cada coeficiente igual en ambas submuestras), así que q = k. Sustituyendo en la fórmula general de la F, con 2k parámetros en el no restringido, se obtiene exactamente la fórmula de Chow con n − 2k grados de libertad.</p>`},
+{k:"Variante", t:"Comprobar varianzas iguales antes de Chow", html:`<div class="eq">F = <span class="frac"><span>σ̂₁²</span><span>σ̂₂²</span></span> = <span class="frac"><span>SCR₁/(n₁ − k)</span><span>SCR₂/(n₂ − k)</span></span> ~ F(n₁ − k, n₂ − k)<span class="note">Pon la varianza mayor en el numerador y compara con el F crítico</span></div><p>En el ejemplo resuelto: σ̂₁² = 120/13 = 9,23 y σ̂₂² = 150/13 = 11,54. F = 11,54/9,23 = 1,25, menor que F crítico (13, 13) ≈ 2,58. Las varianzas son compatibles y la prueba de Chow es válida.</p>`},
+{k:"Avanzado", t:"Cuando no sabes dónde está el quiebre", html:`<p><b>Quandt-Andrews (sup-F):</b> calcula el F de Chow para cada posible punto de quiebre (dejando fuera, por ejemplo, el 15 % inicial y final) y toma el máximo. Ese máximo no sigue una distribución F; tiene sus propios valores críticos (Andrews, 1993).</p><p><b>CUSUM:</b> suma acumulada de residuos recursivos. Si la línea se sale de las bandas de confianza, hay inestabilidad en los parámetros. Es visual y no requiere fijar un punto.</p><p><b>Bai-Perron:</b> permite estimar varios quiebres a la vez.</p>`}],
+code:{r:String.raw`library(strucchange)
+sctest(y ~ x, data = df, type = "Chow", point = 30)
+
+# quiebre desconocido
+fs <- Fstats(y ~ x, data = df)
+sctest(fs)         # sup-F
+breakpoints(y ~ x, data = df)`, stata:String.raw`gen D = (_n > 30)
+reg y c.x##i.D
+test 1.D 1.D#c.x     // = F de Chow
+
+* quiebre desconocido (requiere tsset)
+reg y x
+estat sbsingle`, py:String.raw`from scipy.stats import f
+r = smf.ols("y ~ x", data=df).fit()
+a = smf.ols("y ~ x", data=df.iloc[:30]).fit()
+b = smf.ols("y ~ x", data=df.iloc[30:]).fit()
+k, n = 2, len(df)
+F = ((r.ssr - (a.ssr + b.ssr)) / k) / ((a.ssr + b.ssr) / (n - 2*k))
+p = f.sf(F, k, n - 2*k)`},
+q:"Modelo con 3 regresoras e intercepto, n = 60 dividido 35/25. SCR_R = 900, SCR₁ = 320, SCR₂ = 280. ¿Hay cambio estructural al 5 %?",
+a:"k = 4, gl = (4, 52). SCR_NR = 600. F = [(900 − 600)/4] / [600/52] = 75 / 11,54 ≈ 6,50. F crítico (4, 52) al 5 % ≈ 2,55. Como 6,50 > 2,55 se rechaza H₀: hay evidencia de cambio estructural."}
+];
+
+const BRANCHES = [
+{g:"Cuando fallan los supuestos", from:"supuestos", items:[
+
+{id:"hetero", t:"Heterocedasticidad", sim:"hetero", html:`
+<section><h3>La idea</h3>
+<p class="lead">Hay heterocedasticidad cuando la varianza del error cambia entre observaciones: <span class="m">Var(uᵢ|X) = σᵢ²</span>. Es típica en corte transversal. Por ejemplo, el gasto en ocio varía mucho más entre hogares de ingreso alto que entre hogares de ingreso bajo.</p></section>
+<section><h3>Consecuencias</h3>
+<ul><li>β̂ sigue siendo <b>insesgado y consistente</b>.</li>
+<li>La fórmula σ²(X′X)⁻¹ ya no es correcta, así que los errores estándar, las t y las F están mal.</li>
+<li>MCO deja de ser el más eficiente (ya no es MELI).</li></ul></section>
+<section><h3>Laboratorio: abre el abanico</h3><div class="sim" id="sim"></div></section>
+<section><h3>Cómo detectarla</h3>
+<p><b>Breusch-Pagan.</b> Estima el modelo, guarda û², y regresa û² sobre las regresoras:</p>
+<div class="eq">ûᵢ² = α₀ + α₁xᵢ₁ + … + αₖ₋₁xᵢ,ₖ₋₁ + vᵢ &nbsp;&nbsp;&nbsp; LM = n·R²<sub>aux</sub> ~ χ²(k − 1)<span class="note">H₀: homocedasticidad (todas las α de pendiente iguales a cero)</span></div>
+<p><b>White.</b> Igual, pero la regresión auxiliar incluye además los cuadrados y los productos cruzados de las regresoras. Detecta formas más generales, a costa de muchos grados de libertad.</p></section>
+<section><h3>Cómo corregirla</h3>
+<ol class="steps"><li><b>Errores estándar robustos</b> (de White o HC): mantienes β̂ y corriges solo la inferencia. Es lo más usado.</li>
+<li><b>Mínimos cuadrados ponderados (MCP)</b>: si sabes que Var(uᵢ) = σ²·h(xᵢ), divides toda la ecuación por √h(xᵢ) y estimas por MCO. Recuperas la eficiencia.</li>
+<li><b>MCG factible</b>: estimas h(xᵢ) a partir de los residuos y luego aplicas MCP.</li></ol></section>`,
+deep:[
+{k:"Intuición", t:"Por qué MCP es más eficiente", html:`<p>MCO le da el mismo peso a todas las observaciones. Pero las que tienen varianza alta son menos informativas: su dato está más contaminado por ruido. MCP les da menos peso (1/σᵢ²), y así el estimador aprovecha mejor la información. Si Var(uᵢ) = σ²xᵢ, la ecuación transformada es:</p><div class="eq">yᵢ/√xᵢ = β₀(1/√xᵢ) + β₁√xᵢ + uᵢ/√xᵢ<span class="note">El nuevo error tiene varianza constante σ²</span></div>`},
+{k:"Variante", t:"Goldfeld-Quandt", html:`<p>Ordena las observaciones según la variable que sospechas causa la heterocedasticidad, quita un bloque central (por ejemplo, el 20 %) y estima por separado el tercio inferior y el superior. Luego <span class="m">F = SCR₂/SCR₁</span> (con sus grados de libertad). Fíjate que es la misma prueba de varianzas iguales que se usa antes de Chow.</p>`}],
+code:{r:String.raw`library(lmtest); library(sandwich)
+bptest(m)                                            # Breusch-Pagan
+bptest(m, ~ x1 * x2 + I(x1^2) + I(x2^2), data = df)  # White
+coeftest(m, vcov = vcovHC(m, type = "HC1"))          # robustos
+lm(y ~ x1 + x2, data = df, weights = 1/x1)           # MCP`, stata:String.raw`reg y x1 x2
+estat hettest          // Breusch-Pagan
+estat imtest, white    // White
+reg y x1 x2, vce(robust)
+reg y x1 x2 [aweight = 1/x1]   // MCP`, py:String.raw`from statsmodels.stats.diagnostic import het_breuschpagan, het_white
+het_breuschpagan(m.resid, m.model.exog)   # (LM, p, F, p)
+het_white(m.resid, m.model.exog)
+m_rob = smf.ols("y ~ x1 + x2", data=df).fit(cov_type="HC1")
+m_mcp = smf.wls("y ~ x1 + x2", data=df, weights=1/df["x1"]).fit()`},
+q:"Con n = 100 y 3 regresoras, la regresión auxiliar de Breusch-Pagan tiene R² = 0,08. ¿Hay heterocedasticidad al 5 %?",
+a:"LM = 100·0,08 = 8. Valor crítico χ²(3) al 5 % = 7,81. Como 8 > 7,81 se rechaza la homocedasticidad. Conviene usar errores estándar robustos."},
+
+{id:"autocorr", t:"Autocorrelación", html:`
+<section><h3>La idea</h3>
+<p class="lead">Hay autocorrelación cuando los errores de distintos periodos están relacionados: <span class="m">Corr(uₜ, uₛ) ≠ 0</span>. Es típica en series de tiempo, porque los choques tienden a persistir. El caso más estudiado es el proceso AR(1):</p>
+<div class="eq">uₜ = ρuₜ₋₁ + εₜ &nbsp;&nbsp;&nbsp; |ρ| &lt; 1<span class="note">ρ &gt; 0: autocorrelación positiva (la más común) · ρ &lt; 0: negativa</span></div></section>
+<section><h3>Consecuencias</h3>
+<p>Como con la heterocedasticidad: β̂ insesgado si las regresoras son exógenas, pero errores estándar incorrectos. Con ρ &gt; 0 suelen salir <b>demasiado pequeños</b>, y entonces encuentras variables "significativas" que no lo son. Si el modelo incluye <span class="m">yₜ₋₁</span> como regresora, la autocorrelación además produce sesgo.</p></section>
+<section><h3>Prueba de Durbin-Watson</h3>
+<div class="eq">d = <span class="frac"><span>Σₜ₌₂(ûₜ − ûₜ₋₁)²</span><span>Σₜ₌₁ûₜ²</span></span> ≈ 2(1 − ρ̂)</div>
+<div class="tbl"><table><tr><th>Valor de d</th><th>Conclusión</th></tr><tr><td>Cerca de 2</td><td>Sin autocorrelación</td></tr><tr><td>Menor que d<sub>L</sub></td><td>Autocorrelación positiva</td></tr><tr><td>Entre d<sub>L</sub> y d<sub>U</sub></td><td>Zona inconclusa</td></tr><tr><td>Cerca de 4</td><td>Autocorrelación negativa</td></tr></table></div>
+<p>Limitaciones: solo detecta AR(1), exige intercepto y no sirve si hay <span class="m">yₜ₋₁</span> entre las regresoras.</p></section>
+<section><h3>Prueba de Breusch-Godfrey</h3>
+<p>Más general. Regresa ûₜ sobre las regresoras originales y sobre ûₜ₋₁, …, ûₜ₋ₚ:</p>
+<div class="eq">LM = (n − p)·R²<sub>aux</sub> ~ χ²(p)</div></section>
+<section><h3>Corrección</h3>
+<ul><li><b>Errores de Newey-West</b> (HAC): corrigen heterocedasticidad y autocorrelación a la vez sin tocar β̂.</li>
+<li><b>Cochrane-Orcutt / Prais-Winsten</b>: estiman ρ y transforman el modelo con cuasi-diferencias <span class="m">yₜ − ρ̂yₜ₋₁</span>.</li></ul></section>`,
+deep:[
+{k:"Demostración", t:"Por qué d ≈ 2(1 − ρ̂)", html:`<p>Desarrollando el numerador: <span class="m">Σ(ûₜ − ûₜ₋₁)² = Σûₜ² + Σûₜ₋₁² − 2Σûₜûₜ₋₁</span>. En muestras grandes, Σûₜ² ≈ Σûₜ₋₁², y Σûₜûₜ₋₁ / Σûₜ² ≈ ρ̂. Entonces:</p><div class="eq">d ≈ <span class="frac"><span>2Σûₜ² − 2ρ̂Σûₜ²</span><span>Σûₜ²</span></span> = 2(1 − ρ̂)</div><p>Por eso d va de 0 (ρ = 1) a 4 (ρ = −1).</p>`},
+{k:"Conceptos", t:"Autocorrelación que en realidad es mala especificación", html:`<p>Muchas veces los residuos parecen autocorrelacionados porque falta una variable con tendencia, la forma funcional es incorrecta o hay un cambio estructural no modelado. Antes de corregir con Cochrane-Orcutt, revisa la especificación: un quiebre no detectado con Chow deja residuos con "rachas" que DW confunde con autocorrelación.</p>`}],
+code:{r:String.raw`library(lmtest); library(sandwich)
+dwtest(m)
+bgtest(m, order = 2)
+coeftest(m, vcov = NeweyWest(m, lag = 2))
+library(orcutt); cochrane.orcutt(m)`, stata:String.raw`tsset t
+reg y x
+estat dwatson
+estat bgodfrey, lags(2)
+newey y x, lag(2)
+prais y x, corc      // Cochrane-Orcutt`, py:String.raw`from statsmodels.stats.stattools import durbin_watson
+from statsmodels.stats.diagnostic import acorr_breusch_godfrey
+durbin_watson(m.resid)
+acorr_breusch_godfrey(m, nlags=2)
+m_nw = smf.ols("y ~ x", data=df).fit(cov_type="HAC", cov_kwds={"maxlags": 2})`},
+q:"Un modelo de series de tiempo da DW = 0,6. ¿Qué valor aproximado tiene ρ̂ y qué concluyes?",
+a:"ρ̂ ≈ 1 − d/2 = 1 − 0,3 = 0,7. Hay autocorrelación positiva fuerte. Los errores estándar de MCO están subestimados; hay que revisar la especificación y usar Newey-West o Cochrane-Orcutt."},
+
+{id:"multicol", t:"Multicolinealidad", html:`
+<section><h3>La idea</h3>
+<p class="lead">Multicolinealidad es una correlación alta (no perfecta) entre regresoras. No viola ningún supuesto de Gauss-Markov: MCO sigue siendo MELI. El problema es de información: los datos no permiten separar bien el efecto de cada variable.</p></section>
+<section><h3>Dónde se ve en la fórmula</h3>
+<div class="eq">Var(β̂ⱼ) = <span class="frac"><span>σ²</span><span>STCⱼ·(1 − Rⱼ²)</span></span> &nbsp;&nbsp;&nbsp; VIFⱼ = <span class="frac"><span>1</span><span>1 − Rⱼ²</span></span><span class="note">STCⱼ: variación total de xⱼ · Rⱼ²: R² de regresar xⱼ sobre las demás regresoras</span></div>
+<p>Si Rⱼ² se acerca a 1, la varianza de β̂ⱼ explota. Regla práctica: VIF &gt; 10 es señal de alarma.</p></section>
+<section><h3>Síntomas</h3>
+<ul><li>R² alto y prueba F global significativa, pero pocas t individuales significativas.</li>
+<li>Coeficientes que cambian mucho de valor o de signo al quitar o agregar una variable o unas pocas observaciones.</li>
+<li>Correlaciones altas entre pares de regresoras (aunque la multicolinealidad puede involucrar a tres o más sin que ningún par sea alto).</li></ul></section>
+<section><h3>Qué hacer</h3>
+<ul><li>Si la variable afectada es solo de control, puede que no haga falta hacer nada.</li>
+<li>Conseguir más datos o más variación en las regresoras.</li>
+<li>Combinar variables en un índice (por ejemplo, componentes principales).</li>
+<li>Quitar una variable solo si la teoría lo justifica: quitarla por colinealidad puede generar sesgo por variable omitida.</li></ul></section>`,
+deep:[
+{k:"Intuición", t:"Por qué la prueba F detecta lo que las t no", html:`<p>Si x₁ y x₂ se mueven casi juntas, los datos dicen con claridad que "x₁ y x₂, en conjunto, afectan a y", pero no pueden decir cuánto es de cada una. La F prueba el efecto conjunto y sale significativa; cada t pregunta por el efecto de una variable manteniendo la otra constante, algo que casi nunca ocurre en la muestra, y por eso sale con errores estándar grandes.</p>`},
+{k:"Ejemplo", t:"La trampa clásica: variables que suman un total", html:`<p>Gasto en alimentos, en vivienda, en transporte y en otros, junto con el gasto total como regresoras. Las cuatro primeras suman exactamente el total: multicolinealidad perfecta y el modelo no se puede estimar. Si en lugar del total usas el ingreso (que está muy cerca del gasto total, pero no es idéntico), el modelo se estima, pero con VIF enormes.</p>`}],
+code:{r:String.raw`library(car)
+vif(m)
+cor(df[, c("x1", "x2", "x3")])`, stata:String.raw`reg y x1 x2 x3
+estat vif
+correlate x1 x2 x3`, py:String.raw`from statsmodels.stats.outliers_influence import variance_inflation_factor as vif
+X = m.model.exog
+[vif(X, j) for j in range(1, X.shape[1])]   # se omite el intercepto`},
+q:"Al regresar x₂ sobre las demás regresoras se obtiene R² = 0,95. ¿Cuál es su VIF y qué significa?",
+a:"VIF = 1/(1 − 0,95) = 20. La varianza de β̂₂ es 20 veces la que tendría si x₂ no estuviera correlacionada con las demás. Su error estándar es √20 ≈ 4,5 veces mayor."},
+
+{id:"especificacion", t:"Especificación del modelo", html:`
+<section><h3>La idea</h3>
+<p class="lead">Un modelo está mal especificado si omite variables relevantes, incluye irrelevantes, usa una forma funcional equivocada o mide mal alguna variable. El caso más grave es la omisión, porque viola E(u|X) = 0.</p></section>
+<section><h3>Sesgo por variable omitida</h3>
+<p>Modelo verdadero: <span class="m">y = β₀ + β₁x₁ + β₂x₂ + u</span>. Si estimas sin x₂:</p>
+<div class="eq">E(β̃₁) = β₁ + β₂·δ̃₁<span class="note">δ̃₁: pendiente de regresar x₂ sobre x₁</span></div>
+<div class="tbl"><table><tr><th></th><th>Corr(x₁, x₂) &gt; 0</th><th>Corr(x₁, x₂) &lt; 0</th></tr><tr><td>β₂ &gt; 0</td><td>Sesgo hacia arriba</td><td>Sesgo hacia abajo</td></tr><tr><td>β₂ &lt; 0</td><td>Sesgo hacia abajo</td><td>Sesgo hacia arriba</td></tr></table></div>
+<p>Hay sesgo solo si la variable omitida importa (β₂ ≠ 0) <b>y</b> está correlacionada con la incluida.</p></section>
+<section><h3>Variables irrelevantes</h3>
+<p>Incluir una variable con β = 0 no sesga a los demás coeficientes, pero aumenta su varianza si está correlacionada con ellos. Es un error menos grave que omitir.</p></section>
+<section><h3>Prueba RESET de Ramsey</h3>
+<p>Detecta forma funcional incorrecta. Agrega potencias de los valores ajustados y prueba si son significativas:</p>
+<div class="eq">y = Xβ + γ₁ŷ² + γ₂ŷ³ + error &nbsp;&nbsp;&nbsp; H₀: γ₁ = γ₂ = 0 &nbsp;(prueba F)</div></section>
+<section><h3>Error de medición</h3>
+<ul><li>En <b>y</b>: aumenta la varianza del error, pero no sesga si el error es aleatorio.</li>
+<li>En <b>x</b>: produce <b>sesgo de atenuación</b>; β̂ se acerca a cero. Se corrige con variables instrumentales.</li></ul></section>`,
+deep:[
+{k:"Demostración", t:"De dónde sale la fórmula del sesgo", html:`<p>El estimador del modelo corto es β̃₁ = Σ(x₁ᵢ − x̄₁)yᵢ / Σ(x₁ᵢ − x̄₁)². Sustituyendo el modelo verdadero de yᵢ:</p><div class="eq">β̃₁ = β₁ + β₂·<span class="frac"><span>Σ(x₁ᵢ − x̄₁)x₂ᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span> + <span class="frac"><span>Σ(x₁ᵢ − x̄₁)uᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span></div><p>La fracción del medio es δ̃₁ y el último término tiene esperanza cero. Tomando esperanzas queda la fórmula.</p>`},
+{k:"Conceptos", t:"Criterios de información AIC y BIC", html:`<p>Para elegir entre modelos no anidados (que no son versiones restringidas uno del otro), se usan:</p><div class="eq">AIC = ln(SCR/n) + 2k/n &nbsp;&nbsp;&nbsp; BIC = ln(SCR/n) + k·ln(n)/n</div><p>Se prefiere el de menor valor. El BIC penaliza más los parámetros adicionales y tiende a elegir modelos más pequeños.</p>`}],
+code:{r:String.raw`library(lmtest)
+resettest(m, power = 2:3, type = "fitted")
+AIC(m1, m2); BIC(m1, m2)`, stata:String.raw`reg y x1 x2
+estat ovtest      // RESET
+estat ic          // AIC y BIC`, py:String.raw`from statsmodels.stats.diagnostic import linear_reset
+linear_reset(m, power=3, use_f=True)
+m1.aic, m2.aic, m1.bic, m2.bic`},
+q:"En una ecuación de salarios omites la habilidad, que aumenta el salario y está positivamente correlacionada con la educación. ¿En qué dirección queda sesgado el retorno a la educación?",
+a:"β₂ > 0 (la habilidad aumenta el salario) y Corr(educación, habilidad) > 0, así que el sesgo es positivo: el retorno estimado a la educación queda sobreestimado, porque recoge parte del efecto de la habilidad."}
+]},
+
+{g:"Más allá de MCO", from:"supuestos", items:[
+
+{id:"vi", t:"Variables instrumentales", html:`
+<section><h3>El problema: endogeneidad</h3>
+<p class="lead">Una regresora es endógena si está correlacionada con el error: <span class="m">Cov(x, u) ≠ 0</span>. Entonces MCO es sesgado e inconsistente. Las tres fuentes clásicas son variable omitida, error de medición en x y simultaneidad.</p></section>
+<section><h3>La solución: un instrumento</h3>
+<p>Una variable <span class="m">z</span> que cumpla dos condiciones:</p>
+<ol class="steps"><li><b>Relevancia:</b> Cov(z, x) ≠ 0. Se puede probar con los datos.</li>
+<li><b>Exogeneidad:</b> Cov(z, u) = 0. z solo afecta a y a través de x. No se puede probar con los datos; se argumenta con teoría.</li></ol>
+<div class="eq">β̂₁<sup>VI</sup> = <span class="frac"><span>Cov(z, y)</span><span>Cov(z, x)</span></span></div></section>
+<section><h3>Mínimos cuadrados en dos etapas (MC2E)</h3>
+<ol class="steps"><li><b>Primera etapa:</b> regresa x sobre z y las regresoras exógenas. Guarda x̂.</li>
+<li><b>Segunda etapa:</b> regresa y sobre x̂ y las regresoras exógenas. El coeficiente de x̂ es β̂<sup>MC2E</sup>.</li></ol>
+<p>Hacer las dos etapas a mano da bien los coeficientes, pero mal los errores estándar. Usa el comando del software.</p></section>
+<section><h3>Pruebas asociadas</h3>
+<ul><li><b>Instrumentos débiles:</b> F de la primera etapa sobre los instrumentos excluidos. Regla práctica: F &gt; 10.</li>
+<li><b>Hausman (endogeneidad):</b> compara MCO y VI. Si no difieren significativamente, x es exógena y MCO es preferible por ser más eficiente.</li>
+<li><b>Sargan (sobreidentificación):</b> si tienes más instrumentos que variables endógenas, prueba si son consistentes entre sí.</li></ul></section>
+<p class="warn"><b>Error común:</b> creer que un instrumento muy correlacionado con x es automáticamente bueno. Si también está correlacionado con u, el estimador VI puede quedar peor que MCO.</p>`,
+deep:[
+{k:"Intuición", t:"Qué hace realmente el instrumento", html:`<p>x tiene una parte "buena" (no relacionada con u) y una "contaminada". El instrumento aísla la parte buena: en la primera etapa, x̂ es solo la variación de x que proviene de z, y como z no está relacionada con u, esa variación tampoco. La segunda etapa usa solo esa variación limpia. El precio es que se usa menos información, por eso VI tiene más varianza que MCO.</p>`},
+{k:"Ejemplo", t:"Instrumentos famosos en economía", html:`<div class="tbl"><table><tr><th>Endógena</th><th>Instrumento</th><th>Estudio</th></tr><tr><td>Años de educación</td><td>Trimestre de nacimiento</td><td>Angrist y Krueger (1991)</td></tr><tr><td>Años de educación</td><td>Distancia a una universidad</td><td>Card (1995)</td></tr><tr><td>Calidad de las instituciones</td><td>Mortalidad de los colonos</td><td>Acemoglu, Johnson y Robinson (2001)</td></tr><tr><td>Precio (en demanda)</td><td>Choques de oferta, como el clima</td><td>Clásico de oferta y demanda</td></tr></table></div>`}],
+code:{r:String.raw`library(AER)
+iv <- ivreg(salario ~ educ + exper | distancia + exper, data = df)
+summary(iv, diagnostics = TRUE)   # F 1a etapa, Wu-Hausman, Sargan`, stata:String.raw`ivregress 2sls salario exper (educ = distancia)
+estat firststage     // instrumentos débiles
+estat endogenous     // Hausman`, py:String.raw`from linearmodels.iv import IV2SLS
+iv = IV2SLS.from_formula("salario ~ 1 + exper + [educ ~ distancia]", df).fit()
+print(iv.first_stage)
+iv.wu_hausman()`},
+q:"Se propone la distancia a la universidad más cercana como instrumento de la educación en una ecuación de salarios. ¿Qué debes argumentar y qué puedes probar?",
+a:"Puedes probar la relevancia: en la primera etapa, la distancia debe explicar significativamente la educación (F > 10). Debes argumentar la exogeneidad: que la distancia no afecta el salario por otra vía. Un riesgo es que las universidades están en ciudades con salarios más altos; por eso suele controlarse por zona urbana o región."},
+
+{id:"simultaneas", t:"Ecuaciones simultáneas", html:`
+<section><h3>La idea</h3>
+<p class="lead">Algunas variables se determinan conjuntamente. En un mercado, precio y cantidad salen del cruce de oferta y demanda; ninguna es "causa" de la otra en una sola ecuación.</p>
+<div class="eq">Demanda: Q = α₀ + α₁P + α₂I + u₁ &nbsp;&nbsp;&nbsp; Oferta: Q = β₀ + β₁P + β₂W + u₂<span class="note">Q y P: endógenas · I (ingreso) y W (clima): exógenas</span></div></section>
+<section><h3>Sesgo de simultaneidad</h3>
+<p>Un choque u₁ en la demanda mueve P. Entonces P está correlacionado con u₁ y estimar la demanda por MCO da un α̂₁ sesgado. Es un caso de endogeneidad.</p></section>
+<section><h3>Forma estructural y forma reducida</h3>
+<p>La <b>estructural</b> son las ecuaciones de comportamiento (las de arriba). La <b>reducida</b> expresa cada endógena solo en función de las exógenas, resolviendo el sistema:</p>
+<div class="eq">P = π₁₀ + π₁₁I + π₁₂W + v₁ &nbsp;&nbsp;&nbsp; Q = π₂₀ + π₂₁I + π₂₂W + v₂</div>
+<p>La forma reducida sí se puede estimar por MCO. El problema es recuperar los parámetros estructurales a partir de las π: eso es la <b>identificación</b>.</p></section>
+<section><h3>Condición de orden</h3>
+<p>Para que una ecuación esté identificada, el número de exógenas <b>excluidas</b> de ella debe ser al menos igual al número de endógenas <b>incluidas</b> a la derecha.</p>
+<div class="tbl"><table><tr><th>Caso</th><th>Situación</th><th>Estimación</th></tr><tr><td>Menos excluidas</td><td>Subidentificada</td><td>No se puede</td></tr><tr><td>Igual número</td><td>Exactamente identificada</td><td>MCI o MC2E</td></tr><tr><td>Más excluidas</td><td>Sobreidentificada</td><td>MC2E</td></tr></table></div>
+<p>En el ejemplo, la demanda excluye a W y la oferta excluye a I; cada una tiene una endógena a la derecha (P). Ambas están exactamente identificadas.</p></section>`,
+deep:[
+{k:"Intuición", t:"Por qué el clima identifica la demanda", html:`<p>Un cambio en el clima desplaza la oferta pero no la demanda. Al moverse la oferta, el punto de equilibrio recorre la curva de demanda, que se queda quieta. Así los datos "dibujan" la demanda. Por eso la variable excluida de una ecuación sirve como instrumento de P en esa ecuación: el clima es el instrumento del precio en la demanda.</p>`},
+{k:"Conceptos", t:"Condición de rango", html:`<p>La condición de orden es necesaria pero no suficiente. La de rango exige además que la variable excluida tenga efecto real en la otra ecuación: si β₂ = 0 (el clima no afecta la oferta), W no mueve nada y la demanda queda sin identificar aunque cumpla el conteo. En la práctica se verifica revisando que el instrumento sea relevante en la primera etapa.</p>`}],
+code:{r:String.raw`library(AER)
+demanda <- ivreg(q ~ p + ingreso | ingreso + lluvia, data = df)
+oferta  <- ivreg(q ~ p + lluvia  | ingreso + lluvia, data = df)`, stata:String.raw`ivregress 2sls q ingreso (p = lluvia)   // demanda
+ivregress 2sls q lluvia (p = ingreso)   // oferta`, py:String.raw`from linearmodels.iv import IV2SLS
+dem = IV2SLS.from_formula("q ~ 1 + ingreso + [p ~ lluvia]", df).fit()
+ofe = IV2SLS.from_formula("q ~ 1 + lluvia + [p ~ ingreso]", df).fit()`},
+q:"Si la oferta no incluyera ninguna variable exógena (no hay W), ¿qué ecuación queda identificada?",
+a:"La oferta sí, porque excluye a I y tiene una sola endógena a la derecha: los cambios en el ingreso desplazan la demanda y dibujan la curva de oferta. La demanda no, porque no excluye ninguna exógena."},
+
+{id:"discreta", t:"Elección discreta: logit y probit", sim:"logit", html:`
+<section><h3>La idea</h3>
+<p class="lead">Cuando la variable dependiente es binaria (y = 1 si la persona trabaja, compra, migra; 0 si no), lo que modelamos es la probabilidad <span class="m">P(y = 1 | x)</span>.</p></section>
+<section><h3>Modelo de probabilidad lineal (MPL)</h3>
+<div class="eq">P(y = 1 | x) = β₀ + β₁x₁ + … + βₖ₋₁xₖ₋₁</div>
+<p>Se estima por MCO y β₁ es directamente el cambio en la probabilidad. Problemas: puede predecir probabilidades menores que 0 o mayores que 1, supone efectos constantes y es heterocedástico por construcción (siempre usa errores robustos).</p></section>
+<section><h3>Logit y probit</h3>
+<div class="eq">Logit: P = Λ(xβ) = <span class="frac"><span>e<sup>xβ</sup></span><span>1 + e<sup>xβ</sup></span></span> &nbsp;&nbsp;&nbsp; Probit: P = Φ(xβ)<span class="note">Λ: función logística · Φ: función de distribución normal estándar · ambas entre 0 y 1</span></div>
+<p>Se estiman por <b>máxima verosimilitud</b>. El signo de β es interpretable, su magnitud directamente no.</p></section>
+<section><h3>Laboratorio: MPL contra logit</h3><div class="sim" id="sim"></div></section>
+<section><h3>Efectos marginales</h3>
+<div class="eq">∂P/∂xⱼ = g(xβ)·βⱼ<span class="note">Logit: g = Λ(1 − Λ), máximo 0,25 · Probit: g = φ (densidad normal), máximo 0,40</span></div>
+<p>El efecto depende del punto donde se evalúe. Se reporta el efecto marginal en la media (EMM) o el promedio de los efectos marginales (EMP).</p></section>
+<section><h3>Bondad de ajuste y pruebas</h3>
+<ul><li><b>Pseudo R² de McFadden:</b> 1 − ln L<sub>modelo</sub> / ln L<sub>solo intercepto</sub>.</li>
+<li><b>Razón de verosimilitud:</b> LR = 2(ln L<sub>NR</sub> − ln L<sub>R</sub>) ~ χ²(q). Hace el papel de la F.</li>
+<li><b>Porcentaje correctamente predicho:</b> se predice 1 si P̂ &gt; 0,5.</li></ul></section>`,
+deep:[
+{k:"Interpretación", t:"Razones de odds en el logit", html:`<p>Los odds son P/(1 − P). En el logit, <span class="m">ln[P/(1−P)] = xβ</span>, así que:</p><div class="eq">e<sup>βⱼ</sup> = razón de odds al aumentar xⱼ en una unidad</div><p>Si β = 0,4, entonces e<sup>0,4</sup> = 1,49: una unidad más de x multiplica los odds por 1,49 (los aumenta 49 %). No es lo mismo que aumentar la probabilidad en 49 %.</p>`},
+{k:"Comparación", t:"Logit y probit dan casi lo mismo", html:`<p>Las dos curvas son muy parecidas; el logit tiene colas un poco más gruesas. Por eso los coeficientes difieren en escala (β<sub>logit</sub> ≈ 1,6·β<sub>probit</sub>), pero los efectos marginales y las probabilidades predichas suelen ser casi idénticos. La elección rara vez cambia las conclusiones.</p>`}],
+code:{r:String.raw`lg <- glm(y ~ x1 + x2, family = binomial(link = "logit"), data = df)
+pb <- glm(y ~ x1 + x2, family = binomial(link = "probit"), data = df)
+library(margins); summary(margins(lg))   # efectos marginales promedio
+exp(coef(lg))                            # razones de odds`, stata:String.raw`logit y x1 x2
+margins, dydx(*)        // efectos marginales promedio
+logit y x1 x2, or       // razones de odds
+probit y x1 x2
+estat classification`, py:String.raw`lg = smf.logit("y ~ x1 + x2", data=df).fit()
+lg.get_margeff().summary()
+np.exp(lg.params)        # razones de odds
+pb = smf.probit("y ~ x1 + x2", data=df).fit()`},
+q:"En un logit, β₁ = 0,4. Para una persona con probabilidad predicha de 0,5, ¿cuál es el efecto marginal de x₁?",
+a:"g = Λ(1 − Λ) = 0,5·0,5 = 0,25. Efecto marginal = 0,25·0,4 = 0,10: una unidad más de x₁ aumenta la probabilidad en unos 10 puntos porcentuales. Con P = 0,9 sería 0,09·0,4 = 0,036."}
+]},
+
+{g:"Según la estructura de datos", from:"datos", items:[
+
+{id:"panel", t:"Datos de panel", html:`
+<section><h3>La idea</h3>
+<p class="lead">Con datos de panel seguimos a los mismos individuos en el tiempo. Eso permite controlar características que no observamos y que no cambian, como la habilidad de una persona o la cultura de una empresa.</p>
+<div class="eq">yᵢₜ = β₀ + β₁xᵢₜ + aᵢ + uᵢₜ<span class="note">aᵢ: efecto inobservado fijo en el tiempo · uᵢₜ: error idiosincrático</span></div></section>
+<section><h3>El problema del MCO agrupado</h3>
+<p>Si estimas por MCO juntando todo, aᵢ queda en el error. Si aᵢ está correlacionado con xᵢₜ, hay sesgo por variable omitida.</p></section>
+<section><h3>Los tres estimadores</h3>
+<div class="tbl"><table><tr><th>Estimador</th><th>Cómo elimina aᵢ</th><th>Supuesto clave</th></tr>
+<tr><td>Primeras diferencias</td><td>Resta el periodo anterior: Δyᵢₜ = β₁Δxᵢₜ + Δuᵢₜ</td><td>aᵢ puede correlacionarse con x</td></tr>
+<tr><td>Efectos fijos (EF)</td><td>Resta la media de cada individuo: yᵢₜ − ȳᵢ</td><td>aᵢ puede correlacionarse con x</td></tr>
+<tr><td>Efectos aleatorios (EA)</td><td>No lo elimina; lo trata como parte de un error compuesto y usa MCG</td><td>Cov(aᵢ, x) = 0</td></tr></table></div>
+<p>EF pierde las variables constantes en el tiempo (sexo, región de nacimiento): se eliminan junto con aᵢ. EA las conserva y es más eficiente, pero solo si su supuesto se cumple.</p></section>
+<section><h3>Prueba de Hausman</h3>
+<p>H₀: aᵢ no está correlacionado con las regresoras (EA es consistente y eficiente). Bajo H₀, EF y EA deberían dar coeficientes parecidos.</p>
+<ul><li>Se rechaza H₀ → usar <b>efectos fijos</b>.</li><li>No se rechaza → <b>efectos aleatorios</b> es aceptable.</li></ul></section>
+<p class="warn"><b>Error común:</b> olvidar agrupar los errores estándar por individuo. Las observaciones de un mismo individuo están correlacionadas en el tiempo; sin agrupar, los errores salen demasiado pequeños.</p>`,
+deep:[
+{k:"Equivalencia", t:"Efectos fijos con dicotómicas", html:`<p>Estimar por EF es numéricamente igual a meter una dicotómica por cada individuo (MCVD: mínimos cuadrados con variables dicotómicas). Con 1.000 empresas serían 999 dicotómicas, por eso se usa la transformación de las medias. Fíjate en la conexión con Chow: es como permitir un intercepto distinto para cada individuo y una pendiente común.</p>`},
+{k:"Conceptos", t:"Qué hace efectos aleatorios por dentro", html:`<p>EA aplica una cuasi-transformación: <span class="m">yᵢₜ − θȳᵢ</span>, con θ entre 0 y 1 calculado a partir de las varianzas de aᵢ y uᵢₜ. Si θ = 0 es MCO agrupado; si θ = 1 es efectos fijos. EA es un punto intermedio que aprovecha también la variación entre individuos.</p>`}],
+code:{r:String.raw`library(plm)
+fe <- plm(y ~ x, data = df, index = c("id", "anio"), model = "within")
+re <- plm(y ~ x, data = df, index = c("id", "anio"), model = "random")
+phtest(fe, re)   # Hausman
+library(lmtest); coeftest(fe, vcov = vcovHC(fe, cluster = "group"))`, stata:String.raw`xtset id anio
+xtreg y x, fe vce(cluster id)
+xtreg y x, fe
+estimates store fe
+xtreg y x, re
+hausman fe .`, py:String.raw`from linearmodels.panel import PanelOLS, RandomEffects
+d = df.set_index(["id", "anio"])
+fe = PanelOLS.from_formula("y ~ x + EntityEffects", d).fit(cov_type="clustered", cluster_entity=True)
+re = RandomEffects.from_formula("y ~ 1 + x", d).fit()`},
+q:"Estimas un panel de 200 municipios y la prueba de Hausman da p-valor = 0,01. ¿Qué estimador usas?",
+a:"Se rechaza H₀ al 5 %: el efecto inobservado de cada municipio está correlacionado con las regresoras, así que efectos aleatorios es inconsistente. Usas efectos fijos, con errores agrupados por municipio."},
+
+{id:"series", t:"Series de tiempo", html:`
+<section><h3>Estacionariedad</h3>
+<p class="lead">Una serie es (débilmente) estacionaria si su media y su varianza son constantes en el tiempo y la covarianza entre yₜ y yₜ₋ₛ depende solo de la distancia s. La mayoría de las herramientas de MCO necesitan series estacionarias.</p>
+<div class="eq">Caminata aleatoria: yₜ = yₜ₋₁ + εₜ<span class="note">No estacionaria: su varianza crece con t. Tiene raíz unitaria.</span></div></section>
+<section><h3>Regresión espuria</h3>
+<p>Si regresas una serie con raíz unitaria sobre otra independiente que también la tiene, es muy común obtener un R² alto y t significativas aunque no haya relación alguna (Granger y Newbold, 1974). Señal típica: R² mayor que el Durbin-Watson.</p></section>
+<section><h3>Prueba de Dickey-Fuller</h3>
+<div class="eq">Δyₜ = α + γyₜ₋₁ + εₜ &nbsp;&nbsp;&nbsp; H₀: γ = 0 (raíz unitaria)<span class="note">El estadístico t de γ̂ no sigue la t usual. Valor crítico al 5 % con constante ≈ −2,86</span></div>
+<p>La versión <b>aumentada (ADF)</b> agrega rezagos de Δyₜ para limpiar la autocorrelación. Si no se rechaza H₀, se diferencia la serie: si Δyₜ es estacionaria, yₜ es integrada de orden 1, I(1).</p></section>
+<section><h3>Modelos ARIMA</h3>
+<p><b>ARIMA(p, d, q)</b>: p rezagos de la variable (AR), d diferencias, q rezagos del error (MA). La metodología de Box-Jenkins tiene tres pasos:</p>
+<ol class="steps"><li><b>Identificación:</b> diferenciar hasta lograr estacionariedad y mirar la FAC y la FACP.</li>
+<li><b>Estimación</b> de los parámetros.</li>
+<li><b>Diagnóstico:</b> los residuos deben ser ruido blanco (prueba de Ljung-Box).</li></ol>
+<div class="tbl"><table><tr><th>Proceso</th><th>FAC</th><th>FACP</th></tr><tr><td>AR(p)</td><td>Decae gradualmente</td><td>Se corta después de p</td></tr><tr><td>MA(q)</td><td>Se corta después de q</td><td>Decae gradualmente</td></tr></table></div></section>
+<section><h3>Cointegración</h3>
+<p>Dos series I(1) están <b>cointegradas</b> si alguna combinación lineal de ellas es estacionaria: comparten una tendencia de largo plazo (consumo e ingreso, por ejemplo). Prueba de Engle-Granger: regresa una sobre otra y aplica Dickey-Fuller a los residuos. Si están cointegradas, la regresión no es espuria y se puede estimar un modelo de corrección de errores.</p></section>`,
+deep:[
+{k:"Conexión", t:"Series de tiempo y cambio estructural", html:`<p>Un quiebre estructural en la media o la tendencia (por ejemplo, la crisis de 2008 o la pandemia) hace que Dickey-Fuller tienda a no rechazar la raíz unitaria aunque la serie sea estacionaria alrededor de una tendencia con quiebre. La prueba de Perron (1989) incorpora el quiebre. Por eso Chow y las pruebas de raíz unitaria se usan juntas.</p>`},
+{k:"Avanzado", t:"Modelos VAR", html:`<p>Un vector autorregresivo modela varias series a la vez, cada una en función de sus propios rezagos y de los de las demás. Es la herramienta estándar en macroeconomía para analizar cómo responde, por ejemplo, la inflación a un choque en la tasa de política monetaria (funciones impulso-respuesta). También permite la prueba de causalidad de Granger.</p>`}],
+code:{r:String.raw`library(tseries); library(forecast)
+adf.test(y)
+dy <- diff(y)
+acf(dy); pacf(dy)
+fit <- auto.arima(y); checkresiduals(fit)`, stata:String.raw`tsset t
+dfuller y, lags(2)
+ac D.y
+pac D.y
+arima y, arima(1,1,1)`, py:String.raw`from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.arima.model import ARIMA
+adfuller(y)            # (estadístico, p-valor, ...)
+ARIMA(y, order=(1, 1, 1)).fit().summary()`},
+q:"La prueba de Dickey-Fuller con constante da un estadístico de −1,9. ¿Qué concluyes y qué haces?",
+a:"El valor crítico al 5 % es aproximadamente −2,86. Como −1,9 > −2,86, no se rechaza la raíz unitaria: la serie no es estacionaria. Se diferencia y se repite la prueba sobre Δyₜ."}
+]}
+];
+
+// ===== TALLERES: herramientas interactivas (código más abajo, en SIMS.ws*) =====
+const WSBOX=`<div id="ws" style="display:flex;flex-direction:column;gap:16px"></div>`;
+const WORKSHOPS=[
+{id:"t-matrices",t:"Matrices paso a paso y partición",anchor:"matrices",links:["matrices","mco-matricial","chow"],sim:"wsMat",html:WSBOX,
+ d:"Escribe tus propios datos y mira cada operación de β̂ = (X′X)⁻¹X′y. Después parte la matriz por columnas, para ver el teorema de Frisch-Waugh-Lovell, o por filas, que es la base de la prueba de Chow."},
+{id:"t-geometria",t:"Geometría de MCO en 3D",anchor:"mco-matricial",links:["matrices","mco-matricial","supuestos"],sim:"wsGeo",html:WSBOX,
+ d:"MCO es una proyección. Con tres observaciones se puede ver: y se proyecta sobre el plano que generan las columnas de X, y el residuo queda perpendicular a ese plano."},
+{id:"t-plano",t:"Plano de regresión y superficie de la SCR",anchor:"mco-matricial",links:["mco-simple","mco-matricial","multicol"],sim:"wsPlane",html:WSBOX,
+ d:"Con dos regresoras, la recta de regresión se vuelve un plano. Gíralo, cambia la correlación entre x₁ y x₂ y mira cómo la superficie de la SCR pasa de un tazón a un valle alargado cuando hay multicolinealidad."},
+{id:"t-calc",t:"Calculadora de pruebas",anchor:"chow",links:["inferencia","chow","hetero","autocorr"],sim:"wsCalc",html:WSBOX,
+ d:"Escribe los datos del ejercicio y obtén el procedimiento completo: la sustitución numérica, el valor crítico, el p-valor y la gráfica de la distribución. Sirve para Chow, F general, varianzas iguales, Breusch-Pagan y Durbin-Watson."}
+];
+
+// ===== índice general =====
+const ALL=[]; TRUNK.forEach(s=>ALL.push(Object.assign(s,{kind:"t"})));
+BRANCHES.forEach(g=>g.items.forEach(it=>ALL.push(Object.assign(it,{kind:"b",grp:g}))));
+WORKSHOPS.forEach(w=>ALL.push(Object.assign(w,{kind:"w"})));
+const LESSONS=ALL.filter(s=>s.kind!=="w");
+const byId=id=>ALL.find(s=>s.id===id);
+
+let done={}; try{done=JSON.parse(localStorage.getItem("ruta-eco-done")||"{}")||{}}catch(e){done={}}
+function save(){try{localStorage.setItem("ruta-eco-done",JSON.stringify(done))}catch(e){}}
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const trunkEl=document.getElementById("trunk"), brEl=document.getElementById("branches"), les=document.getElementById("lesson");
+let cur=null;
+
+function renderMap(){
+  trunkEl.innerHTML=TRUNK.map((s,i)=>`<li><button class="st ${done[s.id]?"done":""} ${cur===s.id?"on":""}" data-go="${s.id}">
+    <span class="dot">${done[s.id]?"✓":i+1}</span><span class="nm">${s.t}</span>${s.exam?'<span class="tag">Parcial 2</span>':""}</button></li>`).join("");
+  brEl.innerHTML=BRANCHES.map(b=>`<div class="bgrp"><h4>${b.g}</h4><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
+    b.items.map(it=>`<button class="chip ${cur===it.id?"on":""} ${done[it.id]?"done":""}" data-go="${it.id}">${it.t}</button>`).join("")}</div></div>`).join("");
+  document.getElementById("talleres").innerHTML=`<div class="wsgrp"><small>Calculadoras y visualizaciones para practicar</small><div class="chips">${WORKSHOPS.map(w=>`<button class="chip ws-chip ${cur===w.id?"on":""}" data-go="${w.id}">${w.t}</button>`).join("")}</div></div>`;
+  const n=LESSONS.filter(s=>done[s.id]).length;
+  document.getElementById("pbar").style.width=(n/LESSONS.length*100)+"%";
+  document.getElementById("ptxt").textContent=`${n} de ${LESSONS.length} temas dominados`;
+  requestAnimationFrame(moveTrain);
+}
+function moveTrain(){
+  const s=byId(cur); if(!s) return;
+  const anchor=s.kind==="t"?s.id:s.kind==="b"?s.grp.from:s.anchor;
+  const btn=trunkEl.querySelector(`[data-go="${anchor}"]`); if(!btn) return;
+  const y=btn.offsetTop+btn.offsetHeight/2;
+  document.getElementById("fill").style.height=Math.max(0,y-14)+"px";
+  document.getElementById("train").style.top=(y-8)+"px";
+}
+
+function deepBlock(s){
+  let h=""; const items=(s.deep||[]).slice();
+  h+=items.map((d,j)=>`<div class="dp"><button type="button" aria-expanded="false" data-dp><span class="k">${d.k}</span><span>${d.t}</span><span class="chev">›</span></button><div class="dpb"><div><div>${d.html}</div></div></div></div>`).join("");
+  if(s.code) h+=`<div class="dp"><button type="button" aria-expanded="false" data-dp><span class="k">Código</span><span>En el software: R, Stata y Python</span><span class="chev">›</span></button><div class="dpb"><div><div>
+    <div class="tabs" role="tablist">${["r","stata","py"].map((l,j)=>`<button role="tab" aria-selected="${j===0}" data-tab="${l}">${{r:"R",stata:"Stata",py:"Python"}[l]}</button>`).join("")}</div>
+    ${["r","stata","py"].map((l,j)=>`<div data-pane="${l}" ${j?"hidden":""}><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(s.code[l])}</pre></div>`).join("")}
+  </div></div></div></div>`;
+  return h?`<section><h3>Para profundizar</h3><div class="deep">${h}</div></section>`:"";
+}
+
+function show(id,scroll){
+  const s=byId(id)||TRUNK[0]; const prevIdx=ALL.findIndex(x=>x.id===cur); cur=s.id;
+  const i=ALL.indexOf(s), prev=ALL[i-1], next=ALL[i+1];
+  const eyebrow=s.kind==="t"
+    ? `<span>Estación ${i+1} de ${TRUNK.length}</span>${s.exam?'<span class="tag">Parcial 2</span>':""}`
+    : s.kind==="b" ? `<span class="tag br">Rama</span><span>${s.grp.g} · sale de ${byId(s.grp.from).t}</span>`
+    : `<span class="tag ws">Taller</span><span>Herramienta interactiva</span>`;
+  const rel=WORKSHOPS.filter(w=>w.links.includes(s.id));
+  const relHtml=s.kind==="w"
+    ? `<div class="relws"><span class="lbl">Lecciones relacionadas</span>${s.links.map(l=>`<button class="btn" type="button" data-go="${l}">${byId(l).t}</button>`).join("")}</div>`
+    : rel.length?`<div class="relws"><span class="lbl">Practica en</span>${rel.map(w=>`<button class="btn" type="button" data-go="${w.id}">${w.t} →</button>`).join("")}</div>`:"";
+  les.innerHTML=`<div><div class="eyebrow">${eyebrow}</div><h2>${s.t}</h2></div>
+    ${s.kind==="w"?`<p class="lead" style="margin:0">${s.d}</p>`:""}
+    ${s.html}
+    ${relHtml}
+    ${deepBlock(s)}
+    ${s.q?`<div class="quiz"><div class="lbl" style="margin-bottom:6px">Ponte a prueba</div><p style="margin:0 0 10px">${s.q}</p>
+      <button type="button" id="rev">Ver respuesta</button><div class="ans" id="ans" hidden>${s.a}</div></div>`:""}
+    <div class="foot">${s.kind!=="w"?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya lo domino</label>`:"<span></span>"}
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${prev?`<button class="btn" type="button" data-go="${prev.id}">← ${prev.t}</button>`:""}${next?`<button class="btn solid" type="button" data-go="${next.id}">${next.t} →</button>`:""}</div></div>`;
+  [...les.children].forEach((c,k)=>c.style.setProperty("--i",k));
+  if(!reduce && prevIdx>=0 && les.animate){
+    const dir=i>=prevIdx?1:-1;
+    les.animate([{transform:"translateX("+(dir*36)+"px)",opacity:.35},{transform:"none",opacity:1}],{duration:420,easing:"cubic-bezier(.2,.7,.2,1)"});
+  }
+  const rv=document.getElementById("rev");
+  if(rv) rv.onclick=()=>{const a=document.getElementById("ans");a.hidden=!a.hidden;rv.textContent=a.hidden?"Ver respuesta":"Ocultar respuesta"};
+  const ck=document.getElementById("chk");
+  if(ck) ck.onchange=e=>{done[s.id]=e.target.checked;save();renderMap()};
+  if(s.sim) SIMS[s.sim]();
+  renderMap();
+  if(scroll){ if(window.matchMedia("(max-width:860px)").matches) les.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}); else window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); }
+}
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");
+  if(g){const id=g.dataset.go; if(location.hash==="#"+id) show(id,true); else location.hash=id; return;}
+  const d=e.target.closest("[data-dp]");
+  if(d){const p=d.parentElement;p.classList.toggle("open");d.setAttribute("aria-expanded",p.classList.contains("open"));return;}
+  const t=e.target.closest("[data-tab]");
+  if(t){const box=t.closest("div:not(.tabs)");box.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b===t));
+    box.querySelectorAll("[data-pane]").forEach(p=>p.hidden=p.dataset.pane!==t.dataset.tab);return;}
+  const c=e.target.closest("[data-copy]");
+  if(c){const txt=c.nextElementSibling.textContent;
+    const ok=()=>{c.textContent="Copiado";setTimeout(()=>c.textContent="Copiar",1500)};
+    try{navigator.clipboard.writeText(txt).then(ok,()=>sel(c.nextElementSibling))}catch(err){sel(c.nextElementSibling)}}
+});
+function sel(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+document.addEventListener("keydown",e=>{
+  if(e.target.closest("input,textarea,select")) return;
+  const i=ALL.findIndex(x=>x.id===cur);
+  if(e.key==="ArrowRight"&&ALL[i+1]) location.hash=ALL[i+1].id;
+  if(e.key==="ArrowLeft"&&ALL[i-1]) location.hash=ALL[i-1].id;
+});
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)||TRUNK[0].id,true));
+window.addEventListener("resize",()=>moveTrain());
+
+// ===== utilidades numéricas =====
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function normals(R,n){const o=[];for(let i=0;i<n;i++){const u1=R()||1e-9,u2=R();o.push(Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2))}return o}
+function ols(x,y){const n=x.length,mx=x.reduce((a,b)=>a+b)/n,my=y.reduce((a,b)=>a+b)/n;let sxy=0,sxx=0,sct=0;
+  for(let i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)**2;sct+=(y[i]-my)**2}const b1=sxy/sxx,b0=my-b1*mx;let scr=0;
+  for(let i=0;i<n;i++)scr+=(y[i]-b0-b1*x[i])**2;return{b0,b1,scr,r2:1-scr/sct}}
+function gln(z){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];
+  let x=z,y=z,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x)}
+function bcf(a,b,x){const F=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<F)d=F;d=1/d;let h=d;
+  for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<F)d=F;c=1+aa/c;if(Math.abs(c)<F)c=F;d=1/d;h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<F)d=F;c=1+aa/c;if(Math.abs(c)<F)c=F;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-12)break}return h}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(gln(a+b)-gln(a)-gln(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x<(a+1)/(a+b+2)?bt*bcf(a,b,x)/a:1-bt*bcf(b,a,1-x)/b}
+function fp(F,d1,d2){return F<=0?1:ibeta(d2/2,d1/2,d2/(d2+d1*F))}
+function fcrit(d1,d2,al=.05){let lo=0,hi=8000;for(let i=0;i<100;i++){const m=(lo+hi)/2;fp(m,d1,d2)>al?lo=m:hi=m}return(lo+hi)/2}
+function erfc(x){const z=Math.abs(x),t=1/(1+.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(.37409196+t*(.09678418+t*(-.18628806+t*(.27886807+t*(-1.13520398+t*(1.48851587+t*(-.82215223+t*.17087277)))))))));return x>=0?r:2-r}
+const fmt=(v,d=2)=>v.toLocaleString("es-CO",{minimumFractionDigits:d,maximumFractionDigits:d});
+const $=id=>document.getElementById(id);
+
+// marco de gráfico
+function frame(W,H,xr,yr,xt,yt,xl,yl){
+  const L=46,R=12,T=12,B=36; const sx=x=>L+(x-xr[0])/(xr[1]-xr[0])*(W-L-R), sy=y=>T+(yr[1]-y)/(yr[1]-yr[0])*(H-T-B);
+  let g="";
+  yt.forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${sy(v)}" y2="${sy(v)}" stroke="var(--rule)"/><text x="${L-6}" y="${sy(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${typeof v==="number"&&!Number.isInteger(v)?fmt(v,1):v}</text>`);
+  xt.forEach(v=>g+=`<text x="${sx(v)}" y="${H-18}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${v}</text>`);
+  g+=`<text x="${W-R}" y="${H-3}" text-anchor="end" font-size="11" fill="var(--muted)">${xl}</text><text x="${L}" y="${T-2}" font-size="11" fill="var(--muted)" dy="10" dx="4">${yl}</text>`;
+  return{sx,sy,g,W,H};
+}
+const svg=(f,body,label)=>`<svg viewBox="0 0 ${f.W} ${f.H}" role="img" aria-label="${label}">${f.g}${body}</svg>`;
+function ticks(a,b,step){const o=[];for(let v=Math.ceil(a/step)*step;v<=b+1e-9;v+=step)o.push(+v.toFixed(6));return o}
+function slider(id,label,min,max,step,val){return `<label for="${id}"><span>${label} <output id="o-${id}"></output></span><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></label>`}
+
+const SIMS={};
+
+// ---- MCO simple: intenta ganarle a MCO
+SIMS.mco=function(){
+  const R=rng(4), E=normals(R,20), X=[], Y=[];
+  for(let i=0;i<20;i++){const x=+(0.5+R()*9.5).toFixed(2);X.push(x);Y.push(7+2.5*x+3*E[i])}
+  const best=ols(X,Y);
+  $("sim").innerHTML=`<p>Mueve la recta candidata. Los segmentos rojos son los residuos. MCO es la única recta con la SCR más baja posible.</p>
+  <div class="ctr">${slider("cb0","Intercepto candidato",-5,20,"any",3)}${slider("cb1","Pendiente candidata",0,5,"any",3.5)}</div>
+  <div class="plot" id="plot"></div><div class="res" id="res"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn solid" type="button" id="fit">Ajustar por MCO</button><span id="msg" style="align-self:center;font-weight:600"></span></div>`;
+  const run=()=>{const b0=+$("cb0").value,b1=+$("cb1").value;$("o-cb0").textContent=fmt(b0);$("o-cb1").textContent=fmt(b1);
+    let scr=0;X.forEach((x,i)=>scr+=(Y[i]-b0-b1*x)**2);
+    const f=frame(600,320,[0,10],[0,40],ticks(0,10,2),ticks(0,40,10),"x (publicidad)","y (ventas)");
+    let b="";X.forEach((x,i)=>{const yh=b0+b1*x;b+=`<line x1="${f.sx(x)}" x2="${f.sx(x)}" y1="${f.sy(Math.max(-5,Math.min(45,yh)))}" y2="${f.sy(Y[i])}" stroke="var(--bad)" stroke-width="1.5" stroke-opacity=".7"/>`});
+    X.forEach((x,i)=>b+=`<circle cx="${f.sx(x)}" cy="${f.sy(Y[i])}" r="4.5" fill="var(--line)"/>`);
+    const cl=(v)=>Math.max(-5,Math.min(45,v));
+    b+=`<line x1="${f.sx(0)}" y1="${f.sy(cl(best.b0))}" x2="${f.sx(10)}" y2="${f.sy(cl(best.b0+best.b1*10))}" stroke="var(--muted)" stroke-dasharray="5 5" stroke-width="1.5"/>`;
+    b+=`<line x1="${f.sx(0)}" y1="${f.sy(cl(b0))}" x2="${f.sx(10)}" y2="${f.sy(cl(b0+b1*10))}" stroke="var(--ink)" stroke-width="2.5"/>`;
+    $("plot").innerHTML=`<svg viewBox="0 0 600 320" role="img" aria-label="Datos, recta candidata y residuos"><defs><clipPath id="cp"><rect x="46" y="12" width="542" height="272"/></clipPath></defs>${f.g}<g clip-path="url(#cp)">${b}</g></svg>`;
+    $("res").innerHTML=[["SCR de tu recta",fmt(scr,1)],["SCR de MCO",fmt(best.scr,1)],["β̂₀ MCO",fmt(best.b0)],["β̂₁ MCO",fmt(best.b1)],["R² MCO",fmt(best.r2,3)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    const gap=scr/best.scr-1; $("msg").textContent=gap<0.005?"Llegaste al mínimo: esta es la recta de MCO.":`Tu SCR es ${fmt(gap*100,1)} % mayor que la de MCO.`;
+    $("msg").style.color=gap<0.005?"var(--good)":"var(--muted)";};
+  ["cb0","cb1"].forEach(i=>$(i).addEventListener("input",run));
+  $("fit").onclick=()=>{$("cb0").value=best.b0;$("cb1").value=best.b1;run()};
+  run();
+};
+
+// ---- Chow
+SIMS.chow=function(){
+  const N=60,R=rng(20261028),XS=[];for(let i=0;i<N;i++)XS.push(10+R()*40);const ES=normals(R,N);
+  $("sim").innerHTML=`<p>60 observaciones ordenadas en el tiempo. Las primeras forman el periodo 1 y el resto el periodo 2. Tú decides cuánto cambia la relación en el periodo 2.</p>
+  <div class="ctr">${slider("s-nb","Observaciones en el periodo 1",15,45,1,30)}${slider("s-di","Cambio en el intercepto (δ₀)",-15,15,0.5,0)}${slider("s-ds","Cambio en la pendiente (δ₁)",-0.6,0.6,0.02,0.3)}${slider("s-sg","Ruido (σ)",1,12,0.5,4)}</div>
+  <div class="legend"><span><i style="background:var(--line)"></i>Periodo 1</span><span><i style="background:var(--branch)"></i>Periodo 2</span><span><i style="background:var(--muted);height:2px"></i>Modelo restringido</span></div>
+  <div class="plot" id="plot"></div><div class="res" id="res"></div><div class="verdict" id="ver"></div>`;
+  const run=()=>{const nb=+$("s-nb").value,di=+$("s-di").value,ds=+$("s-ds").value,sg=+$("s-sg").value;
+    $("o-s-nb").textContent=nb;$("o-s-di").textContent=fmt(di,1);$("o-s-ds").textContent=fmt(ds,2);$("o-s-sg").textContent=fmt(sg,1);
+    const Y=XS.map((x,i)=>5+0.8*x+(i>=nb?di+ds*x:0)+sg*ES[i]);
+    const p=ols(XS,Y),a=ols(XS.slice(0,nb),Y.slice(0,nb)),b=ols(XS.slice(nb),Y.slice(nb));
+    const k=2,d2=N-2*k,nr=a.scr+b.scr,F=((p.scr-nr)/k)/(nr/d2),pv=fp(F,k,d2),fc=fcrit(k,d2);
+    const ymin=Math.min(...Y),ymax=Math.max(...Y),pad=(ymax-ymin)*.08,y0=Math.floor((ymin-pad)/10)*10,y1=Math.ceil((ymax+pad)/10)*10;
+    const f=frame(600,320,[10,50],[y0,y1],ticks(10,50,10),ticks(y0,y1,(y1-y0)>80?20:10),"x","y");
+    const ln=(m,c,d)=>`<line x1="${f.sx(10)}" y1="${f.sy(m.b0+m.b1*10)}" x2="${f.sx(50)}" y2="${f.sy(m.b0+m.b1*50)}" stroke="${c}" stroke-width="${d?2:2.5}" ${d?'stroke-dasharray="6 5"':""}/>`;
+    let pts="";XS.forEach((x,i)=>pts+=`<circle cx="${f.sx(x).toFixed(1)}" cy="${f.sy(Y[i]).toFixed(1)}" r="4" fill="${i<nb?"var(--line)":"var(--branch)"}" fill-opacity=".75"/>`);
+    $("plot").innerHTML=svg(f,pts+ln(p,"var(--muted)",1)+ln(a,"var(--line)")+ln(b,"var(--branch)"),"Dispersión de los dos periodos con sus rectas");
+    $("res").innerHTML=[["SCR restringida",fmt(p.scr,1)],["SCR₁",fmt(a.scr,1)],["SCR₂",fmt(b.scr,1)],["F de Chow",fmt(F)],[`F crítico (${k}, ${d2})`,fmt(fc)],["p-valor",pv<1e-4?"< 0,0001":fmt(pv,4)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    const ver=$("ver");
+    if(pv<.05){ver.className="verdict rej";ver.textContent=`F = ${fmt(F)} > ${fmt(fc)}: se rechaza H₀ al 5 %. Hay evidencia de cambio estructural.`}
+    else{ver.className="verdict acc";ver.textContent=`F = ${fmt(F)} ≤ ${fmt(fc)}: no se rechaza H₀ al 5 %. Los datos son compatibles con una sola relación.`}};
+  ["s-nb","s-di","s-ds","s-sg"].forEach(i=>$(i).addEventListener("input",run));run();
+};
+
+// ---- Heterocedasticidad
+SIMS.hetero=function(){
+  const N=80,R=rng(77),X=[];for(let i=0;i<N;i++)X.push(1+R()*49);const E=normals(R,N);
+  $("sim").innerHTML=`<p>Gasto en ocio (y) contra ingreso (x). Aumenta el grado de heterocedasticidad y observa cómo los puntos se abren en abanico y la prueba de Breusch-Pagan lo detecta.</p>
+  <div class="ctr">${slider("hg","Grado de heterocedasticidad (γ)",0,3,0.1,1.5)}</div>
+  <div class="plot" id="plot"></div><div class="res" id="res"></div><div class="verdict" id="ver"></div>`;
+  const run=()=>{const g=+$("hg").value;$("o-hg").textContent=fmt(g,1);
+    const Y=X.map((x,i)=>10+0.6*x+2.5*(1+g*x/25)*E[i]);
+    const m=ols(X,Y),u2=X.map((x,i)=>(Y[i]-m.b0-m.b1*x)**2),aux=ols(X,u2),LM=N*aux.r2,p=erfc(Math.sqrt(LM/2));
+    const f=frame(600,320,[0,50],[-30,90],ticks(0,50,10),ticks(-30,90,30),"x (ingreso)","y");
+    let b="";
+    // banda ±2σ(x)
+    const top=[],bot=[];for(let x=0;x<=50;x+=2){const s=2*2.5*(1+g*x/25);top.push(`${f.sx(x)},${f.sy(Math.min(90,m.b0+m.b1*x+s))}`);bot.unshift(`${f.sx(x)},${f.sy(Math.max(-30,m.b0+m.b1*x-s))}`)}
+    b+=`<polygon points="${top.concat(bot).join(" ")}" fill="var(--branch)" fill-opacity=".15"/>`;
+    X.forEach((x,i)=>{if(Y[i]>-30&&Y[i]<90)b+=`<circle cx="${f.sx(x)}" cy="${f.sy(Y[i])}" r="4" fill="var(--line)" fill-opacity=".75"/>`});
+    b+=`<line x1="${f.sx(0)}" y1="${f.sy(m.b0)}" x2="${f.sx(50)}" y2="${f.sy(m.b0+m.b1*50)}" stroke="var(--ink)" stroke-width="2.5"/>`;
+    $("plot").innerHTML=svg(f,b,"Dispersión con banda de dos desviaciones del error");
+    $("res").innerHTML=[["β̂₁ (verdadero 0,6)",fmt(m.b1,3)],["R² auxiliar",fmt(aux.r2,3)],["LM = n·R²",fmt(LM)],["χ²(1) crítico 5 %","3,84"],["p-valor",p<1e-4?"< 0,0001":fmt(p,4)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    const ver=$("ver");
+    if(p<.05){ver.className="verdict rej";ver.textContent="Se rechaza la homocedasticidad. Fíjate que β̂₁ sigue cerca de 0,6: el problema no es el coeficiente sino sus errores estándar."}
+    else{ver.className="verdict acc";ver.textContent="No se rechaza la homocedasticidad: la varianza del error parece constante."}};
+  $("hg").addEventListener("input",run);run();
+};
+
+// ---- Logit vs MPL
+SIMS.logit=function(){
+  const N=120,R=rng(9),X=[],U=[];for(let i=0;i<N;i++){X.push(R()*10);U.push(R())}
+  $("sim").innerHTML=`<p>Probabilidad de comprar un producto (y = 1) según el ingreso (x). La recta es el MPL; la curva es el logit, ambos estimados con los mismos datos. Elige dónde evaluar el efecto marginal.</p>
+  <div class="ctr">${slider("lb","Fuerza de la relación verdadera",0.3,2,0.05,0.9)}${slider("lx","Evaluar efecto marginal en x =",0,10,0.5,5)}</div>
+  <div class="legend"><span><i style="background:var(--line)"></i>Logit</span><span><i style="background:var(--branch)"></i>MPL</span></div>
+  <div class="plot" id="plot"></div><div class="res" id="res"></div>`;
+  const run=()=>{const tb=+$("lb").value,xe=+$("lx").value;$("o-lb").textContent=fmt(tb);$("o-lx").textContent=fmt(xe,1);
+    const Y=X.map((x,i)=>U[i]<1/(1+Math.exp(-(tb*(x-5))))?1:0);
+    // logit por Newton-Raphson
+    let b0=0,b1=0;for(let it=0;it<40;it++){let g0=0,g1=0,h00=0,h01=0,h11=0;
+      for(let i=0;i<N;i++){const p=1/(1+Math.exp(-(b0+b1*X[i]))),w=p*(1-p);g0+=Y[i]-p;g1+=(Y[i]-p)*X[i];h00+=w;h01+=w*X[i];h11+=w*X[i]*X[i]}
+      const det=h00*h11-h01*h01;if(!isFinite(det)||Math.abs(det)<1e-12)break;const d0=(h11*g0-h01*g1)/det,d1=(-h01*g0+h00*g1)/det;b0+=d0;b1+=d1;if(Math.abs(d0)+Math.abs(d1)<1e-9)break;if(Math.abs(b1)>50)break}
+    const lp=ols(X,Y),P=x=>1/(1+Math.exp(-(b0+b1*x)));
+    const f=frame(600,320,[0,10],[-0.2,1.2],ticks(0,10,2),[-0.2,0,0.2,0.4,0.6,0.8,1,1.2],"x (ingreso)","P(y = 1)");
+    let b=`<rect x="${f.sx(0)}" y="${f.sy(1.2)}" width="${f.sx(10)-f.sx(0)}" height="${f.sy(1)-f.sy(1.2)}" fill="var(--bad)" fill-opacity=".08"/><rect x="${f.sx(0)}" y="${f.sy(0)}" width="${f.sx(10)-f.sx(0)}" height="${f.sy(-0.2)-f.sy(0)}" fill="var(--bad)" fill-opacity=".08"/>`;
+    X.forEach((x,i)=>b+=`<circle cx="${f.sx(x)}" cy="${f.sy(Y[i]?1-0.03*U[i]:0.03*U[i])}" r="3.5" fill="var(--muted)" fill-opacity=".55"/>`);
+    let path="";for(let x=0;x<=10.001;x+=0.1)path+=(path?"L":"M")+f.sx(x).toFixed(1)+","+f.sy(P(x)).toFixed(1);
+    const cl=v=>Math.max(-0.2,Math.min(1.2,v));
+    b+=`<line x1="${f.sx(0)}" y1="${f.sy(cl(lp.b0))}" x2="${f.sx(10)}" y2="${f.sy(cl(lp.b0+lp.b1*10))}" stroke="var(--branch)" stroke-width="2.5"/>`;
+    b+=`<path d="${path}" fill="none" stroke="var(--line)" stroke-width="2.5"/>`;
+    const pe=P(xe),me=pe*(1-pe)*b1,tx=1.2;
+    b+=`<line x1="${f.sx(Math.max(0,xe-tx))}" y1="${f.sy(cl(pe-me*Math.min(tx,xe)))}" x2="${f.sx(Math.min(10,xe+tx))}" y2="${f.sy(cl(pe+me*Math.min(tx,10-xe)))}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="${f.sx(xe)}" cy="${f.sy(pe)}" r="6" fill="var(--ink)"/>`;
+    b+=`<text x="${f.sx(0.15)}" y="${f.sy(1.12)}" font-size="11" fill="var(--bad)">Zona imposible: P &gt; 1</text>`;
+    $("plot").innerHTML=svg(f,b,"Datos binarios, recta del MPL y curva logit");
+    $("res").innerHTML=[["Logit: P̂ en x",fmt(pe,3)],["Efecto marginal logit",fmt(me,3)],["Efecto marginal MPL",fmt(lp.b1,3)],["β̂₁ logit",fmt(b1,3)],["MPL predice en x = 10",fmt(lp.b0+lp.b1*10,3)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");};
+  ["lb","lx"].forEach(i=>$(i).addEventListener("input",run));run();
+};
+
+// ===================== TALLERES =====================
+const TR=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+const MM=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,v,q)=>s+v*B[q][j],0)));
+const EYE=n=>Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>+(i===j)));
+const SUB=(A,B)=>A.map((r,i)=>r.map((v,j)=>v-B[i][j]));
+const colv=v=>v.map(x=>[x]);
+function INV(A){const n=A.length,mx=Math.max(...A.flat().map(Math.abs))||1;const M=A.map((r,i)=>[...r,...A.map((_,j)=>+(i===j))]);
+  for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;
+    if(Math.abs(M[p][c])<1e-10*mx)return null;[M[c],M[p]]=[M[p],M[c]];const d=M[c][c];for(let j=0;j<2*n;j++)M[c][j]/=d;
+    for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f)for(let j=0;j<2*n;j++)M[r][j]-=f*M[c][j]}}
+  return M.map(r=>r.slice(n))}
+function DET3(m){return m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])-m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0])}
+function OLSM(X,y){const XtX=MM(TR(X),X),inv=INV(XtX);if(!inv)return null;const Xty=MM(TR(X),colv(y));const b=MM(inv,Xty).map(r=>r[0]);
+  const yh=X.map(r=>r.reduce((s,v,q)=>s+v*b[q],0)),u=y.map((v,i)=>v-yh[i]);return{XtX,inv,Xty,b,yh,u,scr:u.reduce((s,v)=>s+v*v,0)}}
+function fm(v){if(!isFinite(v))return"—";if(Math.abs(v)<5e-10)return"0";const a=Math.abs(v);
+  if(Math.abs(v-Math.round(v))<1e-9)return Math.round(v).toLocaleString("es-CO");
+  const d=a>=1000?1:a>=10?2:a>=1?3:a>=0.01?4:6;return(+v.toFixed(d)).toLocaleString("es-CO",{maximumFractionDigits:d})}
+const pf=p=>p<1e-4?"&lt; 0,0001":fmt(p,4);
+const sgn=v=>v<0?"−":"+";
+function nice(v){const p=10**Math.floor(Math.log10(v)),m=v/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
+function mat(M,cap,o={}){const r=M.length,c=M[0].length;let cells="";
+  for(let i=0;i<r;i++)for(let j=0;j<c;j++){const cl=(o.cls?o.cls(i,j):"")+(o.click?" cl":"");
+    cells+=`<span class="${cl}"${o.click?` data-cell="${o.click}" data-i="${i}" data-j="${j}"`:""}>${fm(M[i][j])}</span>`}
+  return `<div class="mx"><div class="cap">${cap}${o.sub?`<small>${o.sub}</small>`:""}</div><div class="mg" style="grid-template-columns:repeat(${c},auto)">${cells}</div></div>`}
+let CALC_PREFILL=null;
+const SING=`<p class="warn"><b>X′X no tiene inversa.</b> Alguna columna es combinación lineal exacta de otras (por ejemplo, una variable constante o proporcional a otra). Es multicolinealidad perfecta: cambia algún dato.</p>`;
+
+// ---------- motor 3D mínimo en canvas ----------
+function hx(c){c=(c||"").trim();if(/^#[0-9a-f]{6}$/i.test(c))return[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));return[120,120,140]}
+function Scene3D(cv){
+  const S={yaw:-0.85,pitch:0.42,scale:1,auto:false,center:[0,0,0],items:[],onStop:null};
+  const ctx=cv.getContext("2d");let W=0,H=0,dpr=1,dirty=true,drag=null;
+  const P=p=>{const x=p[0]-S.center[0],y=p[1]-S.center[1],z=p[2]-S.center[2];
+    const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw),cp=Math.cos(S.pitch),sp=Math.sin(S.pitch);
+    const X=x*cy-y*sy,Y=x*sy+y*cy,up=z*cp+Y*sp,dep=Y*cp-z*sp,f=3.6/(3.6+dep),k=Math.min(W,H)*0.3*S.scale;
+    return[W/2+X*f*k,H/2-up*f*k,dep]};
+  function draw(){
+    if(!cv.clientWidth)return;
+    if(cv.clientWidth!==W||cv.clientHeight!==H){dpr=window.devicePixelRatio||1;W=cv.clientWidth;H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr}
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+    const css=getComputedStyle(document.documentElement),col=n=>n.startsWith("--")?css.getPropertyValue(n).trim():n,font=css.getPropertyValue("--f-body");
+    const A=hx(col("--line")),B=hx(col("--branch"));
+    const L=S.items.map(it=>{let pts;if(it.type==="pt"||it.type==="txt")pts=[P(it.p)];else if(it.type==="ln"||it.type==="arr")pts=[P(it.a),P(it.b)];else pts=it.pts.map(P);
+      return{it,pts,d:pts.reduce((s,q)=>s+q[2],0)/pts.length+(it.bias||0)}});
+    L.sort((a,b)=>b.d-a.d);
+    for(const{it,pts}of L){
+      let c=it.mix!=null?`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*it.mix)).join(",")})`:col(it.c||"--ink");
+      ctx.globalAlpha=it.op??1;
+      if(it.type==="poly"){ctx.beginPath();pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.fillStyle=c;ctx.fill();
+        if(it.stroke){ctx.globalAlpha=it.sa??.5;ctx.strokeStyle=col(it.stroke);ctx.lineWidth=.7;ctx.stroke()}}
+      else if(it.type==="ln"||it.type==="arr"){const[a,b]=pts;ctx.beginPath();ctx.setLineDash(it.dash||[]);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=c;ctx.lineWidth=it.w||1.5;ctx.stroke();ctx.setLineDash([]);
+        if(it.type==="arr"){const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,ux=dx/l,uy=dy/l,h=Math.min(12,l*.35);
+          ctx.beginPath();ctx.moveTo(b[0],b[1]);ctx.lineTo(b[0]-ux*h-uy*h*.45,b[1]-uy*h+ux*h*.45);ctx.lineTo(b[0]-ux*h+uy*h*.45,b[1]-uy*h-ux*h*.45);ctx.closePath();ctx.fillStyle=c;ctx.fill()}}
+      else if(it.type==="pt"){ctx.beginPath();ctx.arc(pts[0][0],pts[0][1],it.r||3.5,0,7);ctx.fillStyle=c;ctx.fill()}
+      else if(it.type==="txt"){ctx.font=`${it.bold?"600 ":""}${it.s||12}px ${font}`;ctx.fillStyle=c;ctx.textAlign=it.align||"center";ctx.textBaseline="middle";ctx.fillText(it.t,pts[0][0]+(it.dx||0),pts[0][1]+(it.dy||0))}
+    }
+    ctx.globalAlpha=1}
+  const mo=new MutationObserver(()=>dirty=true);mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  const mq=window.matchMedia("(prefers-color-scheme: dark)"),mqf=()=>dirty=true;if(mq.addEventListener)mq.addEventListener("change",mqf);
+  function loop(){if(!cv.isConnected){mo.disconnect();if(mq.removeEventListener)mq.removeEventListener("change",mqf);return}
+    if(S.auto){S.yaw+=.005;dirty=true}if(dirty){dirty=false;draw()}requestAnimationFrame(loop)}
+  S.set=it=>{S.items=it;dirty=true};
+  S.stop=()=>{if(S.auto){S.auto=false;S.onStop&&S.onStop()}};
+  S.tween=d=>{let best=null;for(const s of[1,-1]){const e=d.map(v=>v*s),p=Math.asin(Math.max(-1,Math.min(1,-e[2]))),yw=Math.atan2(e[0],e[1]),sc=Math.abs(p-.4);if(!best||sc<best.sc)best={p,yw,sc}}
+    S.stop();const p0=S.pitch,y0=S.yaw;let dy=best.yw-y0;dy=((dy+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;const p1=Math.max(-.3,Math.min(1.45,best.p));
+    const t0=performance.now(),D=reduce?1:750;const st=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);S.yaw=y0+dy*e;S.pitch=p0+(p1-p0)*e;dirty=true;if(k<1&&cv.isConnected)requestAnimationFrame(st)};requestAnimationFrame(st)};
+  cv.addEventListener("pointerdown",e=>{drag=[e.clientX,e.clientY];try{cv.setPointerCapture(e.pointerId)}catch(_){}S.stop()});
+  cv.addEventListener("pointermove",e=>{if(!drag)return;S.yaw+=(e.clientX-drag[0])*.01;S.pitch=Math.max(-.3,Math.min(1.45,S.pitch+(e.clientY-drag[1])*.008));drag=[e.clientX,e.clientY];dirty=true});
+  const up=()=>drag=null;cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+  cv.addEventListener("wheel",e=>{e.preventDefault();S.scale=Math.max(.5,Math.min(2.4,S.scale*(e.deltaY<0?1.08:.93)));dirty=true},{passive:false});
+  requestAnimationFrame(loop);return S}
+function boxItems(){const o=[],c=[-1,1];for(const a of c)for(const b of c){o.push({type:"ln",a:[-1,a,b],b:[1,a,b],c:"--rule",w:1,bias:80});o.push({type:"ln",a:[a,-1,b],b:[a,1,b],c:"--rule",w:1,bias:80});o.push({type:"ln",a:[a,b,-1],b:[a,b,1],c:"--rule",w:1,bias:80})}return o}
+const txt=(p,t,o={})=>Object.assign({type:"txt",p,t,c:"--muted",s:11,bias:-60},o);
+function rotBtn(sc){const b=$("rot");b.onclick=()=>{if(sc.auto)sc.stop();else{sc.auto=true;b.textContent="Detener giro"}};sc.onStop=()=>b.textContent="Girar solo"}
+
+// ---------- Taller 1: matrices paso a paso y partición ----------
+SIMS.wsMat=function(){
+  const EX={x1:[2,3,5,6,4,7,8,5,9,6],x2:[10,9,9,8,10,7,6,8,6,7],y:[12,15,20,22,16,25,29,19,33,23]};
+  const fresh=()=>EX.y.map((_,i)=>({x1:EX.x1[i],x2:EX.x2[i],y:EX.y[i]}));
+  let D=fresh(),view="pasos",step=1,shown=0,k1=1,rs=5,jump=false;const mem={};
+  const ws=$("ws");
+  ws.innerHTML=`<div class="sim"><p>Ventas (y), publicidad (x₁) y precio (x₂) de 10 meses. Cambia cualquier número y todo se recalcula.</p>
+    <div class="tbl dtable"><table id="dt"></table></div>
+    <div class="row"><button class="btn" type="button" id="addr">+ Fila</button><button class="btn" type="button" id="delr">− Fila</button><button class="btn" type="button" id="rst">Restaurar ejemplo</button></div></div>
+    <div class="seg" role="group" aria-label="Vista" id="vseg"><button type="button" data-v="pasos" aria-pressed="true">Paso a paso</button><button type="button" data-v="cols" aria-pressed="false">Partición por columnas</button><button type="button" data-v="filas" aria-pressed="false">Partición por filas</button></div>
+    <div id="wsv" style="display:flex;flex-direction:column;gap:14px"></div>`;
+  const drawTable=()=>{$("dt").innerHTML=`<tr><th>Mes</th><th>x₁ publicidad</th><th>x₂ precio</th><th>y ventas</th></tr>`+D.map((d,i)=>`<tr><td class="num">${i+1}</td>${["x1","x2","y"].map(k=>`<td><input type="text" inputmode="decimal" id="d-${i}-${k}" data-i="${i}" data-k="${k}" value="${String(d[k]).replace(".",",")}" aria-label="${k} mes ${i+1}"></td>`).join("")}</tr>`).join("")};
+  $("dt").addEventListener("input",e=>{const t=e.target;if(!t.dataset.k)return;const v=parseFloat(t.value.replace(",","."));if(isFinite(v)){D[+t.dataset.i][t.dataset.k]=v;t.style.borderColor="";render()}else t.style.borderColor="var(--bad)"});
+  $("addr").onclick=()=>{if(D.length>=14)return;D.push({...D[D.length-1]});drawTable();render()};
+  $("delr").onclick=()=>{if(D.length<=4)return;D.pop();drawTable();render()};
+  $("rst").onclick=()=>{D=fresh();drawTable();render()};
+  $("vseg").onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;view=b.dataset.v;$("vseg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));shown=0;render()};
+  ws.addEventListener("click",e=>{
+    const c=e.target.closest("[data-cell]");
+    if(c){const i=+c.dataset.i,j=+c.dataset.j,X=mem.X,kind=c.dataset.cell;ws.querySelectorAll(".mg span.hl").forEach(s=>s.classList.remove("hl"));c.classList.add("hl");
+      const a=X.map(r=>r[i]),b=kind==="xtx"?X.map(r=>r[j]):mem.y,s=a.reduce((S,v,t)=>S+v*b[t],0),terms=a.map((v,t)=>`${fm(v)}·${fm(b[t])}`).join(" + "),nm=["1","x₁","x₂"];
+      $("ex-"+kind).innerHTML=kind==="xtx"?`Celda (${i+1}, ${j+1}) = Σ ${nm[i]}·${nm[j]} = ${terms} = <b>${fm(s)}</b>`:`Fila ${i+1} = Σ ${nm[i]}·y = ${terms} = <b>${fm(s)}</b>`;return}
+    const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+    if(a==="next"&&step<7){step++;jump=true}if(a==="all"){step=7;jump=true}if(a==="reset"){step=1;shown=0}
+    if(a==="k1")k1=+b.dataset.val;
+    if(a==="calc"){CALC_PREFILL=mem.chow;location.hash="t-calc";return}
+    render()});
+  ws.addEventListener("input",e=>{if(e.target.id==="rsl"){rs=+e.target.value;render()}});
+  drawTable();render();
+
+  function render(){
+    const X=D.map(d=>[1,d.x1,d.x2]),y=D.map(d=>d.y),n=D.length,k=3;mem.X=X;mem.y=y;
+    const XtX=MM(TR(X),X),Xty=MM(TR(X),colv(y)),r=OLSM(X,y),v=$("wsv");
+    if(view==="pasos"){
+      let s7=SING;
+      if(r){const s2=r.scr/(n-k),ee=r.inv.map((q,i)=>Math.sqrt(s2*q[i])),my=y.reduce((a,b)=>a+b)/n,sct=y.reduce((a,b)=>a+(b-my)**2,0);
+        s7=`<div class="tbl"><table><tr><th>Mes</th><th>y</th><th>ŷ = Xβ̂</th><th>û = y − ŷ</th><th>û²</th></tr>${y.map((v,i)=>`<tr><td class="num">${i+1}</td><td class="num">${fm(v)}</td><td class="num">${fm(r.yh[i])}</td><td class="num">${fm(r.u[i])}</td><td class="num">${fm(r.u[i]**2)}</td></tr>`).join("")}<tr><td colspan="4"><b>SCR = Σû²</b></td><td class="num"><b>${fm(r.scr)}</b></td></tr></table></div>
+        <div class="res"><div><small>σ̂² = SCR/(n − k)</small><b>${fm(s2)}</b></div><div><small>ee(β̂₀)</small><b>${fm(ee[0])}</b></div><div><small>ee(β̂₁)</small><b>${fm(ee[1])}</b></div><div><small>ee(β̂₂)</small><b>${fm(ee[2])}</b></div><div><small>R²</small><b>${fmt(1-r.scr/sct,3)}</b></div></div>
+        <p>Los errores estándar son la raíz de la diagonal de σ̂²(X′X)⁻¹. Con ellos se arman las pruebas t.</p>`}
+      const st=[
+        ["Arma la matriz X y el vector y",`<div class="mscroll"><div class="mrow">${mat(X,"X",{sub:n+"×3",cls:(i,j)=>j===0?"b3":""})}${mat(colv(y),"y",{sub:n+"×1"})}</div></div><p>La columna de unos (resaltada) acompaña al intercepto β₀. Cada fila es un mes y cada columna, una variable.</p>`],
+        ["Transpón X",`<div class="mscroll">${mat(TR(X),"X′",{sub:"3×"+n})}</div><p>Las filas de X pasan a ser columnas. Como X′ es 3×${n} y X es ${n}×3, el producto X′X será 3×3.</p>`],
+        ["Multiplica X′X",`<div class="mscroll"><div class="mrow">${mat(XtX,"X′X",{sub:"3×3",click:"xtx"})}</div></div><div class="expl" id="ex-xtx">Toca cualquier celda de X′X para ver la cuenta.</div><p>La celda (1, 1) es n = ${n}. El resto de la primera fila son Σx₁ y Σx₂, y la diagonal tiene las sumas de cuadrados. La matriz es simétrica.</p>`],
+        ["Invierte X′X",r?`<div class="mscroll"><div class="mrow">${mat(r.inv,"(X′X)⁻¹")}<span class="op">→</span>${mat(MM(XtX,r.inv),"(X′X)(X′X)⁻¹",{sub:"= I"})}</div></div><p>El determinante de X′X es <b>${fm(DET3(XtX))}</b>. Si fuera cero, no habría inversa. Al multiplicar X′X por su inversa sale la identidad, y así se comprueba.</p>`:SING],
+        ["Multiplica X′y",`<div class="mscroll"><div class="mrow">${mat(Xty,"X′y",{sub:"3×1",click:"xty"})}</div></div><div class="expl" id="ex-xty">Toca una celda de X′y para ver la cuenta.</div>`],
+        ["Obtén β̂ = (X′X)⁻¹X′y",r?`<div class="mscroll"><div class="mrow">${mat(r.inv,"(X′X)⁻¹")}<span class="op">·</span>${mat(Xty,"X′y")}<span class="op">=</span>${mat(colv(r.b),"β̂",{cls:()=>"b1"})}</div></div><div class="eq">ŷ = ${fm(r.b[0])} ${sgn(r.b[1])} ${fm(Math.abs(r.b[1]))}·x₁ ${sgn(r.b[2])} ${fm(Math.abs(r.b[2]))}·x₂</div><p>Con el precio constante, una unidad más de publicidad se asocia con ${fm(Math.abs(r.b[1]))} unidades ${r.b[1]>=0?"más":"menos"} de ventas. Con la publicidad constante, una unidad más de precio se asocia con ${fm(Math.abs(r.b[2]))} unidades ${r.b[2]>=0?"más":"menos"}.</p>`:SING],
+        ["Residuos, SCR y errores estándar",s7]];
+      let h=st.slice(0,step).map(([t,b],i)=>`<div class="stepc${i>=shown?" fresh":""}"><h4><span class="n">${i+1}</span>${t}</h4>${b}</div>`).join("");
+      h+=`<div class="row">${step<7?`<button class="btn solid" type="button" data-act="next">Siguiente paso (${step+1} de 7)</button><button class="btn" type="button" data-act="all">Ver todos</button>`:""}${step>1?`<button class="btn" type="button" data-act="reset">Empezar de nuevo</button>`:""}</div>`;
+      v.innerHTML=h;shown=step;
+      if(jump){jump=false;const f=v.querySelectorAll(".stepc.fresh");if(f.length)f[0].scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}
+      return}
+    if(view==="cols"){
+      const segK=`<div class="seg" role="group" aria-label="Partición"><button type="button" data-act="k1" data-val="1" aria-pressed="${k1===1}">X₁ = [1] · X₂ = [x₁ x₂]</button><button type="button" data-act="k1" data-val="2" aria-pressed="${k1===2}">X₁ = [1 x₁] · X₂ = [x₂]</button></div>`;
+      const X1=X.map(q=>q.slice(0,k1)),X2=X.map(q=>q.slice(k1)),inv1=INV(MM(TR(X1),X1));
+      if(!r||!inv1){v.innerHTML=segK+SING;return}
+      const M1=SUB(EYE(n),MM(MM(X1,inv1),TR(X1))),X2t=MM(M1,X2),yt=MM(M1,colv(y)).map(q=>q[0]),A=INV(MM(TR(X2t),X2t));
+      if(!A){v.innerHTML=segK+SING;return}
+      const b2=MM(A,MM(TR(X2t),colv(yt))).map(q=>q[0]),ok=b2.every((b,i)=>Math.abs(b-r.b[k1+i])<1e-7*(1+Math.abs(b)));
+      const blk=(i,j)=>i<k1&&j<k1?"b1":i>=k1&&j>=k1?"b2":"b3",invBlk=r.inv.slice(k1).map(q=>q.slice(k1));
+      let sc="";
+      if(k1===2){const xs=X2t.map(q=>q[0]),ex=Math.max(...xs.map(Math.abs))*1.2||1,ey=Math.max(...yt.map(Math.abs))*1.2||1;
+        const f=frame(600,300,[-ex,ex],[-ey,ey],ticks(-ex,ex,nice(ex/2)),ticks(-ey,ey,nice(ey/2)),"x̃₂: precio sin lo que explica la publicidad","ỹ");
+        let b=`<line x1="${f.sx(0)}" x2="${f.sx(0)}" y1="${f.sy(-ey)}" y2="${f.sy(ey)}" stroke="var(--rule)"/>`;
+        xs.forEach((x,i)=>b+=`<circle cx="${f.sx(x).toFixed(1)}" cy="${f.sy(yt[i]).toFixed(1)}" r="5" fill="var(--branch)"/>`);
+        b+=`<line x1="${f.sx(-ex)}" y1="${f.sy(-ex*b2[0])}" x2="${f.sx(ex)}" y2="${f.sy(ex*b2[0])}" stroke="var(--line)" stroke-width="2.5"/>`;
+        sc=`<p>La pendiente de esta nube, sin intercepto, es exactamente β̂₂ = ${fm(b2[0])}. Cada punto es un mes con la publicidad ya descontada.</p><div class="plot"><svg viewBox="0 0 600 300" role="img" aria-label="Residuos de y contra residuos de x2"><defs><clipPath id="cpw"><rect x="46" y="12" width="542" height="252"/></clipPath></defs>${f.g}<g clip-path="url(#cpw)">${b}</g></svg></div>`}
+      v.innerHTML=segK+`
+      <div class="stepc"><h4><span class="n">1</span>La partición</h4><div class="eq">X = [ X₁ | X₂ ] &nbsp;⇒&nbsp; X′X = [ X₁′X₁ &nbsp; X₁′X₂ ; X₂′X₁ &nbsp; X₂′X₂ ]</div>
+        <div class="mscroll"><div class="mrow">${mat(X,"X",{cls:(i,j)=>j<k1?"b1":"b2"})}${mat(XtX,"X′X",{cls:blk})}</div></div>
+        <div class="legend"><span><i style="background:var(--line-soft);height:10px"></i>X₁ y su bloque X₁′X₁</span><span><i style="background:var(--branch-soft);height:10px"></i>X₂ y su bloque X₂′X₂</span><span><i style="background:var(--exam-soft);height:10px"></i>Bloques cruzados X₁′X₂ y X₂′X₁</span></div>
+        <p>Si los bloques cruzados fueran cero (X₁ y X₂ ortogonales), cada grupo de coeficientes se podría estimar por separado. Como no lo son, hay que limpiar X₂ de lo que comparte con X₁.</p></div>
+      <div class="stepc"><h4><span class="n">2</span>Limpiar con M₁</h4><div class="eq">M₁ = I − X₁(X₁′X₁)⁻¹X₁′ &nbsp;&nbsp; X̃₂ = M₁X₂ &nbsp;&nbsp; ỹ = M₁y</div>
+        <div class="mscroll"><div class="mrow">${mat(M1,"M₁",{sub:n+"×"+n})}</div></div>
+        <div class="mscroll"><div class="mrow">${mat(X2t,"X̃₂ = M₁X₂",{cls:()=>"b2"})}${mat(colv(yt),"ỹ = M₁y")}</div></div>
+        <p>${k1===1?"Con X₁ = [1], M₁ solo le resta la media a cada columna. Por eso las fórmulas de la regresión simple se escriben con desviaciones respecto a la media.":"X̃₂ son los residuos de regresar el precio sobre una constante y la publicidad: la parte del precio que la publicidad no explica."} M₁ es simétrica e idempotente (M₁M₁ = M₁).</p></div>
+      <div class="stepc"><h4><span class="n">3</span>Mismo resultado por dos caminos</h4><div class="eq">β̂₂ = (X̃₂′X̃₂)⁻¹X̃₂′ỹ</div>
+        <div class="mscroll"><div class="mrow">${mat(colv(b2),"β̂₂ por FWL",{cls:()=>"b2"})}<span class="op">=</span>${mat(colv(r.b),"β̂ completo",{cls:i=>i>=k1?"b2":""})}</div></div>
+        <p class="${ok?"ok":"bad"}">${ok?"✓ Coinciden: es el teorema de Frisch-Waugh-Lovell.":"No coinciden: revisa los datos."}</p>
+        <div class="mscroll"><div class="mrow">${mat(invBlk,"Bloque de X₂ en (X′X)⁻¹")}<span class="op">=</span>${mat(A,"(X̃₂′X̃₂)⁻¹")}</div></div>
+        <p>La inversa de una matriz partida cumple que el bloque de X₂ en (X′X)⁻¹ es (X₂′M₁X₂)⁻¹. De ahí sale Var(β̂₂) = σ²(X₂′M₁X₂)⁻¹: cuanto más se parece X₂ a X₁, más pequeño es X₂′M₁X₂ y mayor la varianza.</p>${sc}</div>`;
+      return}
+    // filas
+    rs=Math.max(1,Math.min(rs,n-1));
+    if(!$("rsl")||$("rsl").max!==String(n-1))v.innerHTML=`<div class="sim"><div class="ctr"><label for="rsl"><span>Meses en el periodo 1 <output id="o-rsl"></output></span><input type="range" id="rsl" min="1" max="${n-1}" step="1" value="${rs}"></label></div><p>Parte las filas en dos periodos, como en la prueba de Chow. Se necesitan al menos k + 1 = 4 meses en una parte para estimarla sola.</p></div><div id="fv" style="display:flex;flex-direction:column;gap:14px"></div>`;
+    $("o-rsl").textContent=rs;
+    const Xa=X.slice(0,rs),Xb=X.slice(rs),ya=y.slice(0,rs),yb=y.slice(rs),A1=MM(TR(Xa),Xa),A2=MM(TR(Xb),Xb);
+    const ra=rs>k?OLSM(Xa,ya):null,rb=n-rs>k?OLSM(Xb,yb):null,rc=(i)=>i<rs?"b1":"b2";
+    const row=(nm,m,res)=>`<tr><td>${nm}</td><td class="num">${m}</td>${res?res.b.map(b=>`<td class="num">${fm(b)}</td>`).join("")+`<td class="num">${fm(res.scr)}</td>`:`<td colspan="4" style="color:var(--muted)">No se puede estimar: ${m} ≤ k</td>`}</tr>`;
+    let ch="";
+    if(!r)ch=SING;
+    else if(ra&&rb){const nr=ra.scr+rb.scr,d2=n-2*k;
+      if(nr<1e-12)ch=`<p class="warn"><b>SCR₁ + SCR₂ = 0.</b> Cada periodo se ajusta perfecto; agrega meses o cambia el punto de corte.</p>`;
+      else{const F=((r.scr-nr)/k)/(nr/d2),c=fcrit(k,d2),p=fp(F,k,d2);mem.chow={scrR:r.scr,scr1:ra.scr,scr2:rb.scr,n,k};
+        ch=`<div class="eq">F = <span class="frac"><span>(${fm(r.scr)} − ${fm(nr)}) / ${k}</span><span>${fm(nr)} / ${d2}</span></span> = ${fm(F)} &nbsp;&nbsp; F crítico 5 % (${k}, ${d2}) = ${fm(c)}</div>
+        <div class="verdict ${p<.05?"rej":"acc"}">${p<.05?`Se rechaza H₀ (p = ${pf(p)}): hay evidencia de cambio estructural entre los dos periodos.`:`No se rechaza H₀ (p = ${pf(p)}): no hay evidencia de cambio estructural.`}</div>
+        <div class="row"><button class="btn solid" type="button" data-act="calc">Ver el procedimiento en la calculadora →</button></div>`}}
+    else if(r&&(ra||rb)){const big=ra?{res:ra,m:rs}:{res:rb,m:n-rs},ns=n-big.m,d2=big.m-k;
+      if(big.res.scr<1e-12)ch=`<p class="warn"><b>La parte grande se ajusta perfecto</b> (SCR = 0); agrega meses.</p>`;
+      else{const F=((r.scr-big.res.scr)/ns)/(big.res.scr/d2),c=fcrit(ns,d2),p=fp(F,ns,d2);
+        ch=`<p>Una parte tiene solo ${ns} ${ns===1?"mes":"meses"}, menos de los k + 1 = 4 necesarios para estimarla sola. Se usa la <b>Chow predictiva</b>:</p><div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>grande</sub>) / n<sub>pequeña</sub></span><span>SCR<sub>grande</sub> / (n<sub>grande</sub> − k)</span></span> = <span class="frac"><span>(${fm(r.scr)} − ${fm(big.res.scr)}) / ${ns}</span><span>${fm(big.res.scr)} / ${d2}</span></span> = ${fm(F)}</div><div class="verdict ${p<.05?"rej":"acc"}">F crítico 5 % (${ns}, ${d2}) = ${fm(c)}. ${p<.05?"Se rechaza H₀: los meses de la parte pequeña no se ajustan a la relación de la grande.":"No se rechaza H₀: la parte pequeña es compatible con la relación estimada en la grande."}</div>`}}
+    else ch=`<p class="warn"><b>Ninguna parte tiene suficientes meses.</b> Con k = 3 parámetros cada periodo necesita al menos 4 observaciones para estimarse solo.</p>`;
+    $("fv").innerHTML=`<div class="stepc"><h4><span class="n">1</span>Partir por filas</h4><div class="eq">X = [ X⁽¹⁾ ; X⁽²⁾ ] &nbsp;&nbsp; y = [ y⁽¹⁾ ; y⁽²⁾ ]</div>
+      <div class="mscroll"><div class="mrow">${mat(X,"X",{cls:rc})}${mat(colv(y),"y",{cls:rc})}</div></div></div>
+    <div class="stepc"><h4><span class="n">2</span>X′X es la suma de los dos periodos</h4><div class="eq">X′X = X⁽¹⁾′X⁽¹⁾ + X⁽²⁾′X⁽²⁾</div>
+      <div class="mscroll"><div class="mrow">${mat(A1,"X⁽¹⁾′X⁽¹⁾",{cls:()=>"b1"})}<span class="op">+</span>${mat(A2,"X⁽²⁾′X⁽²⁾",{cls:()=>"b2"})}<span class="op">=</span>${mat(XtX,"X′X")}</div></div>
+      <p>Partir por filas no cambia X′X: lo descompone en la información de cada periodo. Lo mismo ocurre con X′y. El modelo restringido usa la suma (un solo β̂); el no restringido usa cada parte por separado (un β̂ por periodo).</p></div>
+    <div class="stepc"><h4><span class="n">3</span>Tres regresiones y la prueba de Chow</h4>
+      <div class="tbl"><table><tr><th>Modelo</th><th>n</th><th>β̂₀</th><th>β̂₁</th><th>β̂₂</th><th>SCR</th></tr>${row("Toda la muestra (restringido)",n,r)}${row("Periodo 1",rs,ra)}${row("Periodo 2",n-rs,rb)}</table></div>${ch}</div>`;
+  }
+};
+
+// ---------- Taller 2: geometría de MCO ----------
+SIMS.wsGeo=function(){
+  const ws=$("ws");
+  ws.innerHTML=`<div class="sim">
+    <canvas class="c3" id="c3" role="img" aria-label="Vista 3D: proyección del vector y sobre el plano de las columnas de X"></canvas>
+    <div class="row"><span class="hint">Arrastra para girar · rueda para acercar</span><button class="btn" type="button" id="rot">Girar solo</button><button class="btn solid" type="button" id="edge">Ver el ángulo recto</button></div>
+    <div class="legend"><span><i style="background:var(--ink)"></i>y (datos)</span><span><i style="background:var(--line)"></i>ŷ = Py</span><span><i style="background:var(--bad)"></i>û = y − ŷ</span><span><i style="background:var(--muted)"></i>columna de unos</span><span><i style="background:var(--branch)"></i>columna x</span><span><i style="background:var(--line-soft);height:10px"></i>plano de X</span></div>
+    <p>Datos: y = (y₁, y₂, y₃) y la regresora x = (x₁, x₂, x₃). Si las tres x son iguales, x es proporcional al vector de unos y el plano colapsa en una recta.</p>
+    <div class="ctr">${slider("gy1","y₁",0,6,0.25,2)}${slider("gy2","y₂",0,6,0.25,5)}${slider("gy3","y₃",0,6,0.25,3.5)}${slider("gx1","x₁",0,6,0.25,1)}${slider("gx2","x₂",0,6,0.25,2)}${slider("gx3","x₃",0,6,0.25,4)}</div>
+    <div class="verdict rej" id="gver" hidden></div>
+    <div class="res" id="res"></div></div>
+  <div class="stepc"><h4>Las matrices de proyección</h4><div class="eq">P = X(X′X)⁻¹X′ &nbsp;&nbsp; ŷ = Py &nbsp;&nbsp; M = I − P &nbsp;&nbsp; û = My</div><div class="mscroll"><div class="mrow" id="gpm"></div></div><div id="gchk"></div></div>
+  <div class="stepc"><h4>Cómo leer el dibujo</h4><p>Cada eje es una observación, así que un punto del espacio es una columna completa de datos. Toda combinación β₀·1 + β₁·x vive en el plano azul. MCO elige la combinación más cercana a y, y esa es ŷ. La distancia más corta de un punto a un plano es la perpendicular, por eso û forma un ángulo recto con el plano. Esa perpendicularidad es la condición X′û = 0 de las ecuaciones normales, y ‖û‖² es la SCR.</p></div>`;
+  const sc=Scene3D($("c3"));sc.center=[.35,.35,.35];rotBtn(sc);
+  const ids=["gy1","gy2","gy3","gx1","gx2","gx3"];ids.forEach(i=>$(i).addEventListener("input",upd));
+  let dir=null;$("edge").onclick=()=>{if(dir)sc.tween(dir)};
+  const dot=(a,c)=>a[0]*c[0]+a[1]*c[1]+a[2]*c[2],scl=(a,s)=>a.map(v=>v*s),add=(a,c)=>a.map((v,i)=>v+c[i]),sub=(a,c)=>a.map((v,i)=>v-c[i]),nrm=a=>Math.hypot(...a),unit=a=>scl(a,1/(nrm(a)||1)),cross=(a,c)=>[a[1]*c[2]-a[2]*c[1],a[2]*c[0]-a[0]*c[2],a[0]*c[1]-a[1]*c[0]];
+  const vec=a=>`(${a.map(fm).join("; ")})`;
+  upd();
+  function upd(){
+    const g=ids.map(i=>+$(i).value);ids.forEach((i,j)=>$("o-"+i).textContent=fmt(g[j],2));
+    const y=g.slice(0,3),x=g.slice(3),one=[1,1,1],X=[[1,x[0]],[1,x[1]],[1,x[2]]],inv=INV(MM(TR(X),X));
+    const S=Math.max(nrm(y),nrm(x),nrm(one))/1.1,w=a=>scl(a,1/S),items=[];
+    [[1.3,0,0],[0,1.3,0],[0,0,1.3]].forEach((a,i)=>{items.push({type:"ln",a:[0,0,0],b:a,c:"--muted",w:1,op:.55,bias:120});items.push(txt(scl(a,1.1),"obs "+(i+1)))});
+    const ON=w(one),XX=w(x),Y=w(y);
+    items.push({type:"arr",a:[0,0,0],b:ON,c:"--muted",w:2},txt(scl(ON,1.12),"1",{c:"--muted",s:13,bold:1}),{type:"arr",a:[0,0,0],b:XX,c:"--branch",w:2},txt(scl(XX,1.1),"x",{c:"--branch",s:13,bold:1}),{type:"arr",a:[0,0,0],b:Y,c:"--ink",w:2.8},txt(scl(Y,1.08),"y",{c:"--ink",s:14,bold:1}));
+    if(!inv){$("gver").hidden=false;$("gver").textContent="Las dos columnas de X son colineales: generan una recta, no un plano. X′X no tiene inversa y MCO no puede separar β₀ de β₁ (multicolinealidad perfecta).";
+      items.push({type:"ln",a:scl(unit(one),-1.2),b:scl(unit(one),1.6),c:"--line",w:3,op:.35,bias:100});sc.set(items);$("res").innerHTML="";$("gpm").innerHTML="";$("gchk").innerHTML="";dir=null;return}
+    $("gver").hidden=true;
+    const b=MM(inv,MM(TR(X),colv(y))).map(q=>q[0]),yh=X.map(q=>q[0]*b[0]+q[1]*b[1]),u=sub(y,yh),YH=w(yh);
+    const u1=unit(one),u2=unit(sub(x,scl(u1,dot(x,u1)))),R=1.2,cr=(s,t)=>add(scl(u1,s*R),scl(u2,t*R));
+    items.push({type:"poly",pts:[cr(-1,-1),cr(1,-1),cr(1,1),cr(-1,1)],c:"--line",op:.11,bias:100});
+    for(let t=-1;t<=1.001;t+=1/3){items.push({type:"ln",a:cr(-1,t),b:cr(1,t),c:"--line",op:.3,w:.8,bias:90},{type:"ln",a:cr(t,-1),b:cr(t,1),c:"--line",op:.3,w:.8,bias:90})}
+    items.push({type:"arr",a:[0,0,0],b:YH,c:"--line",w:2.8},txt(add(YH,scl(unit(YH),.1)),"ŷ",{c:"--line",s:14,bold:1}));
+    if(nrm(u)>1e-6){items.push({type:"arr",a:YH,b:Y,c:"--bad",w:2.2},txt(add(YH,scl(sub(Y,YH),.5)),"û",{c:"--bad",s:14,bold:1,dx:12}));
+      if(nrm(yh)>1e-6){const e1=scl(unit(sub(Y,YH)),.07),e2=scl(unit(YH),-.07);items.push({type:"ln",a:add(YH,e1),b:add(add(YH,e1),e2),c:"--bad",w:1.3},{type:"ln",a:add(add(YH,e1),e2),b:add(YH,e2),c:"--bad",w:1.3})}}
+    sc.set(items);
+    const nv=cross(u1,u2);dir=nrm(yh)>1e-6?unit(cross(nv,unit(yh))):u2;
+    const Pm=MM(MM(X,inv),TR(X)),Mm=SUB(EYE(3),Pm),xu=MM(TR(X),colv(u)).map(q=>q[0]),ny=dot(y,y),nh=dot(yh,yh),nu=dot(u,u);
+    $("res").innerHTML=[["β̂₀",fm(b[0])],["β̂₁",fm(b[1])],["ŷ",vec(yh)],["û",vec(u)],["SCR = ‖û‖²",fm(nu)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    $("gpm").innerHTML=mat(Pm,"P",{cls:()=>"b1"})+mat(Mm,"M = I − P",{cls:()=>"b3"});
+    $("gchk").innerHTML=`<div class="res"><div><small>X′û</small><b>${vec(xu)}</b></div><div><small>traza(P)</small><b>${fm(Pm[0][0]+Pm[1][1]+Pm[2][2])}</b></div><div><small>‖y‖²</small><b>${fm(ny)}</b></div><div><small>‖ŷ‖² + ‖û‖²</small><b>${fm(nh)} + ${fm(nu)}</b></div></div><p>X′û = 0: el residuo es perpendicular a las dos columnas de X. La traza de P es 2, el número de parámetros. Y se cumple Pitágoras: ‖y‖² = ‖ŷ‖² + ‖û‖². P y M son simétricas e idempotentes: proyectar dos veces es lo mismo que proyectar una.</p>`;
+  }
+};
+
+// ---------- Taller 3: plano de regresión y superficie de la SCR ----------
+SIMS.wsPlane=function(){
+  let seed=11,view="plano";const ws=$("ws");
+  ws.innerHTML=`<div class="sim">
+    <div class="seg" role="group" aria-label="Vista" id="pv"><button type="button" data-pv="plano" aria-pressed="true">Datos y plano</button><button type="button" data-pv="scr" aria-pressed="false">Superficie de la SCR</button></div>
+    <canvas class="c3" id="c3" role="img" aria-label="Vista 3D del plano de regresión o de la superficie de la SCR"></canvas>
+    <div class="row"><span class="hint">Arrastra para girar · rueda para acercar</span><button class="btn" type="button" id="rot">Girar solo</button><button class="btn" type="button" id="pnew">Nueva muestra</button></div>
+    <div class="legend" id="plg"></div>
+    <p>50 observaciones simuladas con y = 2 + β₁x₁ + β₂x₂ + u.</p>
+    <div class="ctr">${slider("pb1","β₁ verdadero",-2,3,0.1,1.5)}${slider("pb2","β₂ verdadero",-2,3,0.1,-1)}${slider("prho","Correlación entre x₁ y x₂ (ρ)",0,0.98,0.02,0.3)}${slider("psg","Ruido (σ)",0.5,6,0.25,2)}</div>
+    <div class="res" id="res"></div></div><p class="link" id="pnote"></p>`;
+  const sc=Scene3D($("c3"));rotBtn(sc);
+  let Z1,Z2,E;const gen=()=>{const R=rng(seed);Z1=normals(R,50);Z2=normals(R,50);E=normals(R,50)};gen();
+  ["pb1","pb2","prho","psg"].forEach(i=>$(i).addEventListener("input",upd));
+  $("pnew").onclick=()=>{seed++;gen();upd()};
+  $("pv").onclick=e=>{const b=e.target.closest("[data-pv]");if(!b)return;view=b.dataset.pv;$("pv").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));sc.tween(view==="scr"?[.64,.64,-.42]:[-.69,.6,-.41]);upd()};
+  const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  upd();
+  function upd(){
+    const B1=+$("pb1").value,B2=+$("pb2").value,rho=+$("prho").value,sg=+$("psg").value;
+    $("o-pb1").textContent=fmt(B1,1);$("o-pb2").textContent=fmt(B2,1);$("o-prho").textContent=fmt(rho,2);$("o-psg").textContent=fmt(sg,2);
+    const n=50,x1=Z1.map(z=>5+2*z),x2=Z1.map((z,i)=>5+2*(rho*z+Math.sqrt(1-rho*rho)*Z2[i])),y=x1.map((v,i)=>2+B1*v+B2*x2[i]+sg*E[i]);
+    const X=x1.map((v,i)=>[1,v,x2[i]]),r=OLSM(X,y),s2=r.scr/(n-3),ee=[1,2].map(j=>Math.sqrt(s2*r.inv[j][j]));
+    const m1=mean(x1),m2=mean(x2),my=mean(y);let S11=0,S22=0,S12=0,S1y=0,S2y=0,Syy=0;
+    for(let i=0;i<n;i++){const a=x1[i]-m1,b=x2[i]-m2,c=y[i]-my;S11+=a*a;S22+=b*b;S12+=a*b;S1y+=a*c;S2y+=b*c;Syy+=c*c}
+    const rr=S12/Math.sqrt(S11*S22),items=boxItems();
+    if(view==="plano"){
+      $("plg").innerHTML=`<span><i style="background:var(--line)"></i>Punto sobre el plano (û &gt; 0)</span><span><i style="background:var(--branch)"></i>Punto bajo el plano (û &lt; 0)</span><span><i style="background:var(--muted);height:1px"></i>Residuo</span>`;
+      $("pnote").textContent="Sube ρ cerca de 0,95 y presiona «Nueva muestra» varias veces. Con multicolinealidad el plano cambia de inclinación en cada muestra, aunque el modelo verdadero sea el mismo: eso son errores estándar grandes vistos en 3D.";
+      const ext=a=>{const lo=Math.min(...a),hi=Math.max(...a),p=(hi-lo)*.06||1;return[lo-p,hi+p]};
+      const[a1,c1]=ext(x1),[a2,c2]=ext(x2),pz=(u,v)=>r.b[0]+r.b[1]*u+r.b[2]*v;
+      const[ay,cy]=ext(y.concat([[a1,a2],[c1,a2],[c1,c2],[a1,c2]].map(([u,v])=>pz(u,v))));
+      const N=(v,a,c)=>-1+2*(v-a)/(c-a),Wp=(u,v,z)=>[N(u,a1,c1),N(v,a2,c2),N(z,ay,cy)];
+      items.push({type:"poly",pts:[[a1,a2],[c1,a2],[c1,c2],[a1,c2]].map(([u,v])=>Wp(u,v,pz(u,v))),c:"--line",op:.16,bias:60});
+      for(let t=0;t<=6;t++){const u=a1+(c1-a1)*t/6,v=a2+(c2-a2)*t/6;items.push({type:"ln",a:Wp(u,a2,pz(u,a2)),b:Wp(u,c2,pz(u,c2)),c:"--line",op:.32,w:.8,bias:55},{type:"ln",a:Wp(a1,v,pz(a1,v)),b:Wp(c1,v,pz(c1,v)),c:"--line",op:.32,w:.8,bias:55})}
+      for(let i=0;i<n;i++){const p=Wp(x1[i],x2[i],y[i]),q=Wp(x1[i],x2[i],r.yh[i]);items.push({type:"ln",a:p,b:q,c:"--muted",op:.55,w:1},{type:"pt",p,r:3.6,c:r.u[i]>0?"--line":"--branch"})}
+      items.push(txt([0,-1.3,-1],"x₁",{s:13,c:"--ink",bold:1}),txt([1.3,0,-1],"x₂",{s:13,c:"--ink",bold:1}),txt([-1,-1,1.2],"y",{s:13,c:"--ink",bold:1}),
+        txt([-1,-1.15,-1.08],fmt(a1,1)),txt([1,-1.15,-1.08],fmt(c1,1)),txt([1.15,-1,-1.08],fmt(a2,1)),txt([1.15,1,-1.08],fmt(c2,1)),txt([-1.12,-1.12,-1],fmt(ay,1)),txt([-1.12,-1.12,1],fmt(cy,1)));
+    }else{
+      $("plg").innerHTML=`<span><i style="background:var(--line)"></i>SCR baja</span><span><i style="background:var(--branch)"></i>SCR alta</span><span><i style="background:var(--ink);height:9px;width:9px;border-radius:50%"></i>Mínimo: β̂ de MCO</span><span><i style="background:var(--good);height:9px;width:9px;border-radius:50%"></i>Valor verdadero</span>`;
+      $("pnote").textContent="Con ρ cerca de 0 la superficie es un tazón con un mínimo claro. Con ρ alto se vuelve un valle alargado: muchas combinaciones de β₁ y β₂ dan casi la misma SCR, y por eso los errores estándar crecen. Para cada par (β₁, β₂) se usa el β₀ óptimo.";
+      const f=(u,v)=>Syy-2*u*S1y-2*v*S2y+u*u*S11+2*u*v*S12+v*v*S22,Wd=2,G=22,u0=r.b[1]-Wd,v0=r.b[2]-Wd,h=2*Wd/G;
+      const grid=[];let mx=-Infinity;for(let i=0;i<=G;i++){grid.push([]);for(let j=0;j<=G;j++){const z=f(u0+i*h,v0+j*h);grid[i].push(z);mx=Math.max(mx,z)}}
+      const mn=r.scr,Z=z=>-1+2*(z-mn)/(mx-mn),Nu=u=>-1+2*(u-u0)/(2*Wd),Nv=v=>-1+2*(v-v0)/(2*Wd);
+      for(let i=0;i<G;i++)for(let j=0;j<G;j++){const zs=[grid[i][j],grid[i+1][j],grid[i+1][j+1],grid[i][j+1]],t=(zs.reduce((a,b)=>a+b)/4-mn)/(mx-mn);
+        items.push({type:"poly",pts:[[Nu(u0+i*h),Nv(v0+j*h),Z(zs[0])],[Nu(u0+(i+1)*h),Nv(v0+j*h),Z(zs[1])],[Nu(u0+(i+1)*h),Nv(v0+(j+1)*h),Z(zs[2])],[Nu(u0+i*h),Nv(v0+(j+1)*h),Z(zs[3])]],mix:Math.sqrt(t),op:.93,stroke:"--card",sa:.45})}
+      items.push({type:"pt",p:[0,0,-1],r:5.5,c:"--ink",bias:-30},txt([0,0,-1],"β̂",{c:"--ink",s:13,bold:1,dy:-14,bias:-70}));
+      if(Math.abs(B1-r.b[1])<Wd&&Math.abs(B2-r.b[2])<Wd)items.push({type:"pt",p:[Nu(B1),Nv(B2),Z(f(B1,B2))],r:5.5,c:"--good",bias:-30});
+      items.push(txt([0,-1.3,-1],"β₁",{s:13,c:"--ink",bold:1}),txt([1.3,0,-1],"β₂",{s:13,c:"--ink",bold:1}),txt([-1,-1,1.2],"SCR",{s:13,c:"--ink",bold:1}),
+        txt([-1,-1.15,-1.08],fmt(u0,1)),txt([1,-1.15,-1.08],fmt(u0+2*Wd,1)),txt([1.15,-1,-1.08],fmt(v0,1)),txt([1.15,1,-1.08],fmt(v0+2*Wd,1)));
+    }
+    sc.set(items);
+    $("res").innerHTML=[["β̂₁ (ee)",`${fmt(r.b[1],2)} (${fmt(ee[0],2)})`],["β̂₂ (ee)",`${fmt(r.b[2],2)} (${fmt(ee[1],2)})`],["Corr(x₁, x₂)",fmt(rr,3)],["VIF",fmt(1/(1-rr*rr),2)],["R²",fmt(1-r.scr/Syy,3)],["SCR",fmt(r.scr,1)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+  }
+};
+
+// ---------- Taller 4: calculadora de pruebas ----------
+function gammq(a,x){if(x<=0)return 1;const lg=-x+a*Math.log(x)-gln(a);
+  if(x<a+1){let ap=a,sum=1/a,del=sum;for(let i=0;i<600;i++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-14)break}return Math.max(0,1-sum*Math.exp(lg))}
+  let b=x+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<600;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-14)break}return Math.exp(lg)*h}
+const chip=(x,k)=>gammq(k/2,x/2);
+function chicrit(k,al){let lo=0,hi=500;for(let i=0;i<100;i++){const m=(lo+hi)/2;chip(m,k)>al?lo=m:hi=m}return(lo+hi)/2}
+function distChart(kind,d1,d2,stat,crit){
+  const lB=kind==="F"?gln(d1/2)+gln(d2/2)-gln((d1+d2)/2):0;
+  const pdf=kind==="F"?x=>x<=0?0:Math.exp((d1/2)*Math.log(d1/d2)+(d1/2-1)*Math.log(x)-((d1+d2)/2)*Math.log(1+d1*x/d2)-lB):x=>x<=0?0:Math.exp((d1/2-1)*Math.log(x)-x/2-(d1/2)*Math.log(2)-gln(d1/2));
+  const base=kind==="F"?Math.max(4,crit*1.6):Math.max(d1+4*Math.sqrt(2*d1),crit*1.5),xmax=Math.max(base,Math.min(stat*1.15,base*4));
+  const xs=[],ys=[];for(let i=0;i<=240;i++){const x=xmax*i/240;xs.push(x);ys.push(pdf(x))}
+  let ym=0;xs.forEach((x,i)=>{if(x>=xmax*.04&&isFinite(ys[i]))ym=Math.max(ym,ys[i])});ym=ym*1.25||1;
+  const f=frame(600,220,[0,xmax],[0,ym],ticks(0,xmax,nice(xmax/5)),[],kind==="F"?"F":"χ²",""),cy=v=>f.sy(Math.min(isFinite(v)?v:ym,ym));
+  const path=xs.map((x,i)=>(i?"L":"M")+f.sx(x).toFixed(1)+","+cy(ys[i]).toFixed(1)).join("");
+  const ax=xs.map((x,i)=>[x,ys[i]]).filter(([x])=>x>=crit);
+  const area=ax.length?`M${f.sx(crit)},${f.sy(0)}L${f.sx(crit)},${cy(pdf(crit))}`+ax.map(([x,y])=>`L${f.sx(x).toFixed(1)},${cy(y).toFixed(1)}`).join("")+`L${f.sx(xmax)},${f.sy(0)}Z`:"";
+  const xc=f.sx(crit),xsx=f.sx(Math.min(stat,xmax)),top=f.sy(ym),anc=x=>x>430?"end":"start",off=x=>x>430?-6:6;
+  return `<div class="plot"><svg viewBox="0 0 600 220" role="img" aria-label="Distribución con región de rechazo y valor del estadístico">${f.g}
+    <line x1="46" x2="588" y1="${f.sy(0)}" y2="${f.sy(0)}" stroke="var(--muted)"/>
+    <path d="${area}" fill="var(--bad)" fill-opacity=".22"/><path d="${path}" fill="none" stroke="var(--ink)" stroke-width="2"/>
+    <line x1="${xc}" x2="${xc}" y1="${top}" y2="${f.sy(0)}" stroke="var(--bad)" stroke-dasharray="5 4" stroke-width="1.5"/>
+    <text x="${xc+off(xc)}" y="${top+12}" font-size="11.5" text-anchor="${anc(xc)}" fill="var(--bad)">crítico ${fm(crit)}</text>
+    <line x1="${xsx}" x2="${xsx}" y1="${top+18}" y2="${f.sy(0)}" stroke="var(--line)" stroke-width="2.5"/>
+    <text x="${xsx+off(xsx)}" y="${top+32}" font-size="11.5" font-weight="600" text-anchor="${anc(xsx)}" fill="var(--line)">${kind==="F"?"F":"LM"} = ${fm(stat)}${stat>xmax?" (fuera de escala)":""}</text>
+    <text x="${f.sx(xmax)-4}" y="${f.sy(0)-8}" font-size="11" text-anchor="end" fill="var(--bad)">región de rechazo</text></svg></div>`}
+function dwGauge(d,dl,du){const W=600,L=16,R=16,sx=v=>L+Math.max(0,Math.min(4,v))/4*(W-L-R);
+  const z=[[0,dl,"--bad","Autocorrelación +"],[dl,du,"--branch","Inconclusa"],[du,4-du,"--good","Sin autocorrelación"],[4-du,4-dl,"--branch","Inconclusa"],[4-dl,4,"--bad","Autocorrelación −"]];
+  let b=z.map(([a,c,col,t])=>`<rect x="${sx(a)}" y="34" width="${sx(c)-sx(a)}" height="24" fill="var(${col})" fill-opacity=".3"/>${sx(c)-sx(a)>90?`<text x="${(sx(a)+sx(c))/2}" y="50" text-anchor="middle" font-size="11" fill="var(--ink)">${t}</text>`:""}`).join("");
+  [[0,"0"],[dl,"d_L"],[du,"d_U"],[2,"2"],[4-du,"4 − d_U"],[4-dl,"4 − d_L"],[4,"4"]].forEach(([v,t],i)=>b+=`<text x="${sx(v)}" y="${i%2?78:90}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${t}</text>`);
+  b+=`<line x1="${sx(d)}" x2="${sx(d)}" y1="24" y2="64" stroke="var(--ink)" stroke-width="2.5"/><circle cx="${sx(d)}" cy="24" r="5" fill="var(--ink)"/><text x="${sx(d)}" y="14" text-anchor="${sx(d)>500?"end":sx(d)<100?"start":"middle"}" font-size="12" font-weight="600" fill="var(--ink)">d = ${fm(d)}</text>`;
+  return `<div class="plot"><svg viewBox="0 0 600 96" role="img" aria-label="Zonas de decisión de Durbin-Watson">${b}</svg></div>`}
+SIMS.wsCalc=function(){
+  const ws=$("ws");
+  const TABS={
+    chow:{t:"Chow",f:[["scrR","SCR restringida (toda la muestra)",420],["scr1","SCR₁ (submuestra 1)",120],["scr2","SCR₂ (submuestra 2)",150],["n","n total",30],["k","k (parámetros con intercepto)",2]]},
+    f:{t:"F general",f:[["scrR","SCR restringida",1250],["scrNR","SCR no restringida",980],["q","q (restricciones)",2],["n","n",60],["k","k (parámetros del no restringido)",4]]},
+    vr:{t:"Varianzas iguales",f:[["scr1","SCR₁",120],["n1","n₁",15],["scr2","SCR₂",150],["n2","n₂",15],["k","k (parámetros)",2]]},
+    bp:{t:"Breusch-Pagan",f:[["n","n",100],["r2","R² de la regresión auxiliar",0.08],["p","Regresoras en la auxiliar",3]]},
+    dw:{t:"Durbin-Watson",f:[["d","Estadístico d",0.6],["dl","d_L (de la tabla)",1.35],["du","d_U (de la tabla)",1.49]]}};
+  const vals={};Object.entries(TABS).forEach(([k,o])=>{vals[k]={};o.f.forEach(([id,,v])=>vals[k][id]=v)});
+  let tab="chow",al=0.05;
+  if(CALC_PREFILL){Object.assign(vals.chow,CALC_PREFILL);CALC_PREFILL=null}
+  ws.innerHTML=`<div class="seg" role="group" aria-label="Prueba" id="ctab">${Object.entries(TABS).map(([k,o])=>`<button type="button" data-ct="${k}" aria-pressed="${k===tab}">${o.t}</button>`).join("")}</div>
+    <div class="sim"><div class="calcf" id="cf"></div></div><div id="cout" style="display:flex;flex-direction:column;gap:12px"></div>`;
+  const shown=v=>String(+(+v).toFixed(6)).replace(".",",");
+  const fields=()=>{$("cf").innerHTML=TABS[tab].f.map(([id,lab])=>`<label for="c-${id}">${lab}<input type="text" inputmode="decimal" id="c-${id}" data-f="${id}" value="${shown(vals[tab][id])}"></label>`).join("")+(tab!=="dw"?`<label for="c-al">Nivel de significancia α<select id="c-al"><option value="0.01">1 %</option><option value="0.05">5 %</option><option value="0.1">10 %</option></select></label>`:"");if($("c-al"))$("c-al").value=String(al)};
+  const onIn=e=>{if(e.target.id==="c-al"){al=+e.target.value;out();return}if(!e.target.dataset.f)return;const v=parseFloat(e.target.value.replace(",","."));if(!isFinite(v)){e.target.style.borderColor="var(--bad)";return}e.target.style.borderColor="";vals[tab][e.target.dataset.f]=v;out()};
+  $("cf").addEventListener("input",onIn);$("cf").addEventListener("change",onIn);
+  $("ctab").onclick=e=>{const b=e.target.closest("[data-ct]");if(!b)return;tab=b.dataset.ct;$("ctab").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));fields();out()};
+  const err=m=>`<p class="warn"><b>Revisa los datos:</b> ${m}</p>`,verd=(rej,a,b)=>`<div class="verdict ${rej?"rej":"acc"}">${rej?a:b}</div>`,ap=()=>fmt(al*100,0)+" %";
+  const stp=(i,t,b)=>`<div class="stepc"><h4><span class="n">${i}</span>${t}</h4>${b}</div>`;
+  const RUN={
+    chow:v=>{const{scrR,scr1,scr2,n,k}=v,nr=scr1+scr2,d2=n-2*k;
+      if(!(k>=1)||!Number.isInteger(k))return err("k debe ser un entero positivo.");
+      if(d2<=0)return err(`n − 2k = ${fm(d2)}. Debe ser positivo: cada submuestra necesita más observaciones que parámetros.`);
+      if(nr<=0)return err("SCR₁ + SCR₂ debe ser positiva.");
+      if(scrR<nr)return err("la SCR restringida no puede ser menor que SCR₁ + SCR₂, porque el modelo restringido nunca ajusta mejor.");
+      const F=((scrR-nr)/k)/(nr/d2),c=fcrit(k,d2,al),p=fp(F,k,d2);
+      return stp(1,"Hipótesis",`<div class="eq">H₀: los ${fm(k)} coeficientes son iguales en ambas submuestras &nbsp;&nbsp; H₁: al menos uno cambia</div>`)+
+        stp(2,"SCR del modelo no restringido",`<div class="eq">SCR<sub>NR</sub> = SCR₁ + SCR₂ = ${fm(scr1)} + ${fm(scr2)} = ${fm(nr)}</div>`)+
+        stp(3,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / k</span><span>SCR<sub>NR</sub> / (n − 2k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(nr)}) / ${fm(k)}</span><span>${fm(nr)} / (${fm(n)} − 2·${fm(k)})</span></span> = <span class="frac"><span>${fm((scrR-nr)/k)}</span><span>${fm(nr/d2)}</span></span> = ${fm(F)}</div>`)+
+        stp(4,"Decisión",`<div class="eq">F crítico: F<sub>${ap()}</sub>(${fm(k)}, ${fm(d2)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("F",k,d2,F,c)}${verd(F>c,`F = ${fm(F)} &gt; ${fm(c)}: se rechaza H₀ al ${ap()}. Hay evidencia de cambio estructural.`,`F = ${fm(F)} ≤ ${fm(c)}: no se rechaza H₀ al ${ap()}. No hay evidencia de cambio estructural.`)}`)},
+    f:v=>{const{scrR,scrNR,q,n,k}=v,d2=n-k;
+      if(!(q>=1)||!Number.isInteger(q))return err("q debe ser un entero positivo.");
+      if(d2<=0)return err("n − k debe ser positivo.");
+      if(scrNR<=0||scrR<scrNR)return err("la SCR restringida debe ser mayor o igual que la no restringida, y esta, positiva.");
+      const F=((scrR-scrNR)/q)/(scrNR/d2),c=fcrit(q,d2,al),p=fp(F,q,d2);
+      return stp(1,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / q</span><span>SCR<sub>NR</sub> / (n − k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(scrNR)}) / ${fm(q)}</span><span>${fm(scrNR)} / ${fm(d2)}</span></span> = ${fm(F)}</div>`)+
+        stp(2,"Decisión",`<div class="eq">F crítico: F<sub>${ap()}</sub>(${fm(q)}, ${fm(d2)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("F",q,d2,F,c)}${verd(F>c,`Se rechaza H₀ al ${ap()}: las ${fm(q)} restricciones no son compatibles con los datos.`,`No se rechaza H₀ al ${ap()}: las restricciones son compatibles con los datos.`)}`)},
+    vr:v=>{const{scr1,n1,scr2,n2,k}=v,d1=n1-k,d2=n2-k;
+      if(d1<=0||d2<=0)return err("cada submuestra necesita más observaciones que parámetros.");
+      if(scr1<=0||scr2<=0)return err("las SCR deben ser positivas.");
+      const s1=scr1/d1,s2=scr2/d2,big=s1>=s2,F=big?s1/s2:s2/s1,a=big?d1:d2,b=big?d2:d1,c=fcrit(a,b,al),p=fp(F,a,b);
+      return stp(1,"Varianza estimada en cada submuestra",`<div class="eq">σ̂₁² = <span class="frac"><span>${fm(scr1)}</span><span>${fm(n1)} − ${fm(k)}</span></span> = ${fm(s1)} &nbsp;&nbsp; σ̂₂² = <span class="frac"><span>${fm(scr2)}</span><span>${fm(n2)} − ${fm(k)}</span></span> = ${fm(s2)}</div>`)+
+        stp(2,"Estadístico F (la mayor arriba)",`<div class="eq">F = <span class="frac"><span>${fm(big?s1:s2)}</span><span>${fm(big?s2:s1)}</span></span> = ${fm(F)} &nbsp;&nbsp; gl = (${fm(a)}, ${fm(b)})</div>`)+
+        stp(3,"Decisión",`<div class="eq">F crítico: F<sub>${ap()}</sub>(${fm(a)}, ${fm(b)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("F",a,b,F,c)}${verd(F>c,"Las varianzas son distintas. La prueba de Chow pierde validez: conviene una versión robusta.","Las varianzas son compatibles. Se puede aplicar la prueba de Chow.")}`)},
+    bp:v=>{const{n,r2,p:q}=v;
+      if(!(q>=1)||!Number.isInteger(q))return err("el número de regresoras debe ser un entero positivo.");
+      if(r2<0||r2>1)return err("el R² debe estar entre 0 y 1.");
+      const LM=n*r2,c=chicrit(q,al),p=chip(LM,q);
+      return stp(1,"Estadístico LM",`<div class="eq">LM = n·R²<sub>aux</sub> = ${fm(n)} · ${fm(r2)} = ${fm(LM)} &nbsp;~&nbsp; χ²(${fm(q)})</div>`)+
+        stp(2,"Decisión",`<div class="eq">Valor crítico: χ²<sub>${ap()}</sub>(${fm(q)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("chi",q,0,LM,c)}${verd(LM>c,`Se rechaza la homocedasticidad al ${ap()}. Usa errores estándar robustos o MCP.`,`No se rechaza la homocedasticidad al ${ap()}.`)}`)},
+    dw:v=>{const{d,dl,du}=v;
+      if(d<0||d>4)return err("d debe estar entre 0 y 4.");
+      if(!(dl>0&&dl<du&&du<=2))return err("se necesita 0 &lt; d_L &lt; d_U ≤ 2 (valores de la tabla de Durbin-Watson).");
+      const rho=1-d/2,zone=d<dl?["rej","Hay autocorrelación positiva. Los errores estándar de MCO están subestimados."]:d<du?["","Zona inconclusa: la prueba no permite decidir. Usa Breusch-Godfrey."]:d<=4-du?["acc","No hay evidencia de autocorrelación de primer orden."]:d<=4-dl?["","Zona inconclusa: la prueba no permite decidir. Usa Breusch-Godfrey."]:["rej","Hay autocorrelación negativa."];
+      return stp(1,"Coeficiente de autocorrelación aproximado",`<div class="eq">ρ̂ ≈ 1 − d/2 = 1 − ${fm(d)}/2 = ${fm(rho)}</div>`)+
+        stp(2,"Zona de decisión",`${dwGauge(d,dl,du)}<div class="verdict ${zone[0]||""}" style="${zone[0]?"":"color:var(--branch);border-color:var(--branch)"}">${zone[1]}</div><p>d_L y d_U dependen de n y del número de regresoras; se buscan en la tabla de Durbin-Watson.</p>`)}};
+  const out=()=>{$("cout").innerHTML=RUN[tab](vals[tab])};
+  fields();out();
+};
+
+show(location.hash.slice(1)||TRUNK[0].id,false);
+</script>
+
+</body></html>
