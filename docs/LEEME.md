@@ -39,7 +39,7 @@ docs/
 1. En el repositorio `economiapp`, entra a **Add file → Upload files** y arrastra la carpeta `docs` completa (con sus subcarpetas). Confirma con **Commit changes**.
 2. Ve a **Settings → Pages**.
 3. En **Build and deployment**, elige **Deploy from a branch**, la rama **main** y la carpeta **/docs**. Guarda.
-4. Espera uno o dos minutos. El sitio queda en `https://juanpa0295-alt.github.io/economiapp/`.
+4. Espera uno o dos minutos. El sitio queda en `https://economiapp.app/` (dominio propio; la dirección vieja de github.io redirige sola).
 
 Para actualizarlo después, sube de nuevo los archivos que cambiaron dentro de `docs`. Los archivos de Streamlit (`Inicio.py`, `pages/`, `datos/`) siguen funcionando igual; GitHub Pages solo publica lo que está en `docs`.
 

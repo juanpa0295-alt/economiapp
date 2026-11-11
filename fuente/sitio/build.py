@@ -571,6 +571,9 @@ print({c["slug"]: (len(c["t"]), len(c["b"]), len(c["w"])) for c in cat})
 # App instalable: íconos, manifiesto y service worker (con la lista de todo el sitio)
 import hashlib, re as _re
 wr("comun/app.js", open(os.path.join(S, "app.js"), encoding="utf-8").read())
+# Dominio propio (GitHub Pages lo lee de este archivo)
+DOMINIO = "economiapp.app"
+wr("CNAME", DOMINIO + "\n")
 os.makedirs(os.path.join(OUT, "iconos"), exist_ok=True)
 for _f in sorted(os.listdir(os.path.join(S, "iconos"))):
     shutil.copy(os.path.join(S, "iconos", _f), os.path.join(OUT, "iconos", _f))
