@@ -127,7 +127,7 @@ gtag("js",new Date());gtag("config","G-7BHLT18DZR",{send_page_view:false,anonymi
    para que el informe «Páginas y pantallas» muestre qué temas se estudian más */
 (function(){let last="";const v=()=>{const h=location.hash.replace(/^#/,"").split(/[?&]/)[0],p=h?location.pathname.replace(/\.html$/,"")+"/"+encodeURIComponent(h):location.pathname;if(p===last)return;last=p;
 const t=document.querySelector("h2")&&h?document.title.split(" · ")[0]+" · "+(document.querySelector("h2").textContent||h):document.title;
-gtag("event","page_view",{page_location:location.origin+p,page_title:t})};
+gtag("event","page_view",{page_location:location.origin+p+location.search,page_title:t})};
 setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
 </script>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -136,6 +136,7 @@ setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
 <link rel="apple-touch-icon" href="./iconos/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Economiapp">
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))</script>
+<script>window.ECO={"form": {"action": "", "campos": {}}}</script><script defer src="./comun/app.js"></script>
 </head>
 <body>
 <div class="wrap">
