@@ -1,0 +1,247 @@
+// =====================================================================
+// CONTENIDO: Derecho Laboral y Comercial. Temas del curso: prórrogas, indemnizaciones, nómina/horas extras y prima de servicios (CST).
+// Normas verificadas a octubre de 2026: CST con la Ley 2466 de 2025, Ley 2101 de 2021, Decretos 1469 y 1470 de 2025.
+// =====================================================================
+const LAB_=`<section><h3>Calculadora</h3><div class="sim" id="sim"></div></section>`;
+const AVISO=`<p class="hint">Herramienta de estudio, no asesoría legal. Las normas y los valores cambian: los de esta página están vigentes a octubre de 2026.</p>`;
+const TRUNK=[
+{id:"fundamentos", t:"Fundamentos: Constitución y contrato de trabajo", html:String.raw`
+<section><h3>La idea</h3><p class="lead">El derecho laboral parte de que el trabajador es la parte débil de la relación. Por eso la Constitución fija unos mínimos que ningún contrato puede desmejorar, y el Código Sustantivo del Trabajo (CST) los desarrolla.</p></section>
+<section><h3>Bases constitucionales</h3><div class="tbl"><table><tr><th>Norma</th><th>Qué dice</th></tr>
+<tr><td>Art. 25 C.P.</td><td>El trabajo es un derecho y una obligación social, y goza de especial protección del Estado.</td></tr>
+<tr><td>Art. 53 C.P.</td><td>Principios mínimos: igualdad de oportunidades, remuneración mínima vital y móvil, estabilidad en el empleo, <b>irrenunciabilidad</b> de los beneficios mínimos, <b>favorabilidad</b> (en caso de duda se aplica la norma más favorable al trabajador) y <b>primacía de la realidad</b> sobre las formalidades.</td></tr>
+<tr><td>Art. 13 CST</td><td>Lo que dice el Código es el mínimo de derechos; cualquier pacto que lo desmejore no produce efecto.</td></tr></table></div></section>
+<section><h3>El contrato de trabajo</h3>
+<p>Según el art. 23 del CST hay contrato de trabajo cuando concurren tres elementos, sin importar el nombre que le den las partes:</p>
+<ol class="steps"><li><b>Actividad personal</b> del trabajador.</li><li><b>Subordinación</b>: el empleador puede dar órdenes sobre modo, tiempo y cantidad de trabajo.</li><li><b>Salario</b> como retribución del servicio.</li></ol>
+<p>Si se dan los tres, el contrato es laboral aunque se haya firmado como «prestación de servicios»: es la primacía de la realidad.</p></section>
+<section><h3>Clases de contrato por duración</h3><div class="tbl"><table><tr><th>Tipo</th><th>Artículo</th><th>Regla</th></tr>
+<tr><td>Término indefinido</td><td>Art. 47</td><td>Es la regla general desde la Ley 2466 de 2025.</td></tr>
+<tr><td>Término fijo</td><td>Art. 46</td><td>Por escrito y por máximo 4 años, incluidas las prórrogas.</td></tr>
+<tr><td>Obra o labor</td><td>Art. 45</td><td>Dura lo que dure la obra; si el trabajador sigue después, pasa a indefinido.</td></tr>
+<tr><td>Ocasional</td><td>Art. 6</td><td>Labores de corta duración, no mayores a un mes, distintas a las actividades normales del empleador.</td></tr></table></div></section>${AVISO}`,
+qs:[{q:"Una empresa firma un «contrato de prestación de servicios» con alguien que cumple horario, recibe órdenes diarias y cobra cada mes. ¿Qué contrato hay?",a:"Un contrato de trabajo, por primacía de la realidad (art. 53 C.P. y art. 23 CST): están la actividad personal, la subordinación y el salario."},
+ {q:"¿Puede un trabajador renunciar por escrito a sus vacaciones a cambio de un bono?",a:"No a las vacaciones mínimas: son un beneficio irrenunciable (art. 53 C.P., art. 14 CST). Solo se permite compensar en dinero hasta la mitad, en los casos que autoriza la ley."}]},
+
+{id:"prorrogas", t:"Prórrogas del contrato a término fijo", sim:"pro", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Un contrato a término fijo se renueva solo si ninguna de las partes avisa, con 30 días de anticipación, que no quiere continuar. La Ley 2466 de 2025 añadió un tope: el contrato a término fijo no puede pasar de 4 años sumando el período inicial y las prórrogas.</p></section>
+<section><h3>Reglas del art. 46 del CST (texto vigente)</h3><ol class="steps">
+<li><b>Forma y duración:</b> por escrito y por un término no mayor a 4 años. Si no cumple esto, se entiende a término indefinido desde el inicio.</li>
+<li><b>Preaviso:</b> si ninguna parte avisa por escrito su intención de terminarlo con al menos <b>30 días</b> antes del vencimiento, se prorroga por un período igual al pactado.</li>
+<li><b>Contratos de menos de un año:</b> las tres primeras prórrogas automáticas son por el mismo término; <b>la cuarta prórroga automática es por un año</b>, y así en adelante.</li>
+<li><b>Tope de 4 años:</b> incluye el período inicial y todas las prórrogas. Si el contrato lo supera, se convierte en contrato a término indefinido.</li>
+<li><b>Prórrogas pactadas:</b> las partes pueden acordar por escrito prórrogas por otros plazos, pero después de la cuarta no puede renovarse por menos de un año.</li></ol></section>
+<section><h3>Ejemplo</h3>
+<p>Contrato de 3 meses desde el 1 de enero de 2026, sin preaviso:</p>
+<div class="tbl"><table><tr><th>Período</th><th>Desde</th><th>Hasta</th><th>Duración</th><th>Último día para avisar</th></tr>
+<tr><td>Inicial</td><td>1 ene 2026</td><td>31 mar 2026</td><td>3 meses</td><td>1 mar 2026</td></tr>
+<tr><td>1.ª prórroga</td><td>1 abr 2026</td><td>30 jun 2026</td><td>3 meses</td><td>31 may 2026</td></tr>
+<tr><td>2.ª prórroga</td><td>1 jul 2026</td><td>30 sep 2026</td><td>3 meses</td><td>31 ago 2026</td></tr>
+<tr><td>3.ª prórroga</td><td>1 oct 2026</td><td>31 dic 2026</td><td>3 meses</td><td>1 dic 2026</td></tr>
+<tr><td><b>4.ª prórroga</b></td><td>1 ene 2027</td><td>31 dic 2027</td><td><b>1 año</b></td><td>1 dic 2027</td></tr></table></div>
+<p>El tope de 4 años se cumple el 31 de diciembre de 2029; si sigue trabajando desde el 1 de enero de 2030, el contrato es indefinido.</p></section>
+${LAB_}
+<p class="warn"><b>Error común:</b> creer que el preaviso de 30 días obliga a indemnizar. Avisar a tiempo que no se renueva es una forma legal de terminar el contrato por vencimiento del plazo, sin indemnización. Lo que genera indemnización es terminarlo antes del vencimiento sin justa causa.</p>${AVISO}`,
+deep:[{k:"Transición",t:"Contratos firmados antes de la reforma",html:String.raw`<p>Para los contratos a término fijo que ya existían el <b>25 de junio de 2025</b>, el tope de 4 años se cuenta desde esa fecha, no desde el inicio del contrato (art. 46, Ley 2466). Así lo entendió también el Ministerio del Trabajo en el Concepto 6157 de 2026: la conversión a indefinido no es retroactiva, y los primeros contratos llegarán al tope el 25 de junio de 2029.</p><p>El concepto agrega que, cuando el contrato pasa a indefinido, no hay que liquidarlo en ese momento: la liquidación se hace al terminar la relación laboral.</p>`},
+ {k:"Interpretación",t:"¿Desde qué día es indefinido?",html:String.raw`<p>La ley dice que ninguna prórroga puede superar los 4 años y que, si el contrato los supera, se convierte en indefinido. La calculadora toma como fecha de conversión el día siguiente a cumplir los 4 años. Si tu profesor usa otra interpretación (por ejemplo, desde el inicio de la prórroga que ya no cabía completa en los 4 años), sigue la de clase.</p>`}],
+qs:[{q:"Un contrato de 6 meses empezó el 1 de febrero de 2026. ¿Hasta cuándo puede el empleador avisar que no lo renovará?",a:"Vence el 31 de julio de 2026, así que el aviso debe darse a más tardar el 1 de julio de 2026 (30 días antes)."},
+ {q:"Un contrato de 2 meses ya tuvo 3 prórrogas automáticas. ¿Por cuánto se renueva la siguiente?",a:"Por un año: la cuarta prórroga automática de un contrato menor a un año es de un año (art. 46 CST)."},
+ {q:"Un contrato a término fijo de un año se firmó en marzo de 2023 y se ha renovado cada año. ¿Cuándo pasa a indefinido?",a:"El tope se cuenta desde el 25 de junio de 2025 por ser anterior a la reforma: pasa a indefinido si sigue después del 24 de junio de 2029. Puedes comprobarlo en la calculadora."}]},
+
+{id:"indemnizaciones", t:"Terminación del contrato e indemnizaciones", sim:"ind", html:String.raw`
+<section><h3>La idea</h3><p class="lead">El empleador puede terminar el contrato con justa causa (art. 62) sin pagar indemnización. Si lo termina sin justa causa, debe indemnizar al trabajador según el art. 64, y el monto depende del tipo de contrato.</p></section>
+<section><h3>Indemnización por despido sin justa causa (art. 64 CST)</h3><div class="tbl"><table><tr><th>Contrato</th><th>Indemnización</th></tr>
+<tr><td>Término fijo</td><td>Los salarios del tiempo que falte para cumplir el plazo pactado (o de la prórroga en curso).</td></tr>
+<tr><td>Obra o labor</td><td>Los salarios del tiempo que falte para terminar la obra, <b>mínimo 15 días</b>.</td></tr>
+<tr><td>Indefinido, salario menor a 10 SMMLV</td><td><b>30 días</b> por el primer año y <b>20 días</b> por cada año siguiente, proporcional por fracción.</td></tr>
+<tr><td>Indefinido, salario de 10 SMMLV o más</td><td><b>20 días</b> por el primer año y <b>15 días</b> por cada año siguiente, proporcional por fracción.</td></tr></table></div>
+<p>La Ley 2466 de 2025 no modificó este artículo.</p></section>
+<section><h3>Cómo se calcula a mano (indefinido)</h3><ol class="steps">
+<li>Cuenta los días de servicio con año de 360 días (cada mes vale 30): \(\text{días}=\text{días360}(\text{inicio},\text{despido})+1\).</li>
+<li>Separa los años completos y los días que sobran (la fracción): 490 días son 1 año y 130 días.</li>
+<li>Si trabajó un año o menos, le corresponden 30 días completos (20 si gana 10 SMMLV o más).</li>
+<li>Si trabajó más: 30 días por el primer año, 20 por cada año completo siguiente y, por la fracción, \(20\times\text{días que sobran}/360\). <b>Los días no llevan decimales</b>: ese resultado se redondea al entero.</li>
+<li>Multiplica por el salario diario: \(\text{salario}/30\).</li></ol>
+<p><b>Ejemplo:</b> salario de $3.000.000, del 1 de enero de 2025 al 10 de mayo de 2026: 490 días = 1 año y 130 días. Fracción: \(20\times130/360=7{,}22\), que se redondea a 7 días. Indemnización: \((30+7)=37\) días \(\times\$100.000=\$3.700.000\).</p></section>
+<section><h3>Cuándo aplica</h3><ul><li>Despido sin justa causa.</li><li>Renuncia del trabajador por una justa causa imputable al empleador (art. 62, literal B), el llamado despido indirecto.</li></ul>
+<p>No aplica cuando el contrato a término fijo termina por vencimiento del plazo con preaviso, ni cuando el trabajador renuncia voluntariamente.</p></section>
+${LAB_}${AVISO}`,
+deep:[{k:"Base",t:"Qué salario se usa",html:String.raw`<p>Se usa el último salario. Si el salario es variable, se toma el promedio de lo devengado en el último año de servicio, o en todo el tiempo si trabajó menos de un año. El auxilio de transporte no forma parte del salario para esta indemnización.</p>`}],
+qs:[{q:"Despiden sin justa causa a una persona con contrato a término fijo que vencía en 4 meses y gana $2.400.000. ¿Cuánto le deben?",a:"Los salarios de los 4 meses que faltan: 4 × $2.400.000 = $9.600.000."},
+ {q:"Un trabajador con contrato indefinido gana 12 SMMLV y trabajó exactamente 3 años. ¿Cuántos días de indemnización le corresponden?",a:"20 por el primer año y 15 por cada uno de los otros dos: 20 + 30 = 50 días de salario."}]},
+
+{id:"jornada", t:"Jornada, recargos y horas extras", sim:"horas", html:String.raw`
+<section><h3>La idea</h3><p class="lead">El salario mensual paga la jornada ordinaria diurna. Todo lo que se trabaje de noche, en domingo o festivo, o por encima de la jornada, se paga con un recargo sobre el valor de la hora ordinaria.</p></section>
+<section><h3>Jornada máxima y valor de la hora</h3>
+<p>La Ley 2101 de 2021 redujo la jornada gradualmente: 44 horas semanales desde el 15 de julio de 2025 y <b>42 horas desde el 15 de julio de 2026</b>.</p>
+<div class="mj">\[\text{horas al mes}=\frac{\text{jornada semanal}}{6}\times30\qquad\qquad\text{hora ordinaria}=\frac{\text{salario mensual}}{\text{horas al mes}}\]</div>
+<p>Con 42 horas: 210 horas al mes. Con el salario mínimo de 2026: \(1.750.905/210=\$8.338\) por hora.</p></section>
+<section><h3>Diurno y nocturno (art. 160)</h3><p>Desde el 25 de diciembre de 2025, el trabajo <b>nocturno va de 7:00 p. m. a 6:00 a. m.</b> (antes empezaba a las 9:00 p. m.). El diurno va de 6:00 a. m. a 7:00 p. m.</p></section>
+<section><h3>Recargos vigentes</h3><div class="tbl"><table><tr><th>Concepto</th><th>Recargo</th><th>Factor sobre la hora ordinaria</th></tr>
+<tr><td>Recargo nocturno (hora ordinaria de noche)</td><td>35 %</td><td class="num">0,35 (solo el recargo)</td></tr>
+<tr><td>Hora extra diurna</td><td>25 %</td><td class="num">1,25</td></tr>
+<tr><td>Hora extra nocturna</td><td>75 %</td><td class="num">1,75</td></tr>
+<tr><td>Hora dominical o festiva diurna</td><td>90 %</td><td class="num">1,90</td></tr>
+<tr><td>Hora dominical o festiva nocturna</td><td>90 % + 35 %</td><td class="num">2,25</td></tr>
+<tr><td>Extra diurna dominical o festiva</td><td>90 % + 25 %</td><td class="num">2,15</td></tr>
+<tr><td>Extra nocturna dominical o festiva</td><td>90 % + 75 %</td><td class="num">2,65</td></tr></table></div>
+<p>El recargo dominical y festivo (art. 179, Ley 2466) sube por etapas: <b>80 %</b> desde el 1 de julio de 2025, <b>90 %</b> desde el 1 de julio de 2026 y <b>100 %</b> desde el 1 de julio de 2027. Los recargos se suman.</p></section>
+<section><h3>Límites de las horas extra</h3><p>Máximo <b>2 horas extra al día y 12 a la semana</b>. Desde la Ley 2466 ya no se necesita autorización del Ministerio del Trabajo, pero el empleador debe llevar un registro de las horas.</p></section>
+${LAB_}
+<p class="warn"><b>Error común:</b> pagar la hora nocturna ordinaria a 1,35. Esa hora ya está pagada en el salario mensual; lo que se agrega es solo el recargo del 35 %. En cambio, la hora extra sí se paga completa con su recargo (1,25 o 1,75).</p>${AVISO}`,
+deep:[{k:"Domingos",t:"Trabajo dominical habitual u ocasional",html:String.raw`<p>El trabajo dominical es <b>habitual</b> cuando se trabajan tres o más domingos en el mes calendario, y <b>ocasional</b> cuando son dos o menos. En el habitual, el trabajador tiene derecho además a un día de descanso compensatorio remunerado; en el ocasional puede elegir entre el descanso compensatorio o el pago del recargo.</p>`},
+ {k:"Convención",t:"Por qué la hora dominical va a 1,90",html:String.raw`<p>La tabla sigue la práctica usual de nómina: la hora trabajada en domingo o festivo se paga completa con su recargo (\(1+0{,}90\)), porque el salario mensual remunera el descanso dominical, no el trabajo de ese día. Algunos textos solo agregan el recargo. Si tu profesor usa otra convención, aplícala.</p>`}],
+qs:[{q:"Con un salario de $2.100.000 y jornada de 42 horas, ¿cuánto vale una hora extra nocturna?",a:"Hora ordinaria: 2.100.000/210 = $10.000. Hora extra nocturna: 10.000 × 1,75 = $17.500."},
+ {q:"Un trabajador con jornada de 8 horas entra a las 2:00 p. m. y sale a las 11:00 p. m. un martes. ¿Cómo se clasifican sus horas?",a:"De 2 a 7 p. m.: 5 horas ordinarias diurnas. De 7 a 10 p. m.: 3 horas ordinarias nocturnas (recargo del 35 %). De 10 a 11 p. m.: 1 hora extra nocturna (1,75). Compruébalo en la calculadora."}]},
+
+{id:"nomina", t:"Nómina mensual", sim:"nom", html:String.raw`
+<section><h3>La idea</h3><p class="lead">La nómina reúne lo que el trabajador gana en el mes (devengados), lo que se le descuenta (deducciones) y lo que recibe al final (neto).</p></section>
+<section><h3>Devengados</h3><ul><li><b>Salario básico</b> proporcional a los días trabajados: \(\frac{\text{salario}}{30}\times\text{días}\).</li><li><b>Horas extra y recargos</b>, calculados como en la estación anterior.</li><li><b>Auxilio de transporte</b> ($249.095 en 2026) para quienes devengan hasta 2 SMMLV, proporcional a los días trabajados. No es salario: no entra en la base de aportes.</li></ul></section>
+<section><h3>Deducciones del trabajador</h3><div class="tbl"><table><tr><th>Concepto</th><th>Porcentaje del IBC</th></tr>
+<tr><td>Salud</td><td class="num">4 %</td></tr><tr><td>Pensión</td><td class="num">4 %</td></tr>
+<tr><td>Fondo de solidaridad pensional (desde 4 SMMLV)</td><td class="num">1 % a 2 %</td></tr></table></div>
+<p>El IBC (ingreso base de cotización) es el salario más los pagos salariales del mes, como horas extra y recargos, sin el auxilio de transporte. La retención en la fuente no se incluye aquí.</p></section>
+<section><h3>Neto a pagar</h3><div class="mj">\[\text{Neto}=\underbrace{\text{básico}+\text{extras}+\text{auxilio}}_{\text{devengado}}-\underbrace{(\text{salud}+\text{pensión}+\text{FSP})}_{\text{deducciones}}\]</div></section>
+${LAB_}${AVISO}`,
+deep:[{k:"Empleador",t:"Lo que paga el empleador además del salario",html:String.raw`<div class="tbl"><table><tr><th>Concepto</th><th>Porcentaje</th></tr><tr><td>Pensión</td><td class="num">12 % del IBC</td></tr><tr><td>Caja de compensación</td><td class="num">4 % del IBC</td></tr><tr><td>ARL (riesgo I)</td><td class="num">0,522 % del IBC</td></tr><tr><td>Salud, ICBF y SENA</td><td>8,5 %, 3 % y 2 %; el empleador está exonerado por los trabajadores que ganan menos de 10 SMMLV</td></tr><tr><td>Cesantías y prima</td><td class="num">8,33 % cada una</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">12 % anual de las cesantías</td></tr><tr><td>Vacaciones</td><td class="num">4,17 % del salario básico</td></tr></table></div><p>Las cesantías, la prima y sus intereses se calculan incluyendo el auxilio de transporte; las vacaciones, no.</p>`}],
+qs:[{q:"Un trabajador gana el salario mínimo de 2026 y trabajó el mes completo sin extras. ¿Cuál es su neto?",a:"Devengado: 1.750.905 + 249.095 = $2.000.000. Deducciones: 8 % de 1.750.905 = $140.072,40. Neto: $1.859.927,60."}]},
+{id:"prima", t:"Prima de servicios", sim:"prima", html:String.raw`
+<section><h3>La idea</h3><p class="lead">La prima de servicios es una prestación social: <b>un mes de salario por cada año trabajado</b> (30 días), que se paga en dos mitades, una por semestre (art. 306 del CST, modificado por la Ley 1788 de 2016). Si se trabajó solo una parte del semestre, se paga en proporción a los días.</p></section>
+<section><h3>Los dos pagos</h3><div class="tbl"><table><tr><th>Pago</th><th>Periodo que cubre</th><th>Valor (semestre completo)</th><th>Plazo</th><th>Mora desde</th></tr>
+<tr><td>Prima 1</td><td>1 de enero a 30 de junio</td><td>15 días de salario</td><td>30 de junio</td><td>1 de julio</td></tr>
+<tr><td>Prima 2</td><td>1 de julio a 31 de diciembre</td><td>15 días de salario</td><td>20 de diciembre</td><td>21 de diciembre</td></tr></table></div>
+<p>Si el contrato termina antes, la prima del semestre en curso se paga proporcional con la liquidación final.</p></section>
+<section><h3>La base: ¿qué salario se usa?</h3><ol class="steps">
+<li><b>Salario devengado:</b> el salario más lo que se paga como retribución del trabajo, como horas extra, recargos y comisiones.</li>
+<li><b>Si los últimos tres meses del semestre son iguales</b> (abril, mayo y junio en la prima 1; octubre, noviembre y diciembre en la prima 2), la base es el salario actual.</li>
+<li><b>Si no son iguales</b> (hubo horas extra, comisiones o un aumento), la base es el <b>promedio</b> de lo devengado en el semestre (enero a junio, o julio a diciembre).</li>
+<li>A la base se le suma el <b>auxilio de transporte</b> ($249.095 en 2026), para quienes ganan hasta 2 SMMLV. Para las prestaciones sociales, el auxilio se trata como salario (art. 7 de la Ley 1 de 1963).</li></ol></section>
+<section><h3>La fórmula</h3>
+<div class="mj">\[\text{Prima}=\frac{(\text{salario base}+\text{auxilio de transporte})\times\text{días laborados}}{360}\]</div>
+<p>Los días se cuentan con el año comercial: cada mes tiene 30 días y el semestre completo, 180. Se descuentan los días no laborados que suspenden el contrato, como las licencias no remuneradas y las sanciones (art. 51). Con el semestre completo, la prima es la mitad de la base.</p></section>
+<section><h3>Mora en el pago</h3><p>Si el empleador no paga a tiempo, desde el día siguiente al plazo (1 de julio o 21 de diciembre) y hasta que pague, debe <b>un día de salario por cada día de retraso</b>. Ese día se calcula con el <b>salario básico, sin el auxilio de transporte</b>:</p>
+<div class="mj">\[\text{Mora}=\frac{\text{salario básico}}{30}\times\text{días de retraso}\]</div>
+<p class="hint">Así se vio en clase. Ten en cuenta que el artículo 65 del CST prevé esta sanción cuando, <b>al terminar el contrato</b>, no se pagan salarios y prestaciones, y que la Corte Suprema exige analizar si el empleador actuó de buena fe. Mientras el contrato sigue vigente, el retraso también puede reclamarse ante el Ministerio de Trabajo, que puede imponer multas.</p></section>
+<section><h3>Ejemplos resueltos (2026)</h3>
+<div class="tbl"><table><tr><th>Caso</th><th>Base</th><th class="num">Días</th><th class="num">Prima</th></tr>
+<tr><td>Salario mínimo, prima 1 completa</td><td>1.750.905 + 249.095 = 2.000.000</td><td class="num">180</td><td class="num">$1.000.000</td></tr>
+<tr><td>Salario de $2.500.000, ingresó el 15 de marzo</td><td>2.500.000 + 249.095 = 2.749.095</td><td class="num">106</td><td class="num">$809.456</td></tr>
+<tr><td>Básico de $2.000.000 con horas extra: devengó 2,0; 2,0; 2,0; 2,2; 2,35 y 2,15 millones</td><td>Abril, mayo y junio difieren: promedio 2.116.667 + 249.095 = 2.365.762</td><td class="num">180</td><td class="num">$1.182.881</td></tr>
+<tr><td>Salario mínimo con 10 días de licencia no remunerada</td><td>2.000.000</td><td class="num">170</td><td class="num">$944.444</td></tr>
+<tr><td>Salario de $4.000.000 (más de 2 SMMLV, sin auxilio)</td><td>4.000.000</td><td class="num">180</td><td class="num">$2.000.000</td></tr></table></div>
+<p><b>Días del segundo caso:</b> del 15 de marzo al 30 de junio son (6 − 3) × 30 + (30 − 15) + 1 = 106 días.</p>
+<p class="link">Para liquidar todas las primas de un contrato, con sus moras, en el formato del tablero, usa la <button class="btn" type="button" data-go="liquidacion">Liquidación de prestaciones (formato de clase)</button>.</p>
+<p><b>Mora:</b> si al trabajador de salario mínimo le pagan la prima de junio el 15 de julio, son 15 días de mora: 1.750.905 / 30 × 15 = <b>$875.452,50</b>. Si le pagan la de diciembre el 28, son 8 días: <b>$466.908</b>.</p></section>
+${LAB_}${AVISO}`,
+deep:[{k:"Quién",t:"Quién tiene derecho y quién no",html:String.raw`<ul><li><b>Sí:</b> todos los trabajadores con contrato de trabajo, sin importar el tipo de contrato (término fijo, indefinido, obra o labor), incluidos, desde la Ley 1788 de 2016, los trabajadores del servicio doméstico, los choferes de servicio familiar y los trabajadores por días.</li><li><b>No:</b> quien gana salario integral, porque su factor prestacional ya incluye la prima (art. 132); los aprendices SENA, porque el contrato de aprendizaje no es un contrato de trabajo; y los contratistas por prestación de servicios.</li><li>La prima no es salario: no entra en la base de aportes a salud y pensión.</li></ul>`},
+ {k:"Excel",t:"Cómo montarla en una hoja de cálculo",html:String.raw`<ol><li>En B2:G2, el salario devengado de cada mes.</li><li>¿Son iguales los últimos tres? <code>=Y(E2=F2;F2=G2)</code>.</li><li>Base: <code>=SI(Y(E2=F2;F2=G2);G2;PROMEDIO(B2:G2))+auxilio</code>.</li><li>Días: <code>=DIAS360(ingreso;fin;VERDADERO)+1-ausencias</code>. El VERDADERO usa el método europeo, que cuenta cada mes como 30 días.</li><li>Prima: <code>=base*días/360</code>.</li></ol>`}],
+qs:[{q:"Un trabajador gana $1.750.905 y trabajó todo el primer semestre de 2026. ¿Cuánto le corresponde y hasta cuándo se paga?",a:"(1.750.905 + 249.095) × 180 / 360 = $1.000.000, a más tardar el 30 de junio."},
+ {q:"¿Por qué en un caso se usa el salario actual y en otro el promedio?",a:"Si los últimos tres meses del semestre son iguales, el salario actual representa bien lo devengado. Si cambió (horas extra, comisiones, aumento), se usa el promedio del semestre."},
+ {q:"La prima de diciembre se pagó el 23 de diciembre a quien gana $3.000.000. ¿Cuánto es la mora?",a:"La mora corre desde el 21 de diciembre: 3 días × 3.000.000 / 30 = $300.000, con el salario básico sin auxilio de transporte."}]},
+{id:"cesantias", t:"Cesantías e intereses sobre las cesantías", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Las cesantías son un ahorro obligatorio para cuando el trabajador quede cesante: <b>un mes de salario por cada año trabajado</b>, del 1 de enero al 31 de diciembre, y proporcional si trabajó menos (art. 249 del CST). Sobre ese saldo, el empleador paga además unos <b>intereses del 12 % anual</b> (Ley 52 de 1975).</p></section>
+<section><h3>Los dos regímenes</h3><div class="tbl"><table><tr><th>Régimen</th><th>A quién aplica</th><th>Cómo funciona</th></tr>
+<tr><td>Tradicional (retroactivo)</td><td>Contratos anteriores a la Ley 50 de 1990 que no se cambiaron al nuevo régimen</td><td>Las guarda el empleador y se liquidan al final con el último salario, por todo el tiempo servido.</td></tr>
+<tr><td>Liquidación anual (Ley 50 de 1990)</td><td>Contratos firmados desde el 1 de enero de 1991</td><td>Se liquidan cada 31 de diciembre y se consignan en el <b>fondo de cesantías</b> que elija el trabajador a más tardar el <b>14 de febrero</b> del año siguiente.</td></tr></table></div></section>
+<section><h3>Plazos y sanciones</h3><div class="tbl"><table><tr><th>Qué</th><th>A quién se paga</th><th>Plazo</th><th>Si no se paga</th></tr>
+<tr><td>Cesantías del año</td><td>Al fondo</td><td>14 de febrero del año siguiente</td><td>Desde el <b>15 de febrero</b>, un día de salario por cada día de retraso (art. 99 de la Ley 50 de 1990)</td></tr>
+<tr><td>Intereses sobre las cesantías</td><td>Directamente al trabajador</td><td>31 de enero del año siguiente</td><td>Un valor adicional igual a los intereses: se pagan dobles (Ley 52 de 1975)</td></tr>
+<tr><td>Cesantías e intereses del año del retiro</td><td>Directamente al trabajador</td><td>Con la liquidación final</td><td>Indemnización moratoria (art. 65)</td></tr></table></div></section>
+<section><h3>La base y las fórmulas</h3><p>La base es la misma de la prima: si el salario devengado de los últimos tres meses es igual, el salario actual; si no, el promedio de todos los meses del año (o de lo trabajado, si es menos), contando como 0 los meses suspendidos, como lo hace la profesora. Se le suma el auxilio de transporte para quienes ganan hasta 2 SMMLV, y se restan los días de suspensión del artículo 51.</p>
+<div class="mj">\[\text{Cesantías}=\frac{(\text{salario}+\text{auxilio})\times(\text{días}-\text{días art. 51})}{360}\qquad\qquad\text{Intereses}=\frac{\text{cesantías}\times\text{días}\times12\,\%}{360}\]</div>
+<p>Con el año completo, las cesantías son un mes de base y los intereses el 12 % de ellas.</p></section>
+<section><h3>Salario integral</h3><p>Quien gana salario integral <b>no tiene derecho</b> a cesantías ni a prima (art. 132). Del 100 % del salario integral, el 70 % es la base de la seguridad social (IBC) y el 30 % es el factor prestacional que ya paga esas prestaciones.</p></section>
+<section><h3>¿Cuándo se pueden retirar?</h3><ul><li>Al terminar el contrato.</li><li>Para comprar vivienda.</li><li>Para reformar o mejorar la vivienda.</li><li>Para pagar estudios del trabajador, su cónyuge o sus hijos.</li></ul></section>
+<section><h3>El ejercicio de clase</h3><p>Ingresó el 20 de septiembre de 2025 con $2.000.000 (auxilio 2025: $200.000). En 2026 gana $2.900.000 (auxilio $249.095); en mayo estuvo suspendido 30 días (art. 51), en julio devengó $2.950.000 con horas extra y de agosto a octubre $3.300.000 con recargos. Se retiró el 3 de noviembre de 2026.</p>
+<div class="eq al">2025: 20/9/25 – 31/12/25 = 101<br>(2.000.000 + 200.000) × (101 − 0) / 360 = <b>617.222</b><br>Mora: 15/2/26 – 3/11/26 = 259 × 66.666 = <b>17.266.494</b><br><br>2026: 1/1/26 – 3/11/26 = 303<br>(3.300.000 + 249.095) × (303 − 30) / 360 = <b>2.691.397</b></div>
+<ol class="steps"><li><b>Cesantías de 2025:</b> 101 días con el año de 360 (del 20 de septiembre al 30 de diciembre son 100, más el día de inicio). Los tres últimos meses son iguales, así que la base es 2.000.000 más el auxilio de 2025.</li>
+<li><b>Mora:</b> no se consignaron el 14 de febrero de 2026, así que desde el 15 de febrero hasta el retiro corre un día de salario por día. 2.000.000 / 30 = 66.666 (truncado), por 259 días.</li>
+<li><b>Cesantías de 2026:</b> se pagan en la liquidación. Los últimos tres meses (agosto a octubre) son iguales, así que la base es 3.300.000 más el auxilio de 2026, y se restan los 30 días de mayo.</li>
+<li><b>Intereses:</b> 617.222 × 101 × 12 % / 360 = 20.780 por 2025, que debían pagarse el 31 de enero; como no se pagaron, la sanción es otro tanto. Por 2026: 2.691.397 × 273 × 12 % / 360 = 244.917, con la liquidación.</li></ol>
+<p>La <button class="btn" type="button" data-go="liquidacion">Liquidación de prestaciones (formato de clase)</button> trae este ejercicio cargado, con las primas, las cesantías, los intereses y todas las moras, escrito como en el tablero.</p>
+<p class="hint">Como en clase, el salario diario de la mora se trunca a pesos y se toma el básico del año que se debe. Algunas sentencias liquidan la mora del artículo 99 con el salario vigente en cada año de retraso.</p>
+${AVISO}`,
+qs:[{q:"Un trabajador con salario mínimo de 2026 trabaja todo el año. ¿Cuánto son sus cesantías y sus intereses, y cuándo se pagan?",a:"Cesantías: 2.000.000 × 360 / 360 = $2.000.000, al fondo a más tardar el 14 de febrero de 2027. Intereses: 2.000.000 × 360 × 12 % / 360 = $240.000, al trabajador a más tardar el 31 de enero de 2027."},
+ {q:"Si el empleador no paga los intereses a tiempo, ¿cuál es la sanción?",a:"Un valor adicional igual a los intereses: los paga dobles."},
+ {q:"¿Por qué en 2026 se resta 30 a los 303 días?",a:"Porque en mayo hubo una suspensión del contrato de 30 días (art. 51): esos días no cuentan para las prestaciones."}]},
+{id:"vacaciones", t:"Vacaciones", nuevo:true, sim:"vac", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Por cada año de servicio, el trabajador tiene derecho a <b>15 días hábiles consecutivos de vacaciones remuneradas</b> (art. 186 del CST). Si el contrato termina sin que las haya disfrutado, se le pagan en dinero, en proporción al tiempo trabajado (art. 189).</p>
+<p>Las vacaciones <b>no son una prestación social</b>: son un descanso remunerado. Por eso no llevan auxilio de transporte y no aparecen en la liquidación de primas y cesantías; se suman aparte en la liquidación final.</p></section>
+<section><h3>Las reglas</h3><div class="tbl"><table><tr><th>Tema</th><th>Regla</th><th>Artículo</th></tr>
+<tr><td>Derecho</td><td>15 días hábiles por año de servicio; los proporcionales se causan día a día</td><td>186</td></tr>
+<tr><td>Época</td><td>La señala el empleador dentro del año siguiente, avisando con 15 días de anticipación</td><td>187</td></tr>
+<tr><td>Interrupción</td><td>Si se interrumpen (por ejemplo, por incapacidad), el trabajador conserva el derecho a reanudarlas</td><td>188</td></tr>
+<tr><td>Compensación en dinero</td><td>Durante el contrato, hasta la mitad, por acuerdo escrito. Al terminar, las no disfrutadas se pagan por año cumplido y proporcionalmente por la fracción</td><td>189</td></tr>
+<tr><td>Acumulación</td><td>Se disfrutan al menos 6 días hábiles continuos por año; el resto puede acumularse hasta por 2 años (4 para técnicos, especializados y extranjeros)</td><td>190</td></tr>
+<tr><td>Salario base</td><td>El ordinario que devenga el día en que salen a vacaciones (o al retiro). No incluye horas extra ni el trabajo en dominicales y festivos. Si el salario es variable, el promedio del último año</td><td>192</td></tr>
+<tr><td>Suspensiones</td><td>Los días de suspensión del art. 51 (licencias no remuneradas, sanciones, suspensión de actividades) se descuentan</td><td>53</td></tr>
+<tr><td>Pago</td><td>Se pagan por anticipado, antes de empezar el descanso</td><td>192</td></tr></table></div></section>
+<section><h3>Las fórmulas</h3>
+<div class="mj">\[\text{Días de vacaciones}=\frac{\text{días trabajados}\times15}{360}\qquad\qquad\text{Vacaciones}=\frac{\text{salario}\times\text{días trabajados}}{720}\]</div>
+<p>Las dos dan lo mismo: \(\frac{\text{salario}}{30}\times\frac{\text{días}\times15}{360}=\frac{\text{salario}\times\text{días}}{720}\). Los días trabajados se cuentan con el año de 360, contando el primero y el último, y se les restan las suspensiones del artículo 51.</p>
+<p><b>Días hábiles:</b> no cuentan los domingos ni los festivos. El sábado cuenta si el trabajador labora ese día. Por eso 15 días hábiles suelen ser unos 18 días calendario, y el trabajador regresa el día hábil siguiente al último día de vacaciones.</p></section>
+<section><h3>Ejemplos</h3>
+<p><b>Un año completo:</b> salario de $2.000.000, del 1 de enero al 31 de diciembre de 2025 sin suspensiones: 360 días ⇒ 15 días hábiles ⇒ 2.000.000 × 360 / 720 = <b>$1.000.000</b>.</p>
+<p><b>Mariana (taller):</b> si las vacaciones se deben desde el 1 de enero de 2025, igual que las prestaciones:</p>
+<div class="eq al">Días: 1/1/25 – 31/10/26 = 660<br>Menos art. 51: 660 − 30 (mayo de 2025) − 90 (abril a junio de 2026) − 2 (licencia del 30 y 31 de octubre) = <b>538</b><br>Días de vacaciones: 538 × 15 / 360 = 22,42 días hábiles<br>Vacaciones: 4.950.000 × 538 / 720 = <b>$3.698.750</b></div>
+<p class="hint">La base es el salario básico de 4.950.000: los recargos nocturnos de octubre son de un solo mes y las horas extra de 2025 no cuentan (art. 192). Si nunca tomó vacaciones desde el ingreso (8 de noviembre de 2023): 1.073 − 122 = 951 días ⇒ 4.950.000 × 951 / 720 = $6.538.125.</p></section>
+${LAB_}${AVISO}`,
+qs:[{q:"Un trabajador con salario de $3.000.000 trabajó 200 días y renuncia sin haber salido a vacaciones. ¿Cuánto le deben?",a:"3.000.000 × 200 / 720 = $833.333 (8,33 días hábiles)."},
+ {q:"¿Se incluye el auxilio de transporte en las vacaciones?",a:"No: las vacaciones son descanso remunerado y el auxilio solo se paga por los días trabajados."},
+ {q:"Un trabajador estuvo 30 días en licencia no remunerada. ¿Afecta sus vacaciones?",a:"Sí: es una suspensión del art. 51 y, según el art. 53, esos días se descuentan del tiempo para las vacaciones."}]}
+];
+
+const BRANCHES=[
+{g:"Después del despido", from:"indemnizaciones", items:[
+ {id:"moratoria", t:"Indemnización moratoria (art. 65)", sim:"mora", html:String.raw`
+<section><h3>La idea</h3><p class="lead">Si al terminar el contrato el empleador no paga los salarios y prestaciones que debe, tiene que pagar además un día de salario por cada día de retardo.</p>
+<div class="mj">\[\text{Moratoria}=\frac{\text{último salario}}{30}\times\text{días de retardo}\]</div>
+<ul><li>Para quienes ganan <b>más de un SMMLV</b>, corre hasta por <b>24 meses</b>. Desde el mes 25 se deben intereses moratorios sobre lo adeudado, a la tasa máxima de créditos de libre asignación.</li><li>Para quienes ganan <b>un SMMLV o menos</b>, sigue el régimen anterior: un día de salario por cada día de retardo, sin el límite de 24 meses.</li><li>Si hay desacuerdo sobre el monto, el empleador puede consignar ante el juez lo que reconoce deber para evitar la sanción.</li></ul>
+<p>La jurisprudencia exige revisar la buena fe del empleador: la moratoria no es automática.</p></section>${LAB_}${AVISO}`,
+ qs:[{q:"A un trabajador que ganaba $3.000.000 le pagan la liquidación con 45 días de retraso. ¿Cuánto vale la moratoria?",a:"45 × 100.000 = $4.500.000, si no hay buena fe del empleador."}]}]}
+];
+const WSBOX=`<div class="sim" id="sim"></div>`;
+const WORKSHOPS=[
+ {id:"liquidacion",t:"Liquidación de prestaciones (formato de clase)",anchor:"cesantias",links:["prima","cesantias","moratoria"],sim:"liq",html:String.raw`
+<details class="pdet"><summary><b>Reglas que aplica (las de clase)</b></summary><ol class="steps">
+<li><b>Días:</b> año comercial de 360 días, contando el primer y el último día. Se restan los días de suspensión del artículo 51.</li>
+<li><b>Base:</b> si los tres últimos meses del periodo (sin contar los suspendidos) son iguales, el salario de ese mes; si no, el promedio de lo devengado en el periodo. Más el auxilio de transporte del año, si el básico es de hasta 2 SMMLV.</li>
+<li><b>Primas:</b> por semestre; plazo el 30 de junio y el 20 de diciembre; mora desde el 1 de julio y el 21 de diciembre.</li>
+<li><b>Cesantías:</b> por año calendario; consignación hasta el 14 de febrero; mora desde el 15 de febrero.</li>
+<li><b>Intereses:</b> 12 % anual proporcional a los días; se pagan al trabajador hasta el 31 de enero; si no, se pagan dobles.</li>
+<li><b>Mora:</b> hasta la fecha de retiro, con el salario básico del periodo que se debe / 30, truncado a pesos. Lo del periodo del retiro se paga con la liquidación.</li></ol></details>
+<details class="pdet"><summary><b>Ejercicio completo: de la nómina a la liquidación</b></summary><ol class="steps">
+<li><b>Los meses con novedades</b> (horas extras, recargos, festivos, licencias): calcúlalos uno por uno en la <button class="btn" type="button" data-go="planilla">Resolvedor de horas extras</button> (día por día, con la tabla de la profesora) o en la <button class="btn" type="button" data-go="nomina">Nómina mensual</button> (si el ejercicio da las horas totales). Escribe el <b>mes y año</b> y toca <b>«Enviar este mes a la liquidación»</b>. Repite con cada mes.</li>
+<li><b>Aquí</b>: pon la fecha de inicio y la de retiro. Los meses enviados aparecen en su renglón, con el devengado (básico + extras) y los días del art. 51. Los demás meses escríbelos a mano.</li>
+<li>Marca si las primas, las cesantías o los intereses <b>se pagaron a tiempo</b>; si no, salen las moras y la sanción.</li>
+<li>Copia cada bloque al taller: la fórmula, la sustitución y la nota de por qué se usó el promedio o el salario actual. Si la indemnización también se pide, va en la calculadora de <button class="btn" type="button" data-go="indemnizaciones">Indemnizaciones</button>.</li>
+<li>Con «💾 Guardar» conservas la liquidación completa para volver a verla después.</li></ol></details>
+<div class="sim" id="sim"></div>`,
+  d:"Escribe la fecha de inicio, la de retiro y el salario de cada mes (con extras y días del artículo 51). Calcula las primas, las cesantías y sus intereses de todo el contrato, con las moras y sanciones si no se pagaron, escrito como en el tablero. Trae cargado el ejercicio de clase."},
+ {id:"planilla",t:"Resolvedor del taller de horas extras",anchor:"jornada",links:["jornada","nomina"],sim:"planilla",html:String.raw`
+<details class="pdet" open><summary><b>Reglas que aplica el resolvedor</b></summary>
+<ol class="steps">
+<li><b>Valor de la hora.</b> Salario / (jornada diaria × 30). Con 7 horas de lunes a sábado: salario / 210. En la planilla todo se paga por horas: el salario del mes es la suma de 7 horas por cada uno de los 30 días.</li>
+<li><b>Cada día paga su jornada.</b> Los días hábiles, con las horas ordinarias que se trabajan (HD, HN). Los domingos y festivos, con 7 HD de descanso remunerado, se trabajen o no; si se trabajan, sus horas se suman aparte en R o en H.</li>
+<li><b>Turnos.</b> Cada turno va en la fila del día en que empieza. Las primeras 7 horas del turno son ordinarias y las demás son extra; las extra siempre se pagan completas (HED, HEN, HEDD, HEND). La noche va de 7:00 p. m. a 6:00 a. m. (art. 160).</li>
+<li><b>Turnos que cruzan la medianoche.</b> Cada franja se clasifica por el día en que cae. <b>Sábado → domingo:</b> lo que pasa de las 12 es dominical y se paga completo (HND o HDD), porque la base es la del sábado. <b>Domingo → lunes:</b> lo del lunes ya no es dominical; va en H (HN) o en R (RN) según la regla del domingo trabajado.</li>
+<li><b>Domingo: siempre suma sus 7 HD de descanso</b> (si las ganó en la semana, ver abajo). <b>Si además lo trabaja, ¿descansa en la semana siguiente?</b> Si descansa un día entre el lunes y el sábado siguientes, las horas ordinarias del domingo llevan <b>solo el recargo del 90 %</b>: columnas R (RDD de día, RND de noche), y ese día de descanso también se paga con 7 HD (todo descanso es remunerado). Si no descansa, las horas van <b>completas con el recargo del 90 %</b>: columnas H (HDD, HND).</li>
+<li><b>Festivo.</b> Siempre se pagan 7 h (art. 177). Si además lo trabaja, sus horas van en H: 7 h + 90 % (HDD, HND).</li>
+<li><b>Día 31.</b> El salario cubre 30 días: las ordinarias diurnas no suman, las nocturnas llevan solo el recargo (RN o RND) y las extra se pagan completas. Un descanso o permiso el 31 no suma, y una sanción o licencia el 31 resta 7 h (art. 51).</li>
+<li><b>Las 7 HD del domingo (art. 172 y 173).</b> Completas si en la semana de lunes a sábado trabajó o faltó con justa causa; los festivos cuentan como trabajados. Si ingresó a mitad de semana, se paga proporcional a las horas: si por 42 horas se pagan 7, con \(h\) horas se pagan \(7\times h/42\). Cuentan las horas ordinarias de lunes a sábado (máximo 7 por día, sin las extra) y 7 por cada festivo, permiso o descanso remunerado. En el ejercicio 1: \(7\times28/42=4{,}67\) h. También se puede elegir la proporción por días. Se pierde si faltó por culpa suya: sanción o licencia no remunerada (art. 51). Si faltó por culpa del empleador, se paga proporcional.</li>
+<li><b>Novedades.</b> Descanso: todo descanso es remunerado (compensatorio), 7 HD. Permiso remunerado: 7 HD. Incapacidad por enfermedad general: los dos primeros días los paga el empleador a 2/3 del salario (art. 227), es decir 4,67 h, y nunca menos del mínimo. Sanción disciplinaria y licencia no remunerada: suspensión del contrato (art. 51); se resta el día, 0 h. Un festivo anterior al ingreso no se paga.</li>
+</ol>
+<p class="hint">Si tu profesor usa otra convención en algún punto (por ejemplo, que la sanción no quite el dominical o que la incapacidad se pague completa), cámbiala en los datos del mes.</p></details>
+<div class="sim" id="sim"></div>`,
+  d:"Escribe los turnos y las novedades del mes como vienen en el enunciado. El resolvedor llena la planilla del taller día por día (HD, HN, RN, HED, HEN, HDD, RDD, HND, RND, HEDD, HEND), dice cuándo solo se pagan los recargos, separa lo que pasa de medianoche a un domingo o festivo, y paga las dos quincenas. Trae cargados los dos ejercicios del taller."},
+ {id:"caso",t:"Seguimiento de un caso (expediente)",anchor:"liquidacion",links:["prorrogas","planilla","liquidacion","vacaciones","indemnizaciones","moratoria"],sim:"caso",html:String.raw`
+<details class="pdet" open><summary><b>Cómo funciona</b></summary><ol class="steps">
+<li><b>Crea el caso</b> (o carga el de un taller) y escribe una sola vez los datos del trabajador: contrato, ingreso, retiro, duración pactada y salario.</li>
+<li>En cada herramienta aparece arriba la barra <b>📁 Caso</b>: «Usar los datos del caso» llena el formulario y «Guardar este resultado en el caso» lo deja en el expediente.</li>
+<li>La <b>planilla</b> de un mes con novedades, al guardarse, actualiza el renglón de ese mes; la <b>liquidación</b> guarda todos los meses; las <b>vacaciones</b> toman los días del art. 51 de esos meses; la <b>indemnización</b> toma el vencimiento del período que corría al retiro.</li>
+<li>Al final, el <b>resumen</b> junta todos los resultados con su total. Cada herramienta sigue mostrando el paso a paso de sus cálculos.</li></ol></details>
+<div class="sim" id="sim"></div>`,
+  d:"Escribe una vez los datos del trabajador y síguelo por todas las herramientas: prórrogas, salario del mes, prestaciones, vacaciones e indemnización, con un resumen final. Trae los casos de Mariana y de Pedro."},
+ {id:"valores",t:"Valores y porcentajes por fecha",anchor:"jornada",links:["prorrogas","indemnizaciones","jornada","nomina"],sim:"val",html:WSBOX,
+  d:"El salario mínimo, el auxilio de transporte, la jornada máxima, el recargo dominical y la hora nocturna que aplican en cualquier fecha desde 2025."}
+];

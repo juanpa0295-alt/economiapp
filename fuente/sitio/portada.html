@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!--INICIO-PAGINA-->
+<title>Economiapp</title>
+<meta name="description" content="Rutas de estudio interactivas para las materias de Economía: lecciones, laboratorios y ejercicios resueltos paso a paso.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: la portada es el plano de la red; cada materia es una línea de metro con sus estaciones */
+:root{
+  --paper:#edf0ea; --card:#f8f9f5; --ink:#1b2430; --muted:#5c6670; --rule:#cfd5cb; --accent:#1b2430; --hl:#dfe6d9;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742; --accent:#e4e8ec; --hl:#232d38; color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#141a21; --card:#1b232c; --ink:#e4e8ec; --muted:#9aa5b0; --rule:#2c3742; --accent:#e4e8ec; --hl:#232d38; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+.lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+header{display:flex;flex-direction:column;gap:10px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(40px,8vw,72px);line-height:.95;letter-spacing:-.02em;margin:0;text-wrap:balance}
+header p{margin:0;max-width:60ch;color:var(--muted);font-size:16.5px}
+.legendline{display:flex;gap:6px;align-items:center;margin-top:4px}
+.legendline i{display:block;height:6px;width:46px;border-radius:3px}
+/* buscador */
+.search{display:flex;flex-direction:column;gap:8px;max-width:640px}
+.search label{font-weight:600;font-size:14px}
+.search input{font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink);width:100%}
+.search input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:transparent}
+.results{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:10px;background:var(--card);overflow:hidden}
+.results a{display:flex;gap:10px;align-items:center;padding:9px 14px;text-decoration:none;color:var(--ink);border-top:1px solid var(--rule)}
+.results a:first-child{border-top:0}
+.results a:hover,.results a:focus-visible{background:var(--hl);outline:none}
+.results .dot{flex:0 0 10px;height:10px;border-radius:50%;background:var(--cc)}
+.results .k{margin-left:auto;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.results .m{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.results .t{min-width:0;display:flex;flex-direction:column}
+.results .t small{font-size:12.5px;color:var(--muted)}
+.results p{margin:0;padding:10px 14px;color:var(--muted)}
+/* líneas de la red */
+.net{display:flex;flex-direction:column;gap:14px}
+.line{--cc:var(--c);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:18px 20px 16px;position:relative;transition:border-color .2s,transform .2s}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .line,:root:not([data-theme="light"]) .results a{--cc:var(--cd)}}
+:root[data-theme="dark"] .line,:root[data-theme="dark"] .results a{--cc:var(--cd)}
+.results a{--cc:var(--c)}
+.line:hover{border-color:var(--cc);transform:translateY(-2px)}
+.line:focus-visible{outline:2px solid var(--cc);outline-offset:3px}
+.line h2{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.4vw,28px);line-height:1.1;margin:0;color:var(--cc)}
+.line .sum{margin:2px 0 0;color:var(--muted);font-size:14.5px;max-width:62ch}
+.line .meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.line .meta b{font-family:var(--f-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.line .meta small{font-size:12px;color:var(--muted)}
+.track{grid-column:1/-1;display:flex;align-items:center;margin-top:10px;position:relative;height:22px}
+.track::before{content:"";position:absolute;left:8px;right:8px;top:50%;height:5px;margin-top:-2.5px;background:var(--cc);border-radius:3px;opacity:.9}
+.track span{position:relative;flex:1;display:flex;justify-content:center}
+.track span:first-child{justify-content:flex-start}.track span:last-child{justify-content:flex-end}
+.track span i{width:16px;height:16px;border-radius:50%;background:var(--card);border:3.5px solid var(--cc);display:block}
+.track span.done i{background:var(--cc)}
+.ends{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
+.ends span:last-child{text-align:right}
+.go{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:6px;font-size:14px}
+.go strong{color:var(--cc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:12px;border:1px solid var(--rule);border-radius:99px;padding:1px 9px;color:var(--muted)}
+.soon{display:flex;flex-wrap:wrap;gap:10px}
+.soon div{border:1.5px dashed var(--rule);border-radius:12px;padding:12px 16px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:2px;min-width:0}
+.soon small{font-weight:400;font-size:12.5px}
+/* plan por semestres */
+.semnav{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.semnav button{font:inherit;font-size:13.5px;font-weight:600;border:1.5px solid var(--rule);background:var(--card);color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer;min-height:34px}
+.semnav button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.semnav .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 4px}
+.sems{display:flex;flex-direction:column;gap:30px}
+.sem{display:flex;flex-direction:column;gap:12px}
+.semh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:6px}
+.semh h2{font-family:var(--f-display);font-weight:700;font-size:24px;margin:0}
+.semh small{color:var(--muted);font-size:13px}
+.course{position:relative}
+.course .line{padding-right:22px}
+.st{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--rule);background:var(--paper);color:var(--muted);border-radius:99px;padding:2px 10px;cursor:pointer;min-height:26px;white-space:nowrap}
+.st[data-s="cursando"]{background:#f3e3b8;color:#5a4300;border-color:#d8b85c}
+.st[data-s="aprobada"]{background:#cfe8d2;color:#1d4d26;border-color:#7fb889}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .st[data-s="cursando"]{background:#4a3c12;color:#f3dc9a;border-color:#7d6420}:root:not([data-theme="light"]) .st[data-s="aprobada"]{background:#1f3d25;color:#b8e2c0;border-color:#3d7a4a}}
+:root[data-theme="dark"] .st[data-s="cursando"]{background:#4a3c12;color:#f3dc9a;border-color:#7d6420}:root[data-theme="dark"] .st[data-s="aprobada"]{background:#1f3d25;color:#b8e2c0;border-color:#3d7a4a}
+.course>.st{position:absolute;top:12px;right:12px;z-index:1}
+.course .line .meta{margin-top:30px}
+.pend{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.pend>div{border:1.5px dashed var(--rule);border-radius:12px;padding:11px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pend b{font-weight:600;font-size:15px;line-height:1.3}
+.pend .row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.pend .tag{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pend small{color:var(--muted);font-size:12.5px;line-height:1.4}
+.pend a{color:inherit}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.how div{display:flex;flex-direction:column;gap:4px}
+.how h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:18px}
+.how p{margin:0;color:var(--muted);font-size:14.5px}
+footer{border-top:1px solid var(--rule);padding-top:16px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+@media (max-width:560px){.line{grid-template-columns:minmax(0,1fr)}.line .meta{align-items:flex-start;text-align:left;flex-direction:row;gap:8px;align-items:baseline}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<!--FIN-HEAD-->
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="lbl">Rutas de estudio para Economía</div>
+    <h1>Economiapp</h1>
+    <p>Las materias del pregrado en Economía (plan 2015-I, Universidad de Antioquia) organizadas por semestre. Cada materia es una línea de metro: las estaciones van de lo básico a lo avanzado, con lecciones, laboratorios interactivos y ejercicios resueltos paso a paso para que puedas hacerlos a mano en el examen.</p>
+    <div class="legendline" id="legend" aria-hidden="true"></div>
+  </header>
+
+  <section class="search" role="search">
+    <label for="q">Buscar un tema</label>
+    <input id="q" type="search" placeholder="Por ejemplo: prueba de Chow, estrategias mixtas, intervalo de confianza" autocomplete="off">
+    <div class="results" id="res" hidden></div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div class="lbl" id="plansum">Plan de estudios</div>
+    <div class="semnav" id="semnav" role="group" aria-label="Filtrar por semestre"></div>
+    <div class="sems" id="sems"></div>
+  </section>
+
+  <section class="how" aria-label="Cómo estudiar con la app">
+    <div><h3>Sigue el tronco</h3><p>Las estaciones están en el orden en que conviene estudiar. Cada una se apoya en la anterior.</p></div>
+    <div><h3>Practica en los talleres</h3><p>Cambia los datos y mira cómo responde el resultado. Los resolvedores muestran cada paso con la notación de clase.</p></div>
+    <div><h3>Marca lo que dominas</h3><p>Tu avance se guarda en este navegador y aparece aquí, en cada línea. Con el botón de cada materia puedes marcarla como cursando o aprobada.</p></div>
+  </section>
+
+  <footer><span>Economiapp</span><span>El progreso se guarda solo en este dispositivo.</span></footer>
+</div>
+<script>
+/*CATALOGO*/
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const read=k=>{try{return JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){return{}}};
+const last=k=>{try{return localStorage.getItem(k+"-last")||""}catch(e){return""}};
+const href=(m,id)=>`materias/${m.slug}.html${id?"#"+id:""}`;
+$("legend").innerHTML=MATERIAS.map(m=>`<i style="background:${m.color[0]}"></i>`).join("");
+const ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X"],BYSLUG=Object.fromEntries(MATERIAS.map(m=>[m.slug,m]));
+const KS="eco-plan-estado",KF="eco-plan-filtro";
+const getS=()=>{try{return JSON.parse(localStorage.getItem(KS)||"{}")||{}}catch(e){return{}}};
+const setS=o=>{try{localStorage.setItem(KS,JSON.stringify(o))}catch(e){}};
+let filtro=(()=>{try{return localStorage.getItem(KF)||"todos"}catch(e){return"todos"}})();
+const idOf=p=>p.cod||p.nombre;
+const STL={"":"Marcar",cursando:"Cursando",aprobada:"Aprobada"},NEXT={"":"cursando",cursando:"aprobada",aprobada:""};
+const stBtn=(p,est)=>`<button type="button" class="st" data-id="${esc(idOf(p))}" data-s="${est}" aria-label="Estado de ${esc(p.nombre)}: ${STL[est]==="Marcar"?"sin marcar":STL[est]}. Cambiar">${STL[est]}</button>`;
+function card(m,p,est){
+  const done=read(m.key),lessons=[...m.t,...m.b],n=lessons.filter(([id])=>done[id]).length,pct=Math.round(n/lessons.length*100);
+  const l=last(m.key),lt=[...m.t,...m.b,...m.w].find(([id])=>id===l);
+  return `<div class="course">${stBtn(p,est)}<a class="line" href="${href(m,lt?l:"")}" style="--c:${m.color[0]};--cd:${m.color[1]}">
+      <div><h2>${esc(p.slug==="matematicas"?m.nombre:p.nombre)}</h2><p class="sum">${p.cod?`<span style="font-family:var(--f-mono);font-size:12.5px">${p.cod}</span> · `:""}${esc(m.resumen)}${p.nota?` <i>${esc(p.nota)}</i>`:""}</p></div>
+      <div class="meta"><b>${pct} %</b><small>${n} de ${lessons.length} temas dominados</small></div>
+      <div class="track" aria-label="${m.t.length} estaciones en el tronco">${m.t.map(([id,t])=>`<span class="${done[id]?"done":""}" title="${esc(t)}"><i></i></span>`).join("")}</div>
+      <div class="ends"><span>${esc(m.t[0][1])}</span><span>${esc(m.t[m.t.length-1][1])}</span></div>
+      <div class="go">${lt?`<span>Continuar en <strong>${esc(lt[1])}</strong> →</span>`:`<span><strong>Empezar la ruta</strong> →</span>`}<span class="chips"><span>${m.t.length} estaciones</span><span>${m.b.length} ramas</span><span>${m.w.length} ${m.w.length===1?"taller":"talleres"}</span></span></div>
+    </a></div>`}
+function render(){
+  const S=getS(),hay=PLAN.filter(p=>p.slug&&BYSLUG[p.slug]).length,apr=PLAN.filter(p=>S[idOf(p)]==="aprobada").length,cur=PLAN.filter(p=>S[idOf(p)]==="cursando").length;
+  $("plansum").textContent=`Plan de estudios · ${hay} de ${PLAN.length} materias con ruta en la app`+(apr||cur?` · tú: ${apr} aprobada${apr===1?"":"s"}, ${cur} cursando`:"");
+  const opts=[["todos","Todos"],...ROM.slice(1).map((r,i)=>[String(i+1),r]),["sep"],["cursando","Cursando"],["pend","Sin aprobar"]];
+  $("semnav").innerHTML=`<span class="lbl" style="margin-right:4px">Semestre</span>`+opts.map(([k,l])=>k==="sep"?`<span class="sep"></span>`:`<button type="button" data-f="${k}" aria-pressed="${filtro===k}"${/^\d+$/.test(k)?` aria-label="Semestre ${l}"`:""}>${l}</button>`).join("");
+  const pasa=p=>filtro==="todos"||filtro===String(p.sem)||(filtro==="cursando"&&S[idOf(p)]==="cursando")||(filtro==="pend"&&S[idOf(p)]!=="aprobada");
+  let html="";
+  for(let s=1;s<=10;s++){const items=PLAN.filter(p=>p.sem===s&&pasa(p));if(!items.length)continue;
+    const con=items.filter(p=>p.slug&&BYSLUG[p.slug]),sin=items.filter(p=>!(p.slug&&BYSLUG[p.slug])),tot=PLAN.filter(p=>p.sem===s);
+    html+=`<section class="sem" aria-label="Semestre ${ROM[s]}"><div class="semh"><h2>Semestre ${ROM[s]}</h2><small>${tot.filter(p=>p.slug).length} de ${tot.length} materias en la app</small></div>`
+      +(con.length?`<div class="net">${con.map(p=>card(BYSLUG[p.slug],p,S[idOf(p)]||"")).join("")}</div>`:"")
+      +(sin.length?`<div class="pend">${sin.map(p=>`<div><div class="row"><span class="tag">${p.tipo==="guia"?"Resumen y guía":"Módulo con laboratorios"} · próximamente</span>${stBtn(p,S[idOf(p)]||"")}</div><b>${esc(p.nombre)}</b>${p.cod?`<small style="font-family:var(--f-mono)">${p.cod}</small>`:""}${p.nota?`<small>${esc(p.nota)}</small>`:""}</div>`).join("")}</div>`:"")+`</section>`}
+  $("sems").innerHTML=html||`<p style="color:var(--muted);margin:0">No hay materias con ese filtro. ${filtro==="cursando"?"Marca las que estás viendo con el botón «Marcar» de cada materia.":""}</p>`;
+}
+$("semnav").addEventListener("click",e=>{const b=e.target.closest("button[data-f]");if(!b)return;filtro=b.dataset.f;try{localStorage.setItem(KF,filtro)}catch(x){}render()});
+$("sems").addEventListener("click",e=>{const b=e.target.closest("button.st");if(!b)return;e.preventDefault();e.stopPropagation();const S=getS(),k=b.dataset.id,n=NEXT[S[k]||""];if(n)S[k]=n;else delete S[k];setS(S);render();const nb=[...document.querySelectorAll("button.st")].find(x=>x.dataset.id===k);if(nb)nb.focus()});
+const INDEX=MATERIAS.flatMap(m=>[...m.t.map(([id,t,kw])=>({m,id,t,kw,k:"Estación"})),...m.b.map(([id,t,g,kw])=>({m,id,t,kw,k:"Rama",g})),...m.w.map(([id,t,kw])=>({m,id,t,kw,k:"Taller"}))])
+  .map(x=>Object.assign(x,{n:norm(x.t+" "+(x.g||"")+" "+x.m.nombre),nk:norm(x.kw||"")}));
+const hint=(x,words)=>{if(words.every(w=>x.n.includes(w)))return"";const p=(x.kw||"").split(" · ").find(s=>words.some(w=>norm(s).includes(w)));return p||""};
+function search(){const v=norm($("q").value.trim()),box=$("res");
+  if(!v){box.hidden=true;box.innerHTML="";return}
+  const words=v.split(/\s+/),title=INDEX.filter(x=>words.every(w=>x.n.includes(w))),body=INDEX.filter(x=>!title.includes(x)&&words.every(w=>(x.n+" "+x.nk).includes(w))),hits=[...title,...body].slice(0,12);
+  box.hidden=false;
+  box.innerHTML=hits.length?hits.map(x=>`<a href="${href(x.m,x.id)}" style="--c:${x.m.color[0]};--cd:${x.m.color[1]}"><span class="dot"></span><span class="t">${esc(x.t)}${hint(x,words)?`<small>${esc(hint(x,words))}</small>`:""}</span><span class="m">${esc(x.m.nombre)}</span><span class="k">${x.k}</span></a>`).join("")
+    :`<p>No hay temas con «${esc($("q").value.trim())}». Prueba con otra palabra o revisa la ortografía.</p>`}
+$("q").addEventListener("input",search);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter"){const a=$("res").querySelector("a");if(a){e.preventDefault();location.href=a.getAttribute("href")}}});
+window.addEventListener("pageshow",render);
+window.addEventListener("storage",render);
+render();
+</script>
+</body>
+</html>

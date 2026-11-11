@@ -1,0 +1,359 @@
+[
+ {
+  "slug": "introduccion-economia",
+  "dir": "ie",
+  "h1": "Introducción a la Economía",
+  "nombre": "Introducción a la Economía",
+  "cod": "1503700",
+  "desc": "Programa 1503700: escasez y costo de oportunidad, economía positiva y normativa, flujo circular y frontera de posibilidades, oferta, demanda y elasticidades, fallas de mercado y papel del Estado, y las grandes variables macroeconómicas con el caso colombiano.",
+  "colors": [
+   "#a0441b",
+   "#f6e2d8",
+   "#e59a78",
+   "#4a1d0a"
+  ],
+  "trunk": "Tronco: las cuatro unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503700, con Mankiw, Case y Fair, Samuelson y Nordhaus, y el libro de Cárdenas sobre la economía colombiana. Para practicar con gráficas interactivas de oferta, demanda y excedentes, usa <a href=\"principios-micro.html\">Principios de Microeconomía</a>; para el PIB, la inflación y el desempleo, <a href=\"principios-macro.html\">Principios de Macroeconomía</a>.",
+  "res": "Escasez, costo de oportunidad, flujo circular, oferta y demanda, elasticidad, Estado y macroeconomía básica de Colombia."
+ },
+ {
+  "slug": "economia-clasica",
+  "dir": "ec",
+  "h1": "Economía Clásica",
+  "nombre": "Economía Clásica",
+  "cod": "1503720",
+  "desc": "Programa 1503720: objeto y método de la economía, el sistema de producción clásico (coeficientes técnicos y excedente), precios de producción en Ricardo y en Sraffa, teoría del salario, y la historia del pensamiento clásico sobre precios naturales y de mercado.",
+  "colors": [
+   "#7a5a12",
+   "#f3ebd6",
+   "#d6b469",
+   "#382805"
+  ],
+  "trunk": "Tronco: las cinco unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503720, siguiendo las notas de Eduardo Bolaños (Teoría clásica de los precios) y a Cartelier (Excedente y reproducción). Los laboratorios de Sraffa, Ricardo y Smith están en <a href=\"historia-pensamiento.html\">Historia del Pensamiento Económico</a>.",
+  "res": "Excedente y reproducción, coeficientes técnicos, precios de producción de Ricardo y Sraffa, salario, precios naturales y de mercado."
+ },
+ {
+  "slug": "economia-politica",
+  "dir": "epm",
+  "h1": "Economía Política",
+  "nombre": "Economía Política",
+  "cod": "1503721",
+  "desc": "Programa 1503721: vida y obra de Marx, materialismo histórico, teoría del valor y del dinero (versión ortodoxa y heterodoxa), plusvalía, composición orgánica y tasa de ganancia, el problema de la transformación, el modelo Benetti-Cartelier, esquemas de reproducción, Morishima y la teoría de la crisis.",
+  "colors": [
+   "#8c1c2b",
+   "#f5dde0",
+   "#e07f8c",
+   "#40080f"
+  ],
+  "trunk": "Tronco: las tres unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503721 sobre la obra económica de Marx y sus lecturas modernas. Para practicar las cuentas de valor, plusvalía y precios de producción usa el laboratorio de Marx en <a href=\"historia-pensamiento.html\">Historia del Pensamiento Económico</a>.",
+  "res": "Marx: valor, plusvalía, composición orgánica, transformación, dinero, reproducción simple y ampliada, Morishima y crisis."
+ },
+ {
+  "slug": "fundamentos-administracion",
+  "dir": "ad",
+  "h1": "Fundamentos de Administración",
+  "nombre": "Fundamentos de Administración",
+  "cod": "1501749",
+  "desc": "Programa 1501749: la administración y las organizaciones, funciones y roles del administrador, responsabilidad social y ética, evolución del pensamiento administrativo (Taylor, Fayol, Mayo, Weber, sistemas, contingencia) y el proceso administrativo.",
+  "colors": [
+   "#3d5a80",
+   "#dde6f2",
+   "#98b4d8",
+   "#18263a"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1501749, con Robbins y Coulter, Chiavenato, Koontz y Weihrich, Daft y Bateman y Snell.",
+  "res": "Organizaciones, funciones del administrador, Taylor, Fayol, Mayo, Weber, sistemas, contingencia y proceso administrativo."
+ },
+ {
+  "slug": "fuentes-investigacion",
+  "dir": "ft",
+  "h1": "Fuentes y Técnicas de Investigación Económica",
+  "nombre": "Fuentes y Técnicas de Investigación",
+  "cod": "1503730",
+  "desc": "Programa 1503730: el problema de investigación, objetivos e hipótesis, catálogos y bibliotecas digitales, obras de referencia y revistas, bases de datos y fuentes estadísticas económicas, gestión de referencias y normas de citación, mapa conceptual, tabla de contenido y metodología cuantitativa.",
+  "colors": [
+   "#386641",
+   "#dcefe0",
+   "#8fc79a",
+   "#14281a"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503730, con las fuentes de información económica de Colombia y del mundo, y una guía para formular un proyecto de investigación.",
+  "res": "Problema, objetivos e hipótesis, catálogos y bases de datos, fuentes estadísticas (DANE, Banco de la República), normas de citación y metodología cuantitativa."
+ },
+ {
+  "slug": "desarrollo-humano",
+  "dir": "dh",
+  "h1": "Desarrollo Humano",
+  "nombre": "Desarrollo Humano",
+  "cod": "1501782",
+  "desc": "Programa 1501782: etapas del desarrollo y dimensiones del ser humano, autoestima, valores, personalidad, percepción, inteligencia emocional, proyecto de vida, comunicación, trabajo en equipo, conflicto y negociación, y la relación entre individuo, trabajo y sociedad.",
+  "colors": [
+   "#b5651d",
+   "#f8e8d8",
+   "#e8b07a",
+   "#4d2a0b"
+  ],
+  "trunk": "Tronco: las cuatro unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1501782, con Goleman (inteligencia emocional), Gardner (inteligencias múltiples), Covey (los siete hábitos) y Drucker (gestionarse a uno mismo).",
+  "res": "Etapas del desarrollo, inteligencia emocional, inteligencias múltiples, proyecto de vida, comunicación asertiva, equipos y negociación."
+ },
+ {
+  "slug": "lectoescritura",
+  "dir": "le",
+  "h1": "Lectoescritura Económica",
+  "nombre": "Lectoescritura Económica",
+  "cod": "1503731",
+  "desc": "Programa 1503731: estructura del escrito corto y del artículo científico, generación y organización de ideas, mapas conceptuales, paráfrasis y resumen, el párrafo y sus tipos, argumentación y ensayo, y redacción profesional.",
+  "colors": [
+   "#5f4b8b",
+   "#e9e3f4",
+   "#b1a0d6",
+   "#2a1f40"
+  ],
+  "trunk": "Tronco: las siete unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503731, con Cassany (La cocina de la escritura; Guía de redacción para profesionales), Serafini (Cómo se escribe) y Weston (Las claves de la argumentación). Útil para cualquier trabajo escrito de la carrera, incluida la monografía.",
+  "res": "Artículo científico, mapas conceptuales, paráfrasis y resumen, párrafos, argumentos y ensayo, y redacción profesional."
+ },
+ {
+  "slug": "formacion-ciudadana",
+  "dir": "fci",
+  "h1": "Formación Ciudadana y Constitucional",
+  "nombre": "Formación Ciudadana y Constitucional",
+  "cod": "Formación Ciudadana y Constitucional",
+  "desc": "Curso institucional de la Universidad de Antioquia: norma, conflicto y orden social, qué es una constitución, la Constitución de 1991 y sus principios, ramas y órganos del Estado, estados de excepción, derechos y garantías (tutela, acciones populares), participación ciudadana y la constitución económica.",
+  "colors": [
+   "#1f4e79",
+   "#dbe7f3",
+   "#8ab1d9",
+   "#0b223a"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del curso de Formación Ciudadana y Constitucional, con la Constitución Política de Colombia de 1991 como texto base. La última unidad desarrolla la constitución económica, que es la conferencia para el área de economía.",
+  "res": "Constitución de 1991, Estado social de derecho, ramas del poder, tutela, acciones populares, mecanismos de participación y constitución económica."
+ },
+ {
+  "slug": "ingles-1",
+  "dir": "in1",
+  "h1": "Inglés I",
+  "nombre": "Inglés I",
+  "cod": "1501738",
+  "desc": "Programa 1501738 (nivel A1-A2, Market Leader Elementary): profesiones, compañías, problemas en el trabajo, viajes de negocios, socializar y ventas, con verb to be, presente simple, there is/are, can, pasado simple y comparativos.",
+  "colors": [
+   "#2a6f97",
+   "#d8ebf5",
+   "#7fbfe0",
+   "#0c2b3d"
+  ],
+  "trunk": "Tronco: las seis unidades del curso",
+  "intro": "Guía de estudio del programa 1501738 con el libro Market Leader Elementary. Cada estación resume el tema, el vocabulario de negocios, la gramática del nivel y frases útiles; las tarjetas y el simulacro sirven para practicar antes del parcial.",
+  "res": "Professions, companies, travel, socialising and selling; to be, present simple, there is/are, can, past simple."
+ },
+ {
+  "slug": "ingles-2",
+  "dir": "in2",
+  "h1": "Inglés II",
+  "nombre": "Inglés II",
+  "cod": "1501783",
+  "desc": "Programa 1501783 (nivel A2): descripción personal, mercados, la compañía, internet, culturas y cualidades profesionales, con presente continuo, pasado continuo, futuro con going to y will, adverbios de frecuencia, verbos modales de obligación y la hoja de vida.",
+  "colors": [
+   "#2c7a5b",
+   "#d8f0e6",
+   "#7cc9a8",
+   "#0d3326"
+  ],
+  "trunk": "Tronco: las seis unidades del curso",
+  "intro": "Guía de estudio del programa 1501783 con Market Leader. Resume temas, vocabulario de negocios, gramática y frases útiles por unidad.",
+  "res": "Descriptions, markets, companies, Internet, cultures and skills; present continuous, past continuous, going to, will, must, have to."
+ },
+ {
+  "slug": "ingles-3",
+  "dir": "in3",
+  "h1": "Inglés III",
+  "nombre": "Inglés III",
+  "cod": "1501787",
+  "desc": "Programa 1501787 (nivel A2-B1): carreras, ventas en línea, compañías, creatividad, manejo del estrés y entretenimiento corporativo, con presente perfecto frente a pasado simple, futuro, voz pasiva, primer condicional y verbos con gerundio o infinitivo.",
+  "colors": [
+   "#8a4f9e",
+   "#efe0f4",
+   "#c79ad6",
+   "#3a1f43"
+  ],
+  "trunk": "Tronco: las seis unidades del curso",
+  "intro": "Guía de estudio del programa 1501787 con Market Leader. Resume temas, vocabulario de negocios, gramática y frases útiles por unidad.",
+  "res": "Careers, online selling, companies, creativity, stress and entertaining; present perfect, passive, first conditional, gerunds and infinitives."
+ },
+ {
+  "slug": "ingles-4",
+  "dir": "in4",
+  "h1": "Inglés IV",
+  "nombre": "Inglés IV",
+  "cod": "1501790",
+  "desc": "Programa 1501790 (nivel B1): mercadeo, planeación, dirección de personal, resolución de conflictos, creación de empresa y presentación de un producto, con segundo condicional, estilo indirecto, cláusulas relativas, verbos modales de deducción y lenguaje de presentaciones y reuniones.",
+  "colors": [
+   "#b0413e",
+   "#f6dedd",
+   "#e39391",
+   "#4b1716"
+  ],
+  "trunk": "Tronco: las seis unidades del curso",
+  "intro": "Guía de estudio del programa 1501790 con Market Leader. Resume temas, vocabulario de negocios, gramática y frases útiles por unidad.",
+  "res": "Marketing, planning, managing people, conflict, start-ups and product presentations; second conditional, reported speech, relative clauses."
+ },
+ {
+  "slug": "historia-economica-colombia",
+  "dir": "hec",
+  "h1": "Historia Económica de Colombia",
+  "nombre": "Historia Económica de Colombia",
+  "cod": "1503724",
+  "desc": "Programa 1503724: nuevo institucionalismo y órdenes sociales, la economía colonial y las reformas borbónicas, la república naciente, el modelo liberal y la Regeneración, la economía cafetera, la crisis de 1929, la industrialización sustitutiva, la violencia, y la apertura y la Constitución de 1991.",
+  "colors": [
+   "#7b3f00",
+   "#f4e6d6",
+   "#d9a066",
+   "#371c00"
+  ],
+  "trunk": "Tronco: de la Colonia al siglo XXI",
+  "intro": "Resumen y guía de estudio del programa 1503724, siguiendo a Kalmanovitz (Nueva historia económica de Colombia; La economía de la Nueva Granada), Ocampo (Historia económica de Colombia) y el marco de North, Wallis y Weingast sobre órdenes sociales.",
+  "res": "Instituciones y órdenes sociales, Colonia, reformas borbónicas, federalismo, café, industrialización, violencia, apertura y Constitución de 1991."
+ },
+ {
+  "slug": "epistemologia",
+  "dir": "epi",
+  "h1": "Epistemología de las Ciencias Económicas",
+  "nombre": "Epistemología de las Ciencias Económicas",
+  "cod": "1503740",
+  "desc": "Programa 1503740: el contexto histórico del nacimiento de la economía, conocimiento e interés, concepto, proposición y razonamiento, inducción y deducción, Popper, Kuhn, Lakatos y Feyerabend, Friedman y el realismo de los supuestos, McCloskey y la retórica.",
+  "colors": [
+   "#4a4e69",
+   "#e3e4ee",
+   "#9a8c98",
+   "#1f2130"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503740 sobre cómo conoce la economía: de la lógica del concepto a los grandes debates de la filosofía de la ciencia y su aplicación a la teoría económica.",
+  "res": "Conocimiento y ciencia, concepto y razonamiento, inducción y deducción, Popper, Kuhn, Lakatos, Friedman, McCloskey y el estatus científico de la economía."
+ },
+ {
+  "slug": "economia-colombiana",
+  "dir": "eco",
+  "h1": "Economía Colombiana",
+  "nombre": "Economía Colombiana",
+  "cod": "1503715",
+  "desc": "Programa 1503715: crecimiento de largo plazo y sus motores, ciclos económicos y políticos, sector externo y dependencia minero-energética, tasa de cambio, finanzas públicas y regla fiscal, inflación objetivo, mercado laboral, informalidad, pobreza y desigualdad en Colombia.",
+  "colors": [
+   "#b8860b",
+   "#f7eed6",
+   "#e6c56b",
+   "#4d3804"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503715. Los datos cambian: verifica siempre las cifras recientes en el DANE, el Banco de la República y el Ministerio de Hacienda. Complementa con las rutas de macroeconomía y con Historia Económica de Colombia.",
+  "res": "Crecimiento, ciclos, sector externo, tasa de cambio, regla fiscal, inflación objetivo, informalidad, pobreza y desigualdad en Colombia."
+ },
+ {
+  "slug": "etica-profesional",
+  "dir": "et",
+  "h1": "Ética Profesional",
+  "nombre": "Ética Profesional",
+  "cod": "1503741",
+  "desc": "Programa 1503741: ética y moral, libertad y responsabilidad, éticas teleológicas (Aristóteles, utilitarismo) y deontológicas (Kant), emotivismo, el egoísmo y el bien común, valores, Smith y los sentimientos morales, y la ética del economista.",
+  "colors": [
+   "#6d597a",
+   "#ece6f0",
+   "#b8a3c4",
+   "#2e2433"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503741 sobre ética y la responsabilidad profesional del economista.",
+  "res": "Ética y moral, Aristóteles, utilitarismo, Kant, emotivismo, Smith, valores y ética del economista."
+ },
+ {
+  "slug": "politicas-publicas-salud",
+  "dir": "pps",
+  "h1": "Economía y Políticas Públicas: Salud",
+  "nombre": "Opción I: Economía y Políticas Públicas",
+  "cod": "1503803",
+  "desc": "Programa 1503803 (opción I, énfasis en economía de la salud): salud y desarrollo, fallas de mercado en salud (Arrow), la Ley 100 de 1993, el aseguramiento, la Sentencia T-760 de 2008, la Ley 1438 de 2011 y la Ley Estatutaria 1751 de 2015, demanda de salud (Grossman), oferta, riesgo moral y selección adversa.",
+  "colors": [
+   "#0e7c7b",
+   "#d5efef",
+   "#6fc2c1",
+   "#033534"
+  ],
+  "trunk": "Tronco: las unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503803, que en esta versión se centra en la economía de la salud como caso de política pública.",
+  "res": "Arrow y fallas de mercado en salud, Ley 100, aseguramiento, T-760, Ley Estatutaria, Grossman, riesgo moral y selección adversa."
+ },
+ {
+  "slug": "negocios-emprendimiento",
+  "dir": "ne",
+  "h1": "Negocios y Emprendimiento",
+  "nombre": "Opción II: Negocios y Emprendimiento",
+  "cod": "1503800",
+  "desc": "Programa 1503800 (opción II): emprendimiento y desarrollo económico (Schumpeter, GEM), perfil emprendedor, creatividad, oportunidades y design thinking, Business Model Canvas y propuesta de valor, validación, plan de negocios y fuentes de financiación en Colombia.",
+  "colors": [
+   "#d1495b",
+   "#fae0e3",
+   "#ee9aa5",
+   "#521a22"
+  ],
+  "trunk": "Tronco: las cinco unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503800. Para los estudios de mercado, técnico y financiero del plan de negocios usa las calculadoras de <a href=\"evaluacion-proyectos.html\">Evaluación de Proyectos</a>.",
+  "res": "Schumpeter, GEM, perfil emprendedor, design thinking, Canvas, propuesta de valor, validación, plan de negocios y financiación."
+ },
+ {
+  "slug": "economia-institucional",
+  "dir": "ei2",
+  "h1": "Economía Institucional",
+  "nombre": "Opción II: Economía Institucional",
+  "cod": "1503814",
+  "desc": "Programa 1503814 (opción II): viejo y nuevo institucionalismo, definiciones de instituciones (Veblen, Commons, North, Williamson), el marco de Ostrom (situaciones de acción, gramática institucional, tipos de reglas), medición de instituciones y aplicaciones al caso colombiano.",
+  "colors": [
+   "#5c6b2e",
+   "#e8ecd8",
+   "#adbd77",
+   "#262d12"
+  ],
+  "trunk": "Tronco: las cuatro unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503814, con énfasis en el marco de análisis y desarrollo institucional (IAD) de Elinor Ostrom.",
+  "res": "Veblen, Commons, North, Williamson, costos de transacción, Ostrom, gramática institucional, medición de instituciones y Colombia."
+ },
+ {
+  "slug": "finanzas-territoriales",
+  "dir": "ft2",
+  "h1": "Finanzas Públicas Territoriales",
+  "nombre": "Opción III: Finanzas Públicas Territoriales",
+  "cod": "1503806",
+  "desc": "Programa 1503806 (opción III): federalismo fiscal (Tiebout, Oates, Musgrave), descentralización en Colombia, sistema general de participaciones y regalías, presupuesto municipal, impuestos territoriales (predial, industria y comercio), categorización y la Ley 617 de 2000, y la Ley 358 de 1997 (semáforo de endeudamiento).",
+  "colors": [
+   "#8d5524",
+   "#f3e3d3",
+   "#d6a67c",
+   "#3c220c"
+  ],
+  "trunk": "Tronco: las cuatro unidades del programa",
+  "intro": "Resumen y guía de estudio del programa 1503806, con Iregui, Restrepo (Hacienda pública) y Alviar y Rojas (Elementos de finanzas públicas en Colombia). Los valores de las leyes citadas pueden cambiar con reformas posteriores; verifica la norma vigente.",
+  "res": "Federalismo fiscal, descentralización, SGP, regalías, predial, ICA, Ley 617 de 2000, Ley 358 de 1997 y categorización municipal."
+ },
+ {
+  "slug": "monografia",
+  "dir": "mo",
+  "h1": "Monografía de Grado",
+  "nombre": "Monografía de Grado",
+  "cod": "1503732",
+  "desc": "Guía para la monografía de grado: elegir el tema y el asesor, formular la propuesta, revisión de literatura, datos y estrategia empírica, estructura del documento, normas de citación, ética de la investigación y sustentación.",
+  "colors": [
+   "#264653",
+   "#d8e7ec",
+   "#7fb3c4",
+   "#0d1d23"
+  ],
+  "trunk": "Tronco: las etapas del trabajo de grado",
+  "intro": "Guía práctica para la monografía de grado (1503732). Se apoya en lo visto en <a href=\"fuentes-investigacion.html\">Fuentes y Técnicas de Investigación</a>, <a href=\"lectoescritura.html\">Lectoescritura Económica</a> y las rutas de econometría. Las normas específicas (formato, plazos, jurados) las fija el reglamento vigente de la Facultad: verifícalas con la coordinación del programa.",
+  "res": "Tema y pregunta, propuesta, revisión de literatura, datos y método, estructura del documento, citas, ética y sustentación."
+ }
+]
