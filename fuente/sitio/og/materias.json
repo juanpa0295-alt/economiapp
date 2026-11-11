@@ -1,0 +1,502 @@
+[
+{
+"slug": "microeconometria",
+"h1": "Microeconometría",
+"c": [
+"#5b2a6e",
+"#efe0f5",
+"#c08fd6",
+"#2a1033"
+]
+},
+{
+"slug": "economia-ambiental",
+"h1": "Economía Ambiental",
+"c": [
+"#3c6e1f",
+"#e2f0d6",
+"#94c973",
+"#1a330b"
+]
+},
+{
+"slug": "economia-internacional",
+"h1": "Economía Internacional",
+"c": [
+"#0f6b6b",
+"#d6efef",
+"#6cc6c6",
+"#053030"
+]
+},
+{
+"slug": "contabilidad",
+"h1": "Contabilidad y Análisis Financiero",
+"c": [
+"#4f3a8c",
+"#e6e0f5",
+"#a996e0",
+"#211646"
+]
+},
+{
+"slug": "evaluacion-proyectos",
+"h1": "Evaluación de Proyectos",
+"c": [
+"#1d4f7a",
+"#dbe8f4",
+"#7fb0dc",
+"#0c2236"
+]
+},
+{
+"slug": "desarrollo-economico",
+"h1": "Desarrollo Económico",
+"c": [
+"#7a4b14",
+"#f3e6d2",
+"#d9a65c",
+"#3a2208"
+]
+},
+{
+"slug": "matematicas-3",
+"h1": "Matemáticas III",
+"c": [
+"#7a3420",
+"#f2dbd2",
+"#d98f74",
+"#33150c"
+]
+},
+{
+"slug": "matematicas-2",
+"h1": "Matemáticas II",
+"c": [
+"#9a3d22",
+"#f5ddd3",
+"#e69a7d",
+"#3a1a10"
+]
+},
+{
+"slug": "matematicas-1",
+"h1": "Matemáticas I",
+"c": [
+"#b5501c",
+"#f6e2d6",
+"#f0a070",
+"#3d2618"
+]
+},
+{
+"slug": "finanzas-corporativas",
+"h1": "Finanzas Corporativas",
+"c": [
+"#1f5c4a",
+"#d9eee6",
+"#7cc7ab",
+"#0d2a21"
+]
+},
+{
+"slug": "macroeconomia-3",
+"h1": "Macroeconomía III",
+"c": [
+"#7d2a4a",
+"#f4dde7",
+"#e48fb3",
+"#36101f"
+]
+},
+{
+"slug": "econometria-2",
+"h1": "Econometría II",
+"c": [
+"#2f3f8f",
+"#dde3f6",
+"#8fa2e6",
+"#141c45"
+]
+},
+{
+"slug": "historia-economica",
+"h1": "Historia Económica",
+"c": [
+"#7a4b2a",
+"#f1e3d6",
+"#d9a57c",
+"#33200f"
+]
+},
+{
+"slug": "matematicas-economicas",
+"h1": "Matemáticas para el análisis económico",
+"c": [
+"#2d5d2a",
+"#e0eedb",
+"#8cc47f",
+"#16301a"
+]
+},
+{
+"slug": "metodos-lineales",
+"h1": "Métodos Lineales",
+"c": [
+"#8a3b12",
+"#f6e3d6",
+"#e8a274",
+"#3d1d0b"
+]
+},
+{
+"slug": "estadistica-1",
+"h1": "Estadística I",
+"c": [
+"#1f5f8b",
+"#dcebf6",
+"#86b9e0",
+"#102f45"
+]
+},
+{
+"slug": "estadistica-2",
+"h1": "Estadística II",
+"c": [
+"#0d6e6a",
+"#d4ebe8",
+"#5cc8bd",
+"#143a37"
+]
+},
+{
+"slug": "teoria-juegos",
+"h1": "Teoría de Juegos",
+"c": [
+"#6b3fa0",
+"#ebe1f6",
+"#c3a6f0",
+"#2e2244"
+]
+},
+{
+"slug": "derecho-laboral",
+"h1": "Derecho Laboral y Comercial",
+"c": [
+"#7a5a2e",
+"#efe4d3",
+"#d9b07a",
+"#352a1c"
+]
+},
+{
+"slug": "matematicas",
+"h1": "Matemáticas",
+"c": [
+"#b5501c",
+"#f6e2d6",
+"#f0a070",
+"#3d2618"
+]
+},
+{
+"slug": "principios-micro",
+"h1": "Principios de Microeconomía",
+"c": [
+"#1f6f6b",
+"#d8efec",
+"#7cc7bf",
+"#123b39"
+]
+},
+{
+"slug": "microeconomia-1",
+"h1": "Microeconomía I",
+"c": [
+"#5b3f8c",
+"#e8e0f3",
+"#b29ee0",
+"#2a1d42"
+]
+},
+{
+"slug": "microeconomia-2",
+"h1": "Microeconomía II",
+"c": [
+"#8c5a1f",
+"#f4e7d6",
+"#e0b47c",
+"#3f2810"
+]
+},
+{
+"slug": "principios-macro",
+"h1": "Principios de Macroeconomía",
+"c": [
+"#9e2a3e",
+"#f5dde1",
+"#ec8a9c",
+"#3d1a21"
+]
+},
+{
+"slug": "macroeconomia-2",
+"h1": "Macroeconomía II",
+"c": [
+"#1f5f8b",
+"#dcebf5",
+"#7fb8e0",
+"#16324a"
+]
+},
+{
+"slug": "macroeconomia-1",
+"h1": "Macroeconomía I",
+"c": [
+"#3d6b1f",
+"#e3eed7",
+"#9fd06f",
+"#26341a"
+]
+},
+{
+"slug": "historia-pensamiento",
+"h1": "Historia del Pensamiento Económico",
+"c": [
+"#8a5a12",
+"#f3e6cc",
+"#e0b25e",
+"#3a2a10"
+]
+},
+{
+"slug": "gerencia-financiera",
+"h1": "Gerencia Financiera I",
+"c": [
+"#0f6b4f",
+"#d6eee4",
+"#5fcf9f",
+"#163a2d"
+]
+},
+{
+"slug": "econometria",
+"h1": "Econometría I",
+"c": [
+"#2546a8",
+"#dbe2f5",
+"#7f9cf0",
+"#22305a"
+]
+},
+{
+"slug": "introduccion-economia",
+"h1": "Introducción a la Economía",
+"c": [
+"#a0441b",
+"#f6e2d8",
+"#e59a78",
+"#4a1d0a"
+]
+},
+{
+"slug": "economia-clasica",
+"h1": "Economía Clásica",
+"c": [
+"#7a5a12",
+"#f3ebd6",
+"#d6b469",
+"#382805"
+]
+},
+{
+"slug": "economia-politica",
+"h1": "Economía Política",
+"c": [
+"#8c1c2b",
+"#f5dde0",
+"#e07f8c",
+"#40080f"
+]
+},
+{
+"slug": "fundamentos-administracion",
+"h1": "Fundamentos de Administración",
+"c": [
+"#3d5a80",
+"#dde6f2",
+"#98b4d8",
+"#18263a"
+]
+},
+{
+"slug": "fuentes-investigacion",
+"h1": "Fuentes y Técnicas de Investigación Económica",
+"c": [
+"#386641",
+"#dcefe0",
+"#8fc79a",
+"#14281a"
+]
+},
+{
+"slug": "desarrollo-humano",
+"h1": "Desarrollo Humano",
+"c": [
+"#b5651d",
+"#f8e8d8",
+"#e8b07a",
+"#4d2a0b"
+]
+},
+{
+"slug": "lectoescritura",
+"h1": "Lectoescritura Económica",
+"c": [
+"#5f4b8b",
+"#e9e3f4",
+"#b1a0d6",
+"#2a1f40"
+]
+},
+{
+"slug": "formacion-ciudadana",
+"h1": "Formación Ciudadana y Constitucional",
+"c": [
+"#1f4e79",
+"#dbe7f3",
+"#8ab1d9",
+"#0b223a"
+]
+},
+{
+"slug": "ingles-1",
+"h1": "Inglés I",
+"c": [
+"#2a6f97",
+"#d8ebf5",
+"#7fbfe0",
+"#0c2b3d"
+]
+},
+{
+"slug": "ingles-2",
+"h1": "Inglés II",
+"c": [
+"#2c7a5b",
+"#d8f0e6",
+"#7cc9a8",
+"#0d3326"
+]
+},
+{
+"slug": "ingles-3",
+"h1": "Inglés III",
+"c": [
+"#8a4f9e",
+"#efe0f4",
+"#c79ad6",
+"#3a1f43"
+]
+},
+{
+"slug": "ingles-4",
+"h1": "Inglés IV",
+"c": [
+"#b0413e",
+"#f6dedd",
+"#e39391",
+"#4b1716"
+]
+},
+{
+"slug": "historia-economica-colombia",
+"h1": "Historia Económica de Colombia",
+"c": [
+"#7b3f00",
+"#f4e6d6",
+"#d9a066",
+"#371c00"
+]
+},
+{
+"slug": "epistemologia",
+"h1": "Epistemología de las Ciencias Económicas",
+"c": [
+"#4a4e69",
+"#e3e4ee",
+"#9a8c98",
+"#1f2130"
+]
+},
+{
+"slug": "economia-colombiana",
+"h1": "Economía Colombiana",
+"c": [
+"#b8860b",
+"#f7eed6",
+"#e6c56b",
+"#4d3804"
+]
+},
+{
+"slug": "etica-profesional",
+"h1": "Ética Profesional",
+"c": [
+"#6d597a",
+"#ece6f0",
+"#b8a3c4",
+"#2e2433"
+]
+},
+{
+"slug": "politicas-publicas-salud",
+"h1": "Economía y Políticas Públicas: Salud",
+"c": [
+"#0e7c7b",
+"#d5efef",
+"#6fc2c1",
+"#033534"
+]
+},
+{
+"slug": "negocios-emprendimiento",
+"h1": "Negocios y Emprendimiento",
+"c": [
+"#d1495b",
+"#fae0e3",
+"#ee9aa5",
+"#521a22"
+]
+},
+{
+"slug": "economia-institucional",
+"h1": "Economía Institucional",
+"c": [
+"#5c6b2e",
+"#e8ecd8",
+"#adbd77",
+"#262d12"
+]
+},
+{
+"slug": "finanzas-territoriales",
+"h1": "Finanzas Públicas Territoriales",
+"c": [
+"#8d5524",
+"#f3e3d3",
+"#d6a67c",
+"#3c220c"
+]
+},
+{
+"slug": "monografia",
+"h1": "Monografía de Grado",
+"c": [
+"#264653",
+"#d8e7ec",
+"#7fb3c4",
+"#0d1d23"
+]
+}
+]

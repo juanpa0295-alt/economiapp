@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Arma el sitio de Economiapp en ./docs a partir de los prototipos de cada materia."""
+import html as html_mod
 import json, os, re, shutil, subprocess
 
 S = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +17,15 @@ FORM = json.loads(os.environ["ECONOMIAPP_FORM"]) if os.environ.get("ECONOMIAPP_F
     "action": "https://docs.google.com/forms/d/e/1FAIpQLSf_Muwartu_Od-3A5lhfVu5djis4J4CmnA9RR5VClaW0YpHIg/formResponse",
     "campos": {"materia": "entry.332894674", "utilidad": "entry.467103254", "falta": "entry.1719251696",
                "pago": "entry.1755850544", "contacto": "entry.1508511471"}}
+
+SITIO = "https://economiapp.app"
+def og_tags(path, title, desc, img):
+    e = lambda x: html_mod.escape(x, quote=True)
+    return (f'\n<meta property="og:type" content="website"><meta property="og:site_name" content="Economiapp"><meta property="og:locale" content="es_CO">'
+            f'\n<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">'
+            f'\n<meta property="og:url" content="{SITIO}/{path}"><link rel="canonical" href="{SITIO}/{path}">'
+            f'\n<meta property="og:image" content="{SITIO}/og/{img}.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
+            f'\n<meta name="twitter:card" content="summary_large_image">')
 
 def pwa_tags(base):
     return (f'\n<link rel="manifest" href="{base}manifest.webmanifest">'
@@ -253,7 +263,7 @@ HEAD = '''<!doctype html>
 @media (prefers-color-scheme: dark){{:root:not([data-theme="light"]){{--line:{d};--line-soft:{ds}}}}}
 :root[data-theme="dark"]{{--line:{d};--line-soft:{ds}}}
 </style>
-{mathjax}{analytics}{pwa}
+{mathjax}{analytics}{pwa}{og}
 </head>
 <body>
 '''
@@ -441,7 +451,7 @@ MATERIAS += [dict(slug=g["slug"], key="ruta-" + g["dir"] + "-done", title=g["h1"
 for m in MATERIAS:
     l, ls, d, ds = m["colors"]
     mj = MATHJAX if m.get("mathjax", True) else ""
-    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, analytics=analytics_tag(), pwa=pwa_tags("../"), l=l, ls=ls, d=d, ds=ds)
+    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, analytics=analytics_tag(), pwa=pwa_tags("../"), og=og_tags("materias/" + m["slug"] + ".html", m["h1"] + " · Economiapp", m["desc"][:200], m["slug"] if os.path.exists(os.path.join(S, "og", m["slug"] + ".png")) else "portada"), l=l, ls=ls, d=d, ds=ds)
     if m.get("css"):
         marker = ":root[data-theme=\"dark\"]{--line:" + d + ";--line-soft:" + ds + "}\n</style>"
         assert marker in html
@@ -564,7 +574,7 @@ proximas = []
 idx = open(os.path.join(S, "portada.html"), encoding="utf-8").read()
 idx = idx.replace("/*CATALOGO*/", "const MATERIAS=" + json.dumps(cat, ensure_ascii=False) + ";\nconst PROXIMAS=" + json.dumps(proximas, ensure_ascii=False) + ";\nconst PLAN=" + json.dumps(PLANJ, ensure_ascii=False) + ";")
 idx = idx.replace("</head>", analytics_tag().lstrip() + "\n</head>", 1) if ANALYTICS_ID else idx
-idx = idx.replace("</head>", pwa_tags("./").lstrip() + "\n</head>", 1)
+idx = idx.replace("</head>", pwa_tags("./").lstrip() + og_tags("", "Economiapp · Rutas de estudio para Economía", "Las 49 materias de Economía como líneas de metro: lecciones, laboratorios, simulacros y resolvedores paso a paso. Gratis, instalable y sin internet.", "portada") + "\n</head>", 1)
 wr("index.html", idx)
 wr(".nojekyll", "")
 shutil.copy(os.path.join(S, "LEEME.md"), os.path.join(OUT, "LEEME.md"))
@@ -574,6 +584,13 @@ print({c["slug"]: (len(c["t"]), len(c["b"]), len(c["w"])) for c in cat})
 # App instalable: íconos, manifiesto y service worker (con la lista de todo el sitio)
 import hashlib, re as _re
 wr("comun/app.js", open(os.path.join(S, "app.js"), encoding="utf-8").read())
+# Imágenes para vista previa al compartir (las genera fuente/sitio/og.py con Pillow)
+os.makedirs(os.path.join(OUT, "og"), exist_ok=True)
+for _f in sorted(os.listdir(os.path.join(S, "og"))):
+    if _f.endswith(".png"):
+        shutil.copy(os.path.join(S, "og", _f), os.path.join(OUT, "og", _f))
+open(os.path.join(S, "og", "materias.json"), "w", encoding="utf-8").write(json.dumps(
+    [{"slug": m["slug"], "h1": m["h1"], "c": list(m["colors"])} for m in MATERIAS], ensure_ascii=False, indent=0))
 # Dominio propio (GitHub Pages lo lee de este archivo)
 DOMINIO = "economiapp.app"
 wr("CNAME", DOMINIO + "\n")
@@ -595,7 +612,7 @@ _files, _ext, _h = [], set(), hashlib.sha256()
 for _d, _, _fs in sorted(os.walk(OUT)):
     for _f in sorted(_fs):
         _p = os.path.join(_d, _f); _r = os.path.relpath(_p, OUT).replace(os.sep, "/")
-        if _r in ("sw.js", "LEEME.md"):
+        if _r in ("sw.js", "LEEME.md", "CNAME") or _r.startswith("og/"):
             continue
         _files.append("./" + ("" if _r == "index.html" else _r)); _h.update(_r.encode()); _h.update(open(_p, "rb").read())
         if _r.endswith(".html"):
