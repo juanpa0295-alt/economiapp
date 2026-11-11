@@ -41,6 +41,16 @@ ECONOMIAPP_OUT=/tmp/prueba python3 fuente/sitio/build.py
 
 En cada materia, `content.js` tiene las estaciones (tronco, ramas, talleres) y `labs.js` los laboratorios. Los archivos `extra.js` y `labs_extra.js` agregan las estaciones que alinean un módulo con su programa.
 
+## Estadísticas de visitas
+
+El sitio puede enviar visitas a Google Analytics 4. Para activarlas, pega el ID de medición (empieza por `G-`) en `ANALYTICS_ID` dentro de `sitio/build.py`, o pásalo al generar:
+
+```bash
+ECONOMIAPP_GA=G-XXXXXXXXXX python3 fuente/sitio/build.py
+```
+
+Se registra una vista por página y otra por cada estación que se abre (por ejemplo `/materias/estadistica-2.html#tlc`), así que en Analytics se ve qué temas se estudian más. Con el ID vacío no se carga nada.
+
 ## Pruebas
 
 Requieren Node.js y Playwright (`npm install playwright` dentro de `fuente/pruebas/`).

@@ -8,6 +8,25 @@ OUT = os.environ.get("ECONOMIAPP_OUT") or os.path.join(os.path.dirname(SCR), "do
 ECO = os.path.join(SCR, "eco/original.html")
 rd = lambda p: open(os.path.join(SCR, p), encoding="utf-8").read()
 
+# ---------------------------------------------------------------------
+# Estadísticas de visitas (Google Analytics 4). Pega aquí el «ID de medición»
+# de tu propiedad (empieza por G-). Vacío = el sitio no carga ninguna analítica.
+ANALYTICS_ID = os.environ.get("ECONOMIAPP_GA", "")
+def analytics_tag():
+    if not ANALYTICS_ID:
+        return ""
+    g = ANALYTICS_ID
+    return f'''
+<script async src="https://www.googletagmanager.com/gtag/js?id={g}"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}
+gtag("js",new Date());gtag("config","{g}",{{send_page_view:false,anonymize_ip:true}});
+/* una «vista» por página y por estación (#estacion), para saber qué temas se estudian más */
+(function(){{let last="";const v=()=>{{const p=location.pathname+location.hash;if(p===last)return;last=p;
+gtag("event","page_view",{{page_location:location.href,page_path:p,page_title:document.title}})}};
+v();addEventListener("hashchange",v)}})();
+</script>'''
+
 def wr(rel, txt):
     p = os.path.join(OUT, rel); os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w", encoding="utf-8").write(txt)
@@ -214,7 +233,7 @@ HEAD = '''<!doctype html>
 @media (prefers-color-scheme: dark){{:root:not([data-theme="light"]){{--line:{d};--line-soft:{ds}}}}}
 :root[data-theme="dark"]{{--line:{d};--line-soft:{ds}}}
 </style>
-{mathjax}
+{mathjax}{analytics}
 </head>
 <body>
 '''
@@ -402,7 +421,7 @@ MATERIAS += [dict(slug=g["slug"], key="ruta-" + g["dir"] + "-done", title=g["h1"
 for m in MATERIAS:
     l, ls, d, ds = m["colors"]
     mj = MATHJAX if m.get("mathjax", True) else ""
-    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, l=l, ls=ls, d=d, ds=ds)
+    html = HEAD.format(title=m["title"], desc=m["desc"], fonts=FONTS, mathjax=mj, analytics=analytics_tag(), l=l, ls=ls, d=d, ds=ds)
     if m.get("css"):
         marker = ":root[data-theme=\"dark\"]{--line:" + d + ";--line-soft:" + ds + "}\n</style>"
         assert marker in html
@@ -524,6 +543,7 @@ for c in cat:
 proximas = []
 idx = open(os.path.join(S, "portada.html"), encoding="utf-8").read()
 idx = idx.replace("/*CATALOGO*/", "const MATERIAS=" + json.dumps(cat, ensure_ascii=False) + ";\nconst PROXIMAS=" + json.dumps(proximas, ensure_ascii=False) + ";\nconst PLAN=" + json.dumps(PLANJ, ensure_ascii=False) + ";")
+idx = idx.replace("</head>", analytics_tag().lstrip() + "\n</head>", 1) if ANALYTICS_ID else idx
 wr("index.html", idx)
 wr(".nojekyll", "")
 shutil.copy(os.path.join(S, "LEEME.md"), os.path.join(OUT, "LEEME.md"))
