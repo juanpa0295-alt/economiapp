@@ -170,12 +170,12 @@ SIMS.val=function(){
   watch(["v-f"],run);run();
 };
 
-// ---- Planilla de horas del taller: cada hora en su columna y pago por quincena
+// ---- Planilla de horas del taller: cada hora en su columna y pago por quincena o por el mes completo
 const PLAP={
   ej1:{t:"Taller · Ejercicio 1 (ingresó por primera vez)",ingreso:2,venia:false,salario:2940000,x:"2-4: 8am-5pm\n5: 10pm-7am\n6: descanso\n7-11: 6pm-4am\n12: 1pm-8pm\n13: 2pm-11pm\n14-15: 2pm-11pm\n16-19: 8am-12m, 2pm-7pm\n20-21: 5am-3pm\n22-24: 11am-9pm\n25: permiso remunerado\n26: descanso\n27-28: 10pm-7am\n29-30: incapacidad\n31: 9pm-7am"},
   ej2:{t:"Taller · Ejercicio 2 (venía laborando)",ingreso:1,venia:true,salario:2850000,x:"1-4: 2pm-11pm\n5-6: descanso\n7-9: 9pm-7am\n10-12: sancion\n13-15: 7pm-4am\n16-19: 8am-12m, 2pm-8pm\n20-21: 10am-7pm\n22-23: 10pm-8am\n24: licencia no remunerada\n25: 10pm-8am\n26: incapacidad\n27-28: 2pm-11pm\n29: descanso\n30-31: licencia no remunerada"},
   pedro:{t:"Taller 2026-2 · Pedro, junio de 2026",mes:"2026-06",ingreso:1,venia:true,salario:4250000,n:30,w:"2",f:"8, 15, 29",j:7,d:"0.75",no:"19",x:"# Calendario del taller: el 1 de junio es martes; domingos 6, 13, 20 y 27\n# De lunes a sábado de 2 pm a 10 pm, festivos incluidos; descansa los domingos\n1-5: 2pm-10pm\n7-11: 2pm-10pm\n12-14: licencia no remunerada\n15-19: 2pm-10pm\n21-26: 2pm-10pm\n28-30: 2pm-10pm"},
-  mariana:{t:"Taller · Mariana, octubre de 2026",mes:"2026-10",ingreso:1,venia:true,salario:4950000,n:31,w:"2",f:"7",j:7,d:"0.75",no:"19",x:"# Calendario del taller: el 1 de octubre es martes; domingos 6, 13, 20 y 27; festivo el lunes 7\n# De lunes a viernes de 10 pm a 6 am; los sábados de 10 pm a 5 am; descansa domingos y festivos\n1-4: 10pm-6am\n5: 10pm-5am\n8-11: 10pm-6am\n12: 10pm-5am\n14-18: 10pm-6am\n19: 10pm-5am\n21-25: 10pm-6am\n26: 10pm-5am\n28-29: 10pm-6am\n30-31: licencia no remunerada"},
+  mariana:{t:"Taller · Mariana, octubre de 2026",mes:"2026-10",ingreso:1,venia:true,salario:4950000,n:31,w:"2",f:"7",j:7,d:"0.9",no:"19",x:"# Calendario del taller: el 1 de octubre es martes; domingos 6, 13, 20 y 27; festivo el lunes 7\n# De lunes a viernes de 10 pm a 6 am; los sábados de 10 pm a 5 am; descansa domingos y festivos\n1-4: 10pm-6am\n5: 10pm-5am\n8-11: 10pm-6am\n12: 10pm-5am\n14-18: 10pm-6am\n19: 10pm-5am\n21-25: 10pm-6am\n26: 10pm-5am\n28-29: 10pm-6am\n30-31: licencia no remunerada"},
   vacio:{t:"Empezar en blanco",ingreso:1,venia:true,salario:2000000,x:"1-3: 6am-2pm\n"}};
 const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],DI1="DLMMJVS";
 const hh=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mi=m%60,ap=h<12?"a. m.":"p. m.",h12=h%12===0?12:h%12;return `${h12}:${String(mi).padStart(2,"0")} ${ap}`};
@@ -193,7 +193,8 @@ SIMS.planilla=function(){
   ${selIn("pl-pr","Dominical proporcional (si no cumplió la semana)",[["h","por horas: 7 × horas/42"],["d","por días: 7 × días/6"]],"h")}
   ${selIn("pl-in","Incapacidad (días 1 y 2)",[["2/3","2/3 del día (art. 227)"],["1","día completo"]],"2/3")}
   ${selIn("pl-ax","Auxilio de transporte",[["0","no incluir"],["1","incluir si gana hasta 2 SMMLV"]],"0")}
-  ${selIn("pl-de","Deducciones",[["0","no descontar"],["1","salud 4 % y pensión 4 %"]],"0")}</div></details>
+  ${selIn("pl-de","Deducciones",[["0","no descontar"],["1","salud 4 % y pensión 4 %"]],"0")}
+  ${selIn("pl-pe","Liquidar el pago por",[["q","quincenas (1 a 15 y 16 a fin de mes)"],["m","mes completo"]],"q")}</div></details>
   <label for="pl-tx" style="display:block;font-size:13px;margin-top:6px"><b>Novedades del mes</b>, una por línea: «días: horario» o «días: novedad». Horarios: <code>8am-5pm</code>, <code>10:00pm-7:00am</code>, <code>8am-12m, 2pm-7pm</code>. Novedades: <code>descanso</code>, <code>permiso remunerado</code>, <code>incapacidad</code>, <code>sancion</code>, <code>licencia no remunerada</code>, <code>vacaciones</code>. Los domingos y festivos que no escribas se toman como descanso.</label>
   <textarea id="pl-tx" class="pltx" rows="10" spellcheck="false"></textarea><div id="pl-out" class="slv-out"></div>`;
   const load=k=>{const p=PLAP[k];$("pl-pre").value=k;$("pl-tx").value=p.x;$("pl-s").value=p.salario;$("pl-v").value=p.venia?"v":"n";$("pl-i").value=p.ingreso;$("pl-n").value=p.n||31;$("pl-w").value=p.w||"2";$("pl-f").value=p.f||"1, 14, 21";$("pl-j").value=p.j||7;$("pl-d").value=p.d||"0.9";$("pl-no").value=p.no||"19";$("pl-mes").value=p.mes||""};
@@ -218,12 +219,14 @@ SIMS.planilla=function(){
       if(row.trabajo){const ex=["HED","HEN","HEDD","HEND"].reduce((q,k)=>q+row.h[k],0);if(ex>2)t.push(`Son ${hN(ex)} horas extra: pasan el máximo legal de 2 al día, pero se pagan igual.`);if(row.h.D0)t.push(`${hN(row.h.D0)} h diurnas ordinarias del día 31 no suman: ya las paga el salario.`)}
       t.push(...row.notas.map(z=>z.charAt(0).toUpperCase()+z.slice(1)+"."));return t};
     const rowH=row=>`<tr class="${row.dom?"pdom":""}"><td><b>${row.d}</b> ${DI1[row.dow]}${row.fest?" F":""}</td>${C.map(k=>`<td class="num">${hN(row.h[k])}</td>`).join("")}<td class="pnota">${corto(row)}</td></tr>`;
-    const sub=(i,lab)=>`<tr class="psub"><td>${lab}</td>${C.map(k=>`<td class="num">${hN(r.tot[i].h[k])}</td>`).join("")}<td>${i===1&&r.extra30?`incluye ${hN(r.extra30)} h para completar 30 días`:""}</td></tr>`;
-    let tab=`<div class="tbl ptab"><table>${head}${r.rows.filter(x=>x.d<=15).map(rowH).join("")}${sub(0,"1.ª quincena")}${r.rows.filter(x=>x.d>15).map(rowH).join("")}${sub(1,"2.ª quincena")}</table></div>`;
+    const mes=$("pl-pe").value==="m",TM={h:Object.fromEntries(C.map(k=>[k,r.tot[0].h[k]+r.tot[1].h[k]])),val:Object.fromEntries(C.map(k=>[k,r.tot[0].val[k]+r.tot[1].val[k]])),total:r.tot[0].total+r.tot[1].total};
+    const sub=(t,lab,x30)=>`<tr class="psub"><td>${lab}</td>${C.map(k=>`<td class="num">${hN(t.h[k])}</td>`).join("")}<td>${x30&&r.extra30?`incluye ${hN(r.extra30)} h para completar 30 días`:""}</td></tr>`;
+    let tab=mes?`<div class="tbl ptab"><table>${head}${r.rows.map(rowH).join("")}${sub(TM,"Total del mes",true)}</table></div>`
+      :`<div class="tbl ptab"><table>${head}${r.rows.filter(x=>x.d<=15).map(rowH).join("")}${sub(r.tot[0],"1.ª quincena")}${r.rows.filter(x=>x.d>15).map(rowH).join("")}${sub(r.tot[1],"2.ª quincena",true)}</table></div>`;
     // pago
     const aux=$("pl-ax").value==="1"&&sal<=2*V0.smmlv,ded=$("pl-de").value==="1";
-    const diasAux=q=>r.rows.filter(x=>(q?x.d>15:x.d<=15)&&x.d<=30&&x.tipo==="trabajo").length;
-    const pago=i=>{const t=r.tot[i];const ax=aux?V0.aux/30*diasAux(i):0,dd=ded?t.total*0.08:0;
+    const diasAux=q=>r.rows.filter(x=>(q==="m"?true:q?x.d>15:x.d<=15)&&x.d<=30&&x.tipo==="trabajo").length;
+    const pago=i=>{const t=i==="m"?TM:r.tot[i];const ax=aux?V0.aux/30*diasAux(i):0,dd=ded?t.total*0.08:0;
       return `<div class="tbl"><table><tr><th>Columna</th><th>Horas</th><th>Factor</th><th>Valor de la hora × factor</th><th>Valor</th></tr>${C.filter(k=>t.h[k]).map(k=>`<tr><td>${k} · ${LAB.NOMCOL[k]}</td><td class="num">${hN(t.h[k])}</td><td class="num">${fmt(F[k],2)}</td><td class="num">${$c(r.vh*F[k])}</td><td class="num">${$p(t.val[k])}</td></tr>`).join("")}
       <tr class="psub"><td>Total por horas</td><td class="num">${hN(C.reduce((s,k)=>s+t.h[k],0))}</td><td></td><td></td><td class="num">${$p(t.total)}</td></tr>
       ${aux?`<tr><td>Auxilio de transporte (${diasAux(i)} días trabajados)</td><td></td><td></td><td></td><td class="num">${$p(ax)}</td></tr>`:""}${ded?`<tr><td>Salud y pensión (8 % de lo que no es auxilio)</td><td></td><td></td><td></td><td class="num">−${$p(dd)}</td></tr>`:""}
@@ -233,10 +236,11 @@ SIMS.planilla=function(){
       return `<details class="pdet"><summary>Día ${row.d} (${DIAS[row.dow]}${row.fest?", festivo":""})${row.trabajo?"":" · "+corto(row)}</summary>${segs}${largo(row).map(z=>`<p class="hint">${z}</p>`).join("")}${row.base==="comp"?`<p class="hint">Como descansa en la semana siguiente, las horas ordinarias de este turno llevan solo el recargo: RDD de día, RND de noche y RN si el turno pasa a un día hábil. El domingo igual suma sus horas de descanso en HD, y el día de descanso también se paga.</p>`:""}${row.base==="31"?`<p class="hint">El salario mensual cubre 30 días: en el 31 las ordinarias diurnas no suman, las nocturnas llevan solo el recargo (RN o RND) y las extra se pagan completas.</p>`:""}</details>`}).join("");
     out.innerHTML=`<div class="stepc"><h4><span class="n">1</span>Calendario</h4>${cal}<p class="hint">Sombreados: domingos y festivos. Valor de la hora ordinaria: ${$p(sal)} / (${hN(J)} × 30) = <b>${$c(r.vh)}</b>.</p></div>
     <div class="stepc"><h4><span class="n">2</span>Planilla de horas</h4><p class="hint">Cada turno se asigna a la fila del día en que empieza. Cada franja se clasifica por el día en que cae: lo que pasa de medianoche a un domingo o festivo es dominical. Las primeras ${hN(J)} horas del turno son ordinarias y el resto son extra.</p>${tab}</div>
-    <div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
-    <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>
+    ${mes?`<div class="stepc"><h4><span class="n">3</span>Pago del mes completo (días 1 a ${n})</h4>${pago("m")}<div class="verdict acc">Total del mes por horas: ${$p(TM.total)}</div></div>`
+    :`<div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
+    <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>`}
     ${botonEnvio("pl-send",`Lleva el total de este mes (${$p(r.tot[0].total+r.tot[1].total)}) y sus ${r.rows.filter(x=>x.d<=30&&(x.tipo==="licencia"||x.tipo==="sancion")).length} días de licencia o suspensión (art. 51) al renglón del mes en la liquidación de prestaciones.`)}
-    <div class="stepc"><h4><span class="n">5</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
+    <div class="stepc"><h4><span class="n">${mes?4:5}</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
   const pre=window.TOOL_PRE;window.TOOL_PRE=null;const cP=PLAP[pre]?(CASO_PRE[pre]&&CASO.taller(pre),null):CASO.dePre(pre),viaPre=!!(pre&&PLAP[pre])||!!cP;load(PLAP[pre]?pre:"ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
   $("sim").addEventListener("click",e=>{if(e.target.id!=="pl-send")return;const mm=$("pl-send-m"),v=$("pl-mes").value;
@@ -249,7 +253,7 @@ SIMS.planilla=function(){
     mm.innerHTML=` Listo: ${MESN[m-1]} de ${y} quedó para la liquidación. <button class="btn" type="button" data-go="liquidacion">Ir a la liquidación →</button>`});
   $("pl-mes").addEventListener("change",()=>{const v=$("pl-mes").value;if(!/^\d{4}-\d{2}$/.test(v))return;const [y,m]=v.split("-").map(Number);
     $("pl-n").value=new Date(Date.UTC(y,m,0)).getUTCDate();$("pl-w").value=String(new Date(Date.UTC(y,m-1,1)).getUTCDay());run()});
-  const PIDS=["pl-pre","pl-mes","pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-tx"];
+  const PIDS=["pl-pre","pl-mes","pl-n","pl-w","pl-f","pl-v","pl-i","pl-s","pl-j","pl-d","pl-no","pl-pd","pl-pr","pl-dt","pl-in","pl-ax","pl-de","pl-pe","pl-tx"];
   watch(PIDS.slice(1),run);run();
   guardados("planilla",{get:formGet(PIDS),set:formSet(PIDS,run),label:"Planilla",restore:!viaPre});
   const deCaso=c=>{const q=c.planilla||{};if(q.state)formSet(PIDS,run)(q.state);else if(q.pre&&PLAP[q.pre]){load(q.pre);run()}else{$("pl-s").value=c.salario;run()}};
@@ -399,7 +403,7 @@ CASO.finPactado=c=>{const ini=LAB.parse(c.ingreso),ret=LAB.parse(c.retiro);if(!i
 // ---- casos de los talleres
 const CASO_PRE={};
 (()=>{const m={};for(let k=1;k<=12;k++)m["2025-"+k]=[3725000,k>=9?175000:0,k===5?30:0,k===5?"Sanción disciplinaria (art. 51)":k>=9?"Horas extra: devengó 3.900.000":""];
-  for(let k=1;k<=10;k++)m["2026-"+k]=[4950000,k===10?2234571.43:0,k>=4&&k<=6?30:k===10?2:0,k>=4&&k<=6?"Suspensión por razones técnicas (art. 51)":k===10?"Planilla de octubre: 7.184.571,43; licencia 30 y 31":""];
+  for(let k=1;k<=10;k++)m["2026-"+k]=[4950000,k===10?2305285.71:0,k>=4&&k<=6?30:k===10?2:0,k>=4&&k<=6?"Suspensión por razones técnicas (art. 51)":k===10?"Planilla de octubre: 7.255.285,71; licencia 30 y 31":""];
   CASO_PRE.mariana={id:"mariana",nombre:"Mariana (taller)",tipo:"fijo",ingreso:"2023-11-08",retiro:"2026-10-31",durM:8,durD:15,modo:"360",salario:4950000,desde:"2025-01-01",vacDesde:"2025-01-01",disfrutados:0,meses:m,pagos:{prima:false,ces:false,int:false},planilla:{pre:"mariana"},res:{}};
   const p={};[1,2,3,4,8,9,10,11,12].forEach(k=>p["2025-"+k]=[1835000,2000000,0,"Comisiones"]);p["2025-5"]=[1835000,4000000,0,"Comisiones"];p["2025-6"]=[1835000,0,30,"Suspensión"];p["2025-7"]=[1835000,0,30,"Suspensión"];
   [1,2,3,5,7].forEach(k=>p["2026-"+k]=[4250000,0,0,""]);p["2026-4"]=[4250000,0,30,"Suspensión"];p["2026-6"]=[4250000,1198094,3,"Junio de la solución de clase: 5.448.094"];p["2026-8"]=[4250000,0,30,"Licencia no remunerada"];

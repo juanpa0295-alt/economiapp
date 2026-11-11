@@ -321,7 +321,7 @@ puntos:[
 enun:String.raw`<p>En octubre de 2026 Mariana laboró de 10 pm a 6 am de lunes a viernes y los sábados de 10 pm a 5 am; descansaba los domingos y festivos. El 30 y el 31 de octubre pidió licencia no remunerada. Su salario es $4.950.000. ¿Cuál es el salario que le corresponde por octubre?</p>`,
 saber:[String.raw`<b>Calendario del taller:</b> el 1 de octubre cae <b>martes</b>. Domingos: 6, 13, 20 y 27. Festivo: <b>lunes 7</b> (así viene marcado en la hoja). El 30 es miércoles y el 31 jueves.`,
 String.raw`<b>Jornada:</b> 7 horas diarias (42 semanales desde el 15 de julio de 2026); lo que pase de 7 horas en el turno es extra. <b>Nocturna:</b> de 7:00 pm a 6:00 am, así que todo el turno es nocturno.`,
-String.raw`<b>Tabla del taller:</b> HN 1,35 · HEN 1,75 · HND 2,10 (recargo dominical del 75 %, como en la tabla del taller de Pedro). Con el 90 % legal desde el 1 de julio de 2026, HND sería 2,25.`,
+String.raw`<b>Tabla del taller:</b> HN 1,35 · RN 0,35 · HED 1,25 · HEN 1,75 · HDD 1,90 · RD 0,90 · HND 2,25 · RND 1,25 · HEDD 2,15 · HEND 2,65. Es el recargo dominical del <b>90 %</b>, el legal desde el 1 de julio de 2026.`,
 String.raw`<b>Valor de la hora:</b> 4.950.000 / (7 × 30) = 23.571,43.`,
 String.raw`<b>Turno del sábado:</b> de 10 pm a 12 am es sábado (HN); de 12 am a 5 am ya es domingo: horas <b>nocturnas dominicales completas</b> (HND), porque la base del turno es la del sábado.`,
 String.raw`<b>Licencia no remunerada (art. 51):</b> suspende el contrato. El día 30 no se paga; el 31 <b>resta 7 horas</b>, porque el salario mensual ya lo incluía. No afecta ningún domingo del mes.`],
@@ -334,16 +334,16 @@ sol:String.raw`<ol class="steps"><li><b>Lunes a viernes</b> (10 pm – 6 am, 8 h
 <tr><td>HD</td><td class="num">28</td><td class="num">1</td><td class="num">660.000,00</td></tr>
 <tr><td>HN</td><td class="num">148</td><td class="num">1,35</td><td class="num">4.709.571,43</td></tr>
 <tr><td>HEN</td><td class="num">20</td><td class="num">1,75</td><td class="num">825.000,00</td></tr>
-<tr><td>HND</td><td class="num">20</td><td class="num">2,10</td><td class="num">990.000,00</td></tr>
-<tr><td><b>Total</b></td><td></td><td></td><td class="num"><b>7.184.571,43</b></td></tr></table></div></li>
+<tr><td>HND</td><td class="num">20</td><td class="num">2,25</td><td class="num">1.060.714,29</td></tr>
+<tr><td><b>Total</b></td><td></td><td></td><td class="num"><b>7.255.285,71</b></td></tr></table></div></li>
 <li><b>Comprobación:</b> las horas base son 28 HD + 148 HN + 20 HND = 196 = 28 días × 7 (los 30 días del mes menos los 2 de licencia). Sin recargos ni extras habría ganado 4.950.000 × 28/30 = 4.620.000.</li></ol>
-<p class="hint">No tiene auxilio de transporte: gana más de 2 SMMLV. Con el recargo dominical legal del 90 %, el total sería $7.255.285,71. El calendario real de 2026 es distinto (el 1 de octubre es jueves y el festivo es el 12); se usa el de la hoja del taller.</p>`,
-res:String.raw`<p>Salario de octubre de 2026: <b>$7.184.571,43</b> (28 HD, 148 HN, 20 HEN y 20 HND), con la tabla del taller (75 %), jornada de 7 horas y nocturna desde las 7 pm.</p>`},
+<p class="hint">No tiene auxilio de transporte: gana más de 2 SMMLV. Con la tabla del 75 % (la del taller de Pedro), el total sería $7.184.571,43. En el resolvedor puedes ver la planilla por quincenas o por el mes completo. El calendario real de 2026 es distinto (el 1 de octubre es jueves y el festivo es el 12); se usa el de la hoja del taller.</p>`,
+res:String.raw`<p>Salario de octubre de 2026: <b>$7.255.285,71</b> (28 HD, 148 HN, 20 HEN y 20 HND), con la tabla del examen (90 %), jornada de 7 horas y nocturna desde las 7 pm.</p>`},
 
 {id:"mar-2",n:"2",t:"Liquidación de las prestaciones sociales desde 2025",tipo:"Liquidación",temas:["prima","cesantias","liquidacion"],tool:{id:"liquidacion",pre:"mariana",lbl:"Abrir la liquidación de Mariana"},
 enun:String.raw`<p>Liquide las prestaciones sociales a que tiene derecho Mariana, teniendo en cuenta que al momento de su retiro le adeudan todas las prestaciones desde 2025.</p>`,
 saber:[String.raw`<b>Datos de 2025:</b> básico 3.725.000; devengó 3.725.000 de enero a abril y de junio a agosto; <b>mayo suspendida</b> por sanción (30 días); de septiembre a diciembre 3.900.000 por horas extras.`,
-String.raw`<b>Datos de 2026:</b> básico 4.950.000; enero a marzo 4.950.000; <b>abril a junio suspendida</b> por razones técnicas (90 días); julio a septiembre 4.950.000; octubre <b>7.184.571,43</b> (punto 1) con 2 días de licencia.`,
+String.raw`<b>Datos de 2026:</b> básico 4.950.000; enero a marzo 4.950.000; <b>abril a junio suspendida</b> por razones técnicas (90 días); julio a septiembre 4.950.000; octubre <b>7.255.285,71</b> (punto 1) con 2 días de licencia.`,
 String.raw`<b>Sin auxilio de transporte:</b> en 2025 y 2026 su básico supera 2 SMMLV (2.847.000 y 3.501.810).`,
 String.raw`<b>Base (como en clase):</b> si los tres últimos meses del periodo son iguales, el salario de ese mes; si no, el promedio de todos los meses del periodo, con los meses suspendidos en 0. Si alguno de los tres últimos está suspendido, ya no son iguales.`,
 String.raw`<b>Fórmulas:</b> prima y cesantías = base × (días − días art. 51) / 360; intereses = cesantías × días × 12 % / 360. <b>Moras:</b> un día de salario básico del periodo (truncado) por cada día de retraso hasta el retiro: primas desde el 1 de julio y el 21 de diciembre, cesantías desde el 15 de febrero; intereses no pagados al 31 de enero se pagan dobles.`],
@@ -354,16 +354,16 @@ sol:String.raw`<h5>2025 (básico 3.725.000 → diario 124.166)</h5><ol class="st
 <li><b>Intereses:</b> 3.575.000 × 330 × 12 % / 360 = <b>393.250</b>; no se pagaron al 31 de enero de 2026, así que la sanción es otro tanto: <b>393.250</b>.</li></ol>
 <h5>2026 (básico 4.950.000 → diario 165.000)</h5><ol class="steps">
 <li><b>Prima 1:</b> 1/1/26 – 30/6/26 = 180 − 90 = 90 días. Abril a junio están suspendidos: base = (3 × 4.950.000 + 0 + 0 + 0)/6 = 2.475.000. 2.475.000 × 90/360 = <b>618.750</b>. Mora: 1/7/26 – 31/10/26 = 120 × 165.000 = <b>19.800.000</b>.</li>
-<li><b>Prima 2:</b> 1/7/26 – 31/10/26 = 120 − 2 = 118 días. Base = (3 × 4.950.000 + 7.184.571,43)/4 = 5.508.642,86. 5.508.642,86 × 118/360 = <b>1.805.611</b>, con la liquidación.</li>
-<li><b>Cesantías:</b> 1/1/26 – 31/10/26 = 300 − 92 = 208 días. Base = (6 × 4.950.000 + 3 × 0 + 7.184.571,43)/10 = 3.688.457,14. 3.688.457,14 × 208/360 = <b>2.131.109</b>, con la liquidación.</li>
-<li><b>Intereses:</b> 2.131.109 × 208 × 12 % / 360 = <b>147.757</b>, con la liquidación.</li></ol>
+<li><b>Prima 2:</b> 1/7/26 – 31/10/26 = 120 − 2 = 118 días. Base = (3 × 4.950.000 + 7.255.285,71)/4 = 5.526.321,43. 5.526.321,43 × 118/360 = <b>1.811.405</b>, con la liquidación.</li>
+<li><b>Cesantías:</b> 1/1/26 – 31/10/26 = 300 − 92 = 208 días. Base = (6 × 4.950.000 + 3 × 0 + 7.255.285,71)/10 = 3.695.528,57. 3.695.528,57 × 208/360 = <b>2.135.194</b>, con la liquidación.</li>
+<li><b>Intereses:</b> 2.135.194 × 208 × 12 % / 360 = <b>148.040</b>, con la liquidación.</li></ol>
 <h5>Resumen</h5><div class="tbl"><table><tr><th>Concepto</th><th class="num">Valor</th></tr>
-<tr><td>Primas (cuatro semestres)</td><td class="num">5.667.764</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.706.109</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">541.007</td></tr>
-<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>11.914.880</b></td></tr>
+<tr><td>Primas (cuatro semestres)</td><td class="num">5.673.558</td></tr><tr><td>Cesantías 2025 y 2026</td><td class="num">5.710.194</td></tr><tr><td>Intereses sobre cesantías</td><td class="num">541.290</td></tr>
+<tr><td><b>Prestaciones sociales</b></td><td class="num"><b>11.925.042</b></td></tr>
 <tr><td>Mora de las primas</td><td class="num">117.891.140</td></tr><tr><td>Mora por no consignar las cesantías de 2025</td><td class="num">31.786.496</td></tr><tr><td>Sanción por no pagar los intereses de 2025</td><td class="num">393.250</td></tr>
-<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>161.985.766</b></td></tr></table></div>
+<tr><td><b>Total con moras y sanciones</b></td><td class="num"><b>161.995.928</b></td></tr></table></div>
 <p class="hint"><b>Supuestos que conviene confirmar con la profesora:</b> (1) en la prima 1 de 2026 los tres últimos meses están suspendidos; aquí se usa el promedio con ceros, como hizo ella con Pedro. Si se tomara el salario de 4.950.000, la prima daría 1.237.500. (2) La licencia del 30 y el 31 se cuenta como 2 días del art. 51. (3) La mora se liquida con el básico del año que se debe. Las vacaciones no son prestación social: van aparte (punto extra).</p>`,
-res:String.raw`<p>Prestaciones adeudadas: <b>$11.914.880</b> (primas 5.667.764, cesantías 5.706.109 e intereses 541.007). Con las moras y la sanción por intereses, el total es <b>$161.985.766</b>.</p>`},
+res:String.raw`<p>Prestaciones adeudadas: <b>$11.925.042</b> (primas 5.673.558, cesantías 5.710.194 e intereses 541.290). Con las moras y la sanción por intereses, el total es <b>$161.995.928</b>.</p>`},
 
 {id:"mar-3",n:"3",t:"Indemnización por despido sin justa causa (contrato a término fijo)",tipo:"Prórrogas e indemnización",temas:["prorrogas","indemnizaciones"],tool:{id:"indemnizaciones",pre:"mariana",lbl:"Abrir la indemnización de Mariana"},
 enun:String.raw`<p>Realice la indemnización por despido sin justa causa a que tiene derecho Mariana.</p>`,

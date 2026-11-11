@@ -20,7 +20,7 @@ CASO.finPactado=c=>{const ini=LAB.parse(c.ingreso),ret=LAB.parse(c.retiro);if(!i
 // ---- casos de los talleres
 const CASO_PRE={};
 (()=>{const m={};for(let k=1;k<=12;k++)m["2025-"+k]=[3725000,k>=9?175000:0,k===5?30:0,k===5?"Sanción disciplinaria (art. 51)":k>=9?"Horas extra: devengó 3.900.000":""];
-  for(let k=1;k<=10;k++)m["2026-"+k]=[4950000,k===10?2234571.43:0,k>=4&&k<=6?30:k===10?2:0,k>=4&&k<=6?"Suspensión por razones técnicas (art. 51)":k===10?"Planilla de octubre: 7.184.571,43; licencia 30 y 31":""];
+  for(let k=1;k<=10;k++)m["2026-"+k]=[4950000,k===10?2305285.71:0,k>=4&&k<=6?30:k===10?2:0,k>=4&&k<=6?"Suspensión por razones técnicas (art. 51)":k===10?"Planilla de octubre: 7.255.285,71; licencia 30 y 31":""];
   CASO_PRE.mariana={id:"mariana",nombre:"Mariana (taller)",tipo:"fijo",ingreso:"2023-11-08",retiro:"2026-10-31",durM:8,durD:15,modo:"360",salario:4950000,desde:"2025-01-01",vacDesde:"2025-01-01",disfrutados:0,meses:m,pagos:{prima:false,ces:false,int:false},planilla:{pre:"mariana"},res:{}};
   const p={};[1,2,3,4,8,9,10,11,12].forEach(k=>p["2025-"+k]=[1835000,2000000,0,"Comisiones"]);p["2025-5"]=[1835000,4000000,0,"Comisiones"];p["2025-6"]=[1835000,0,30,"Suspensión"];p["2025-7"]=[1835000,0,30,"Suspensión"];
   [1,2,3,5,7].forEach(k=>p["2026-"+k]=[4250000,0,0,""]);p["2026-4"]=[4250000,0,30,"Suspensión"];p["2026-6"]=[4250000,1198094,3,"Junio de la solución de clase: 5.448.094"];p["2026-8"]=[4250000,0,30,"Licencia no remunerada"];
