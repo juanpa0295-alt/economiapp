@@ -10,13 +10,18 @@ rd = lambda p: open(os.path.join(SCR, p), encoding="utf-8").read()
 
 # ---------------------------------------------------------------------
 # App instalable (PWA): manifiesto, íconos y service worker para usarla sin internet.
+# Formulario de opiniones (Google Forms). «action» termina en /formResponse; «campos» son los entry.NNN de cada pregunta.
+# Vacío = el botón «Opinar» no aparece.
+FORM = json.loads(os.environ["ECONOMIAPP_FORM"]) if os.environ.get("ECONOMIAPP_FORM") else {"action": "", "campos": {}}
+
 def pwa_tags(base):
     return (f'\n<link rel="manifest" href="{base}manifest.webmanifest">'
             f'\n<meta name="theme-color" content="#1b2430">'
             f'\n<link rel="icon" type="image/png" href="{base}iconos/favicon-48.png">'
             f'\n<link rel="apple-touch-icon" href="{base}iconos/apple-touch-icon.png">'
             f'\n<meta name="apple-mobile-web-app-title" content="Economiapp">'
-            f'\n<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("{base}sw.js").catch(()=>{{}}))</script>')
+            f'\n<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("{base}sw.js").catch(()=>{{}}))</script>'
+            f'\n<script>window.ECO={json.dumps({"form": FORM}, ensure_ascii=False)}</script><script defer src="{base}comun/app.js"></script>')
 
 # ---------------------------------------------------------------------
 # Estadísticas de visitas (Google Analytics 4). Pega aquí el «ID de medición»
@@ -35,7 +40,7 @@ gtag("js",new Date());gtag("config","{g}",{{send_page_view:false,anonymize_ip:tr
    para que el informe «Páginas y pantallas» muestre qué temas se estudian más */
 (function(){{let last="";const v=()=>{{const h=location.hash.replace(/^#/,"").split(/[?&]/)[0],p=h?location.pathname.replace(/\\.html$/,"")+"/"+encodeURIComponent(h):location.pathname;if(p===last)return;last=p;
 const t=document.querySelector("h2")&&h?document.title.split(" · ")[0]+" · "+(document.querySelector("h2").textContent||h):document.title;
-gtag("event","page_view",{{page_location:location.origin+p,page_title:t}})}};
+gtag("event","page_view",{{page_location:location.origin+p+location.search,page_title:t}})}};
 setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))}})();
 </script>'''
 
@@ -565,6 +570,7 @@ print({c["slug"]: (len(c["t"]), len(c["b"]), len(c["w"])) for c in cat})
 # ---------------------------------------------------------------------
 # App instalable: íconos, manifiesto y service worker (con la lista de todo el sitio)
 import hashlib, re as _re
+wr("comun/app.js", open(os.path.join(S, "app.js"), encoding="utf-8").read())
 os.makedirs(os.path.join(OUT, "iconos"), exist_ok=True)
 for _f in sorted(os.listdir(os.path.join(S, "iconos"))):
     shutil.copy(os.path.join(S, "iconos", _f), os.path.join(OUT, "iconos", _f))
