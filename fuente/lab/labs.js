@@ -238,7 +238,7 @@ SIMS.planilla=function(){
     ${mes?`<div class="stepc"><h4><span class="n">3</span>Pago del mes completo (días 1 a ${n})</h4>${pago("m")}<div class="verdict acc">Total del mes por horas: ${$p(TM.total)}</div></div>`
     :`<div class="stepc"><h4><span class="n">3</span>Pago de la primera quincena (días 1 a 15)</h4>${pago(0)}</div>
     <div class="stepc"><h4><span class="n">4</span>Pago de la segunda quincena (días 16 a ${n})</h4>${pago(1)}<div class="verdict acc">Total del mes por horas: ${$p(r.tot[0].total+r.tot[1].total)}</div></div>`}
-    ${botonEnvio("pl-send",`Lleva el total de este mes (${$p(r.tot[0].total+r.tot[1].total)}) y sus ${r.rows.filter(x=>x.d<=30&&(x.tipo==="licencia"||x.tipo==="sancion")).length} días de licencia o suspensión (art. 51) al renglón del mes en la liquidación de prestaciones.`)}
+    ${botonEnvio("pl-send",`Lleva el total de este mes (${$p(r.tot[0].total+r.tot[1].total)}) y sus ${Math.min(30,r.rows.filter(x=>x.tipo==="licencia"||x.tipo==="sancion").length)} días de licencia o suspensión (art. 51) al renglón del mes en la liquidación de prestaciones.`)}
     <div class="stepc"><h4><span class="n">${mes?4:5}</span>Detalle de cada día</h4><p class="hint">Abre un día para ver cada franja del turno, en qué columna quedó y por qué.</p>${det}</div>`};
   const pre=window.TOOL_PRE;window.TOOL_PRE=null;const cP=PLAP[pre]?(CASO_PRE[pre]&&CASO.taller(pre),null):CASO.dePre(pre),viaPre=!!(pre&&PLAP[pre])||!!cP;load(PLAP[pre]?pre:"ej1");
   $("pl-pre").addEventListener("change",()=>{load($("pl-pre").value);run()});
@@ -247,7 +247,7 @@ SIMS.planilla=function(){
     const n=Math.round(N("pl-n")),sal=N("pl-s"),p=LAB.parsePlanilla($("pl-tx").value,n);if(p.errs.length)return;
     const fs=($("pl-f").value.match(/\d+/g)||[]).map(Number).filter(d=>d>=1&&d<=n),V0=LAB.valores({y:2026,m:10,d:1}),venia=$("pl-v").value==="v";
     const r=LAB.planilla({ndias:n,dow1:+$("pl-w").value,festivos:fs,ingreso:venia?1:Math.round(N("pl-i")),venia,salario:sal,jornada:N("pl-j"),d:+$("pl-d").value,noct:+$("pl-no").value,smmlv:V0.smmlv,pierde:$("pl-pd").value==="1",propHoras:$("pl-pr").value==="h",domTrab:$("pl-dt").value,ndiasPrev:30,incap:$("pl-in").value==="2/3"?2/3:1},p.rec);
-    const tot=r.tot[0].total+r.tot[1].total,a51=r.rows.filter(x=>x.d<=30&&(x.tipo==="licencia"||x.tipo==="sancion")).length,[y,m]=v.split("-").map(Number);
+    const tot=r.tot[0].total+r.tot[1].total,a51=Math.min(30,r.rows.filter(x=>x.tipo==="licencia"||x.tipo==="sancion").length),[y,m]=v.split("-").map(Number);
     enviarALiq({y,m,basico:sal,extra:Math.round((tot-sal)*100)/100,art51:a51,nota:`Planilla: ${$p(tot)}${a51?`, ${a51} días art. 51`:""}`,origen:"el resolvedor de horas extras"});
     mm.innerHTML=` Listo: ${MESN[m-1]} de ${y} quedó para la liquidación. <button class="btn" type="button" data-go="liquidacion">Ir a la liquidación →</button>`});
   $("pl-mes").addEventListener("change",()=>{const v=$("pl-mes").value;if(!/^\d{4}-\d{2}$/.test(v))return;const [y,m]=v.split("-").map(Number);
@@ -377,5 +377,5 @@ SIMS.liq=function(){
   const env=tomarEnvios();if(env.length){read();const a=D("lq-ini"),b=D("lq-ret"),k0=a?a.y*12+a.m:0,k1=b?b.y*12+b.m:0,dentro=[],fuera=[];
     env.forEach(x=>{vals[x.y+"-"+x.m]=[x.basico,x.extra,x.art51,x.nota];(x.y*12+x.m>=k0&&x.y*12+x.m<=k1?dentro:fuera).push(x)});
     $("lq-m").innerHTML="";draw();$("sim").dispatchEvent(new Event("change"));
-    $("lq-env").innerHTML=`<div class="okbox">${dentro.length?`Llegó desde ${dentro[0].origen}: ${dentro.map(x=>`<b>${MESN[x.m-1]} de ${x.y}</b> (devengado ${$p(x.basico+x.extra)}${x.art51?`, ${x.art51} días del art. 51`:""})`).join("; ")}. Revisa su renglón en la tabla.`:""}${fuera.length?` ${fuera.map(x=>`${MESN[x.m-1]} de ${x.y}`).join(", ")} está fuera de las fechas de esta liquidación: ajusta la fecha de inicio o de retiro y aparecerá con sus datos.`:""}</div>`}
+    $("lq-env").innerHTML=`<div class="okbox">${dentro.length?`Llegó desde ${dentro[0].origen}: ${dentro.map(x=>`<b>${MESN[x.m-1]} de ${x.y}</b> (devengado ${$p(x.basico+x.extra)}${x.art51?`, ${x.art51} día${x.art51===1?"":"s"} del art. 51`:""})`).join("; ")}. Revisa su renglón en la tabla.`:""}${fuera.length?` ${fuera.map(x=>`${MESN[x.m-1]} de ${x.y}`).join(", ")} está fuera de las fechas de esta liquidación: ajusta la fecha de inicio o de retiro y aparecerá con sus datos.`:""}</div>`}
 };
