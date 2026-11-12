@@ -73,13 +73,31 @@ function guardados(key,{get,set,label,restore}){const K="eco-guard-"+key,KL="eco
 const formGet=ids=>()=>Object.fromEntries(ids.filter(i=>$(i)).map(i=>[i,$(i).type==="checkbox"?$(i).checked:$(i).value]));
 const formSet=(ids,after)=>st=>{ids.forEach(i=>{const el=$(i);if(el&&i in st){if(el.type==="checkbox")el.checked=st[i];else el.value=st[i]}});after()};
 
+// línea de tiempo del contrato a término fijo: prórrogas, despido y lo que faltaba
+function lineaIndem(PR,des,fin,falta){
+  const W=480,H=118,P=PR?PR.periodos.filter(p=>p.n<=PR.actual.n):[],a=P.length?P[0].inicio:LAB.addDays(des,-Math.max(30,Math.round(falta/2))),span=LAB.days360(a,fin)||1,x=d=>14+Math.max(0,Math.min(1,LAB.days360(a,d)/span))*(W-28);
+  const f3=d=>`${d.d}/${d.m}/${d.y}`,nom=p=>p.n===0?"Inicial":p.n+".ª",col=p=>p.n===0?"--line":p.meses>=12&&P[0].meses<12?"--exam":"--branch";
+  let g=`<defs><pattern id="i-rx" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.5" height="7" fill="var(--bad)" fill-opacity=".55"/></pattern></defs>`;
+  if(P.length)g+=P.map(p=>{const x0=x(p.inicio),w=Math.max(1.5,x(LAB.addDays(p.fin,1))-x0-1.5);return`<rect x="${x0}" y="30" width="${w}" height="28" rx="3" fill="var(${col(p)})" fill-opacity="${p.n===PR.actual.n?1:.5}"/>${w>34?`<text x="${x0+w/2}" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--paper)">${nom(p)}</text>`:""}`}).join("");
+  else g+=`<rect x="${x(a)}" y="30" width="${x(LAB.addDays(fin,1))-x(a)}" height="28" rx="3" fill="var(--branch)" fill-opacity=".5"/>`;
+  const xd=x(LAB.addDays(des,1)),xf=x(LAB.addDays(fin,1));
+  g+=`<rect x="${xd}" y="30" width="${Math.max(2,xf-xd)}" height="28" fill="url(#i-rx)"/><text x="${(xd+xf)/2+48>W-8?W-14:(xd+xf)/2}" y="22" text-anchor="${(xd+xf)/2+48>W-8?"end":"middle"}" font-size="13" font-weight="700" fill="var(--bad)">faltan ${falta} días</text>`;
+  g+=`<line x1="${xd}" x2="${xd}" y1="24" y2="74" stroke="var(--ink)" stroke-width="2"/><text x="${xd}" y="88" text-anchor="${xd>W-70?"end":"middle"}" font-size="12" fill="var(--ink)">despido ${LAB.fmtCorta?LAB.fmtCorta(des):`${des.d}/${des.m}/${String(des.y).slice(2)}`}</text>`;
+  g+=`<text x="${xf}" y="106" text-anchor="end" font-size="12" fill="var(--ink-2)">vence ${fin.d}/${fin.m}/${String(fin.y).slice(2)}</text>`;
+  if(P.length)g+=`<text x="${x(a)}" y="106" font-size="12" fill="var(--ink-2)">inicio ${a.d}/${a.m}/${String(a.y).slice(2)}</text>`;
+  const leg=P.length?`<div class="legend"><span><i style="background:var(--line)"></i>Período inicial</span>${P.some(p=>p.n>0&&col(p)==="--branch")?`<span><i style="background:var(--branch)"></i>Prórroga igual</span>`:""}${P.some(p=>col(p)==="--exam")?`<span><i style="background:var(--exam)"></i>Prórroga de 1 año (art. 46)</span>`:""}<span><i style="background:var(--bad);opacity:.6"></i>Lo que faltaba: se paga</span></div>`:`<div class="legend"><span><i style="background:var(--bad);opacity:.6"></i>Lo que faltaba para el vencimiento: se paga</span></div>`;
+  const tab=P.length?`<div class="tbl"><table><tr><th>Período</th><th>Desde</th><th>Hasta</th></tr>${P.map(p=>`<tr${p.n===PR.actual.n?' style="font-weight:600"':""}><td>${p.n===0?"Inicial":p.n+".ª prórroga"}${p.meses>=12&&P[0].meses<12?" (1 año)":""}${p.n===PR.actual.n?" ← corría al despido":""}</td><td>${f3(p.inicio)}</td><td>${f3(p.fin)}</td></tr>`).join("")}</table></div>`:"";
+  return`${leg}<div class="plot"><svg style="min-width:0" viewBox="0 0 ${W} ${H}" role="img" aria-label="Línea de tiempo del contrato: período que corría, despido y tiempo que faltaba">${g}</svg></div>${tab}`}
 SIMS.ind=function(){
   $("sim").innerHTML=`<div class="chips pre" id="i-ej"><button type="button" data-k="mariana">Taller: Mariana (término fijo)</button><button type="button" data-k="pedro">Taller: Pedro (indefinido)</button><button type="button" data-k="ej">Ejemplo del texto</button></div>
   <div class="calcf">${selIn("i-tipo","Tipo de contrato",[["indef","Término indefinido"],["fijo","Término fijo"],["obra","Obra o labor"]],"indef")}${numIn("i-sal","Último salario mensual",3000000,"10000")}
-  <span id="i-wini">${dateIn("i-ini","Inicio del contrato","2025-01-01")}</span>${dateIn("i-des","Fecha del despido","2026-05-10")}<span id="i-wa51">${numIn("i-a51","Días de suspensión a descontar (art. 51)",0)}</span><span id="i-wfin" hidden>${dateIn("i-fin","Vencimiento pactado o fin de la obra","2026-12-31")}</span></div>
-  <div class="res" id="i-res"></div><div id="i-steps"></div>`;
-  const run=()=>{const tipo=$("i-tipo").value,sal=N("i-sal"),ini=D("i-ini"),des=D("i-des"),fin=D("i-fin"),{smmlv}=LAB.valores(des||HOY),a51=Math.max(0,Math.round(N("i-a51")||0));
-    $("i-wini").hidden=tipo!=="indef";$("i-wa51").hidden=tipo!=="indef";$("i-wfin").hidden=tipo==="indef";
+  <span id="i-wini">${dateIn("i-ini","Inicio del contrato","2025-01-01")}</span>${dateIn("i-des","Fecha del despido","2026-05-10")}<span id="i-wa51">${numIn("i-a51","Días de suspensión a descontar (art. 51)",0)}</span><span id="i-wdur" hidden>${numIn("i-dm","Duración inicial pactada en meses (opcional)","","1")}${numIn("i-dd","… más días",0,"1")}</span><span id="i-wfin" hidden>${dateIn("i-fin","Vencimiento del período que corría o fin de la obra","2026-12-31")}</span></div>
+  <p class="hint" id="i-hfijo" hidden>Término fijo: escribe el inicio y la duración pactada y el vencimiento de la prórroga que corría se calcula solo (art. 46). Si no, escribe tú el vencimiento.</p>
+  <div class="res" id="i-res"></div><div id="i-line"></div><div id="i-steps"></div>`;
+  const run=()=>{const tipo=$("i-tipo").value,sal=N("i-sal"),ini=D("i-ini"),des=D("i-des"),dm=Math.round(N("i-dm")||0),dd=Math.max(0,Math.round(N("i-dd")||0)),{smmlv}=LAB.valores(des||HOY),a51=Math.max(0,Math.round(N("i-a51")||0));
+    $("i-wini").hidden=tipo==="obra";$("i-wa51").hidden=tipo!=="indef";$("i-wfin").hidden=tipo==="indef";$("i-wdur").hidden=$("i-hfijo").hidden=tipo!=="fijo";$("i-line").innerHTML="";
+    let PR=null;if(tipo==="fijo"&&ini&&des&&(dm>0||dd>0)&&LAB.cmp(ini,des)<=0){PR=LAB.prorrogas(ini,dm,des,{dias:dd,modo:"360"});if(PR&&PR.actual&&!PR.indefinidoEnCorte){$("i-fin").value=di(PR.actual.fin)}else PR=null}
+    const fin=D("i-fin");
     if(!(sal>0)||!des||(tipo==="indef"&&(!ini||LAB.cmp(ini,des)>0))||(tipo!=="indef"&&(!fin||LAB.cmp(fin,des)<0))){$("i-res").innerHTML=err("revisa el salario y que las fechas estén en orden.");$("i-steps").innerHTML="";return}
     const R=LAB.indemnizacion({tipo,salario:sal,inicio:ini,despido:des,finPactado:fin,smmlv,art51:a51});
     if(tipo==="indef"){
@@ -87,16 +105,17 @@ SIMS.ind=function(){
       $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Salario ${R.alto?"≥":"<"} 10 SMMLV (${$p(10*smmlv)}) ⇒ ${R.p1} días por el primer año y ${R.pn} por cada año siguiente<br>Días de servicio = días360(${dt(ini)}, ${dt(des)}) + 1 = ${R.servicioTotal}${R.art51?`<br>Menos los días de suspensión del art. 51: ${R.servicioTotal} − ${R.art51} = <b>${R.servicio}</b>`:""}<br>${R.servicio<=360?`Trabajó un año o menos ⇒ ${R.p1} días completos`:`${R.servicio} días = ${R.completos} año${R.completos>1?"s":""} completo${R.completos>1?"s":""}${R.frac?` y ${R.frac} días`:""}<br>Primer año: ${R.p1} días${R.completos>1?`<br>Años siguientes completos: ${R.pn} × ${R.completos-1} = ${R.pn*(R.completos-1)} días`:""}${R.frac?`<br>Fracción: ${R.pn} × ${R.frac} / 360 = ${fmt(R.fracExacta,2)} ⇒ <b>${R.diasFrac}</b> días (los días no llevan decimales: se redondea)`:""}<br>Días = ${R.p1}${R.completos>1?` + ${R.pn*(R.completos-1)}`:""}${R.frac?` + ${R.diasFrac}`:""} = <b>${R.dias}</b>`}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>`)}
     else{
       $("i-res").innerHTML=tiles([["Tiempo que faltaba",`${R.falta.toLocaleString("es-CO")} días`],["Días a pagar",String(R.dias)],["Salario diario",$c(R.diario)],["Indemnización",$p(R.valor),"okt"]]);
+      if(tipo==="fijo")$("i-line").innerHTML=lineaIndem(PR,des,fin,R.falta);
       $("i-steps").innerHTML=stp(1,"Paso a paso",`<div class="eq al">Días que faltaban: del ${dt(LAB.addDays(des,1))} al ${dt(fin)} = días360(${dt(des)}, ${dt(fin)}) = ${R.falta}${R.minimo15?"<br>Es menor que 15 ⇒ se paga el mínimo de 15 días (obra o labor)":""}<br>Indemnización = ${R.dias} × ${$c(R.diario)} = <b>${$c(R.valor)}</b></div>${tipo==="fijo"?`<p class="hint" style="margin:0">Usa como vencimiento el fin del período o de la prórroga que estaba corriendo. La estación de prórrogas te da esa fecha.</p>`:""}`)}};
   const pre=window.TOOL_PRE;window.TOOL_PRE=null;const P={pedro:{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31",a51:0},pedro51:{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31",a51:123}}[pre];if(P){$("i-tipo").value=P.tipo;$("i-sal").value=P.sal;$("i-ini").value=P.ini;$("i-des").value=P.des;$("i-a51").value=P.a51}
   const c0=P?(CASO.taller("pedro"),null):(CASO.dePre(pre)||CASO.activo());
-  const deCaso=c=>{$("i-tipo").value=c.tipo;$("i-sal").value=c.salario;$("i-ini").value=c.ingreso;$("i-des").value=c.retiro;$("i-a51").value=0;const f=CASO.finPactado(c);if(f)$("i-fin").value=di(f);run()};
-  watch(["i-tipo","i-sal","i-ini","i-des","i-fin","i-a51"],run);run();
-  {const ids=["i-tipo","i-sal","i-ini","i-des","i-fin","i-a51"];guardados("indem",{get:formGet(ids),set:formSet(ids,run),label:"Indemnización",restore:!P&&!c0})}
+  const deCaso=c=>{$("i-tipo").value=c.tipo;$("i-sal").value=c.salario;$("i-ini").value=c.ingreso;$("i-des").value=c.retiro;$("i-a51").value=0;$("i-dm").value=c.tipo==="fijo"?(c.durM||""):"";$("i-dd").value=c.tipo==="fijo"?(c.durD||0):0;const f=CASO.finPactado(c);if(f)$("i-fin").value=di(f);run()};
+  watch(["i-tipo","i-sal","i-ini","i-des","i-fin","i-a51","i-dm","i-dd"],run);run();
+  {const ids=["i-tipo","i-sal","i-ini","i-des","i-dm","i-dd","i-fin","i-a51"];guardados("indem",{get:formGet(ids),set:formSet(ids,run),label:"Indemnización",restore:!P&&!c0})}
   $("i-ej").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const k=b.dataset.k;
     if(k==="mariana"){deCaso(CASO.taller("mariana"));bar.draw("Se activó el caso de Mariana. Al despido corría la 4.ª prórroga, que ya es de un año (art. 46): del 8 de septiembre de 2026 al 7 de septiembre de 2027.")}
     else{const V=k==="pedro"?{tipo:"indef",sal:4250000,ini:"2021-05-08",des:"2026-08-31",a51:0}:{tipo:"indef",sal:3000000,ini:"2025-01-01",des:"2026-05-10",a51:0};if(k==="pedro"){CASO.taller("pedro");bar.draw("Se activó el caso de Pedro.")}
-      $("i-tipo").value=V.tipo;$("i-sal").value=V.sal;$("i-ini").value=V.ini;$("i-des").value=V.des;$("i-a51").value=V.a51;run()}});
+      $("i-tipo").value=V.tipo;$("i-sal").value=V.sal;$("i-ini").value=V.ini;$("i-des").value=V.des;$("i-a51").value=V.a51;$("i-dm").value="";$("i-dd").value=0;run()}});
   const bar=casoBar("indemnizaciones",{cargar:deCaso,resultado:()=>{const tipo=$("i-tipo").value,sal=N("i-sal"),ini=D("i-ini"),des=D("i-des"),fin=D("i-fin");if(!(sal>0)||!des)return null;
     const R=LAB.indemnizacion({tipo,salario:sal,inicio:ini,despido:des,finPactado:fin,smmlv:LAB.valores(des).smmlv,art51:Math.max(0,Math.round(N("i-a51")||0))});return isFinite(R.valor)?{t:`${R.dias} días de salario`,v:R.valor}:null}});
   if(c0)deCaso(c0);
