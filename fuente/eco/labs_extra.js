@@ -60,7 +60,7 @@ SIMS.mcg=function(){
       const d=a11*a22-a12*a12;if(Math.abs(d)<1e-12){o.innerHTML=err("X′Ω⁻¹X no es invertible (¿todos los X iguales?).");return}
       const I=[[a22/d,-a12/d],[-a12/d,a11/d]],b1=I[0][0]*c1+I[0][1]*c2,b2=I[1][0]*c1+I[1][1]*c2;
       const sx=S(i=>x[i]),sxx=S(i=>x[i]*x[i]),sy=S(i=>y[i]),sxy=S(i=>x[i]*y[i]),d0=n*sxx-sx*sx,I0=[[sxx/d0,-sx/d0],[-sx/d0,n/d0]],o1=I0[0][0]*sy+I0[0][1]*sxy,o2=I0[1][0]*sy+I0[1][1]*sxy;
-      const e=y.map((v,i)=>v-b1-b2*x[i]),s2=S(i=>w[i]*e[i]*e[i])/(n-k),eo=y.map((v,i)=>v-o1-o2*x[i]),s2o=S(i=>eo[i]*eo[i])/(n-k);
+      const yy=S(i=>w[i]*y[i]*y[i]),bxy=b1*c1+b2*c2,cor=c1*c1/a11,e=y.map((v,i)=>v-b1-b2*x[i]),s2=S(i=>w[i]*e[i]*e[i])/(n-k),eo=y.map((v,i)=>v-o1-o2*x[i]),s2o=S(i=>eo[i]*eo[i])/(n-k);
       const om=x.map((_,i)=>1/w[i]),m11=S(i=>om[i]),m12=S(i=>om[i]*x[i]),m22=S(i=>om[i]*x[i]*x[i]);
       const vo22=s2*(I0[1][0]*(I0[1][0]*m11+I0[1][1]*m12)+I0[1][1]*(I0[1][0]*m12+I0[1][1]*m22)),vo11=s2*(I0[0][0]*(I0[0][0]*m11+I0[0][1]*m12)+I0[0][1]*(I0[0][0]*m12+I0[0][1]*m22));
       const hs=h===1?"Xₜ":h===2?"Xₜ²":h===0.5?"√Xₜ":"1",ws=h===0?"1":h===1?"1/Xₜ":h===2?"1/Xₜ²":"1/√Xₜ";
@@ -71,7 +71,9 @@ SIMS.mcg=function(){
       stp(5,"b_MCG = (X′Ω⁻¹X)⁻¹ X′Ω⁻¹y",`<p>${mat([[b1],[b2]])} → Ŷₜ = ${n7(+b1.toFixed(4))} + ${n7(+b2.toFixed(4))}·Xₜ</p>`)+
       stp(6,"Comparación con MCO",`<div class="res">${tiles([["β̂₁ MCO",fmt(o1,4)],["β̂₂ MCO",fmt(o2,4)],["β̂₁ MCG",fmt(b1,4),"okt"],["β̂₂ MCG",fmt(b2,4),"okt"],["σ̂² con residuos ponderados",fmt(s2,4)],["e.e.(β̂₂) MCG",fmt(Math.sqrt(s2*I[1][1]),4),"okt"],["e.e.(β̂₂) MCO correcto",fmt(Math.sqrt(vo22),4)],["e.e.(β̂₂) MCO fórmula usual",fmt(Math.sqrt(s2o*I0[1][1]),4),h?"badt":""]])}</div>
       <p>${h?`Var(β̂₂) por MCG es el ${fmt(100*s2*I[1][1]/vo22,1)} % de la de MCO. El «e.e. fórmula usual» s²(X′X)⁻¹ no es válido con heterocedasticidad.`:"Con varianza constante (Ω = I), MCG y MCO coinciden."}${h?` Modelo transformado equivalente: dividir todo por √(${hs}) y estimar por MCO sin intercepto.`:""}</p>
-      <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`);
+      <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`)+
+      stp(7,"Sumas de cuadrados por MCG",`<div class="tbl"><table><tr><th>Término</th><th>Fórmula</th><th>Valor</th></tr><tr><td>y′Ω⁻¹y</td><td>Σ peso·Yₜ²</td><td>${n7(yy)}</td></tr><tr><td>b′X′Ω⁻¹y</td><td>b₁·${n7(c1)} + b₂·${n7(c2)}</td><td>${n7(bxy)}</td></tr><tr><td>Corrección</td><td>(Σ peso·Yₜ)² / Σ peso = ${n7(c1)}² / ${n7(a11)}</td><td>${n7(cor)}</td></tr><tr><th>SCT</th><td>y′Ω⁻¹y − corrección</td><th>${n7(yy-cor)}</th></tr><tr><th>SCE</th><td>b′X′Ω⁻¹y − corrección</td><th>${n7(bxy-cor)}</th></tr><tr><th>SCR</th><td>y′Ω⁻¹y − b′X′Ω⁻¹y = e′Ω⁻¹e</td><th>${n7(yy-bxy)}</th></tr></table></div>
+      <div class="res">${tiles([["Media ponderada ȳ",fmt(c1/a11,4)],["R² MCG",fmt((bxy-cor)/(yy-cor),4),"okt"],["R² ajustado",fmt(1-((yy-bxy)/(n-k))/((yy-cor)/(n-1)),4)],["F (1, n−2)",fmt((bxy-cor)/s2,3)]])}</div>`);
     };
     bindSeg("mg-v",v=>{h=+v;run()});$("mg-y").oninput=run;$("mg-x").oninput=run;run()};
   bindSeg("mg-m",m=>m==="sim"?simu():calc());calc()};

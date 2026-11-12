@@ -94,6 +94,25 @@ ins(B2.length?B2[B2.length-1].id:"diagnostico",[
 <tr><td>MCO, fórmula usual</td><td>101,17</td><td>1,810</td><td>0,360</td><td>\(s^2(X'X)^{-1}\) con \(s^2=618{,}10/4\): <b>no es válida</b> aquí</td></tr></table></div>
 <p>La varianza de \(\hat\beta_2\) por MCG es el 62 % de la de MCO (0,0653 frente a 0,1050). <b>¿Por qué cambian los coeficientes?</b> MCG le da peso \(1/X_t\) a cada observación: la primera (\(X=4\)) pesa 12 veces más que la última (\(X=49\)), porque su error tiene mucha menos varianza y por lo tanto informa más. MCO trata a todas por igual y se deja jalar por las observaciones ruidosas de gasto alto.</p></section>
 
+<section><h3>d. Sumas de cuadrados por MCG</h3>
+<p class="lead">En MCG las sumas de cuadrados se definen con la misma ponderación \(\Omega^{-1}\) que el estimador: son las sumas de cuadrados de MCO, pero sobre los datos transformados \(y^*=Py\), \(X^*=PX\).</p>
+<div class="tbl"><table><tr><th>Suma</th><th>MCO</th><th>MCG</th></tr>
+<tr><td>Total (sin centrar)</td><td>\(y'y\)</td><td>\(y'\Omega^{-1}y=\sum Y_t^2/X_t\)</td></tr>
+<tr><td>Explicada (sin centrar)</td><td>\(b'X'y\)</td><td>\(b_{MCG}'X'\Omega^{-1}y\)</td></tr>
+<tr><td>Residual</td><td>\(e'e=y'y-b'X'y\)</td><td>\(e'\Omega^{-1}e=y'\Omega^{-1}y-b_{MCG}'X'\Omega^{-1}y\)</td></tr>
+<tr><td>Corrección por la media</td><td>\(n\bar y^2\)</td><td>\(\dfrac{(\iota'\Omega^{-1}y)^2}{\iota'\Omega^{-1}\iota}=\dfrac{(\sum Y_t/X_t)^2}{\sum 1/X_t}\)</td></tr></table></div>
+<p>Las versiones centradas restan la corrección: \(SCT=y'\Omega^{-1}y-\frac{(\iota'\Omega^{-1}y)^2}{\iota'\Omega^{-1}\iota}\) y \(SCE=b_{MCG}'X'\Omega^{-1}y-\frac{(\iota'\Omega^{-1}y)^2}{\iota'\Omega^{-1}\iota}\). El papel de \(\bar y\) lo hace la <b>media ponderada</b> \(\bar y_\omega=\frac{\sum Y_t/X_t}{\sum 1/X_t}\). La descomposición \(SCT=SCE+SCR\) se cumple porque la primera ecuación normal de MCG dice \(\iota'\Omega^{-1}e=\sum e_t/X_t=0\): los residuos <i>ponderados</i> suman cero.</p>
+<h4>Con los datos del ejemplo</h4>
+<p>Falta una columna en la tabla: \(Y_t^2/X_t\) = 3.600; 676; 750; 711,1111; 810; 816,3265, que suman \(y'\Omega^{-1}y=7.363{,}4376\).</p>
+<div class="mj">\[b_{MCG}'X'\Omega^{-1}y=112{,}38228\cdot53{,}226077+1{,}444056\cdot940=5.981{,}6684+1.357{,}4126=7.339{,}0807\]</div>
+<div class="mj">\[SCR_{MCG}=e'\Omega^{-1}e=7.363{,}4376-7.339{,}0807=24{,}3570\]</div>
+<div class="mj">\[\frac{(\sum Y_t/X_t)^2}{\sum 1/X_t}=\frac{53{,}226077^2}{0{,}396519}=7.144{,}7101\qquad(\bar y_\omega=134{,}23)\]</div>
+<div class="mj">\[SCT_{MCG}=7.363{,}4376-7.144{,}7101=218{,}7275\qquad SCE_{MCG}=7.339{,}0807-7.144{,}7101=194{,}3705\]</div>
+<p>Comprobación: 194,3705 + 24,3570 = 218,7275. Con estas sumas:</p>
+<ul><li>\(\hat\sigma^2=SCR/(n-k)=24{,}3570/4=6{,}0892\) (el mismo del punto c).</li>
+<li>\(R^2_{MCG}=SCE/SCT=0{,}8886\) y \(\bar R^2=1-\frac{SCR/(n-k)}{SCT/(n-1)}=0{,}8608\).</li>
+<li>\(F=\frac{SCE/(k-1)}{SCR/(n-k)}=\frac{194{,}3705}{6{,}0892}=31{,}92\), frente a \(F_{0{,}05}(1,4)=7{,}71\): la publicidad es significativa.</li></ul>
+<p class="hint">Otra convención que aparece en algunos textos centra con la media simple del modelo transformado, \(\bar y^*=\frac1n\sum Y_t/\sqrt{X_t}=32{,}85\): da \(SCT^*=889{,}71\) y \(R^2=0{,}973\). La \(SCR\) es la misma en las dos; el \(R^2\) cambia según la definición y ninguno se compara con el \(R^2\) de MCO (0,864). Usa la que defina tu profesor.</p></section>
 <section><h3>Atajo equivalente: el modelo transformado (MCP)</h3>
 <p>Con \(\Omega=\operatorname{diag}(X_t)\), la matriz de transformación es \(P=\operatorname{diag}(1/\sqrt{X_t})\). Se divide toda la ecuación por \(\sqrt{X_t}\):</p>
 <div class="mj">\[\frac{Y_t}{\sqrt{X_t}}=\beta_1\frac1{\sqrt{X_t}}+\beta_2\sqrt{X_t}+\frac{u_t}{\sqrt{X_t}},\qquad\operatorname{var}\!\left(\frac{u_t}{\sqrt{X_t}}\right)=\frac{\sigma^2X_t}{X_t}=\sigma^2\]</div>
@@ -124,6 +143,7 @@ ${LABX("¿cuánto gana MCG? y calculadora del ejemplo")}`,
 qs:[{q:"Si Var(uᵢ) = σ²xᵢ², ¿qué transformación aplica MCP?",a:"Dividir toda la ecuación por xᵢ: la nueva perturbación uᵢ/xᵢ tiene varianza constante σ²."},
 {q:"Con var(uₜ) = σ²Xₜ, escriba X′Ω⁻¹X y X′Ω⁻¹y para el modelo Yₜ = β₁ + β₂Xₜ + uₜ.",a:"X′Ω⁻¹X = [Σ1/Xₜ, n; n, ΣXₜ] y X′Ω⁻¹y = [ΣYₜ/Xₜ; ΣYₜ]."},
 {q:"En el ejemplo de ventas y publicidad, ¿por qué la pendiente baja de 1,81 (MCO) a 1,44 (MCG)?",a:"MCG pondera cada observación por 1/Xₜ. Las observaciones con gasto alto tienen errores más variables y pesan menos; MCO las trata igual que las demás y se deja influir por su ruido."},
+{q:"Con var(uₜ) = σ²Xₜ, ¿cómo se calcula la SCR por MCG sin calcular cada residuo?",a:"SCR = y′Ω⁻¹y − b′X′Ω⁻¹y = ΣYₜ²/Xₜ − (b₁ΣYₜ/Xₜ + b₂ΣYₜ). En el ejemplo: 7.363,4376 − 7.339,0807 = 24,357."},
 {q:"¿Por qué no hace falta conocer σ² para calcular b_MCG?",a:"Porque Var(u) = σ²Ω y en (X′(σ²Ω)⁻¹X)⁻¹X′(σ²Ω)⁻¹y el factor σ² se cancela. Solo se necesita Ω hasta una constante."},
 {q:"¿Qué condición debe cumplir la matriz P que transforma el modelo?",a:"PΩP′ = I, lo que equivale a P′P = Ω⁻¹. Con Ω diagonal, P = diag(1/√ωₜ)."}]}]);
 ins("mcg",B4);
