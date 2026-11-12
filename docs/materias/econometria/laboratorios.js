@@ -1184,7 +1184,7 @@ SIMS.diag=function(){
   bindSeg("dg-e",v=>{e=v;run()});bindCtl(["dg-n","dg-x","dg-y"],run);run()};
 
 SIMS.mcg=function(){
-  $("sim").innerHTML=`<div style="margin-bottom:10px">${seg("mg-m","Modo",[["calc","Calculadora del ejemplo de clase"],["sim","¿Cuánto gana MCG? (simulación)"]],"calc")}</div><div id="mg-box"></div>`;
+  $("sim").innerHTML=`<div style="margin-bottom:10px">${seg("mg-m","Modo",[["calc","Calculadora (tus datos)"],["sim","¿Cuánto gana MCG? (simulación)"]],"calc")}</div><div id="mg-box"></div>`;
   const simu=()=>{
   $("mg-box").innerHTML=`<div class="ctr">${ctl("mg-h","Heterocedasticidad: Var(u) = σ²x^h, h =",0,4,0.1,2)}${ctl("mg-n","n",10,200,1,40)}</div><p class="hint">500 muestras de y = 1 + 2x + u con x entre 1 y 10. Se comparan MCO y MCG (mínimos cuadrados ponderados con los pesos verdaderos 1/x^(h/2)).</p><div class="res" id="mg-res"></div><div id="mg-st"></div>`;
   const run=()=>{const h=V("mg-h"),n=Math.round(V("mg-n")),R=R0(99),xs=[...Array(n)].map((_,i)=>1+9*i/(n-1)),bo=[],bg=[],seo=[];
@@ -1209,20 +1209,35 @@ SIMS.mcg=function(){
       const d=a11*a22-a12*a12;if(Math.abs(d)<1e-12){o.innerHTML=err("X′Ω⁻¹X no es invertible (¿todos los X iguales?).");return}
       const I=[[a22/d,-a12/d],[-a12/d,a11/d]],b1=I[0][0]*c1+I[0][1]*c2,b2=I[1][0]*c1+I[1][1]*c2;
       const sx=S(i=>x[i]),sxx=S(i=>x[i]*x[i]),sy=S(i=>y[i]),sxy=S(i=>x[i]*y[i]),d0=n*sxx-sx*sx,I0=[[sxx/d0,-sx/d0],[-sx/d0,n/d0]],o1=I0[0][0]*sy+I0[0][1]*sxy,o2=I0[1][0]*sy+I0[1][1]*sxy;
-      const yy=S(i=>w[i]*y[i]*y[i]),bxy=b1*c1+b2*c2,cor=c1*c1/a11,e=y.map((v,i)=>v-b1-b2*x[i]),s2=S(i=>w[i]*e[i]*e[i])/(n-k),eo=y.map((v,i)=>v-o1-o2*x[i]),s2o=S(i=>eo[i]*eo[i])/(n-k);
-      const om=x.map((_,i)=>1/w[i]),m11=S(i=>om[i]),m12=S(i=>om[i]*x[i]),m22=S(i=>om[i]*x[i]*x[i]);
-      const vo22=s2*(I0[1][0]*(I0[1][0]*m11+I0[1][1]*m12)+I0[1][1]*(I0[1][0]*m12+I0[1][1]*m22)),vo11=s2*(I0[0][0]*(I0[0][0]*m11+I0[0][1]*m12)+I0[0][1]*(I0[0][0]*m12+I0[0][1]*m22));
-      const hs=h===1?"Xₜ":h===2?"Xₜ²":h===0.5?"√Xₜ":"1",ws=h===0?"1":h===1?"1/Xₜ":h===2?"1/Xₜ²":"1/√Xₜ";
-      o.innerHTML=stp(1,"Ω y Ω⁻¹",`<p>var(u) = σ²Ω con Ω = diag(${x.map(v=>n7(Math.pow(v,h))).join("; ")}). Su inversa es diagonal con los recíprocos: el peso de cada observación es ${ws}.</p>`)+
-      stp(2,"Tabla de trabajo",`<div class="tbl"><table><tr><th>t</th><th>Yₜ</th><th>Xₜ</th><th>peso ${ws}</th><th>peso·Xₜ</th><th>peso·Xₜ²</th><th>peso·Yₜ</th><th>peso·XₜYₜ</th></tr>${x.map((v,i)=>`<tr><td>${i+1}</td><td>${n7(y[i])}</td><td>${n7(v)}</td><td>${n7(w[i])}</td><td>${n7(w[i]*v)}</td><td>${n7(w[i]*v*v)}</td><td>${n7(w[i]*y[i])}</td><td>${n7(w[i]*v*y[i])}</td></tr>`).join("")}<tr><th>Σ</th><th></th><th></th><th>${n7(a11)}</th><th>${n7(a12)}</th><th>${n7(a22)}</th><th>${n7(c1)}</th><th>${n7(c2)}</th></tr></table></div>`)+
-      stp(3,"X′Ω⁻¹X y X′Ω⁻¹y",`<p>X′Ω⁻¹X = ${mat([[a11,a12],[a12,a22]])} &nbsp; X′Ω⁻¹y = ${mat([[c1],[c2]])}</p>`)+
-      stp(4,"Inversa",`<p>Determinante = ${n7(a11)}·${n7(a22)} − ${n7(a12)}² = ${n7(d)}</p><p>(X′Ω⁻¹X)⁻¹ = ${mat(I)}</p>`)+
-      stp(5,"b_MCG = (X′Ω⁻¹X)⁻¹ X′Ω⁻¹y",`<p>${mat([[b1],[b2]])} → Ŷₜ = ${n7(+b1.toFixed(4))} + ${n7(+b2.toFixed(4))}·Xₜ</p>`)+
-      stp(6,"Comparación con MCO",`<div class="res">${tiles([["β̂₁ MCO",fmt(o1,4)],["β̂₂ MCO",fmt(o2,4)],["β̂₁ MCG",fmt(b1,4),"okt"],["β̂₂ MCG",fmt(b2,4),"okt"],["σ̂² con residuos ponderados",fmt(s2,4)],["e.e.(β̂₂) MCG",fmt(Math.sqrt(s2*I[1][1]),4),"okt"],["e.e.(β̂₂) MCO correcto",fmt(Math.sqrt(vo22),4)],["e.e.(β̂₂) MCO fórmula usual",fmt(Math.sqrt(s2o*I0[1][1]),4),h?"badt":""]])}</div>
-      <p>${h?`Var(β̂₂) por MCG es el ${fmt(100*s2*I[1][1]/vo22,1)} % de la de MCO. El «e.e. fórmula usual» s²(X′X)⁻¹ no es válido con heterocedasticidad.`:"Con varianza constante (Ω = I), MCG y MCO coinciden."}${h?` Modelo transformado equivalente: dividir todo por √(${hs}) y estimar por MCO sin intercepto.`:""}</p>
-      <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`)+
-      stp(7,"Sumas de cuadrados por MCG",`<div class="tbl"><table><tr><th>Término</th><th>Fórmula</th><th>Valor</th></tr><tr><td>y′Ω⁻¹y</td><td>Σ peso·Yₜ²</td><td>${n7(yy)}</td></tr><tr><td>b′X′Ω⁻¹y</td><td>b₁·${n7(c1)} + b₂·${n7(c2)}</td><td>${n7(bxy)}</td></tr><tr><td>Corrección</td><td>(Σ peso·Yₜ)² / Σ peso = ${n7(c1)}² / ${n7(a11)}</td><td>${n7(cor)}</td></tr><tr><th>SCT</th><td>y′Ω⁻¹y − corrección</td><th>${n7(yy-cor)}</th></tr><tr><th>SCE</th><td>b′X′Ω⁻¹y − corrección</td><th>${n7(bxy-cor)}</th></tr><tr><th>SCR</th><td>y′Ω⁻¹y − b′X′Ω⁻¹y = e′Ω⁻¹e</td><th>${n7(yy-bxy)}</th></tr></table></div>
-      <div class="res">${tiles([["Media ponderada ȳ",fmt(c1/a11,4)],["R² MCG",fmt((bxy-cor)/(yy-cor),4),"okt"],["R² ajustado",fmt(1-((yy-bxy)/(n-k))/((yy-cor)/(n-1)),4)],["F (1, n−2)",fmt((bxy-cor)/s2,3)]])}</div>`);
+      const yy=S(i=>w[i]*y[i]*y[i]),bxy=b1*c1+b2*c2,e=y.map((v,i)=>v-b1-b2*x[i]),rss=S(i=>w[i]*e[i]*e[i]),s2=rss/(n-k),eo=y.map((v,i)=>v-o1-o2*x[i]),s2o=S(i=>eo[i]*eo[i])/(n-k);
+      const pm=S(i=>y[i]*Math.sqrt(w[i]))/n,cor=n*pm*pm,tss=yy-cor,ess=bxy-cor;
+      const om=x.map((_,i)=>1/w[i]),M=[[S(i=>om[i]),S(i=>om[i]*x[i])],[S(i=>om[i]*x[i]),S(i=>om[i]*x[i]*x[i])]],m2=(A,B)=>A.map(r=>B[0].map((_,j)=>r[0]*B[0][j]+r[1]*B[1][j])),VO=m2(m2(I0,M),I0);
+      const ws=h===0?"1":h===1?"1/Xₜ":h===2?"1/Xₜ²":"1/√Xₜ",hs=h===1?"Xₜ":h===2?"Xₜ²":"√Xₜ",ps=h===0?"Yₜ":h===1?"Yₜ/√Xₜ":h===2?"Yₜ/Xₜ":"Yₜ/Xₜ^¼";
+      const part=(n_,t,sm,b)=>`<details class="pto"><summary><span class="pn">${n_}</span><span class="pt">${t}<small>${sm}</small></span></summary><div class="pto-b">${b}</div></details>`;
+      o.innerHTML=`<div class="res">${tiles([["β̂₁ MCG",fmt(b1,4),"okt"],["β̂₂ MCG",fmt(b2,4),"okt"],["RSS",fmt(rss,4)],["s² = RSS/(n−k)",fmt(s2,4)],["e.e.(β̂₂) MCG",fmt(Math.sqrt(s2*I[1][1]),4),"okt"],["e.e.(β̂₂) MCO",fmt(Math.sqrt(s2*VO[1][1]),4)]])}</div>
+      <p class="hint" style="margin:10px 0 6px">Abre cada parte para ver el desarrollo con tus datos.</p><div class="tl-list">`+
+      part(1,"b<sub>MCG</sub> paso a paso",`Ω⁻¹ = diag(${ws}) · b = (${n7(+b1.toFixed(6))}; ${n7(+b2.toFixed(6))})`,
+        `<p>Ω = diag(${x.map(v=>n7(Math.pow(v,h))).join("; ")}). Peso de cada observación: ${ws}.</p>
+        <div class="tbl"><table><tr><th>t</th><th>Yₜ</th><th>Xₜ</th><th>peso</th><th>peso·Xₜ</th><th>peso·Xₜ²</th><th>peso·Yₜ</th><th>peso·XₜYₜ</th></tr>${x.map((v,i)=>`<tr><td>${i+1}</td><td>${n7(y[i])}</td><td>${n7(v)}</td><td>${n7(w[i])}</td><td>${n7(w[i]*v)}</td><td>${n7(w[i]*v*v)}</td><td>${n7(w[i]*y[i])}</td><td>${n7(w[i]*v*y[i])}</td></tr>`).join("")}<tr><th>Σ</th><th></th><th></th><th>${n7(a11)}</th><th>${n7(a12)}</th><th>${n7(a22)}</th><th>${n7(c1)}</th><th>${n7(c2)}</th></tr></table></div>
+        <p>X′Ω⁻¹X = ${mat([[a11,a12],[a12,a22]])} &nbsp; X′Ω⁻¹y = ${mat([[c1],[c2]])}</p>
+        <p>Determinante = ${n7(a11)}·${n7(a22)} − ${n7(a12)}² = ${n7(d)}</p>
+        <p>b<sub>MCG</sub> = ${mat(I)} ${mat([[c1],[c2]])} = ${mat([[b1],[b2]])}</p>`)+
+      part(2,"Sumas de cuadrados",`TSS = ${n7(+tss.toFixed(4))} · ESS = ${n7(+ess.toFixed(4))} · RSS = ${n7(+rss.toFixed(5))}`,
+        `<p>Media del modelo transformado: Py = ${ps}, promedio = ${n7(pm)}, n·(media)² = ${n7(cor)}.</p>
+        <div class="tbl"><table><tr><th>Suma</th><th>Definición y cálculo</th><th>Valor</th></tr>
+        <tr><td>TSS</td><td>y′Ω⁻¹y − n·(media Py)²<br><small>${n7(yy)} − ${n7(cor)}</small></td><th>${n7(tss)}</th></tr>
+        <tr><td>ESS</td><td>b′X′Ω⁻¹X b − n·(media Py)²<br><small>${n7(bxy)} − ${n7(cor)}</small></td><th>${n7(ess)}</th></tr>
+        <tr><td>RSS</td><td>e′Ω⁻¹e<br><small>${n7(yy)} − ${n7(bxy)}</small></td><th>${n7(rss)}</th></tr></table></div>
+        <div class="res">${tiles([["σ̂² = RSS/n (MV)",fmt(rss/n,6)],["s² = RSS/(n−k)",fmt(s2,6),"okt"],["R² = ESS/TSS",fmt(ess/tss,4)]])}</div>`)+
+      part(3,"Varianzas de b<sub>MCG</sub> y b<sub>MCO</sub>",`Var(b₂): ${n7(+I[1][1].toPrecision(6))}·σ² (MCG) frente a ${n7(+VO[1][1].toPrecision(6))}·σ² (MCO)`,
+        `<p>Var(b<sub>MCG</sub>) = σ²(X′Ω⁻¹X)⁻¹ = σ² ${mat(I)}</p>
+        <p>X′ΩX = ${mat(M)}</p>
+        <p>Var<sub>v</sub>(b<sub>MCO</sub>) = σ²(X′X)⁻¹X′ΩX(X′X)⁻¹ = σ² ${mat(VO)}</p>
+        <div class="tbl"><table><tr><th>Con s² = ${n7(+s2.toFixed(6))}</th><th>e.e.(b₁)</th><th>e.e.(b₂)</th></tr><tr><td>MCG</td><td>${fmt(Math.sqrt(s2*I[0][0]),4)}</td><td>${fmt(Math.sqrt(s2*I[1][1]),4)}</td></tr><tr><td>MCO (verdadera)</td><td>${fmt(Math.sqrt(s2*VO[0][0]),4)}</td><td>${fmt(Math.sqrt(s2*VO[1][1]),4)}</td></tr><tr><td>MCO fórmula usual (no válida)</td><td>${fmt(Math.sqrt(s2o*I0[0][0]),4)}</td><td>${fmt(Math.sqrt(s2o*I0[1][1]),4)}</td></tr></table></div>
+        <p>${h?`Var(b₂) por MCG es el ${fmt(100*I[1][1]/VO[1][1],1)} % de la de MCO.`:"Con Ω = I, MCG y MCO coinciden."}</p>`)+
+      part(4,"Comparación con MCO y código R",`b<sub>MCO</sub> = (${fmt(o1,4)}; ${fmt(o2,4)})`,
+        `<p>b<sub>MCO</sub> = (X′X)⁻¹X′y = ${mat(I0)} ${mat([[sy],[sxy]])} = ${mat([[o1],[o2]])}</p>${h?`<p>Equivalente: dividir todo por √(${hs}) y estimar por MCO sin intercepto.</p>`:""}
+        <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`)+`</div>`;
     };
     bindSeg("mg-v",v=>{h=+v;run()});$("mg-y").oninput=run;$("mg-x").oninput=run;run()};
   bindSeg("mg-m",m=>m==="sim"?simu():calc());calc()};
