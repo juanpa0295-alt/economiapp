@@ -46,9 +46,9 @@ def analytics_tag():
     g = ANALYTICS_ID
     return f'''
 <script>
-/* No se cuentan: navegadores automáticos (pruebas) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
+/* No se cuentan: navegadores automáticos (pruebas), copias fuera de economiapp.app (vista previa local) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
 (function(){{var q=location.search,a=false;try{{if(/[?&]autor=1\b/.test(q))localStorage.setItem("eco-autor","1");if(/[?&]autor=0\b/.test(q))localStorage.removeItem("eco-autor");a=localStorage.getItem("eco-autor")==="1"}}catch(e){{}}
-window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true;
+window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true||!/(^|\.)economiapp\.app$/.test(location.hostname);
 if(!window.ECO_SIN_GA){{var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id={g}";document.head.appendChild(s)}}}})();
 window.dataLayer=window.dataLayer||[];function gtag(){{if(!window.ECO_SIN_GA)dataLayer.push(arguments)}}
 gtag("js",new Date());gtag("config","{g}",{{send_page_view:false,anonymize_ip:true}});

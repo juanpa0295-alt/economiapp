@@ -48,9 +48,9 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
 <script>
-/* No se cuentan: navegadores automáticos (pruebas) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
+/* No se cuentan: navegadores automáticos (pruebas), copias fuera de economiapp.app (vista previa local) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
 (function(){var q=location.search,a=false;try{if(/[?&]autor=1/.test(q))localStorage.setItem("eco-autor","1");if(/[?&]autor=0/.test(q))localStorage.removeItem("eco-autor");a=localStorage.getItem("eco-autor")==="1"}catch(e){}
-window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true;
+window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true||!/(^|\.)economiapp\.app$/.test(location.hostname);
 if(!window.ECO_SIN_GA){var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-7BHLT18DZR";document.head.appendChild(s)}})();
 window.dataLayer=window.dataLayer||[];function gtag(){if(!window.ECO_SIN_GA)dataLayer.push(arguments)}
 gtag("js",new Date());gtag("config","G-7BHLT18DZR",{send_page_view:false,anonymize_ip:true});
