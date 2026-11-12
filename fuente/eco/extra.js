@@ -36,12 +36,96 @@ ins(B2.length?B2[B2.length-1].id:"diagnostico",[
 <section><h3>Perturbaciones no esféricas</h3><p class="lead">Si \(V(u\mid X)=\sigma^2\Omega\) con \(\Omega\ne I\) (heterocedasticidad o autocorrelación), MCO sigue siendo insesgado y consistente, pero <b>deja de ser eficiente</b> y la fórmula usual \(s^2(X'X)^{-1}\) de su varianza es incorrecta: las pruebas t y F no son válidas.</p>
 <div class="mj">\[V(\hat\beta_{MCO})=\sigma^2(X'X)^{-1}X'\Omega X(X'X)^{-1}\]</div></section>
 <section><h3>El estimador de Aitken</h3>
-<p>Si \(\Omega=PP'\), transformar el modelo con \(P^{-1}\) devuelve perturbaciones esféricas, y aplicar MCO al modelo transformado da</p>
+<p>Si se encuentra una matriz \(P\) con \(P\Omega P'=I\) (abajo se explica cómo), transformar el modelo con \(P\) devuelve perturbaciones esféricas, y aplicar MCO al modelo transformado da</p>
 <div class="mj">\[\hat\beta_{MCG}=(X'\Omega^{-1}X)^{-1}X'\Omega^{-1}y\qquad V(\hat\beta_{MCG})=\sigma^2(X'\Omega^{-1}X)^{-1}\]</div>
 <p>Por el teorema de Aitken, MCG es MELI en el modelo generalizado; con normalidad coincide con el estimador de máxima verosimilitud. Casos: <b>mínimos cuadrados ponderados</b> (\(\Omega\) diagonal, se divide cada observación por \(\sigma_i\)) y la transformación de <b>Cochrane-Orcutt o Prais-Winsten</b> con autocorrelación AR(1).</p>
 <p>En la práctica \(\Omega\) es desconocida: <b>MCG factibles</b> la estiman en una primera etapa. La alternativa es mantener MCO y usar errores estándar robustos (White, Newey-West).</p></section>
-${LABX("¿cuánto gana MCG?")}`,
-qs:[{q:"Si Var(uᵢ) = σ²xᵢ², ¿qué transformación aplica MCP?",a:"Dividir toda la ecuación por xᵢ: la nueva perturbación uᵢ/xᵢ tiene varianza constante σ²."}]}]);
+<section><h3>Por qué funciona: la matriz de transformación P</h3>
+<p>Como \(\Omega\) es simétrica y definida positiva, existe una matriz \(P\) (\(n\times n\)) tal que \(P\Omega P'=I_n\), y por lo tanto \(\Omega^{-1}=P'P\). Se multiplica todo el modelo por \(P\):</p>
+<div class="mj">\[\underbrace{Py}_{y^*}=\underbrace{PX}_{X^*}\beta+\underbrace{Pu}_{u^*}\qquad V(u^*)=P\,V(u)\,P'=\sigma^2P\Omega P'=\sigma^2I_n\]</div>
+<p>El modelo transformado cumple todos los supuestos clásicos, así que MCO aplicado a él es MELI (Gauss-Markov). Ese MCO es justamente MCG:</p>
+<div class="mj">\[\hat\beta=(X^{*\prime}X^*)^{-1}X^{*\prime}y^*=(X'P'PX)^{-1}X'P'Py=(X'\Omega^{-1}X)^{-1}X'\Omega^{-1}y\]</div>
+<p>Esa es la prueba del <b>teorema de Aitken</b>: MCG es «MCO sobre los datos bien ponderados». Dos detalles que preguntan en el parcial:</p>
+<ul><li><b>\(\sigma^2\) no hace falta para estimar \(\beta\)</b>: si \(V(u)=\sigma^2\Omega\), el \(\sigma^2\) se cancela en \((X'\Omega^{-1}X)^{-1}X'\Omega^{-1}y\). Solo hace falta conocer \(\Omega\) <i>salvo una constante</i>.</li>
+<li><b>\(\sigma^2\) se estima con los residuos ponderados</b>: \(\hat\sigma^2=\dfrac{e'\Omega^{-1}e}{n-k}=\dfrac{e^{*\prime}e^*}{n-k}\), con \(e=y-X\hat\beta_{MCG}\).</li></ul></section>
+
+<section><h3>Ejemplo resuelto: ventas y publicidad (Ejemplo 3 de clase)</h3>
+<p class="lead">\(Y_t\) = volumen de ventas, \(X_t\) = gasto en publicidad. Modelo \(Y_t=\beta_1+\beta_2X_t+u_t\), \(t=1,\dots,6\), con \(E[u_t]=0\), \(\operatorname{cov}(u_t,u_s)=0\ \forall t\ne s\) y \(\operatorname{var}(u_t)=\sigma^2X_t\). Es decir, <b>no hay autocorrelación pero sí heterocedasticidad</b>: la varianza del error crece con el gasto en publicidad.</p>
+<div class="tbl"><table><tr><th>\(t\)</th><th>\(Y_t\)</th><th>\(X_t\)</th><th>\(X_t^2\)</th><th>\(X_tY_t\)</th><th>\(1/X_t\)</th><th>\(Y_t/X_t\)</th></tr>
+<tr><td>1</td><td>120</td><td>4</td><td>16</td><td>480</td><td>0,250000</td><td>30,000000</td></tr>
+<tr><td>2</td><td>130</td><td>25</td><td>625</td><td>3.250</td><td>0,040000</td><td>5,200000</td></tr>
+<tr><td>3</td><td>150</td><td>30</td><td>900</td><td>4.500</td><td>0,033333</td><td>5,000000</td></tr>
+<tr><td>4</td><td>160</td><td>36</td><td>1.296</td><td>5.760</td><td>0,027778</td><td>4,444444</td></tr>
+<tr><td>5</td><td>180</td><td>40</td><td>1.600</td><td>7.200</td><td>0,025000</td><td>4,500000</td></tr>
+<tr><td>6</td><td>200</td><td>49</td><td>2.401</td><td>9.800</td><td>0,020408</td><td>4,081633</td></tr>
+<tr><th>Σ</th><th>940</th><th>184</th><th>6.838</th><th>30.990</th><th>0,396519</th><th>53,226077</th></tr></table></div>
+<p>Con esta tabla se resuelve todo el ejercicio: las tres primeras columnas de sumas sirven para MCO y las dos últimas para MCG.</p>
+
+<h4>a. Obtener \(\operatorname{Var}(u)\)</h4>
+<p>En la diagonal van las varianzas \(\sigma_t^2=\operatorname{var}(u_t)=\sigma^2X_t\); fuera de la diagonal, las covarianzas \(\sigma_{ij}=\operatorname{cov}(u_i,u_j)=0\). Se saca \(\sigma^2\) como factor común:</p>
+<div class="mj">\[\operatorname{Var}(u)=\begin{bmatrix}\sigma^2X_1&0&\cdots&0\\0&\sigma^2X_2&\cdots&0\\\vdots&&\ddots&\vdots\\0&0&\cdots&\sigma^2X_6\end{bmatrix}=\sigma^2\,\Omega,\qquad\Omega=\operatorname{diag}(4,\,25,\,30,\,36,\,40,\,49)\ne I_6\]</div>
+<p>Como \(\Omega\ne I\), las perturbaciones son <b>no esféricas</b>: MCO sigue siendo insesgado, pero ya no es el de mínima varianza.</p>
+
+<h4>a. (cont.) Estimar por MCO</h4>
+<div class="mj">\[b_{MCO}=(X'X)^{-1}X'y=\begin{bmatrix}n&\sum X_t\\\sum X_t&\sum X_t^2\end{bmatrix}^{-1}\begin{bmatrix}\sum Y_t\\\sum X_tY_t\end{bmatrix}=\begin{bmatrix}6&184\\184&6838\end{bmatrix}^{-1}\begin{bmatrix}940\\30990\end{bmatrix}\]</div>
+<p>Inversa de una 2×2: se intercambia la diagonal, se cambia el signo de lo de afuera y se divide por el determinante, \(|X'X|=6\cdot6838-184^2=41028-33856=7172\):</p>
+<div class="mj">\[(X'X)^{-1}=\frac1{7172}\begin{bmatrix}6838&-184\\-184&6\end{bmatrix}=\begin{bmatrix}0{,}9534300&-0{,}0256553\\-0{,}0256553&0{,}0008366\end{bmatrix}\]</div>
+<div class="mj">\[b_{MCO}=\begin{bmatrix}0{,}9534300\cdot940-0{,}0256553\cdot30990\\-0{,}0256553\cdot940+0{,}0008366\cdot30990\end{bmatrix}=\begin{bmatrix}101{,}1656\\1{,}8098\end{bmatrix}\]</div>
+<p>\(\hat Y_t=101{,}17+1{,}81X_t\): cada unidad adicional de publicidad se asocia con 1,81 unidades más de ventas.</p>
+
+<h4>b. Estimar por MCG</h4>
+<p><b>Paso 1. Invertir \(\Omega\).</b> Como es diagonal, basta invertir cada elemento: \(\Omega^{-1}=\operatorname{diag}\left(\frac1{X_1},\dots,\frac1{X_6}\right)\).</p>
+<p><b>Paso 2. Calcular \(\Omega^{-1}X\) y \(\Omega^{-1}y\)</b> (lo que el profesor escribe en el tablero). Multiplicar por \(\Omega^{-1}\) divide cada fila por \(X_t\):</p>
+<div class="mj">\[\Omega^{-1}X=\begin{bmatrix}1/X_1&X_1/X_1\\\vdots&\vdots\\1/X_6&X_6/X_6\end{bmatrix}=\begin{bmatrix}1/X_1&1\\\vdots&\vdots\\1/X_6&1\end{bmatrix}\qquad\Omega^{-1}y=\begin{bmatrix}Y_1/X_1\\\vdots\\Y_6/X_6\end{bmatrix}\]</div>
+<p><b>Paso 3. Premultiplicar por \(X'\)</b> (filas: unos y \(X_t\)):</p>
+<div class="mj">\[X'\Omega^{-1}X=\begin{bmatrix}\sum\frac1{X_t}&n\\n&\sum X_t\end{bmatrix}=\begin{bmatrix}0{,}396519&6\\6&184\end{bmatrix}\qquad X'\Omega^{-1}y=\begin{bmatrix}\sum\frac{Y_t}{X_t}\\\sum Y_t\end{bmatrix}=\begin{bmatrix}53{,}226077\\940\end{bmatrix}\]</div>
+<p>Fíjate en el patrón: con \(\operatorname{var}(u_t)=\sigma^2X_t\), las sumas «suben un escalón»: donde MCO tenía \(n\), \(\sum X_t\), \(\sum X_t^2\), MCG tiene \(\sum 1/X_t\), \(n\), \(\sum X_t\).</p>
+<p><b>Paso 4. Invertir.</b> \(|X'\Omega^{-1}X|=0{,}396519\cdot184-6^2=72{,}959546-36=36{,}959546\):</p>
+<div class="mj">\[(X'\Omega^{-1}X)^{-1}=\frac1{36{,}959546}\begin{bmatrix}184&-6\\-6&0{,}396519\end{bmatrix}=\begin{bmatrix}4{,}9784161&-0{,}1623397\\-0{,}1623397&0{,}0107285\end{bmatrix}\]</div>
+<p><b>Paso 5. Multiplicar.</b></p>
+<div class="mj">\[b_{MCG}=\begin{bmatrix}4{,}9784161\cdot53{,}226077-0{,}1623397\cdot940\\-0{,}1623397\cdot53{,}226077+0{,}0107285\cdot940\end{bmatrix}=\begin{bmatrix}264{,}9816-152{,}5993\\-8{,}6407+10{,}0848\end{bmatrix}=\begin{bmatrix}112{,}3823\\1{,}4441\end{bmatrix}\]</div>
+<p>\(\hat Y_t=112{,}38+1{,}44X_t\). Ojo con el redondeo: si usas la inversa con solo seis decimales (0,010728), la pendiente sale 1,4436 en vez de 1,4441. Conserva siete cifras o usa la calculadora del laboratorio.</p>
+
+<h4>c. Errores estándar: ¿qué se gana?</h4>
+<p>Residuos de MCG \(e_t=Y_t-112{,}3823-1{,}4441X_t\): 1,84; −18,48; −5,70; −4,37; 9,86; 16,86. La suma ponderada es \(\sum e_t^2/X_t=24{,}357\), así que \(\hat\sigma^2=24{,}357/(6-2)=6{,}0892\).</p>
+<div class="tbl"><table><tr><th></th><th>\(\hat\beta_1\)</th><th>\(\hat\beta_2\)</th><th>e.e. de \(\hat\beta_2\)</th><th>Comentario</th></tr>
+<tr><td>MCG</td><td>112,38</td><td>1,444</td><td>0,256</td><td>\(\sqrt{\hat\sigma^2\cdot0{,}0107285}\): el correcto y el menor</td></tr>
+<tr><td>MCO, varianza correcta</td><td>101,17</td><td>1,810</td><td>0,324</td><td>\(\hat\sigma^2(X'X)^{-1}X'\Omega X(X'X)^{-1}\)</td></tr>
+<tr><td>MCO, fórmula usual</td><td>101,17</td><td>1,810</td><td>0,360</td><td>\(s^2(X'X)^{-1}\) con \(s^2=618{,}10/4\): <b>no es válida</b> aquí</td></tr></table></div>
+<p>La varianza de \(\hat\beta_2\) por MCG es el 62 % de la de MCO (0,0653 frente a 0,1050). <b>¿Por qué cambian los coeficientes?</b> MCG le da peso \(1/X_t\) a cada observación: la primera (\(X=4\)) pesa 12 veces más que la última (\(X=49\)), porque su error tiene mucha menos varianza y por lo tanto informa más. MCO trata a todas por igual y se deja jalar por las observaciones ruidosas de gasto alto.</p></section>
+
+<section><h3>Atajo equivalente: el modelo transformado (MCP)</h3>
+<p>Con \(\Omega=\operatorname{diag}(X_t)\), la matriz de transformación es \(P=\operatorname{diag}(1/\sqrt{X_t})\). Se divide toda la ecuación por \(\sqrt{X_t}\):</p>
+<div class="mj">\[\frac{Y_t}{\sqrt{X_t}}=\beta_1\frac1{\sqrt{X_t}}+\beta_2\sqrt{X_t}+\frac{u_t}{\sqrt{X_t}},\qquad\operatorname{var}\!\left(\frac{u_t}{\sqrt{X_t}}\right)=\frac{\sigma^2X_t}{X_t}=\sigma^2\]</div>
+<p>Se estima por MCO <b>sin intercepto</b> (la columna de unos se convirtió en \(1/\sqrt{X_t}\)) y sale exactamente \(\hat\beta_1=112{,}38\), \(\hat\beta_2=1{,}444\). Es la misma cuenta que el paso 3: \(X^{*\prime}X^*=X'P'PX=X'\Omega^{-1}X\).</p>
+<div class="tbl"><table><tr><th>Si \(\operatorname{var}(u_t)=\)</th><th>\(\Omega\)</th><th>Se divide por</th><th>Modelo transformado</th></tr>
+<tr><td>\(\sigma^2X_t\)</td><td>\(\operatorname{diag}(X_t)\)</td><td>\(\sqrt{X_t}\)</td><td>\(Y_t/\sqrt{X_t}=\beta_1/\sqrt{X_t}+\beta_2\sqrt{X_t}+v_t\)</td></tr>
+<tr><td>\(\sigma^2X_t^2\)</td><td>\(\operatorname{diag}(X_t^2)\)</td><td>\(X_t\)</td><td>\(Y_t/X_t=\beta_2+\beta_1(1/X_t)+v_t\): el intercepto y la pendiente cambian de papel</td></tr>
+<tr><td>\(\sigma_t^2\) conocidas</td><td>\(\operatorname{diag}(\sigma_t^2)\)</td><td>\(\sigma_t\)</td><td>Cada observación con peso \(1/\sigma_t^2\)</td></tr>
+<tr><td>\(\sigma^2\) y AR(1) con \(\rho\)</td><td>\(\frac1{1-\rho^2}[\rho^{|t-s|}]\)</td><td>Cuasi-diferencias</td><td>\(Y_t-\rho Y_{t-1}=\beta_1(1-\rho)+\beta_2(X_t-\rho X_{t-1})+\varepsilon_t\) (Prais-Winsten conserva la 1.ª obs. multiplicada por \(\sqrt{1-\rho^2}\))</td></tr></table></div></section>
+
+<section><h3>Errores típicos en el parcial</h3>
+<ul><li><b>Dividir por \(X_t\) cuando la varianza es \(\sigma^2X_t\)</b>. Se divide por la <i>desviación estándar</i>, \(\sqrt{X_t}\). En la fórmula matricial, en cambio, \(\Omega^{-1}\) sí lleva \(1/X_t\): son la misma cosa porque \(P'P=\Omega^{-1}\).</li>
+<li><b>Dejar un intercepto en el modelo transformado.</b> La constante original se convierte en el regresor \(1/\sqrt{X_t}\).</li>
+<li><b>Calcular \(\hat\sigma^2\) con los residuos sin ponderar</b>: se usa \(e'\Omega^{-1}e/(n-k)\).</li>
+<li><b>Comparar el \(R^2\)</b> del modelo transformado con el de MCO: están en variables distintas y no son comparables.</li>
+<li><b>Redondear la inversa a dos decimales</b>: con elementos como 0,0107285 el error se dispara al multiplicar por sumas grandes (940). Conserva al menos seis cifras significativas en cada elemento (0,0107285, no 0,010728).</li></ul></section>
+
+<section><h3>Verificación en R</h3>
+<pre class="code"><code>y &lt;- c(120, 130, 150, 160, 180, 200)
+x &lt;- c(4, 25, 30, 36, 40, 49)
+X &lt;- cbind(1, x);  Oi &lt;- diag(1/x)          # Omega^-1
+b_mco &lt;- solve(t(X) %*% X) %*% t(X) %*% y     # 101.17 y 1.81
+b_mcg &lt;- solve(t(X) %*% Oi %*% X) %*% t(X) %*% Oi %*% y   # 112.38 y 1.44
+summary(lm(y ~ x, weights = 1/x))             # MCP: mismos coeficientes y e.e.
+summary(lm(I(y/sqrt(x)) ~ 0 + I(1/sqrt(x)) + sqrt(x)))   # modelo transformado</code></pre>
+<p class="hint">En <code>lm</code>, <code>weights</code> es el inverso de la varianza: \(1/X_t\), no \(1/\sqrt{X_t}\).</p></section>
+${LABX("¿cuánto gana MCG? y calculadora del ejemplo")}`,
+qs:[{q:"Si Var(uᵢ) = σ²xᵢ², ¿qué transformación aplica MCP?",a:"Dividir toda la ecuación por xᵢ: la nueva perturbación uᵢ/xᵢ tiene varianza constante σ²."},
+{q:"Con var(uₜ) = σ²Xₜ, escriba X′Ω⁻¹X y X′Ω⁻¹y para el modelo Yₜ = β₁ + β₂Xₜ + uₜ.",a:"X′Ω⁻¹X = [Σ1/Xₜ, n; n, ΣXₜ] y X′Ω⁻¹y = [ΣYₜ/Xₜ; ΣYₜ]."},
+{q:"En el ejemplo de ventas y publicidad, ¿por qué la pendiente baja de 1,81 (MCO) a 1,44 (MCG)?",a:"MCG pondera cada observación por 1/Xₜ. Las observaciones con gasto alto tienen errores más variables y pesan menos; MCO las trata igual que las demás y se deja influir por su ruido."},
+{q:"¿Por qué no hace falta conocer σ² para calcular b_MCG?",a:"Porque Var(u) = σ²Ω y en (X′(σ²Ω)⁻¹X)⁻¹X′(σ²Ω)⁻¹y el factor σ² se cancela. Solo se necesita Ω hasta una constante."},
+{q:"¿Qué condición debe cumplir la matriz P que transforma el modelo?",a:"PΩP′ = I, lo que equivale a P′P = Ω⁻¹. Con Ω diagonal, P = diag(1/√ωₜ)."}]}]);
 ins("mcg",B4);
 ins(B4.length?B4[B4.length-1].id:"mcg",[
 {id:"gmm", t:"Método generalizado de los momentos (GMM)", sim:"gmm", html:String.raw`
