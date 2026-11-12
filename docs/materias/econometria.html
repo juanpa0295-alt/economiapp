@@ -47,9 +47,12 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
     const go=k=>MathJax.typesetPromise([l]).catch(()=>{}).then(()=>{if(k>0&&crudo()){try{MathJax.typesetClear([l])}catch(e){}setTimeout(()=>go(k-1),300)}});go(4)})}}};
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BHLT18DZR"></script>
 <script>
-window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+/* No se cuentan: navegadores automáticos (pruebas) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
+(function(){var q=location.search,a=false;try{if(/[?&]autor=1/.test(q))localStorage.setItem("eco-autor","1");if(/[?&]autor=0/.test(q))localStorage.removeItem("eco-autor");a=localStorage.getItem("eco-autor")==="1"}catch(e){}
+window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true;
+if(!window.ECO_SIN_GA){var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-7BHLT18DZR";document.head.appendChild(s)}})();
+window.dataLayer=window.dataLayer||[];function gtag(){if(!window.ECO_SIN_GA)dataLayer.push(arguments)}
 gtag("js",new Date());gtag("config","G-7BHLT18DZR",{send_page_view:false,anonymize_ip:true});
 /* una «vista» por página y por estación: /materias/estadistica-2.html#tlc se registra como /materias/estadistica-2/tlc,
    para que el informe «Páginas y pantallas» muestre qué temas se estudian más */

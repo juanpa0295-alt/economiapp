@@ -38,6 +38,15 @@
   const ponerFab = () => { document.body.appendChild(fab); document.body.style.paddingBottom = "70px"; };
   if (document.body) ponerFab(); else addEventListener("DOMContentLoaded", ponerFab);
 
+  // ---------- Aviso del modo autor (tus visitas no se cuentan en Analytics)
+  if (window.ECO_AUTOR && /[?&]autor=1\b/.test(location.search)) {
+    const n = document.createElement("div");
+    n.textContent = "Modo autor activado: tus visitas en este dispositivo ya no se cuentan en Analytics. Para desactivarlo abre ?autor=0.";
+    n.style.cssText = "position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:auto;background:var(--ink,#1b2430);color:var(--card,#f8f9f5);padding:12px 16px;border-radius:12px;font:14px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)";
+    const pon = () => { document.body.appendChild(n); setTimeout(() => n.remove(), 6000); };
+    document.body ? pon() : addEventListener("DOMContentLoaded", pon);
+  }
+
   // ---------- Compartir (con etiqueta de campaña para medir el canal)
   fab.addEventListener("click", async e => {
     if (e.target.id === "eco-sh") {

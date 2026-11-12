@@ -45,9 +45,12 @@ def analytics_tag():
         return ""
     g = ANALYTICS_ID
     return f'''
-<script async src="https://www.googletagmanager.com/gtag/js?id={g}"></script>
 <script>
-window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}
+/* No se cuentan: navegadores automáticos (pruebas) ni el «modo autor» (abrir una vez con ?autor=1; ?autor=0 lo quita) */
+(function(){{var q=location.search,a=false;try{{if(/[?&]autor=1\b/.test(q))localStorage.setItem("eco-autor","1");if(/[?&]autor=0\b/.test(q))localStorage.removeItem("eco-autor");a=localStorage.getItem("eco-autor")==="1"}}catch(e){{}}
+window.ECO_AUTOR=a;window.ECO_SIN_GA=a||navigator.webdriver===true;
+if(!window.ECO_SIN_GA){{var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id={g}";document.head.appendChild(s)}}}})();
+window.dataLayer=window.dataLayer||[];function gtag(){{if(!window.ECO_SIN_GA)dataLayer.push(arguments)}}
 gtag("js",new Date());gtag("config","{g}",{{send_page_view:false,anonymize_ip:true}});
 /* una «vista» por página y por estación: /materias/estadistica-2.html#tlc se registra como /materias/estadistica-2/tlc,
    para que el informe «Páginas y pantallas» muestre qué temas se estudian más */
