@@ -1213,7 +1213,7 @@ SIMS.mcg=function(){
       const pm=S(i=>y[i]*Math.sqrt(w[i]))/n,cor=n*pm*pm,tss=yy-cor,ess=bxy-cor;
       const om=x.map((_,i)=>1/w[i]),M=[[S(i=>om[i]),S(i=>om[i]*x[i])],[S(i=>om[i]*x[i]),S(i=>om[i]*x[i]*x[i])]],m2=(A,B)=>A.map(r=>B[0].map((_,j)=>r[0]*B[0][j]+r[1]*B[1][j])),VO=m2(m2(I0,M),I0);
       const ws=h===0?"1":h===1?"1/Xₜ":h===2?"1/Xₜ²":"1/√Xₜ",hs=h===1?"Xₜ":h===2?"Xₜ²":"√Xₜ",ps=h===0?"Yₜ":h===1?"Yₜ/√Xₜ":h===2?"Yₜ/Xₜ":"Yₜ/Xₜ^¼";
-      const part=(n_,t,sm,b)=>`<details class="pto"><summary><span class="pn">${n_}</span><span class="pt">${t}<small>${sm}</small></span></summary><div class="pto-b">${b}</div></details>`;
+      const dv={1:"√Xₜ",2:"Xₜ",0.5:"Xₜ^¼"}[h]||"1",part=(n_,t,sm,b)=>`<details class="pto"><summary><span class="pn">${n_}</span><span class="pt">${t}<small>${sm}</small></span></summary><div class="pto-b">${b}</div></details>`;
       o.innerHTML=`<div class="res">${tiles([["β̂₁ MCG",fmt(b1,4),"okt"],["β̂₂ MCG",fmt(b2,4),"okt"],["RSS",fmt(rss,4)],["s² = RSS/(n−k)",fmt(s2,4)],["e.e.(β̂₂) MCG",fmt(Math.sqrt(s2*I[1][1]),4),"okt"],["e.e.(β̂₂) MCO",fmt(Math.sqrt(s2*VO[1][1]),4)]])}</div>
       <p class="hint" style="margin:10px 0 6px">Abre cada parte para ver el desarrollo con tus datos.</p><div class="tl-list">`+
       part(1,"b<sub>MCG</sub> paso a paso",`Ω⁻¹ = diag(${ws}) · b = (${n7(+b1.toFixed(6))}; ${n7(+b2.toFixed(6))})`,
@@ -1235,8 +1235,14 @@ SIMS.mcg=function(){
         <p>Var<sub>v</sub>(b<sub>MCO</sub>) = σ²(X′X)⁻¹X′ΩX(X′X)⁻¹ = σ² ${mat(VO)}</p>
         <div class="tbl"><table><tr><th>Con s² = ${n7(+s2.toFixed(6))}</th><th>e.e.(b₁)</th><th>e.e.(b₂)</th></tr><tr><td>MCG</td><td>${fmt(Math.sqrt(s2*I[0][0]),4)}</td><td>${fmt(Math.sqrt(s2*I[1][1]),4)}</td></tr><tr><td>MCO (verdadera)</td><td>${fmt(Math.sqrt(s2*VO[0][0]),4)}</td><td>${fmt(Math.sqrt(s2*VO[1][1]),4)}</td></tr><tr><td>MCO fórmula usual (no válida)</td><td>${fmt(Math.sqrt(s2o*I0[0][0]),4)}</td><td>${fmt(Math.sqrt(s2o*I0[1][1]),4)}</td></tr></table></div>
         <p>${h?`Var(b₂) por MCG es el ${fmt(100*I[1][1]/VO[1][1],1)} % de la de MCO.`:"Con Ω = I, MCG y MCO coinciden."}</p>`)+
-      part(4,"Comparación con MCO y código R",`b<sub>MCO</sub> = (${fmt(o1,4)}; ${fmt(o2,4)})`,
-        `<p>b<sub>MCO</sub> = (X′X)⁻¹X′y = ${mat(I0)} ${mat([[sy],[sxy]])} = ${mat([[o1],[o2]])}</p>${h?`<p>Equivalente: dividir todo por √(${hs}) y estimar por MCO sin intercepto.</p>`:""}
+      part(4,"Modelo transformado y estimación por MCO",h?`${{1:"Yₜ/√Xₜ = β₁·(1/√Xₜ) + β₂·√Xₜ",2:"Yₜ/Xₜ = β₁·(1/Xₜ) + β₂",0.5:"Yₜ/Xₜ^¼ = β₁·(1/Xₜ^¼) + β₂·Xₜ^¾"}[h]} + uₜ*, sin agregar intercepto`:"Con Ω = I no hay que transformar",
+        h?`<p>P = diag(1/${dv}) cumple P′P = Ω⁻¹. Se divide cada fila por ${dv}; el error transformado tiene varianza σ² y la constante se vuelve el regresor X₁*.</p>
+        <div class="tbl"><table><tr><th>t</th><th>Yₜ*</th><th>X₁ₜ*</th><th>X₂ₜ*</th><th>eₜ*</th></tr>${x.map((v,i)=>{const q=Math.sqrt(w[i]);return`<tr><td>${i+1}</td><td>${n7(y[i]*q)}</td><td>${n7(q)}</td><td>${n7(v*q)}</td><td>${n7(e[i]*q)}</td></tr>`}).join("")}</table></div>
+        <p>X*′X* = ${mat([[a11,a12],[a12,a22]])} &nbsp; X*′y* = ${mat([[c1],[c2]])} → b = ${mat([[b1],[b2]])}</p>
+        <p>Son las mismas matrices del paso 1: MCG = MCO sobre el modelo transformado. Σeₜ*² = RSS = ${n7(rss)}; la TSS del modelo transformado es la TSS de MCG (${n7(tss)}).</p>
+        <pre class="code"><code>ys &lt;- y/sqrt(x^${h}); x1s &lt;- 1/sqrt(x^${h}); x2s &lt;- x/sqrt(x^${h})\nsummary(lm(ys ~ 0 + x1s + x2s))</code></pre>`:"<p>Con varianza constante P = I: el modelo ya cumple los supuestos y MCO es MCG.</p>")+
+      part(5,"Comparación con MCO y código R",`b<sub>MCO</sub> = (${fmt(o1,4)}; ${fmt(o2,4)})`,
+        `<p>b<sub>MCO</sub> = (X′X)⁻¹X′y = ${mat(I0)} ${mat([[sy],[sxy]])} = ${mat([[o1],[o2]])}</p>${h?`<p>Equivalente: dividir todo por ${dv} y estimar por MCO sin intercepto (parte 4).</p>`:""}
         <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`)+`</div>`;
     };
     bindSeg("mg-v",v=>{h=+v;run()});$("mg-y").oninput=run;$("mg-x").oninput=run;run()};

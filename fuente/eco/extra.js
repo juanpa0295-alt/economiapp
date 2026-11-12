@@ -90,13 +90,35 @@ ins(B2.length?B2[B2.length-1].id:"diagnostico",[
 <tr><td>MCO (verdadera)</td><td>67,6260</td><td>0,105002</td><td>8,2235</td><td>0,3240</td></tr></table></div>
 <p class="hint">Error común: usar \(s^2(X'X)^{-1}\) para MCO. Con heterocedasticidad esa fórmula no es válida; da 0,3595 para e.e.(\(b_2\)).</p>
 </div></details>
+
+<details class="pto"><summary><span class="pn">d</span><span class="pt">Modelo transformado y estimación por MCO<small>Dividir todo por \(\sqrt{X_t}\) y estimar sin intercepto: da el mismo \(b_{MCG}\)</small></span></summary><div class="pto-b">
+<p><b>1. Encontrar \(P\).</b> Se busca \(P\) con \(P'P=\Omega^{-1}\). Como \(\Omega^{-1}=\operatorname{diag}(1/X_t)\), sirve \(P=\operatorname{diag}(1/\sqrt{X_t})\). Comprobación: \(P\Omega P'=\operatorname{diag}\!\left(\frac{X_t}{\sqrt{X_t}\sqrt{X_t}}\right)=I_6\).</p>
+<p><b>2. Transformar el modelo.</b> Se premultiplica \(y=X\beta+u\) por \(P\), es decir, se divide cada fila por \(\sqrt{X_t}\):</p>
+<div class="mj">\[\underbrace{\frac{Y_t}{\sqrt{X_t}}}_{Y_t^*}=\beta_1\underbrace{\frac1{\sqrt{X_t}}}_{X_{1t}^*}+\beta_2\underbrace{\sqrt{X_t}}_{X_{2t}^*}+\underbrace{\frac{u_t}{\sqrt{X_t}}}_{u_t^*},\qquad\operatorname{var}(u_t^*)=\frac{\sigma^2X_t}{X_t}=\sigma^2\]</div>
+<p>El error transformado es homocedástico: el modelo cumple los supuestos clásicos y se puede estimar por MCO. Ojo: <b>no lleva intercepto</b>, porque la columna de unos se volvió \(1/\sqrt{X_t}\).</p>
+<p><b>3. Datos transformados.</b></p>
+<div class="tbl"><table><tr><th>\(t\)</th><th>\(Y_t^*=Y_t/\sqrt{X_t}\)</th><th>\(X_{1t}^*=1/\sqrt{X_t}\)</th><th>\(X_{2t}^*=\sqrt{X_t}\)</th></tr>
+<tr><td>1</td><td>60</td><td>0,5</td><td>2</td></tr>
+<tr><td>2</td><td>26</td><td>0,2</td><td>5</td></tr>
+<tr><td>3</td><td>27,386128</td><td>0,182574</td><td>5,477226</td></tr>
+<tr><td>4</td><td>26,666667</td><td>0,166667</td><td>6</td></tr>
+<tr><td>5</td><td>28,460499</td><td>0,158114</td><td>6,324555</td></tr>
+<tr><td>6</td><td>28,571429</td><td>0,142857</td><td>7</td></tr></table></div>
+<p><b>4. MCO sobre el modelo transformado.</b> Las sumas son \(\sum X_{1t}^{*2}=\sum 1/X_t\), \(\sum X_{1t}^*X_{2t}^*=n\), \(\sum X_{2t}^{*2}=\sum X_t\), \(\sum X_{1t}^*Y_t^*=\sum Y_t/X_t\) y \(\sum X_{2t}^*Y_t^*=\sum Y_t\):</p>
+<div class="mj">\[b=(X^{*\prime}X^*)^{-1}X^{*\prime}y^*=\begin{bmatrix}0{,}3965193&6\\6&184\end{bmatrix}^{-1}\begin{bmatrix}53{,}22608\\940\end{bmatrix}=\begin{bmatrix}112{,}382282\\1{,}444056\end{bmatrix}\]</div>
+<p>Son exactamente las mismas matrices de la parte b, porque \(X^{*\prime}X^*=X'P'PX=X'\Omega^{-1}X\). <b>MCG = MCO sobre el modelo transformado.</b></p>
+<p><b>5. Lo demás también sale del modelo transformado.</b> Los residuos \(e_t^*=e_t/\sqrt{X_t}\) son 0,9207; −3,6967; −1,0414; −0,7280; 1,5583; 2,4084, y su suma de cuadrados es \(RSS=24{,}35697\). La TSS de clase es la TSS usual del modelo transformado, \(\sum Y_t^{*2}-n\bar Y^{*2}=7.363{,}4376-6.473{,}7313=889{,}7064\): por eso se centra con la media de \(Py\). Y \(s^2_{MCO\text{-}T}=RSS/(n-k)=6{,}089242\) es la \(s^2\) de este MCO; de ahí su nombre.</p>
+<pre class="code"><code>ys &lt;- y/sqrt(x); x1s &lt;- 1/sqrt(x); x2s &lt;- sqrt(x)
+summary(lm(ys ~ 0 + x1s + x2s))   # 0 = sin intercepto: 112.382282 y 1.444056</code></pre>
+<p class="hint">Sin intercepto, R reporta un \(R^2\) no centrado; no es el de clase.</p>
+</div></details>
 </div></section>
 ${LABX("calculadora del ejemplo y simulación")}`,
 deep:[
 {k:"Teoría",t:"Por qué funciona: la matriz de transformación P",html:String.raw`<p>Como \(\Omega\) es simétrica y definida positiva, existe \(P\) con \(P\Omega P'=I\), es decir, \(P'P=\Omega^{-1}\). Multiplicando el modelo por \(P\):</p>
 <div class="mj">\[y^*=Py,\quad X^*=PX,\quad u^*=Pu,\qquad V(u^*)=\sigma^2P\Omega P'=\sigma^2I\]</div>
 <p>El modelo transformado cumple los supuestos clásicos, y su MCO es MCG: \((X^{*\prime}X^*)^{-1}X^{*\prime}y^*=(X'\Omega^{-1}X)^{-1}X'\Omega^{-1}y\). Eso prueba el teorema de Aitken. Además, \(\sigma^2\) se cancela en el estimador: solo hace falta conocer \(\Omega\) salvo una constante.</p>`},
-{k:"Atajo",t:"El modelo transformado (mínimos cuadrados ponderados)",html:String.raw`<p>Con \(\operatorname{var}(u_t)=\sigma^2X_t\), \(P=\operatorname{diag}(1/\sqrt{X_t})\): se divide todo por \(\sqrt{X_t}\) y se estima por MCO <b>sin intercepto</b>. Da los mismos 112,38 y 1,444.</p>
+{k:"Tabla",t:"Cómo transformar según la forma de la varianza",html:String.raw`<p>Con \(\operatorname{var}(u_t)=\sigma^2X_t\), \(P=\operatorname{diag}(1/\sqrt{X_t})\): se divide todo por \(\sqrt{X_t}\) y se estima por MCO <b>sin intercepto</b>. Da los mismos 112,38 y 1,444.</p>
 <div class="mj">\[\frac{Y_t}{\sqrt{X_t}}=\beta_1\frac1{\sqrt{X_t}}+\beta_2\sqrt{X_t}+\frac{u_t}{\sqrt{X_t}}\]</div>
 <div class="tbl"><table><tr><th>Si \(\operatorname{var}(u_t)=\)</th><th>Se divide por</th><th>Modelo transformado</th></tr>
 <tr><td>\(\sigma^2X_t\)</td><td>\(\sqrt{X_t}\)</td><td>\(Y_t/\sqrt{X_t}=\beta_1/\sqrt{X_t}+\beta_2\sqrt{X_t}+v_t\)</td></tr>
