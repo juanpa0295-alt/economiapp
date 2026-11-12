@@ -39,13 +39,11 @@ const POSTULADOS = {
   ["Tasa de ganancia uniforme y transformación", "La competencia iguala la tasa de ganancia, por lo que los precios de producción se apartan de los valores (problema de la transformación)."],
   ["Leyes de movimiento del capitalismo", "Acumulación, tendencia decreciente de la tasa de ganancia y crisis periódicas."]]},
  walras: {esc: "Equilibrio general neoclásico (Walras)", obra: "Elementos de economía política pura (1874); Arrow-Debreu", p: [
-  ["Individualismo metodológico", "La economía se explica a partir de individuos (consumidores y empresas) que optimizan."],
-  ["Datos del modelo", "Preferencias, técnicas y dotaciones están dadas."],
-  ["Racionalidad", "Los consumidores maximizan utilidad y las empresas beneficio, tomando los precios como dados."],
-  ["Competencia perfecta y precios flexibles", "Nadie tiene poder de mercado y los precios se ajustan para vaciar todos los mercados."],
-  ["Sin intercambios en desequilibrio", "Se intercambia solo a los precios de equilibrio (el subastador y el tanteo)."],
-  ["Un mundo sin fricciones", "Propiedad privada sin Estado, sin costos de transacción, sin externalidades, un período, mercados completos e información perfecta."],
-  ["Ley de Walras", "La suma de las demandas excedentes en valor es cero: si n − 1 mercados se equilibran, el último también."]]},
+  ["La empresa maximiza el beneficio", "Elige capital y trabajo para maximizar p·f(K, N) − rK − wN, tomando los precios como dados: contrata hasta que PMg_K = r/p y PMg_N = w/p."],
+  ["El consumidor maximiza la utilidad", "Elige su canasta para maximizar la utilidad sujeta a su restricción presupuestaria: compra hasta que la TMS entre dos bienes iguala la relación de sus precios, UMg_i/UMg_m = p_i/p_m."]],
+  h: [["Datos", "Preferencias, técnicas y dotaciones están dadas."],
+   ["Diez hipótesis del modelo", "Propiedad privada sin Estado, competencia perfecta, precios semipositivos, sin intercambios en desequilibrio, precios flexibles, sin costos de transacción (trueque), sin externalidades, un solo período, mercados completos e información perfecta."],
+   ["Resultado: ley de Walras", "De las restricciones presupuestarias se sigue que la suma de las demandas excedentes en valor es cero: si n − 1 mercados se equilibran, el último también."]]},
  fallos: {esc: "Economía normativa: fallos de mercado", obra: "Pigou, Arrow, Coase, Akerlof", p: [
   ["Referencia: los teoremas del bienestar", "El equilibrio competitivo es eficiente (Pareto) solo si se cumplen las hipótesis de Walras."],
   ["Un fallo es una hipótesis que no se cumple", "Poder de mercado, externalidades, bienes públicos, información asimétrica, mercados incompletos."],
@@ -89,7 +87,7 @@ const POSTULADOS = {
   if (typeof document !== "undefined") { const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st); }
   Object.entries(POSTULADOS).forEach(([id, P]) => {
     const t = TRUNK.find(x => x.id === id); if (!t) return;
-    const box = `<section class="post"><h3>Postulados: ${P.esc}</h3><p class="obra">${P.obra}</p><ol>${P.p.map(([n, d]) => `<li><b>${n}</b>${d}</li>`).join("")}</ol>
+    const box = `<section class="post"><h3>Postulados: ${P.esc}</h3><p class="obra">${P.obra}</p><ol>${P.p.map(([n, d]) => `<li><b>${n}</b>${d}</li>`).join("")}</ol>${P.h ? `<p style="margin:12px 0 6px"><b>Sobre esos postulados se construye el modelo con:</b></p><ul>${P.h.map(([n, d]) => `<li><b>${n}</b>${d}</li>`).join("")}</ul>` : ""}
 <p class="uso">En el parcial: los postulados son las «hipótesis» del esquema hipótesis → mecanismo → resultado → crítica, y la base de la tabla de diferencias. Repásalos en el taller «Postulados de todas las escuelas».</p></section>`;
     const i = t.html.indexOf("</section>");
     t.html = i >= 0 ? t.html.slice(0, i + 10) + box + t.html.slice(i + 10) : box + t.html;
