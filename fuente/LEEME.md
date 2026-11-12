@@ -59,6 +59,11 @@ ECONOMIAPP_GA=G-XXXXXXXXXX python3 fuente/sitio/build.py
 
 Se registra una vista por página y otra por cada estación que se abre (por ejemplo `/materias/estadistica-2.html#tlc`), así que en Analytics se ve qué temas se estudian más. Con el ID vacío no se carga nada.
 
+### Visitas que no se cuentan
+
+- **Pruebas automáticas:** si el navegador es automático (`navigator.webdriver`, como Playwright o Chrome controlado), la etiqueta de Analytics no se carga. Aun así, en cualquier prueba nueva bloquea también `googletagmanager` y `google-analytics` (por ejemplo, `context.route(/googletagmanager|google-analytics/, r => r.abort())`).
+- **Modo autor:** abrir una vez `https://economiapp.app/?autor=1` en un dispositivo hace que ese navegador deje de enviar visitas (se guarda en `eco-autor`). `?autor=0` lo desactiva.
+
 ## Pruebas
 
 Requieren Node.js y Playwright (`npm install playwright` dentro de `fuente/pruebas/`).
