@@ -35,13 +35,46 @@ SIMS.diag=function(){
   bindSeg("dg-e",v=>{e=v;run()});bindCtl(["dg-n","dg-x","dg-y"],run);run()};
 
 SIMS.mcg=function(){
-  $("sim").innerHTML=`<div class="ctr">${ctl("mg-h","Heterocedasticidad: Var(u) = σ²x^h, h =",0,4,0.1,2)}${ctl("mg-n","n",10,200,1,40)}</div><p class="hint">500 muestras de y = 1 + 2x + u con x entre 1 y 10. Se comparan MCO y MCG (mínimos cuadrados ponderados con los pesos verdaderos 1/x^(h/2)).</p><div class="res" id="mg-res"></div><div id="mg-st"></div>`;
+  $("sim").innerHTML=`<div style="margin-bottom:10px">${seg("mg-m","Modo",[["calc","Calculadora del ejemplo de clase"],["sim","¿Cuánto gana MCG? (simulación)"]],"calc")}</div><div id="mg-box"></div>`;
+  const simu=()=>{
+  $("mg-box").innerHTML=`<div class="ctr">${ctl("mg-h","Heterocedasticidad: Var(u) = σ²x^h, h =",0,4,0.1,2)}${ctl("mg-n","n",10,200,1,40)}</div><p class="hint">500 muestras de y = 1 + 2x + u con x entre 1 y 10. Se comparan MCO y MCG (mínimos cuadrados ponderados con los pesos verdaderos 1/x^(h/2)).</p><div class="res" id="mg-res"></div><div id="mg-st"></div>`;
   const run=()=>{const h=V("mg-h"),n=Math.round(V("mg-n")),R=R0(99),xs=[...Array(n)].map((_,i)=>1+9*i/(n-1)),bo=[],bg=[],seo=[];
     for(let r=0;r<500;r++){const y=xs.map(x=>1+2*x+Math.pow(x,h/2)*gs(R)),X=xs.map(x=>[1,x]),o=ols(X,y);bo.push(o.b[1]);seo.push(Math.sqrt(o.scr/(n-2)*o.XtXi[1][1]));const w=xs.map(x=>Math.pow(x,-h/2)),g=ols(X.map((r,i)=>r.map(v=>v*w[i])),y.map((v,i)=>v*w[i]));bg.push(g.b[1])}
     const vo=vr(bo),vg=vr(bg),sec=mean(seo);
     $("mg-res").innerHTML=tiles([["Media de β̂ MCO",fmt(mean(bo),4)],["Media de β̂ MCG",fmt(mean(bg),4)],["Desv. real de MCO",fmt(Math.sqrt(vo),4)],["Desv. real de MCG",fmt(Math.sqrt(vg),4),"okt"],["Eficiencia relativa Var(MCG)/Var(MCO)",fmt(vg/vo,3)],["Error estándar MCO reportado (promedio)",fmt(sec,4),Math.abs(sec/Math.sqrt(vo)-1)>0.1?"badt":""]]);
     $("mg-st").innerHTML=stp(1,"Lectura",`<p>Los dos estimadores son insesgados (medias cerca de 2), pero con h = ${fm(h)} la varianza de MCG es el ${fmt(100*vg/vo,1)} % de la de MCO. Además, el error estándar que reporta MCO con la fórmula usual (${fmt(sec,4)}) ${Math.abs(sec/Math.sqrt(vo)-1)>0.1?"se aleja":"se parece"} de su desviación real (${fmt(Math.sqrt(vo),4)}): por eso con heterocedasticidad se usan errores robustos o MCG. Con h = 0 no hay diferencia.</p><pre class="code"><code>m_mco &lt;- lm(y ~ x)\nm_mcp &lt;- lm(y ~ x, weights = 1/x^${fm(h).replace(",",".")})   # MCG con pesos 1/Var(u)\nlibrary(sandwich); lmtest::coeftest(m_mco, vcov = vcovHC(m_mco))</code></pre>`)};
   bindCtl(["mg-h","mg-n"],run);run()};
+  const n7=v=>isFinite(v)?v.toLocaleString("es-CO",{maximumSignificantDigits:8}):"—";
+  const mat=A=>`<span style="display:inline-grid;grid-template-columns:repeat(${A[0].length},auto);gap:2px 14px;vertical-align:middle;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:6px;padding:4px 10px;margin:4px 2px;font-family:var(--f-mono);font-size:13px;text-align:right">${A.flat().map(v=>`<span>${typeof v==="number"?n7(v):v}</span>`).join("")}</span>`;
+  const num=t=>t.trim().split(/[\s;]+/).filter(Boolean).map(v=>parseFloat(v.replace(",",".")));
+  const calc=()=>{
+    $("mg-box").innerHTML=`<div class="calcf"><label>Y (separa con espacios)<input type="text" id="mg-y" value="120 130 150 160 180 200" spellcheck="false"></label><label>X (separa con espacios)<input type="text" id="mg-x" value="4 25 30 36 40 49" spellcheck="false"></label></div>
+    <div style="margin:8px 0">${seg("mg-v","var(uₜ)",[["1","σ²·Xₜ"],["2","σ²·Xₜ²"],["0.5","σ²·√Xₜ"],["0","σ² (homocedástico)"]],"1")}</div>
+    <p class="hint">Viene cargado el Ejemplo 3 de clase (ventas y publicidad). Cambia los datos o la forma de la varianza y mira cómo cambia cada paso. Se usan decimales con punto o coma.</p><div id="mg-out"></div>`;
+    let h=1;
+    const run=()=>{const y=num($("mg-y").value),x=num($("mg-x").value),o=$("mg-out");
+      if(y.length!==x.length||y.length<3||y.some(isNaN)||x.some(isNaN)){o.innerHTML=err("Y y X deben tener el mismo número de datos (al menos 3) y ser números.");return}
+      if(h&&x.some(v=>v<=0)){o.innerHTML=err("con var(uₜ) = σ²·Xₜ^h, todos los X deben ser positivos.");return}
+      const n=y.length,k=2,w=x.map(v=>Math.pow(v,-h)),S=f=>x.reduce((s,_,i)=>s+f(i),0);
+      const a11=S(i=>w[i]),a12=S(i=>w[i]*x[i]),a22=S(i=>w[i]*x[i]*x[i]),c1=S(i=>w[i]*y[i]),c2=S(i=>w[i]*x[i]*y[i]);
+      const d=a11*a22-a12*a12;if(Math.abs(d)<1e-12){o.innerHTML=err("X′Ω⁻¹X no es invertible (¿todos los X iguales?).");return}
+      const I=[[a22/d,-a12/d],[-a12/d,a11/d]],b1=I[0][0]*c1+I[0][1]*c2,b2=I[1][0]*c1+I[1][1]*c2;
+      const sx=S(i=>x[i]),sxx=S(i=>x[i]*x[i]),sy=S(i=>y[i]),sxy=S(i=>x[i]*y[i]),d0=n*sxx-sx*sx,I0=[[sxx/d0,-sx/d0],[-sx/d0,n/d0]],o1=I0[0][0]*sy+I0[0][1]*sxy,o2=I0[1][0]*sy+I0[1][1]*sxy;
+      const e=y.map((v,i)=>v-b1-b2*x[i]),s2=S(i=>w[i]*e[i]*e[i])/(n-k),eo=y.map((v,i)=>v-o1-o2*x[i]),s2o=S(i=>eo[i]*eo[i])/(n-k);
+      const om=x.map((_,i)=>1/w[i]),m11=S(i=>om[i]),m12=S(i=>om[i]*x[i]),m22=S(i=>om[i]*x[i]*x[i]);
+      const vo22=s2*(I0[1][0]*(I0[1][0]*m11+I0[1][1]*m12)+I0[1][1]*(I0[1][0]*m12+I0[1][1]*m22)),vo11=s2*(I0[0][0]*(I0[0][0]*m11+I0[0][1]*m12)+I0[0][1]*(I0[0][0]*m12+I0[0][1]*m22));
+      const hs=h===1?"Xₜ":h===2?"Xₜ²":h===0.5?"√Xₜ":"1",ws=h===0?"1":h===1?"1/Xₜ":h===2?"1/Xₜ²":"1/√Xₜ";
+      o.innerHTML=stp(1,"Ω y Ω⁻¹",`<p>var(u) = σ²Ω con Ω = diag(${x.map(v=>n7(Math.pow(v,h))).join("; ")}). Su inversa es diagonal con los recíprocos: el peso de cada observación es ${ws}.</p>`)+
+      stp(2,"Tabla de trabajo",`<div class="tbl"><table><tr><th>t</th><th>Yₜ</th><th>Xₜ</th><th>peso ${ws}</th><th>peso·Xₜ</th><th>peso·Xₜ²</th><th>peso·Yₜ</th><th>peso·XₜYₜ</th></tr>${x.map((v,i)=>`<tr><td>${i+1}</td><td>${n7(y[i])}</td><td>${n7(v)}</td><td>${n7(w[i])}</td><td>${n7(w[i]*v)}</td><td>${n7(w[i]*v*v)}</td><td>${n7(w[i]*y[i])}</td><td>${n7(w[i]*v*y[i])}</td></tr>`).join("")}<tr><th>Σ</th><th></th><th></th><th>${n7(a11)}</th><th>${n7(a12)}</th><th>${n7(a22)}</th><th>${n7(c1)}</th><th>${n7(c2)}</th></tr></table></div>`)+
+      stp(3,"X′Ω⁻¹X y X′Ω⁻¹y",`<p>X′Ω⁻¹X = ${mat([[a11,a12],[a12,a22]])} &nbsp; X′Ω⁻¹y = ${mat([[c1],[c2]])}</p>`)+
+      stp(4,"Inversa",`<p>Determinante = ${n7(a11)}·${n7(a22)} − ${n7(a12)}² = ${n7(d)}</p><p>(X′Ω⁻¹X)⁻¹ = ${mat(I)}</p>`)+
+      stp(5,"b_MCG = (X′Ω⁻¹X)⁻¹ X′Ω⁻¹y",`<p>${mat([[b1],[b2]])} → Ŷₜ = ${n7(+b1.toFixed(4))} + ${n7(+b2.toFixed(4))}·Xₜ</p>`)+
+      stp(6,"Comparación con MCO",`<div class="res">${tiles([["β̂₁ MCO",fmt(o1,4)],["β̂₂ MCO",fmt(o2,4)],["β̂₁ MCG",fmt(b1,4),"okt"],["β̂₂ MCG",fmt(b2,4),"okt"],["σ̂² con residuos ponderados",fmt(s2,4)],["e.e.(β̂₂) MCG",fmt(Math.sqrt(s2*I[1][1]),4),"okt"],["e.e.(β̂₂) MCO correcto",fmt(Math.sqrt(vo22),4)],["e.e.(β̂₂) MCO fórmula usual",fmt(Math.sqrt(s2o*I0[1][1]),4),h?"badt":""]])}</div>
+      <p>${h?`Var(β̂₂) por MCG es el ${fmt(100*s2*I[1][1]/vo22,1)} % de la de MCO. El «e.e. fórmula usual» s²(X′X)⁻¹ no es válido con heterocedasticidad.`:"Con varianza constante (Ω = I), MCG y MCO coinciden."}${h?` Modelo transformado equivalente: dividir todo por √(${hs}) y estimar por MCO sin intercepto.`:""}</p>
+      <pre class="code"><code>y &lt;- c(${y.join(", ")}); x &lt;- c(${x.join(", ")})\nsummary(lm(y ~ x, weights = 1/x^${h}))   # MCG con Ω = diag(x^${h})</code></pre>`);
+    };
+    bindSeg("mg-v",v=>{h=+v;run()});$("mg-y").oninput=run;$("mg-x").oninput=run;run()};
+  bindSeg("mg-m",m=>m==="sim"?simu():calc());calc()};
 
 SIMS.gmm=function(){
   $("sim").innerHTML=`<div class="ctr">${ctl("gm-n","n",50,2000,10,400)}${ctl("gm-e","Endogeneidad: Cov(x, u)",0,0.9,0.05,0.5)}${ctl("gm-z","Fuerza de los instrumentos",0.05,1.5,0.05,0.6)}${ctl("gm-v","Invalidez de z₂: Cov(z₂, u)",0,0.8,0.05,0)}${ctl("gm-h","Heterocedasticidad",0,2,0.1,1)}</div><p class="hint">y = 1 + 2x + u; x es endógena; z₁ y z₂ son instrumentos (sobreidentificado: 3 momentos, 2 parámetros).</p><div class="res" id="gm-res"></div><div id="gm-st"></div>`;
