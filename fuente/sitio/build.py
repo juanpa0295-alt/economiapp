@@ -160,7 +160,7 @@ tjs = rd("tj/tjsims.js")
 assert tjs.startswith("const GT=")
 tjs = tjs.split("\n", 1)[1]
 wr("materias/teoria-juegos/contenido.js", "// Teoría de Juegos · contenido de la ruta (notación del curso, ejercicios de los talleres 1 a 3)\n" + tjc + "\n" + rd("tj/extra.js"))
-wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js"))
+wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js") + "\n" + rd("tj/guiada.js"))
 
 wr("comun/macro.js", "// Economiapp · cálculos de Macroeconomía 1 como funciones puras.\n" + rd("macro1/macro.js").replace('if(typeof module!=="undefined")module.exports=MAC;', "").rstrip() + "\n")
 wr("materias/macroeconomia-1/contenido.js", "// Macroeconomía I · contenido de la ruta (programa 1503711)\n" + rd("macro1/content.js"))
