@@ -378,6 +378,8 @@ ${LAB}`,
 ];
 const WSBOX=`<div class="sim" id="sim"></div>`;
 const WORKSHOPS=[
+ {id:"guiada",t:"Práctica guiada: hazlo tú",anchor:"nash",links:["nash","dominancia","mixtas","secuencial","eps","subjuegos","ebp"],sim:"guiada",nuevo:true,html:WSBOX,
+  d:"Aquí no ves la solución hecha: la construyes tú, paso a paso, y la app te corrige al momento con una pista que explica el porqué. Cuatro procedimientos: subrayar mejores respuestas y encontrar el equilibrio de Nash en una tabla, despejar las probabilidades de las mixtas, resolver un árbol hacia atrás hasta escribir el EPS, y usar creencias μ para el EBP."},
  {id:"creencias",t:"Resolvedor de árboles con creencias",anchor:"ebp",links:["eps","ebp","subjuegos","arboles"],sim:"extfull",html:WSBOX,
   d:"Para juegos con información imperfecta: además de los equilibrios de Nash y los perfectos en subjuegos, encuentra los equilibrios bayesianos perfectos con las creencias μ que los sostienen, y revisa el requisito 5. Trae cargadas las figuras del Taller 3 y los ejemplos de clase de EPS y EBP."},
  {id:"arboles",t:"Resolvedor de árboles",anchor:"representacion",links:["representacion","secuencial","subjuegos","tres"],sim:"ext",nuevo:true,html:WSBOX,
