@@ -219,3 +219,15 @@ SIMS.hoja=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th><th>En R</th></tr>`+(rows.length?rows.map(([a,b,c,r])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td><td class="mono">${r}</td></tr>`).join(""):`<tr><td colspan="4">No hay resultados.</td></tr>`)};
   $("h-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const n="<b>Tamaño de la muestra.</b> Con más datos los estimadores consistentes se concentran alrededor del valor verdadero.",T={
+ "mc-n":n,"iv-r":"<b>Endogeneidad</b>: correlación entre x y el error. Con ρ > 0, MCO queda sesgado; variables instrumentales lo corrige.","iv-p":"<b>Fuerza del instrumento</b>: qué tanto mueve z a x. Con π pequeño el instrumento es débil (F de la primera etapa baja) y VI queda sesgado y disperso.","iv-n":n,
+ "gm-d":"<b>Invalidez del segundo instrumento</b>: cuánto se correlaciona z₂ con el error. Con δ > 0 la prueba de Hansen J debería rechazar.","gm-n":n,
+ "pn-n":"<b>Número de individuos</b> del panel.","pn-t":"<b>Períodos</b> por individuo.","pn-r":"<b>Correlación de x con el efecto individual.</b> Si es distinta de cero, efectos aleatorios queda sesgado y Hausman favorece efectos fijos.","pn-s":"<b>Variabilidad del efecto individual</b> entre personas.",
+ "nk-r":"<b>Persistencia verdadera</b> de y. El sesgo de Nickell de efectos fijos es mayor cuando ρ es alto y T es pequeño.","nk-t":"<b>Períodos</b> por individuo: con T grande el sesgo de Nickell desaparece.",
+ "bn-n":n,"tb-n":n,"tb-c":"<b>Desplaza la constante</b> del modelo latente: negativo produce más ceros (más censura) y MCO se sesga más.",
+ "hk-r":"<b>Correlación entre la decisión de participar y el salario.</b> Con ρ ≠ 0, MCO sobre los que trabajan está sesgado; Heckman lo corrige con la razón inversa de Mills.","hk-n":n,
+ "tr-s":"<b>Fuerza de la autoselección</b>: cuánto aumenta X la probabilidad de inscribirse. Con autoselección, la simple diferencia de medias sobreestima el efecto.","tr-n":n,
+ "km-l":"<b>Riesgo verdadero</b> de salir del desempleo cada mes. La duración media es 1/λ.","km-c":"<b>Fin del estudio</b>: quien sigue desempleado en ese mes queda censurado. Kaplan-Meier usa la información censurada sin descartarla.","km-n":n};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

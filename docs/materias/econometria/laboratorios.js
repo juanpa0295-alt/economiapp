@@ -1260,3 +1260,11 @@ SIMS.gmm=function(){
     $("gm-st").innerHTML=stp(1,"Dos etapas",`<div class="eq al">1. MC2E: W = (Z′Z)⁻¹ ⟹ β̂ = ${fmt(b1[1],4)}<br>2. Con los residuos de la etapa 1: Ŝ = (1/n)Σ zᵢzᵢ′êᵢ² y W = Ŝ⁻¹ ⟹ β̂<sub>GMM</sub> = ${fmt(b2[1],4)}<br>J = n·ḡ′Ŝ⁻¹ḡ = ${fmt(J,3)} ~ χ²(3 − 2 = 1)</div><p>${ce>0?"MCO está sesgado por la endogeneidad; los estimadores con instrumentos lo corrigen. ":""}${cv>0?"Como z₂ está correlacionado con u, la prueba J tiende a rechazar la validez de los instrumentos. ":"Con instrumentos válidos, J no debería rechazar. "}Instrumentos débiles (fuerza baja) vuelven imprecisos y sesgados a MC2E y GMM.</p><pre class="code"><code>library(gmm)\nsummary(gmm(y ~ x, ~ z1 + z2))          # incluye la prueba J\nsummary(AER::ivreg(y ~ x | z1 + z2), diagnostics = TRUE)</code></pre>`)};
   bindCtl(["gm-n","gm-e","gm-z","gm-v","gm-h"],run);run()};
 })();
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "mt-n":"<b>Número de observaciones.</b>","mt-k":"<b>Coeficientes del modelo no restringido</b> (incluida la constante).","mt-q":"<b>Número de restricciones</b> que se prueban.","mt-u":"<b>Suma de cuadrados de los residuos del modelo no restringido.</b>","mt-r":"<b>Suma de cuadrados de los residuos del modelo restringido</b>: siempre mayor o igual. F = [(SCR_R − SCR)/q]/[SCR/(n − k)].",
+ "dg-n":"<b>Número de observaciones.</b> Con pocos datos, una atípica pesa más.","dg-x":"<b>Valor de x de la observación atípica.</b> Lejos del centro tiene mucho apalancamiento.","dg-y":"<b>Qué tan lejos está verticalmente de la recta</b>: si además tiene apalancamiento, es influyente (distancia de Cook alta).",
+ "mg-h":"<b>Grado de heterocedasticidad</b>: Var(u) = σ²x^h. Con h = 0 los errores son homocedásticos y MCO = MCG.","mg-n":"<b>Tamaño de cada muestra.</b>",
+ "gm-n":"<b>Tamaño de la muestra.</b>","gm-e":"<b>Endogeneidad</b>: correlación entre x y el error. Sesga a MCO.","gm-z":"<b>Fuerza de los instrumentos</b>: qué tanto explican a x.","gm-v":"<b>Invalidez del segundo instrumento</b>: si es distinta de cero, la prueba J de Hansen debería rechazar.","gm-h":"<b>Heterocedasticidad</b> de los errores: es donde GMM eficiente le gana a MC2E."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

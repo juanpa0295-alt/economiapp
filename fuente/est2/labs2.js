@@ -266,3 +266,26 @@ SIMS.hoja2=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h2-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h2-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th></tr>`+(rows.length?rows.map(([a,b,c])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td></tr>`).join(""):`<tr><td colspan="3">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h2-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const n="<b>Tamaño de la muestra.</b> Con n más grande el error estándar baja (como 1/√n).",al="<b>Nivel de significancia</b>: probabilidad de rechazar H₀ siendo verdadera (error tipo I). Si el p-valor es menor que α, se rechaza.",T={
+ "dm-n":n,"dm-m":"<b>Media de la población</b> de la que se sacan las muestras.","dm-sg":"<b>Desviación estándar de la población.</b>","dm-n2":"<b>Tamaño de la segunda muestra</b>, para el cociente de varianzas que sigue una F.",
+ "or-n":n,"or-k":"<b>Qué estadística de orden se estudia</b>: k = 1 es el mínimo y k = n el máximo.","or-th":"<b>Límite superior θ</b> de la uniforme (0, θ).","or-l":"<b>Tasa λ</b> de la exponencial (media 1/λ).",
+ "tl-n":n+" El teorema del límite central dice que la media muestral se vuelve normal.","tl-e":"<b>Tolerancia ε</b>: la ley de los grandes números dice que P(|x̄ − μ| > ε) tiende a 0.",
+ "dl-m":"<b>Media de la población.</b>","dl-s":"<b>Desviación estándar de la población.</b>","dl-n":n+" El método delta aproxima la varianza de g(x̄) con g′(μ)²·σ²/n.",
+ "e-mu":"<b>Media poblacional</b> verdadera.","e-sg":"<b>Desviación estándar poblacional.</b>","e-n":n,
+ "cr-t":"<b>Parámetro verdadero p</b> (Bernoulli).","cr-n":n+" La cota de Cramér-Rao es la menor varianza posible de un estimador insesgado.",
+ "m-mu":"<b>Valor candidato de μ.</b> El estimador de máxima verosimilitud es el que hace máxima la verosimilitud (donde la pendiente es cero).",
+ "i-xb":"<b>Media de la muestra.</b>","i-sg":"<b>Desviación estándar poblacional</b> (conocida).","i-n":n,"i-E":"<b>Margen de error deseado</b>: con él se calcula el n necesario, n = (z·σ/E)².",
+ "ig-c":"<b>Nivel de confianza</b>: proporción de intervalos que, repitiendo el muestreo, contendrían el valor verdadero.","c-n":n,
+ "hz-mu_0":"<b>Media bajo la hipótesis nula</b> H₀.","hz-x_bar":"<b>Media de la muestra.</b>","hz-sigma":"<b>Desviación estándar poblacional</b> conocida (prueba z).","hz-n":n,"hz-alpha":al,
+ "ht-mu_0":"<b>Media bajo la hipótesis nula.</b>","ht-x_bar":"<b>Media de la muestra.</b>","ht-s":"<b>Desviación estándar de la muestra</b> (σ desconocida: prueba t con n − 1 grados de libertad).","ht-n":n,"ht-alpha":al,
+ "hp-p_0":"<b>Proporción bajo la hipótesis nula.</b>","hp-p_hat":"<b>Proporción de la muestra.</b>","hp-n":n,"hp-alpha":al,
+ "p-mu1":"<b>Media verdadera</b> bajo la alternativa. Entre más lejos de μ₀, mayor la potencia.","p-sg":"<b>Desviación estándar.</b>","p-n":n+" Más n, más potencia.","p-al":al+" Subirlo aumenta la potencia a costa de más error tipo I.",
+ "lr-a":al,
+ "adifp-x1":"<b>Éxitos en la muestra 1.</b>","adifp-n1":"<b>Tamaño de la muestra 1.</b>","adifp-x2":"<b>Éxitos en la muestra 2.</b>","adifp-n2":"<b>Tamaño de la muestra 2.</b>","adifp-d0":"<b>Diferencia de proporciones bajo H₀</b> (normalmente 0).","adifp-alpha":al,
+ "avar-n":n,"avar-s2":"<b>Varianza de la muestra.</b>","avar-sigma2_0":"<b>Varianza bajo la hipótesis nula.</b> El estadístico (n − 1)S²/σ²₀ sigue una ji cuadrado.","avar-alpha":al,
+ "acov-n1":"<b>Tamaño de la muestra 1.</b>","acov-s2_1":"<b>Varianza de la muestra 1.</b>","acov-n2":"<b>Tamaño de la muestra 2.</b>","acov-s2_2":"<b>Varianza de la muestra 2.</b> El cociente S²₁/S²₂ sigue una F bajo H₀: σ²₁ = σ²₂.","acov-alpha":al,
+ "w-x1":"<b>Media de la muestra 1.</b>","w-s1":"<b>Varianza de la muestra 1.</b>","w-n1":"<b>Tamaño de la muestra 1.</b>","w-x2":"<b>Media de la muestra 2.</b>","w-s2":"<b>Varianza de la muestra 2.</b> Welch no supone varianzas iguales.","w-n2":"<b>Tamaño de la muestra 2.</b>","w-d0":"<b>Diferencia de medias bajo H₀.</b>","w-al":al,
+ "ch-a":al};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

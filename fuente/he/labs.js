@@ -55,3 +55,7 @@ SIMS.crec=function(){
     const run=()=>{const a=V("cd-1")/100,b=V("cd-2")/100,n=V("cd-n"),r=Math.pow((1+a)/(1+b),n);
       $("cd-res").innerHTML=tiles([["Ingreso A / B al final",fmt(r,2)+" a 1","okt"],["Diferencia de tasas",fmt((a-b)*100,1)+" puntos"]])+`<p class="hint">Entre 1820 y 1998, Europa occidental creció cerca de 1,5 % anual y África cerca de 0,7 %: unos 0,8 puntos de diferencia durante 178 años bastan para multiplicar la brecha por más de 4.</p>`};
     bindCtl(["cd-1","cd-2","cd-n"],run);run()}})};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={"cp-g":"<b>Tasa de crecimiento anual.</b> Aun tasas pequeñas, mantenidas por siglos, multiplican el ingreso.","cp-n":"<b>Años</b> que se acumula el crecimiento.","cd-1":"<b>Tasa de crecimiento anual del país A.</b>","cd-2":"<b>Tasa de crecimiento anual del país B.</b> Una diferencia de 1 o 2 puntos explica la gran divergencia.","cd-n":"<b>Años</b> que se comparan."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

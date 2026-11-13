@@ -264,3 +264,13 @@ SIMS.hoja=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th></tr>`+(rows.length?rows.map(([a,b,c])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td></tr>`).join(""):`<tr><td colspan="3">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "ce-A":"<b>Parámetro de eficiencia</b>: escala la producción sin cambiar la forma de las isocuantas.","ce-d":"<b>Parámetro de distribución</b>: peso relativo del capital frente al trabajo.","ce-p":"<b>Parámetro de sustitución.</b> La elasticidad de sustitución es σ = 1/(1 + ρ): con ρ = 0 es Cobb-Douglas (σ = 1).","ce-r":"<b>Grado de homogeneidad</b>: r > 1 rendimientos crecientes, r < 1 decrecientes.","ce-K":"<b>Capital</b> en el punto evaluado.","ce-L":"<b>Trabajo</b> en el punto evaluado.",
+ "en-P":"<b>Precio del producto.</b>","en-A":"<b>Productividad</b> en Q = A·L^a.","en-a":"<b>Elasticidad del producto respecto al trabajo</b> (a < 1: rendimientos decrecientes).","en-w":"<b>Salario.</b> Teorema de la envolvente: dπ*/dw = −L*, la pendiente de la envolvente es la demanda de trabajo con signo menos.",
+ "g1-a":"<b>Coeficiente a</b> en la ecuación diferencial y′ + a·y = b. Si a > 0, la solución converge al equilibrio b/a.","g1-b":"<b>Término constante b.</b>","g1-y":"<b>Condición inicial</b> y(0).",
+ "tw-al":"<b>Intercepto de la demanda</b> Qd = α − βP.","tw-be":"<b>Pendiente de la demanda.</b>","tw-ga":"<b>Intercepto de la oferta</b> (Qs = −γ + δP₍t−1₎).","tw-de":"<b>Pendiente de la oferta.</b> La telaraña converge si δ < β y oscila sin parar si δ = β.","tw-p":"<b>Precio inicial.</b>",
+ "tg-a":"<b>Coeficiente a</b> en y₍t+1₎ + a·y_t = c. Si |a| < 1 converge; si a > 0 oscila.","tg-c":"<b>Término constante c.</b>","tg-y":"<b>Valor inicial</b> y₀.",
+ "sm-gm":"<b>Propensión marginal a consumir</b> en el multiplicador-acelerador de Samuelson.","sm-a":"<b>Acelerador</b>: cuánto invierten las empresas por cada peso que crece el consumo. Según γ y α, el ingreso converge, oscila o explota.","sm-G":"<b>Gasto público</b> constante.","sm-y0":"<b>Ingreso del período 0.</b>","sm-y1":"<b>Ingreso del período 1.</b>"};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

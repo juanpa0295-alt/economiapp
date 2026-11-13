@@ -232,3 +232,22 @@ SIMS.hoja=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th></tr>`+(rows.length?rows.map(([a,b,c])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td></tr>`).join(""):`<tr><td colspan="3">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "ct-n":"<b>Elementos disponibles</b> entre los que se escoge.","ct-r":"<b>Elementos que se escogen.</b> Si importa el orden se cuentan permutaciones; si no, combinaciones.",
+ "pe-a":"<b>Probabilidad del evento A.</b>","pe-b":"<b>Probabilidad del evento B.</b>","pe-ab":"<b>Probabilidad de que ocurran A y B a la vez.</b> Si es igual a P(A)·P(B), los eventos son independientes.",
+ "vc-m":"<b>Exponente</b> de la densidad f(x) ∝ xᵐ.","vc-a":"<b>Inicio del soporte</b>: donde empieza a valer la densidad.","vc-b":"<b>Fin del soporte.</b>","vc-l":"<b>Límite inferior</b> del intervalo cuya probabilidad se calcula (área bajo la densidad).","vc-u":"<b>Límite superior</b> del intervalo.",
+ "el-a":"<b>Coeficiente de X</b> en W = aX + bY + c.","el-b":"<b>Coeficiente de Y</b> en W = aX + bY + c.","el-c":"<b>Constante</b>: cambia la media de W, no su varianza.","el-mx":"<b>Media de X.</b>","el-my":"<b>Media de Y.</b>","el-sx":"<b>Desviación estándar de X.</b>","el-sy":"<b>Desviación estándar de Y.</b>","el-r":"<b>Correlación entre X e Y</b>: entra en la varianza de W a través de 2ab·ρ·σ_X·σ_Y.",
+ "ch-k":"<b>Número de desviaciones estándar</b> alrededor de la media. Chebyshev: al menos 1 − 1/k² de los datos queda a menos de k desviaciones, sea cual sea la distribución.","ch-m":"<b>Media.</b>","ch-s":"<b>Desviación estándar.</b>",
+ "dd-a":"<b>Desde qué valor</b> se suma la probabilidad.","dd-b":"<b>Hasta qué valor</b> se suma la probabilidad.",
+ "ap-n":"<b>Número de ensayos</b> de la binomial. Con n grande, la normal la aproxima bien.","ap-p":"<b>Probabilidad de éxito</b> en cada ensayo. La aproximación normal funciona mejor si np y n(1 − p) son mayores que 5.","ap-l":"<b>Media de la Poisson</b> (eventos esperados por intervalo). Con λ grande se parece a la normal.","ap-a":"<b>Desde qué valor</b> se calcula la probabilidad (se usa la corrección por continuidad).","ap-b":"<b>Hasta qué valor.</b>",
+ "tf-a":"<b>Pendiente</b> de la transformación Y = aX + b.","tf-b":"<b>Constante</b> de la transformación.","tf-mu":"<b>Media de X.</b>","tf-s":"<b>Desviación estándar de X.</b>","tf-l":"<b>Parámetro λ</b> de la distribución de X."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();
+(function(){const T={},p="<b>Probabilidad de éxito</b> en cada ensayo (independiente y constante).",ua="<b>Valor mínimo</b> de la uniforme: todos los valores entre a y b son igual de probables.",ub="<b>Valor máximo</b> de la uniforme.",
+  mu="<b>Media</b> de la normal: el centro de la campana.",sg="<b>Desviación estándar</b> de la normal: qué tan ancha es la campana. Cerca del 68 % de los datos queda a una σ de la media.",lam="<b>Tasa λ.</b> En la Poisson es el número medio de eventos por intervalo; en la exponencial, el inverso de la espera media (media 1/λ).",
+  al="<b>Parámetro de forma</b> de la gamma: con α = 1 es una exponencial; más grande, más simétrica.",be="<b>Parámetro de escala</b> de la gamma: estira la distribución (media α·β).";
+  Object.assign(T,{"dp-n":"<b>Número de ensayos</b> de la binomial.","dp-p":p,"dp-lam":lam,"dp-N":"<b>Tamaño de la población</b> de la que se extrae sin reemplazo (hipergeométrica).","dp-K":"<b>Éxitos que hay en la población.</b>","dp-r":"<b>Número de éxitos que se esperan</b> en la binomial negativa: se cuentan los ensayos hasta lograrlos.","dp-a":ua,"dp-b":ub,
+   "cp-mu":mu,"cp-s":sg,"cp-lam":lam,"cp-al":al,"cp-be":be,"cp-a":ua,"cp-b":ub,
+   "fp-lam":lam,"fp-n":"<b>Número de ensayos</b> de la binomial.","fp-p":p,"fp-a":ua,"fp-b":ub,"fp-mu":mu,"fp-s":sg,"fp-al":al,"fp-be":be});
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

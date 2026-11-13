@@ -167,6 +167,18 @@ SIMS.form=function(){MAT_RUN=null;
   $("h-q").addEventListener("input",run);run();
 };
 
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "g-a":"<b>Exponente de x</b> en f = xᵃ·yᵇ.","g-b":"<b>Exponente de y</b> en f = xᵃ·yᵇ.","g-px":"<b>Precio de x</b> en la restricción pₓx + p_y·y = m.","g-py":"<b>Precio de y.</b>","g-m":"<b>Ingreso</b>: lado derecho de la restricción. El multiplicador λ mide cuánto sube el óptimo si m sube en 1.",
+ "e-A":"<b>Demanda máxima</b>: lo que se compra con precio cero.","e-b":"<b>Pendiente de la demanda.</b>","e-P":"<b>Precio</b> en el que se calcula la elasticidad ε = −b·P/Q. En la demanda lineal, la elasticidad cambia a lo largo de la recta.",
+ "x-a":"<b>Intercepto de la demanda</b> P = a − bQ: el precio máximo que alguien pagaría.","x-b":"<b>Pendiente de la demanda.</b>","x-c":"<b>Intercepto de la oferta</b> P = c + dQ: el precio mínimo al que alguien vende.","x-d":"<b>Pendiente de la oferta.</b> Los excedentes son áreas (integrales) entre estas curvas y el precio de equilibrio.",
+ "tr-a":"<b>Estiramiento vertical</b> en a·f(b(x − h)) + k: si |a| > 1 estira, si |a| < 1 aplana, si a < 0 refleja.","tr-bb":"<b>Compresión horizontal</b>: si |b| > 1 comprime hacia el eje y.","tr-h":"<b>Traslación horizontal</b>: h > 0 mueve la gráfica a la derecha.","tr-k":"<b>Traslación vertical</b>: k > 0 la sube.",
+ "tc-t":"<b>Ángulo en grados</b> sobre el círculo unitario: el coseno es la coordenada x y el seno la y.","cc-A":"<b>Amplitud</b>: qué tan grande es la oscilación (picos y valles).","cc-p":"<b>Período</b>: cada cuánto se repite el ciclo.","cc-f":"<b>Fase</b>: desplaza el ciclo en el tiempo.","cc-c":"<b>Nivel</b> alrededor del cual oscila.",
+ "ta-h":"<b>Distancia h</b> entre los dos puntos de la secante. Cuando h → 0, la secante se convierte en la tangente: su pendiente es la derivada.",
+ "rm-n":"<b>Número de rectángulos.</b> Con más rectángulos, la suma de Riemann se acerca a la integral.","ni-n":"<b>Número de subintervalos.</b> Simpson exige que sea par y converge más rápido que los trapecios.",
+ "cr-k":"<b>Tasa de crecimiento</b> continua por período en y = y₀·e^(kt). Negativa, decrecimiento.","ty-n":"<b>Grado del polinomio de Taylor.</b> Más grado, mejor aproximación cerca del punto."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();
+
 
 // ===================== HERRAMIENTAS COMUNES DE MATEMÁTICAS I, II Y III =====================
 const okAll=a=>a.every(x=>isFinite(x)),n2=v=>fmt(v,2),n4=v=>fmt(v,4);
