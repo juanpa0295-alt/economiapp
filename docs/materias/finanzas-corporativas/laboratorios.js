@@ -234,3 +234,11 @@ SIMS.hoja=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th><th>Excel</th></tr>`+(rows.length?rows.map(([a,b,c,d])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td><td class="mono">${d}</td></tr>`).join(""):`<tr><td colspan="4">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "ag-a":"<b>Fracción de la empresa que posee el gerente.</b> Con menos propiedad, consume más beneficios privados a costa de los accionistas (costo de agencia).",
+ "pp-p":"<b>Activos corrientes permanentes</b>: el nivel mínimo que la empresa mantiene todo el año.","pp-e":"<b>Pico estacional</b> de activos corrientes.","pp-l":"<b>Financiación de largo plazo.</b> Si cubre solo lo permanente, la política es de calce; si cubre más, es conservadora; si menos, agresiva.",
+ "mm-ku":"<b>Costo del capital de la empresa sin deuda.</b>","mm-kd":"<b>Costo de la deuda.</b>","mm-t":"<b>Tasa de impuestos</b>: los intereses son deducibles, lo que hace atractiva la deuda.","mm-q":"<b>Intensidad de los costos de quiebra.</b> Crecen con la deuda y crean una estructura de capital óptima (teoría del trade-off).",
+ "li-p":"<b>Razón de pago objetivo</b>: fracción de las utilidades que la empresa quiere repartir a largo plazo.","li-c":"<b>Velocidad de ajuste</b> (Lintner): con c bajo, el dividendo se suaviza y cambia poco ante utilidades transitorias."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

@@ -30,3 +30,18 @@ SIMS.spence=function(){
     $("sp-st").innerHTML=stp(1,"Restricciones de incentivos",`<div class="eq al">Tipo alto: θH − cH·e* ≥ θL ⟺ ${fm(H)} − ${fm(cH)}·${fm(e)} = ${fmt(H-cH*e,2)} ≥ ${fm(L)}<br>Tipo bajo: θL ≥ θH − cL·e* ⟺ ${fm(L)} ≥ ${fmt(H-cL*e,2)}<br>Creencias: μ(alto | e ≥ e*) = 1, μ(alto | e < e*) = 0</div><p>Con e* = ${fmt(lo,2)} se obtiene el separador menos costoso. En un equilibrio agrupador nadie se educa y todos ganan ${fmt(pool,2)}; el tipo alto gana más en el separador si θH − cH·e* > ${fmt(pool,2)}.</p>`)};
   on(["sp-H","sp-L","sp-cH","sp-cL","sp-p"],run);bindCtl(["sp-e"],run);run()};
 })();
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "re-a":"<b>Intercepto de la demanda</b> P = a − bQ.","re-b":"<b>Pendiente de la demanda.</b>","re-c":"<b>Costo marginal</b> de cada firma.","re-n":"<b>Número de firmas</b> en Cournot. Con más firmas, el precio se acerca al costo marginal.",
+ "su-n":()=>document.getElementById("su-v")?"<b>Número de postores</b> en la subasta. Con más rivales conviene pujar más cerca de la propia valoración.":"<b>Número de jugadores</b> que pueden aportar al bien público.",
+ "su-a":"<b>Rendimiento marginal per cápita</b>: lo que le devuelve a cada jugador cada peso aportado. Si a < 1, aportar es dominado; si n·a > 1, aportar es eficiente.","su-w":"<b>Dotación</b> de cada jugador.",
+ "fk-d":"<b>Factor de descuento</b>: cuánto vale hoy un pago de mañana. Si supera el umbral (T − R)/(T − P), la cooperación con estrategias gatillo es un equilibrio (teorema de tradición oral).",
+ "sp-e":"<b>Educación mínima que exigen las empresas</b> para pagar el salario alto. Hay equilibrio separador si al tipo bajo no le conviene alcanzarla y al alto sí.",
+ "co-A":"<b>Valor del primer pez</b> en ρ(H) = A − bH: el precio cae cuando la captura total H crece.","co-b":"<b>Qué tan rápido cae el valor</b> con la captura total.","co-k":"<b>Costo del esfuerzo</b> de cada pescador, c(h) = k·h²/2.","co-n":"<b>Número de pescadores.</b> Más pescadores, más sobreexplotación (tragedia de los comunes).","co-al":"<b>Peso del bien público</b> en la utilidad.","co-w":"<b>Dotación</b> de cada jugador.",
+ "ar-m":"<b>Lo que el árbitro considera justo</b> en promedio (arbitraje de oferta final).","ar-s":"<b>Incertidumbre</b> sobre el criterio del árbitro: más incertidumbre, ofertas más extremas.",
+ "st-M":"<b>Intercepto de la demanda</b> P = M − dQ.","st-d":"<b>Pendiente de la demanda.</b>","st-c":"<b>Costo marginal</b> de las dos firmas.",
+ "ng-d1":"<b>Paciencia del jugador 1</b>: cuánto vale para él hoy un peso del próximo período. Más paciente, mayor su parte.","ng-d2":"<b>Paciencia del jugador 2.</b>","ng-T":"<b>Número de períodos</b> de negociación.","ng-s":"<b>Reparto que se impone</b> si se llega al último período sin acuerdo (parte del jugador 1).",
+ "bc-a":"<b>Intercepto de la demanda.</b>","bc-c":"<b>Costo de la firma 1</b> (conocido por todos).","bc-h":"<b>Costo alto</b> que puede tener la firma 2.","bc-l":"<b>Costo bajo</b> que puede tener la firma 2.","bc-t":"<b>Probabilidad de que la firma 2 tenga costo alto</b>, según cree la firma 1 (Cournot con información asimétrica).",
+ "su-v":"<b>Tu valoración</b> del objeto que se subasta.","su-m":"<b>Valoración máxima posible</b>: las valoraciones de los rivales se reparten uniformes entre 0 y v̄."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

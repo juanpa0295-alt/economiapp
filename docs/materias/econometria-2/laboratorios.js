@@ -257,3 +257,9 @@ SIMS.hoja=function(){
   const nz=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
   const run=()=>{const q=nz($("h-q").value.trim()),rows=F.filter(f=>!q||nz(f.join(" ")).includes(q));$("h-t").innerHTML=`<tr><th>Tema</th><th>Concepto</th><th>Fórmula</th><th>En R</th></tr>`+(rows.length?rows.map(([a,b,c,d])=>`<tr><td>${a}</td><td>${b}</td><td class="mono">${c}</td><td class="mono">${d}</td></tr>`).join(""):`<tr><td colspan="4">No hay fórmulas con esa palabra.</td></tr>`)};
   $("h-q").addEventListener("input",run);run()};
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios
+(function(){const T={
+ "ga-w":"<b>Constante ω</b> de la varianza condicional σ²ₜ = ω + α·u²ₜ₋₁ + β·σ²ₜ₋₁.","ga-a":"<b>Reacción a las noticias</b> (efecto ARCH): cuánto sube la volatilidad tras un choque grande.","ga-b":"<b>Persistencia de la volatilidad</b> (efecto GARCH). Si α + β está cerca de 1, la volatilidad dura mucho; debe ser menor que 1.",
+ "pa-rho":"<b>Correlación entre el efecto individual y x.</b> Si es distinta de cero, efectos aleatorios queda sesgado y la prueba de Hausman favorece efectos fijos."};
+ window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();

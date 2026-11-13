@@ -109,7 +109,7 @@ const tiles=a=>a.map(([s,v,c])=>`<div${c?` class="${c}"`:""}><small>${s}</small>
 const fr=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
 const rt=x=>`√<span class="ov">${x}</span>`;
 const stp=(n,t,h)=>`<div class="stepc"><h4><span class="n">${n}</span>${t}</h4>${h}</div>`;
-function ctl(id,label,min,max,step,val){return `<div class="ctl"><label for="${id}">${label}</label><div class="ctlrow"><input type="range" id="${id}-r" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"><input type="number" id="${id}" value="${val}" step="${step}" inputmode="decimal"></div></div>`}
+function ctl(id,label,min,max,step,val){return `<div class="ctl"><label for="${id}">${typeof tipL==="function"?tipL(id,label):label}</label><div class="ctlrow"><input type="range" id="${id}-r" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"><input type="number" id="${id}" value="${val}" step="${step}" inputmode="decimal"></div></div>`}
 function bindCtl(ids,run){ids.forEach(id=>{const r=$(id+"-r"),n=$(id);
   r.addEventListener("input",()=>{n.value=r.value;run()});
   n.addEventListener("input",()=>{if(n.value!==""&&isFinite(+n.value))r.value=n.value;run()})})}
