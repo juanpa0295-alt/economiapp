@@ -93,6 +93,14 @@ css += """
 .cas.off{color:var(--muted);border-color:var(--rule)}
 .chips.pre{display:flex;flex-wrap:wrap;gap:6px}
 .calcf input[spellcheck]{font-family:var(--f-mono)}
+/* --- tooltips de los controles --- */
+.tipl{display:inline-flex;align-items:center;flex-wrap:wrap}
+.tipb{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;padding:0;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font:700 11px/1 var(--f-body);cursor:help;vertical-align:1px;flex:none}
+.tipb:hover,.tipb[aria-expanded=true]{border-color:var(--line);color:var(--card);background:var(--line)}
+.tipb:focus-visible{outline:2px solid var(--line);outline-offset:2px}
+@media (pointer:coarse){.tipb{width:22px;height:22px;font-size:12px}}
+.tippop{position:fixed;z-index:60;max-width:calc(100vw - 24px);padding:10px 12px;border-radius:10px;background:var(--ink);color:var(--card);font:400 13.5px/1.45 var(--f-body);box-shadow:0 6px 22px rgba(0,0,0,.25)}
+.tippop b{color:inherit}.tippop .ej{display:block;margin-top:6px;opacity:.85;font-size:12.5px}
 /* --- navegación entre materias --- */
 .home{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:10px}
 .home:hover{color:var(--line)}
