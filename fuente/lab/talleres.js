@@ -132,8 +132,11 @@ sol:String.raw`<ol class="steps"><li><b>Períodos del contrato</b> (255 días ca
 <p class="hint">Si los períodos se cuentan con el calendario (8 meses del calendario y 15 días corridos), la 4.ª prórroga vence el 5/9/2027: 305 días × 165.000 = $50.325.000. Las suspensiones no alargan el plazo del contrato. <button class="btn" type="button" data-tool="prorrogas" data-pre="mariana">Ver las prórrogas de Mariana</button></p>`,
 res:String.raw`<p>Indemnización por despido sin justa causa: <b>$50.655.000</b> (307 días de salario que faltaban para el 7 de septiembre de 2027).</p>`},
 
-{id:"mar-4",n:"Extra",t:"Vacaciones (no lo pide el taller)",tipo:"Vacaciones",temas:["vacaciones"],tool:{id:"vacaciones",pre:"mariana",lbl:"Abrir las vacaciones de Mariana"},
-enun:String.raw`<p>Si también se le deben las vacaciones desde 2025, ¿cuánto se le paga al terminar el contrato?</p>`,
-saber:[String.raw`15 días hábiles por año; al terminar, las no disfrutadas se compensan en dinero proporcionalmente (art. 189). Se descuentan las suspensiones del art. 51 (art. 53).`,String.raw`Base: el salario ordinario (4.950.000), sin horas extra ni auxilio de transporte (art. 192).`],
-sol:String.raw`<ol class="steps"><li><b>Días:</b> 1/1/25 – 31/10/26 = 660 − 122 (30 + 90 + 2 del art. 51) = <b>538</b>.</li><li><b>Días de vacaciones:</b> 538 × 15 / 360 = 22,42 días hábiles.</li><li><b>Valor:</b> 4.950.000 × 538 / 720 = <b>$3.698.750</b>.</li></ol>`,
-res:String.raw`<p>Vacaciones compensadas: <b>$3.698.750</b>. Si nunca las tomó desde el ingreso: $6.538.125.</p>`}]});
+{id:"mar-4",n:"4",t:"Vacaciones adeudadas desde el inicio del contrato",tipo:"Vacaciones",temas:["vacaciones"],tool:{id:"vacaciones",pre:"mariana",lbl:"Abrir las vacaciones de Mariana"},
+enun:String.raw`<p>Las vacaciones se le adeudan desde el inicio del contrato. ¿Cuánto se le paga al terminar? Evalúe tres escenarios: (1) nunca ha salido a vacaciones, (2) le dieron 2 períodos, (3) le dieron todos los períodos.</p>`,
+saber:[String.raw`15 días hábiles por año de servicio; al terminar, las no disfrutadas se compensan en dinero proporcionalmente (art. 189). Se descuentan las suspensiones del art. 51 (art. 53).`,String.raw`Fórmula de clase: vacaciones = salario × (días − días del art. 51) / 720, con el último salario devengado (4.950.000), sin horas extra ni auxilio de transporte.`],
+sol:String.raw`<ol class="steps"><li><b>Días del contrato:</b> días360(8/11/23, 31/10/26) + 1 = 1.073. Menos 122 del art. 51 (30 + 90 + 2) = <b>951 días trabajados</b>, que dan 951 × 15 / 360 = 39,625 días hábiles.</li>
+<li><b>Escenario 1 (nunca salió):</b> 4.950.000 × (1.073 − 122) / 720 = 4.950.000 × 951 / 720 = <b>$6.538.125</b>.</li>
+<li><b>Escenario 2 (disfrutó 2 períodos):</b> cada período son 360 días trabajados (15 días hábiles). Queda 951 − 720 = 231: 4.950.000 × 231 / 720 = <b>$1.588.125</b> (o 9,625 días × 165.000).</li>
+<li><b>Escenario 3 (todos los períodos):</b> con 951 días solo completó 2 períodos. Si «todos» son los períodos completos, se debe la misma fracción del escenario 2 ($1.588.125); si también disfrutó la fracción del tercer año, no se debe nada.</li></ol>`,
+res:String.raw`<p>Escenario 1: <b>$6.538.125</b>. Escenario 2: <b>$1.588.125</b>. Escenario 3: la fracción pendiente ($1.588.125) o $0 si también la disfrutó.</p>`}]});
