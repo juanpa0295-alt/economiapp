@@ -176,7 +176,21 @@ const tiles=a=>a.map(([s,v,c])=>`<div${c?` class="${c}"`:""}><small>${s}</small>
 const fr=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
 const rt=x=>`√<span class="ov">${x}</span>`;
 const stp=(n,t,h)=>`<div class="stepc"><h4><span class="n">${n}</span>${t}</h4>${h}</div>`;
-function ctl(id,label,min,max,step,val){return `<div class="ctl"><label for="${id}">${label}</label><div class="ctlrow"><input type="range" id="${id}-r" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"><input type="number" id="${id}" value="${val}" step="${step}" inputmode="decimal"></div></div>`}
+// Tooltips de los controles: cada materia define window.CTL_TIPS = {id: "texto" | () => "texto"}
+function tipL(id,label){const b=tipBtn(id,label);return b?`<span class="tipl">${label}${b}</span>`:label}
+function tipBtn(id,label){const t=window.CTL_TIPS&&window.CTL_TIPS[id];if(!t)return"";const l=String(label).replace(/<[^>]*>/g,"");return `<button type="button" class="tipb" data-tip="${id}" aria-label="¿Qué es ${l.replace(/"/g,"")}?" aria-expanded="false">?</button>`}
+(function(){if(typeof document==="undefined")return;let pop=null,owner=null;const hov=matchMedia("(hover:hover)").matches;
+  const hide=()=>{if(pop)pop.hidden=true;if(owner)owner.setAttribute("aria-expanded","false");owner=null};
+  const place=()=>{if(!owner||pop.hidden)return;const b=owner,r=b.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight){hide();return}const w=pop.offsetWidth;let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(innerWidth-w-12,x));pop.style.left=x+"px";const h=pop.offsetHeight;let y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);pop.style.top=y+"px"};
+  const show=b=>{const t=window.CTL_TIPS&&window.CTL_TIPS[b.dataset.tip];if(!t)return;if(!pop){pop=document.createElement("div");pop.className="tippop";pop.id="tippop";pop.setAttribute("role","tooltip");document.body.appendChild(pop)}
+    pop.innerHTML=typeof t==="function"?t():t;pop.hidden=false;owner=b;b.setAttribute("aria-expanded","true");b.setAttribute("aria-describedby","tippop");
+    const r=b.getBoundingClientRect(),w=Math.min(300,innerWidth-24);pop.style.width=w+"px";let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(innerWidth-w-12,x));pop.style.left=x+"px";
+    const h=pop.offsetHeight;let y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);pop.style.top=y+"px"};
+  document.addEventListener("click",e=>{const b=e.target.closest(".tipb");if(b){e.preventDefault();e.stopPropagation();owner===b?hide():show(b);return}if(pop&&!e.target.closest(".tippop"))hide()},true);
+  if(hov){document.addEventListener("mouseover",e=>{const b=e.target.closest(".tipb");if(b&&owner!==b)show(b)});document.addEventListener("mouseout",e=>{const b=e.target.closest(".tipb");if(b&&!b.contains(e.relatedTarget))hide()})}
+  document.addEventListener("focusin",e=>{const b=e.target.closest&&e.target.closest(".tipb");if(b&&b.matches(":focus-visible"))show(b)});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});addEventListener("scroll",()=>requestAnimationFrame(place),{passive:true});addEventListener("resize",hide)})();
+function ctl(id,label,min,max,step,val){return `<div class="ctl"><label for="${id}">${tipL(id,label)}</label><div class="ctlrow"><input type="range" id="${id}-r" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"><input type="number" id="${id}" value="${val}" step="${step}" inputmode="decimal"></div></div>`}
 function bindCtl(ids,run){ids.forEach(id=>{const r=$(id+"-r"),n=$(id);
   r.addEventListener("input",()=>{n.value=r.value;run()});
   n.addEventListener("input",()=>{if(n.value!==""&&isFinite(+n.value))r.value=n.value;run()})})}

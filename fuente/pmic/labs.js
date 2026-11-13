@@ -17,9 +17,83 @@ const legend=items=>`<div class="legend">${items.map(([c,t,d])=>`<span><i style=
 const okAll=a=>a.every(x=>isFinite(x)),n2=v=>fmt(v,2),n4=v=>fmt(v,4);
 const tabsBox=(id,opts)=>`<div style="margin-bottom:10px">${seg(id,"Herramienta",opts,opts[0][0])}</div><div id="${id}-b"></div>`;
 function tabsRun(id,M){const go=k=>M[k]();bindSeg(id,go);go(Object.keys(M)[0])}
-const nin=(id,l,v,st)=>`<label for="${id}">${l}<input type="number" id="${id}" value="${v}" ${st?`step="${st}"`:""} inputmode="decimal"></label>`;
+const nin=(id,l,v,st)=>`<label for="${id}">${tipL(id,l)}<input type="number" id="${id}" value="${v}" ${st?`step="${st}"`:""} inputmode="decimal"></label>`;
 const N=id=>{const e=$(id);return e?parseFloat(String(e.value).replace(",",".")):NaN};
 const onIn=(ids,run)=>ids.forEach(id=>{const e=$(id);if(e)e.addEventListener("input",run)});
+
+// ---------- Tooltips: qué significa cada variable de los laboratorios (el «?» junto a cada control)
+(function(){const sv=id=>{const b=typeof document!=="undefined"&&document.querySelector(`#${id} [aria-pressed="true"]`);return b?b.dataset.v:""},ej=t=>`<span class="ej">${t}</span>`;
+  const T={},set=(ids,t)=>ids.forEach(i=>T[i]=t);
+  // utilidad compartida (Preferencias, Elección, Slutsky, Excedentes, Dotaciones): a, b y ρ cambian de sentido según el tipo
+  const ua=p=>()=>({cd:"<b>Peso del bien 1</b> en la utilidad u = x₁ᵃ x₂ᵇ. Con Cobb-Douglas, la fracción del ingreso que se gasta en x₁ es a/(a + b).",
+      sust:"<b>Utilidad de cada unidad del bien 1</b> en u = a·x₁ + b·x₂. Los bienes se reemplazan a razón a/b: se compra solo el que da más utilidad por peso (a/p₁ frente a b/p₂).",
+      comp:"<b>Coeficiente del bien 1</b> en u = mín{a·x₁, b·x₂}. Se consume siempre en la proporción a·x₁ = b·x₂ (como zapatos izquierdo y derecho).",
+      quasi:"<b>Peso del bien 1</b> en u = a·ln x₁ + x₂. Cuanto mayor es a, más se valora x₁; su demanda no depende del ingreso (no hay efecto renta en x₁).",
+      ces:"<b>Peso del bien 1</b> en la CES u = (a·x₁^ρ + b·x₂^ρ)^(1/ρ). Subirlo inclina la elección hacia x₁."}[sv(p+"-t")||"cd"]);
+  const ub=p=>()=>({cd:"<b>Peso del bien 2</b> en u = x₁ᵃ x₂ᵇ. La fracción del ingreso que se gasta en x₂ es b/(a + b).",
+      sust:"<b>Utilidad de cada unidad del bien 2</b> en u = a·x₁ + b·x₂.",comp:"<b>Coeficiente del bien 2</b> en u = mín{a·x₁, b·x₂}: junto con a, fija la proporción en que se combinan los bienes.",
+      quasi:"En la cuasilineal u = a·ln x₁ + x₂ este valor no interviene: x₂ entra con coeficiente 1 y absorbe todo el ingreso que sobra.",
+      ces:"<b>Peso del bien 2</b> en la CES u = (a·x₁^ρ + b·x₂^ρ)^(1/ρ)."}[sv(p+"-t")||"cd"]);
+  const ur="<b>Parámetro de sustitución</b> de la CES. La elasticidad de sustitución es σ = 1/(1 − ρ): cerca de 1 los bienes son casi sustitutos perfectos; muy negativo, casi complementarios; cerca de 0, se parece a Cobb-Douglas."+ej("Ej.: ρ = 0,5 → σ = 2; ρ = −1 → σ = 0,5.");
+  ["pf","el","sl","ec","do"].forEach(p=>{T[p+"-a"]=ua(p);T[p+"-b"]=ub(p);T[p+"-r"]=ur});
+  const p1="<b>Precio del bien 1</b>: cuánto cuesta cada unidad de x₁. Si sube, la recta presupuestaria gira hacia adentro sobre el eje de x₂.",p2="<b>Precio del bien 2</b>: cuánto cuesta cada unidad de x₂. Si sube, la recta gira hacia adentro sobre el eje de x₁.",
+        mm="<b>Ingreso</b> (renta) del consumidor: el dinero que puede gastar. Si sube, la recta presupuestaria se desplaza en paralelo hacia afuera.";
+  set(["pr-p1","el-p1"],p1);set(["pr-p2","el-p2","sl-p2","ec-p2"],p2);set(["pr-m","el-m","sl-m","ec-m"],mm);
+  set(["sl-pa","ec-pa"],"<b>Precio del bien 1 antes del cambio.</b> Es el punto de partida (canasta inicial).");
+  set(["sl-pb","ec-pb"],"<b>Precio del bien 1 después del cambio.</b> Si es mayor que el inicial, es una subida de precio; si es menor, una bajada."+ej("La diferencia entre las dos canastas se descompone en efecto sustitución y efecto renta."));
+  T["pr-v"]=()=>({tc:"<b>Impuesto por unidad</b> (en pesos) sobre el bien 1: el precio efectivo pasa a p₁ + t.",tv:"<b>Impuesto ad valorem</b> en porcentaje: el precio efectivo pasa a p₁·(1 + t/100).",sub:"<b>Subsidio por unidad</b> (en pesos) al bien 1: el precio efectivo baja a p₁ − s.",tl:"<b>Impuesto de suma fija</b>: se resta del ingreso sin cambiar los precios (la recta se desplaza en paralelo).",rac:"<b>Racionamiento</b>: cantidad máxima de x₁ que se permite comprar; la recta se corta en ese punto."}[sv("pr-pol")]||"Elige primero una política.");
+  T["pf-x"]="<b>Cantidad del bien 1</b> en la canasta que estás evaluando. La gráfica dibuja la curva de indiferencia que pasa por esa canasta.";
+  T["pf-y"]="<b>Cantidad del bien 2</b> en la canasta que estás evaluando.";
+  // matemáticas del consumidor
+  const mt=()=>sv("mc-t")||"cd";
+  T["mc-A"]=()=>mt()==="quasi"?"En a·ln x + y no hay constante A: este valor no interviene.":"<b>Constante de escala</b>: multiplica toda la función. Cambia el nivel, no la forma (ni la homogeneidad ni la tasa de sustitución).";
+  T["mc-a"]=()=>({cd:"<b>Exponente de x</b> en A·xᵃ·yᵇ. La suma a + b es el grado de homogeneidad.",ces:"<b>Peso de x</b> dentro de la CES.",lin:"<b>Coeficiente de x</b> en A(a·x + b·y).",leon:"<b>Requerimiento de x</b> por unidad en A·mín{x/a, y/b}.",quasi:"<b>Coeficiente</b> de ln x en a·ln x + y."}[mt()]);
+  T["mc-b"]=()=>({cd:"<b>Exponente de y</b> en A·xᵃ·yᵇ.",ces:"<b>Peso de y</b> dentro de la CES.",lin:"<b>Coeficiente de y</b> en A(a·x + b·y).",leon:"<b>Requerimiento de y</b> por unidad en A·mín{x/a, y/b}.",quasi:"En a·ln x + y este valor no interviene."}[mt()]);
+  T["mc-r"]=()=>mt()==="ces"?ur:"Solo se usa con la función CES.";T["mc-h"]=()=>mt()==="ces"?"<b>Grado de homogeneidad</b> de la CES: si se multiplican x e y por t, la función se multiplica por tʰ. h > 1: rendimientos crecientes.":"Solo se usa con la función CES.";
+  T["ml-a"]="<b>Exponente de x</b> en f = xᵃ·yᵇ.";T["ml-b"]="<b>Exponente de y</b> en f = xᵃ·yᵇ.";T["ml-px"]="<b>Precio de x</b> en la restricción pₓx + p_y·y = m.";T["ml-py"]="<b>Precio de y</b> en la restricción.";
+  T["ml-m"]="<b>Ingreso</b> (lado derecho de la restricción). El multiplicador λ dice cuánto sube el valor óptimo si m aumenta en 1 (teorema de la envolvente).";
+  // demanda del mercado y elasticidades
+  T["ds-a1"]="<b>Intercepto de la demanda del consumidor A</b> (q = α − βp): lo que compraría si el precio fuera 0.";T["ds-a2"]="<b>Intercepto de la demanda del consumidor B</b>: lo que compraría si el precio fuera 0.";
+  T["ds-b1"]="<b>Pendiente de la demanda de A</b>: cuántas unidades deja de comprar por cada peso que sube el precio. Su precio máximo es α/β.";T["ds-b2"]="<b>Pendiente de la demanda de B</b>: cuántas unidades deja de comprar por cada peso que sube el precio.";
+  T["ds-p"]="<b>Precio</b> al que se suman las demandas. Por encima del precio máximo de un consumidor, ese consumidor no compra y la demanda de mercado tiene un quiebre.";
+  T["de-a"]="<b>Intercepto</b> de q = α − βp + γp_z + δm: la parte de la demanda que no depende de precios ni ingreso.";T["de-b"]="<b>Sensibilidad al propio precio</b>: unidades que se dejan de comprar por cada peso que sube p.";
+  T["de-g"]="<b>Efecto del precio del otro bien.</b> Positivo: sustitutos (si sube p_z, se compra más de este). Negativo: complementarios.";T["de-d"]="<b>Efecto del ingreso.</b> Positivo: bien normal. Negativo: bien inferior.";
+  T["de-p"]="<b>Precio del bien</b> en el que se evalúan la cantidad y las elasticidades.";T["de-pz"]="<b>Precio del otro bien</b> (sustituto o complementario, según el signo de γ).";T["de-m"]="<b>Ingreso del consumidor</b> en el que se evalúa la demanda.";
+  // dotaciones e intertemporal
+  T["do-w1"]="<b>Dotación del bien 1</b>: cuánto tiene el consumidor antes de comerciar. Si consume menos que esto es vendedor neto de x₁.";T["do-w2"]="<b>Dotación del bien 2</b> antes de comerciar.";
+  T["do-pa"]="<b>Precio del bien 1 antes del cambio.</b> El ingreso es el valor de la dotación: m = p₁ω₁ + p₂ω₂.";T["do-pb"]="<b>Precio del bien 1 después del cambio.</b> Al cambiar p₁ también cambia el valor de la dotación (efecto dotación).";T["do-p2"]=p2;
+  T["it-m1"]="<b>Ingreso del período 1</b> (hoy).";T["it-m2"]="<b>Ingreso del período 2</b> (mañana).";
+  T["it-r"]="<b>Tasa de interés nominal</b> en %: lo que rinde ahorrar o cuesta endeudarse. La pendiente de la restricción es −(1 + r).";
+  T["it-pi"]="<b>Inflación</b> en %. La tasa real es 1 + ρ = (1 + r)/(1 + π): con más inflación, ahorrar rinde menos en bienes.";
+  T["it-a"]="<b>Peso del consumo de hoy</b> en u = c₁ᵃ c₂ᵇ: cuanto mayor, más impaciente es el consumidor.";T["it-b"]="<b>Peso del consumo de mañana</b> en u = c₁ᵃ c₂ᵇ: cuanto mayor, más paciente (ahorra más).";
+  // producción
+  T["tc-a"]="<b>Coeficiente lineal</b> de q = αL + βL² − γL³.";T["tc-b"]="<b>Coeficiente cuadrático</b>: crea la zona de rendimientos marginales crecientes al inicio.";T["tc-c"]="<b>Coeficiente cúbico</b>: hace que el producto marginal termine cayendo (rendimientos decrecientes).";
+  T["tc-L"]="<b>Cantidad de trabajo</b> en la que se evalúan el producto total, medio y marginal.";
+  const tt=()=>sv("tl-t")||"cd";
+  T["tl-A"]="<b>Productividad total (tecnología)</b>: multiplica la producción sin cambiar la forma de las isocuantas.";
+  T["tl-al"]=()=>({cd:"<b>Elasticidad de la producción respecto al trabajo</b> en q = A·L^α·K^β. α + β mide los rendimientos a escala.",ces:"<b>Peso del trabajo</b> en la CES.",leon:"<b>Trabajo necesario por unidad</b> en q = A·mín{L/α, K/β}.",lin:"<b>Productividad del trabajo</b> en q = A(αL + βK)."}[tt()]);
+  T["tl-be"]=()=>({cd:"<b>Elasticidad de la producción respecto al capital</b> en q = A·L^α·K^β.",ces:"<b>Peso del capital</b> en la CES.",leon:"<b>Capital necesario por unidad</b> en q = A·mín{L/α, K/β}.",lin:"<b>Productividad del capital</b> en q = A(αL + βK)."}[tt()]);
+  T["tl-r"]=()=>tt()==="ces"?"<b>Parámetro de sustitución</b> entre trabajo y capital: σ = 1/(1 − ρ). Más alto, más fácil reemplazar uno por otro.":"Solo se usa con la tecnología CES.";
+  T["tl-L"]="<b>Trabajo</b> en el punto evaluado (dónde se calcula la RMST).";T["tl-K"]="<b>Capital</b> en el punto evaluado.";
+  // costos
+  T["co-A"]="<b>Productividad total</b> en q = A·L^α·K^β: con más A, se produce lo mismo con menos insumos y el costo baja.";T["co-al"]="<b>Elasticidad del trabajo</b> en la producción.";T["co-be"]="<b>Elasticidad del capital</b> en la producción. Si α + β < 1, el costo medio de largo plazo crece con q.";
+  T["co-w"]="<b>Salario</b>: precio de cada unidad de trabajo L.";T["co-r"]="<b>Alquiler del capital</b>: precio de cada unidad de K.";T["co-q"]="<b>Producción</b> que la empresa quiere alcanzar al menor costo.";
+  T["co-K"]="<b>Capital fijo en el corto plazo</b>: en el corto plazo la empresa no puede cambiarlo y solo ajusta L. Por eso el costo de corto plazo es mayor o igual que el de largo.";
+  // beneficio e industria
+  const cf="<b>Costo fijo</b>: se paga aunque no se produzca nada (arriendo, maquinaria). No cambia la cantidad óptima, pero sí el beneficio.";
+  set(["be-F","in-F"],cf);set(["be-a","in-a"],"<b>Coeficiente lineal</b> del costo variable en CT = CF + a·q − b·q² + c·q³.");set(["be-b","in-b"],"<b>Coeficiente cuadrático</b>: con signo menos, hace que el costo marginal baje al principio (forma de U).");
+  set(["be-c","in-c"],"<b>Coeficiente cúbico</b>: hace que el costo marginal termine subiendo.");T["be-p"]="<b>Precio de mercado</b> que la empresa toma como dado (competencia perfecta). Produce donde p = CMg, si p cubre el mínimo del costo variable medio.";
+  T["in-n"]="<b>Número de empresas</b> en el corto plazo. La oferta de mercado es la suma horizontal de sus ofertas.";T["in-A"]="<b>Intercepto de la demanda de mercado</b> Q = α − βp.";T["in-B"]="<b>Pendiente de la demanda de mercado</b>: unidades menos por cada peso que sube el precio.";
+  // equilibrio y políticas
+  set(["eq-a","bi-a"],"<b>Intercepto de la demanda</b> Qᵈ = a − b·p: lo que se compraría a precio 0.");set(["eq-b","bi-b"],"<b>Pendiente de la demanda</b>: cuánto cae la cantidad demandada por cada peso que sube el precio.");
+  set(["eq-c","bi-c"],"<b>Intercepto de la oferta</b> Qˢ = c + d·p: lo que se ofrecería a precio 0 (puede ser negativo).");set(["eq-d","bi-d"],"<b>Pendiente de la oferta</b>: cuánto aumenta la cantidad ofrecida por cada peso que sube el precio.");
+  T["eq-da"]="<b>Choque de demanda</b>: desplaza la demanda en paralelo. Positivo (más ingreso, moda): sube precio y cantidad.";T["eq-dc"]="<b>Choque de oferta</b>: desplaza la oferta en paralelo. Positivo (mejor tecnología): baja el precio y sube la cantidad.";
+  T["eq-p0"]="<b>Precio del primer período</b> en la telaraña: los productores deciden cuánto ofrecer con el precio del período anterior.";T["eq-T"]="<b>Número de períodos</b> que se simulan en la telaraña. Converge si d < b, es decir, si la oferta reacciona al precio menos que la demanda.";
+  T["bi-v"]=()=>({imp:"<b>Impuesto por unidad</b> en pesos: abre una brecha entre lo que paga el comprador y lo que recibe el vendedor.",sub:"<b>Subsidio por unidad</b> en pesos: el vendedor recibe más de lo que paga el comprador.",max:"<b>Precio máximo</b> (techo). Solo tiene efecto si está por debajo del precio de equilibrio: genera escasez.",min:"<b>Precio mínimo</b> (piso). Solo tiene efecto si está por encima del precio de equilibrio: genera excedente."}[sv("bi-t")]||"Elige primero una política.");
+  // apartamentos (campos numéricos)
+  T["ap-r"]="<b>Precio de reserva</b> de cada persona: lo máximo que está dispuesta a pagar. Ordenados de mayor a menor forman la curva de demanda.";T["ap-s"]="<b>Apartamentos disponibles</b>: la oferta es fija en el corto plazo (recta vertical).";
+  T["ap-c"]="<b>Precio máximo legal</b> (control de alquileres). Si está por debajo del precio de equilibrio, hay más interesados que apartamentos.";
+  window.CTL_TIPS=Object.assign(window.CTL_TIPS||{},T)})();
 
 // ---------- utilidad compartida por las herramientas del consumidor
 const UT=[["cd","Cobb-Douglas"],["sust","Sustitutos perfectos"],["comp","Complementarios"],["quasi","Cuasilineal"],["ces","CES"]];
@@ -32,7 +106,7 @@ function indSeries(u,v,xmax,ymax,col,dash){if(u.tipo==="comp"){const x0=v/u.a,y0
 
 // ---------- 1. Mercado de apartamentos (Varian, cap. 1)
 SIMS.aptos=function(){
-  $("sim").innerHTML=`<div class="calcf"><label for="ap-r">Precios de reserva (uno por persona)<input id="ap-r" value="500, 480, 450, 420, 400, 380, 350, 300"></label>${nin("ap-s","Apartamentos disponibles (oferta fija)",5)}${nin("ap-c","Precio máximo (control de alquileres, 0 = sin control)",0)}</div>
+  $("sim").innerHTML=`<div class="calcf"><label for="ap-r">${tipL("ap-r","Precios de reserva (uno por persona)")}<input id="ap-r" value="500, 480, 450, 420, 400, 380, 350, 300"></label>${nin("ap-s","Apartamentos disponibles (oferta fija)",5)}${nin("ap-c","Precio máximo (control de alquileres, 0 = sin control)",0)}</div>
   <div class="res" id="ap-res"></div>${legend([["--line","Demanda (precios de reserva)"],["--branch","Oferta fija"]])}<div id="ap-p"></div><div id="ap-st"></div>`;
   const run=()=>{const r=($("ap-r").value.match(/\d+(?:[.,]\d+)?/g)||[]).map(x=>+x.replace(",",".")).filter(x=>x>0).sort((a,b)=>b-a),S=Math.round(N("ap-s")),C=N("ap-c")||0;
     if(r.length<2||!(S>=1)){$("ap-res").innerHTML=err("escribe al menos dos precios de reserva y una oferta de 1 o más.");return}
