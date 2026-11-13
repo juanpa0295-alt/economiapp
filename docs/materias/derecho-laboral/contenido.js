@@ -383,12 +383,12 @@ res:String.raw`<p>Indemnización por despido sin justa causa: <b>$50.655.000</b>
 
 {id:"mar-4",n:"4",t:"Vacaciones adeudadas desde el inicio del contrato",tipo:"Vacaciones",temas:["vacaciones"],tool:{id:"vacaciones",pre:"mariana",lbl:"Abrir las vacaciones de Mariana"},
 enun:String.raw`<p>Las vacaciones se le adeudan desde el inicio del contrato. ¿Cuánto se le paga al terminar? Evalúe tres escenarios: (1) nunca ha salido a vacaciones, (2) le dieron 2 períodos, (3) le dieron todos los períodos.</p>`,
-saber:[String.raw`15 días hábiles por año de servicio; al terminar, las no disfrutadas se compensan en dinero proporcionalmente (art. 189). Se descuentan las suspensiones del art. 51 (art. 53).`,String.raw`Fórmula de clase: vacaciones = salario × (días − días del art. 51) / 720, con el último salario devengado (4.950.000), sin horas extra ni auxilio de transporte.`],
+saber:[String.raw`15 días hábiles por año de servicio; al terminar, las no disfrutadas se compensan en dinero proporcionalmente (art. 189). Se descuentan las suspensiones del art. 51 (art. 53).`,String.raw`Fórmula de clase: vacaciones = salario × (días − días del art. 51) / 720, con el último salario devengado: el de octubre de 2026, $7.255.285,71 (salario diario $241.842,86).`],
 sol:String.raw`<ol class="steps"><li><b>Días del contrato:</b> días360(8/11/23, 31/10/26) + 1 = 1.073. Menos 122 del art. 51 (30 + 90 + 2) = <b>951 días trabajados</b>, que dan 951 × 15 / 360 = 39,625 días hábiles.</li>
-<li><b>Escenario 1 (nunca salió):</b> 4.950.000 × (1.073 − 122) / 720 = 4.950.000 × 951 / 720 = <b>$6.538.125</b>.</li>
-<li><b>Escenario 2 (disfrutó 2 períodos):</b> cada período son 360 días trabajados (15 días hábiles). Queda 951 − 720 = 231: 4.950.000 × 231 / 720 = <b>$1.588.125</b> (o 9,625 días × 165.000).</li>
-<li><b>Escenario 3 (todos los períodos):</b> con 951 días solo completó 2 períodos. Si «todos» son los períodos completos, se debe la misma fracción del escenario 2 ($1.588.125); si también disfrutó la fracción del tercer año, no se debe nada.</li></ol>`,
-res:String.raw`<p>Escenario 1: <b>$6.538.125</b>. Escenario 2: <b>$1.588.125</b>. Escenario 3: la fracción pendiente ($1.588.125) o $0 si también la disfrutó.</p>`}]});
+<li><b>Escenario 1 (nunca salió):</b> 7.255.285,71 × (1.073 − 122) / 720 = 7.255.285,71 × 951 / 720 = <b>$9.583.023</b>.</li>
+<li><b>Escenario 2 (disfrutó 2 períodos):</b> cada período son 360 días trabajados (15 días hábiles). Queda 951 − 720 = 231: 7.255.285,71 × 231 / 720 = <b>$2.327.737</b> (o 9,625 días × 241.842,86).</li>
+<li><b>Escenario 3 (todos los períodos):</b> con 951 días solo completó 2 períodos. Si «todos» son los períodos completos, se debe la misma fracción del escenario 2 ($2.327.737); si también disfrutó la fracción del tercer año, no se debe nada.</li></ol>`,
+res:String.raw`<p>Escenario 1: <b>$9.583.023</b>. Escenario 2: <b>$2.327.737</b>. Escenario 3: la fracción pendiente ($2.327.737) o $0 si también la disfrutó.</p>`}]});
 
 
 // ===================== AJUSTE AL PROGRAMA 1501875 =====================
