@@ -66,16 +66,16 @@ enun:String.raw`<p>Años de educación (Y) y renta familiar (X) de 8 jóvenes: u
 saber:[String.raw`<b>Sin intercepto común:</b> como \(D_1+D_2=1\), el modelo ya tiene un intercepto por zona. Agregar β₀ causaría multicolinealidad perfecta.`,
 String.raw`<b>X′X por bloques:</b> las columnas de una zona valen 0 en la otra, así que X′X es diagonal por bloques y MCO equivale a estimar <b>una regresión simple por zona</b>.`,
 String.raw`<b>Regresión simple:</b> \(b=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}\), \(a=\bar y-b\bar x\), y \(RSS=\left(\sum y^2-n\bar y^2\right)-b^2\left(\sum x^2-n\bar x^2\right)\).`,
-String.raw`<b>R² centrado:</b> \(R^2=1-RSS/STC\), con \(STC=\sum(y-\bar y)^2\). Se usa el centrado porque el modelo tiene intercepto implícito.`,
+String.raw`<b>R² centrado:</b> \(R^2=1-RSS/TSS\), con \(TSS=\sum(y-\bar y)^2\). Se usa el centrado porque el modelo tiene intercepto implícito.`,
 String.raw`<b>Chow:</b> el restringido es una sola recta para todos: \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\), con q = 2 y k = 4.`,
 String.raw`<b>Pronóstico:</b> \(\hat y_0=\mathbf x_0'\mathbf b\); \(ee(\text{media})=\sqrt{s^2\mathbf x_0'(X'X)^{-1}\mathbf x_0}\) y \(ee(\text{individual})=\sqrt{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}\).`],
-sol:String.raw`<h5>a) Significado y signos</h5><p>β₁ y β₃ son los años de educación esperados de un joven urbano y de uno rural con renta 0. β₂ y β₄ son los años adicionales por cada unidad de renta en cada zona. Signos esperados: positivos, porque más renta permite estudiar más. Se espera además β₁ &gt; β₃, por el mejor acceso a la educación en la ciudad.</p>
+sol:String.raw`<h5>a) Significado y signos</h5><p>Y son los años de educación y X la renta familiar. β₁ y β₃ son los interceptos: los años de educación esperados de un joven urbano y de uno rural cuando la renta es 0. β₂ y β₄ son las pendientes, los coeficientes que acompañan a la renta X: cuántos años <b>de educación</b> más se esperan cuando la renta familiar sube una unidad, β₂ en la zona urbana y β₄ en la rural. Signos esperados: positivos, porque más renta permite estudiar más. Se espera además β₁ &gt; β₃, por el mejor acceso a la educación en la ciudad.</p>
 <h5>b) Estimación</h5><ol class="steps">
 <li><b>Urbana</b> (n = 4): Σx = 42, Σy = 66, Σx² = 458, Σxy = 704. \(\hat\beta_2=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{44}{68}=0{,}6471\) y \(\hat\beta_1=16{,}5-0{,}6471(10{,}5)=9{,}7059\).</li>
 <li><b>Rural</b> (n = 4): Σx = 26, Σy = 47, Σx² = 194, Σxy = 320. \(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{58}{100}=0{,}58\) y \(\hat\beta_3=11{,}75-0{,}58(6{,}5)=7{,}98\).</li>
 <li>Modelo estimado: \(\hat Y=9{,}706D_1+0{,}647D_1X+7{,}980D_2+0{,}580D_2X\).</li>
 <li>RSS por zona: urbana 3,8824 y rural 0,34, así que \(RSS_{NR}=4{,}2222\) y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
-<li>\(STC=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
+<li>\(TSS=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
 <li>Errores estándar \(\sqrt{s^2[(X'X)^{-1}]_{jj}}\): 2,666; 0,249; 1,431 y 0,205.</li></ol>
 <p><b>Lectura del R²:</b> la renta y la zona explican el 93,5 % de la variación de los años de educación.</p>
 <h5>c) Cambio estructural</h5><ol class="steps">
@@ -95,7 +95,7 @@ enun:String.raw`<p>Hay 500 empleados: 300 licenciados en empresariales (D = 1) c
 saber:[String.raw`<b>Ecuaciones normales:</b> \(X'X\mathbf b=X'\mathbf y\). Con una dummy, \(\sum D=n_L\) y \(\sum D^2=n_L\).`,
 String.raw`<b>Con una sola dummy, MCO da medias de grupo:</b> los residuos suman cero dentro de cada grupo, así que el ajuste de cada grupo es su media.`,
 String.raw`<b>Varianza de los estimadores:</b> \(\widehat{\operatorname{var}}(\mathbf b)=s^2(X'X)^{-1}\) con \(s^2=RSS/(n-k)\).`,
-String.raw`<b>Descomposición:</b> \(STC=ESS+RSS\) y \(R^2=ESS/STC\).`],
+String.raw`<b>Descomposición:</b> \(TSS=ESS+RSS\) y \(R^2=ESS/TSS\).`],
 sol:String.raw`<h5>a) La demostración</h5><ol class="steps">
 <li>\(X'X=\begin{bmatrix}n&n_L\\n_L&n_L\end{bmatrix}\) y \(X'\mathbf y=\begin{bmatrix}\sum W\\ \sum_L W\end{bmatrix}=\begin{bmatrix}n_L\bar W_L+n_A\bar W_A\\ n_L\bar W_L\end{bmatrix}\).</li>
 <li>Segunda ecuación normal: \(n_L\hat\beta_1+n_L\hat\beta_2=n_L\bar W_L\), así que \(\hat\beta_1+\hat\beta_2=\bar W_L\).</li>
@@ -107,7 +107,7 @@ sol:String.raw`<h5>a) La demostración</h5><ol class="steps">
 <li>\((X'X)^{-1}=\dfrac{1}{n\,n_L-n_L^2}\begin{bmatrix}n_L&-n_L\\-n_L&n\end{bmatrix}=\dfrac{1}{n_Ln_A}\begin{bmatrix}n_L&-n_L\\-n_L&n\end{bmatrix}\).</li>
 <li>\(ee(\hat\beta_1)=\sqrt{s^2/n_A}=\sqrt{1.860{,}64/200}=3{,}050\).<br>\(ee(\hat\beta_2)=\sqrt{s^2\left(\tfrac1{n_L}+\tfrac1{n_A}\right)}=\sqrt{1.860{,}64\left(\tfrac1{300}+\tfrac1{200}\right)}=3{,}938\).</li></ol>
 <p class="hint">Si la desviación típica se define con divisor n, entonces RSS = 300(2.500) + 200(900) = 930.000 y los errores estándar cambian un poco (3,056 y 3,945).</p>
-<h5>d) R²</h5><p>\(ESS=\sum(\hat W-\bar W)^2=300(250-210)^2+200(150-210)^2=480.000+720.000=1.200.000\), y \(STC=ESS+RSS=2.126.600\). Por tanto \(R^2=1.200.000/2.126.600=0{,}564\).</p>
+<h5>d) R²</h5><p>\(ESS=\sum(\hat W-\bar W)^2=300(250-210)^2+200(150-210)^2=480.000+720.000=1.200.000\), y \(TSS=ESS+RSS=2.126.600\). Por tanto \(R^2=1.200.000/2.126.600=0{,}564\).</p>
 <h5>e) Contraste</h5><p>H₀: β₂ = 0 (sin diferencia salarial) frente a H₁: β₂ ≠ 0 (o β₂ &gt; 0 si se quiere probar que los licenciados ganan más). \(t=100/3{,}938=25{,}40\sim t(498)\), y \(t_{0{,}025}\approx1{,}965\). Se rechaza H₀ con mucha holgura (p ≈ 0): hay diferencia salarial. Esta prueba t es la misma que la de diferencia de medias con varianza combinada.</p>`,
 res:String.raw`<p>\(\hat W=150+100D\), con ee de 3,050 y 3,938, y R² = 0,564. Contraste t = 25,4: los licenciados ganan en promedio 100 mil pesetas más al mes.</p>`},
 
@@ -128,9 +128,9 @@ sol:String.raw`<h5>a) Estimación e interpretación</h5><ol class="steps">
 res:String.raw`<p>Hombres: \(\hat W=1{,}809+0{,}0665X\); mujeres: \(\hat W=1{,}731+0{,}0778X\). F = 0,438 &lt; 3,806 (p = 0,65): el género no es significativo, y una sola ecuación de salario sirve para los dos.</p>`},
 
 {id:"ep3-6", n:"6", t:"Función de consumo en tres periodos", tipo:"Chow con m submuestras", temas:["chow"], tool:{id:"t-calc",pre:"rss:e6",lbl:"Abrir en la Calculadora (RSS o R²)"},
-enun:String.raw`<p>Una función keynesiana \(C=\beta_1+\beta_2R\) se estimó en 1964-1971 (\(\hat\beta_2=0{,}3663\)), 1972-1983 (0,8846), 1984-1990 (1,6069) y en todo 1964-1990 (\(\hat C=202{,}23+0{,}895R\), R² = 0,9974). Además, STC = 6.403.270, RSS₁ = 2.379,315, RSS₂ = 3.679,020 y RSS₃ = 1.295,861.</p><p><b>a)</b> Explique el concepto de cambio estructural. <b>b)</b> Contraste la consistencia de los parámetros en los tres periodos.</p>`,
+enun:String.raw`<p>Una función keynesiana \(C=\beta_1+\beta_2R\) se estimó en 1964-1971 (\(\hat\beta_2=0{,}3663\)), 1972-1983 (0,8846), 1984-1990 (1,6069) y en todo 1964-1990 (\(\hat C=202{,}23+0{,}895R\), R² = 0,9974). Además, TSS = 6.403.270, RSS₁ = 2.379,315, RSS₂ = 3.679,020 y RSS₃ = 1.295,861.</p><p><b>a)</b> Explique el concepto de cambio estructural. <b>b)</b> Contraste la consistencia de los parámetros en los tres periodos.</p>`,
 saber:[String.raw`<b>Chow con m submuestras:</b> \(F=\dfrac{(RSS_R-\sum_jSCR_j)/[(m-1)k]}{\sum_jSCR_j/(n-mk)}\sim F((m-1)k,\,n-mk)\).`,
-String.raw`<b>RSS a partir de R²:</b> \(R^2=1-RSS/STC\), así que \(RSS=(1-R^2)\,STC\).`,
+String.raw`<b>RSS a partir de R²:</b> \(R^2=1-RSS/TSS\), así que \(RSS=(1-R^2)\,TSS\).`,
 String.raw`Años de cada periodo: 1964-1971 son 8, 1972-1983 son 12 y 1984-1990 son 7, en total n = 27.`],
 sol:String.raw`<h5>a) Concepto</h5><p>Hay cambio estructural cuando los parámetros de la relación no son los mismos en todo el periodo de la muestra. Un evento, como una crisis, un cambio de política o una reforma, modifica el consumo autónomo, la propensión marginal a consumir o ambos. Si existe y se estima una sola ecuación, los coeficientes son un promedio engañoso de relaciones distintas.</p>
 <h5>b) La prueba</h5><ol class="steps">
@@ -312,11 +312,11 @@ res:String.raw`<p>F = 3,158 &lt; 4,414: la observación nueva es compatible con 
 {id:"d-42", n:"4.2", t:"Estacionalidad y estabilidad con sumas de cuadrados", tipo:"Pruebas F con RSS", temas:["chow","dicotomicas","series"], tool:{id:"t-calc",pre:"rss:d42",lbl:"Abrir la parte de estabilidad en la Calculadora"},
 enun:String.raw`<p>Con datos trimestrales 1958-1976 se estimó \(\hat Y=2{,}20+0{,}104X_2-3{,}48X_3+0{,}34X_4\), con ESS = 109,6 y RSS = 18,48. Al agregar tres dummies estacionales, la ESS sube a 114,8. Pruebe si hay estacionalidad. Las regresiones de los subperiodos 1958.1-1968.4 y 1969.1-1976.4 dan RSS de 9,32 y 7,46. Pruebe la constancia de la relación entre los dos subperiodos.</p>`,
 saber:[String.raw`n = 19 años × 4 = 76 trimestres; subperiodos de 44 y 32. El modelo base tiene k = 4.`,
-String.raw`<b>Con la misma variable dependiente, la STC no cambia:</b> STC = ESS + RSS = 128,08, así que si la ESS sube, la RSS baja lo mismo.`,
+String.raw`<b>Con la misma variable dependiente, la TSS no cambia:</b> TSS = ESS + RSS = 128,08, así que si la ESS sube, la RSS baja lo mismo.`,
 String.raw`<b>F de restricciones:</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k_{NR})}\). <b>Chow:</b> \(F=\dfrac{(RSS_R-RSS_1-RSS_2)/k}{(RSS_1+RSS_2)/(n-2k)}\).`],
 sol:String.raw`<h5>Estacionalidad</h5><ol class="steps">
 <li>H₀: los coeficientes de las tres dummies estacionales valen 0, con q = 3.</li>
-<li>STC = 109,6 + 18,48 = 128,08. Con las dummies, \(RSS_{NR}=128{,}08-114{,}8=13{,}28\) y \(k_{NR}=7\).</li>
+<li>TSS = 109,6 + 18,48 = 128,08. Con las dummies, \(RSS_{NR}=128{,}08-114{,}8=13{,}28\) y \(k_{NR}=7\).</li>
 <li>\(F=\dfrac{(18{,}48-13{,}28)/3}{13{,}28/(76-7)}=\dfrac{1{,}7333}{0{,}1925}=9{,}01\sim F(3,69)\).</li>
 <li>\(F_{0{,}05}(3,69)=2{,}74\), así que se rechaza H₀: hay estacionalidad.</li></ol>
 <h5>Estabilidad entre subperiodos</h5><ol class="steps">
