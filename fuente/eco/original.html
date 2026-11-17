@@ -317,16 +317,16 @@ a:"k = 4 (tres regresoras más el intercepto). X es 50×4 y X′X es 4×4."},
 <div class="eq">β̂₁ = <span class="frac"><span>Σ(xᵢ − x̄)(yᵢ − ȳ)</span><span>Σ(xᵢ − x̄)²</span></span>&nbsp;&nbsp;&nbsp; β̂₀ = ȳ − β̂₁x̄</div></section>
 <section><h3>Laboratorio: intenta ganarle a MCO</h3><div class="sim" id="sim"></div></section>
 <section><h3>Descomposición de la variación</h3>
-<div class="eq">SCT = SCE + SCR &nbsp;&nbsp;&nbsp; R² = <span class="frac"><span>SCE</span><span>SCT</span></span> = 1 − <span class="frac"><span>SCR</span><span>SCT</span></span><span class="note">SCT: suma de cuadrados total · SCE: explicada · SCR: de los residuos</span></div>
-<p>Guarda bien la <b>SCR</b>: es la pieza central de la prueba F y de la prueba de Chow.</p></section>
+<div class="eq">TSS = ESS + RSS &nbsp;&nbsp;&nbsp; R² = <span class="frac"><span>ESS</span><span>TSS</span></span> = 1 − <span class="frac"><span>RSS</span><span>TSS</span></span><span class="note">TSS: suma de cuadrados total · ESS: explicada · RSS: de los errores (la notación del curso; en otros textos SCT, SCE y SCR)</span></div>
+<p>Guarda bien la <b>RSS</b>: es la pieza central de la prueba F y de la prueba de Chow.</p></section>
 <p class="warn"><b>Error común:</b> leer un R² alto como prueba de causalidad. El R² solo dice qué tanto de la variación de y acompaña a la de x dentro de la muestra.</p>`,
 deep:[
 {k:"Demostración", t:"De dónde salen las fórmulas", html:`<p>Minimizamos <span class="m">S = Σ(yᵢ − β₀ − β₁xᵢ)²</span>. Derivando e igualando a cero:</p><div class="eq">∂S/∂β₀ = −2Σûᵢ = 0 &nbsp;&nbsp;&nbsp; ∂S/∂β₁ = −2Σxᵢûᵢ = 0</div><p>La primera condición da <span class="m">ȳ = β̂₀ + β̂₁x̄</span>. Sustituyendo en la segunda y despejando se obtiene β̂₁. Estas dos condiciones implican propiedades que siempre se cumplen con intercepto: los residuos suman cero, no están correlacionados con x, y la recta pasa por el punto (x̄, ȳ).</p>`},
-{k:"Conceptos", t:"El R² ajustado", html:`<div class="eq">R̄² = 1 − <span class="frac"><span>SCR / (n − k)</span><span>SCT / (n − 1)</span></span></div><p>El R² nunca baja al agregar una variable, aunque sea irrelevante. El R² ajustado penaliza cada parámetro adicional y puede bajar. Sirve para comparar modelos con la misma variable dependiente y distinto número de regresoras, no para decidir si una variable es significativa (para eso está la prueba t).</p>`}],
+{k:"Conceptos", t:"El R² ajustado", html:`<div class="eq">R̄² = 1 − <span class="frac"><span>RSS / (n − k)</span><span>TSS / (n − 1)</span></span></div><p>El R² nunca baja al agregar una variable, aunque sea irrelevante. El R² ajustado penaliza cada parámetro adicional y puede bajar. Sirve para comparar modelos con la misma variable dependiente y distinto número de regresoras, no para decidir si una variable es significativa (para eso está la prueba t).</p>`}],
 code:{r:String.raw`m <- lm(ventas ~ publicidad, data = df)
 summary(m)          # coeficientes, R², prueba F
-sum(resid(m)^2)     # SCR`, stata:String.raw`reg ventas publicidad
-display e(rss)      // SCR
+sum(resid(m)^2)     # RSS`, stata:String.raw`reg ventas publicidad
+display e(rss)      // RSS
 display e(r2)       // R²`, py:String.raw`m = smf.ols("ventas ~ publicidad", data=df).fit()
 m.params, m.ssr, m.rsquared`},
 q:"Con los datos de la estación anterior (x̄ = 4, ȳ = 17,25), Σ(x−x̄)(y−ȳ) = 25 y Σ(x−x̄)² = 10. Calcula β̂₁ y β̂₀.",
@@ -337,7 +337,7 @@ a:"β̂₁ = 25/10 = 2,5. β̂₀ = 17,25 − 2,5·4 = 7,25. Cada unidad adicion
 <div class="eq">β̂ = (X′X)⁻¹X′y<span class="note">Sale de minimizar u′u = (y − Xβ)′(y − Xβ) y despejar β</span></div>
 <p class="lead">Cada <span class="m">β̂ⱼ</span> se lee <b>ceteris paribus</b>: el efecto de <span class="m">xⱼ</span> sobre <span class="m">y</span> manteniendo constantes las demás regresoras.</p></section>
 <section><h3>Varianza y error estándar</h3>
-<div class="eq">Var(β̂) = σ²(X′X)⁻¹ &nbsp;&nbsp;&nbsp; σ̂² = <span class="frac"><span>SCR</span><span>n − k</span></span><span class="note">La raíz de cada elemento de la diagonal de σ̂²(X′X)⁻¹ es el error estándar de ese coeficiente</span></div></section>
+<div class="eq">Var(β̂) = σ²(X′X)⁻¹ &nbsp;&nbsp;&nbsp; σ̂² = <span class="frac"><span>RSS</span><span>n − k</span></span><span class="note">La raíz de cada elemento de la diagonal de σ̂²(X′X)⁻¹ es el error estándar de ese coeficiente</span></div></section>
 <section><h3>Grados de libertad</h3>
 <p>Se pierde un grado de libertad por cada parámetro estimado. Por eso se divide entre <span class="m">n − k</span> y no entre <span class="m">n</span>. Este mismo conteo aparece en el denominador de la prueba de Chow como <span class="m">n − 2k</span>, porque ahí se estiman dos modelos.</p></section>`,
 deep:[
@@ -345,7 +345,7 @@ deep:[
 {k:"Intuición", t:"Teorema de Frisch-Waugh-Lovell", html:`<p>¿Qué significa exactamente "manteniendo constantes las demás"? El teorema lo responde: el β̂₁ de la regresión múltiple es igual al que obtienes en dos pasos:</p><ol><li>Regresa x₁ sobre las demás regresoras y guarda el residuo r̂₁ (la parte de x₁ que las otras no explican).</li><li>Regresa y sobre r̂₁.</li></ol><p>Así, β̂₁ usa solo la variación de x₁ que no comparte con las demás. Por eso, si x₁ casi no tiene variación propia (multicolinealidad), su estimación es imprecisa.</p>`}],
 code:{r:String.raw`m <- lm(y ~ x1 + x2 + x3, data = df)
 vcov(m)       # σ̂²(X'X)⁻¹
-sigma(m)^2    # σ̂² = SCR/(n−k)`, stata:String.raw`reg y x1 x2 x3
+sigma(m)^2    # σ̂² = RSS/(n−k)`, stata:String.raw`reg y x1 x2 x3
 matrix list e(V)     // matriz de varianzas
 display e(rmse)^2    // σ̂²`, py:String.raw`m = smf.ols("y ~ x1 + x2 + x3", data=df).fit()
 m.cov_params()   # σ̂²(X'X)⁻¹
@@ -383,21 +383,21 @@ a:"No. Siguen siendo insesgados. Lo que se daña es la varianza estimada: los er
 <section><h3>Prueba t: un solo coeficiente</h3>
 <div class="eq">t = <span class="frac"><span>β̂ⱼ − βⱼ⁰</span><span>ee(β̂ⱼ)</span></span> ~ t(n − k)</div></section>
 <section><h3>Prueba F: varias restricciones a la vez</h3>
-<p class="lead">Comparas un modelo <b>restringido</b> (imponiendo la hipótesis nula) con uno <b>no restringido</b>. Si al imponer la restricción la SCR crece mucho, la restricción no es creíble.</p>
-<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / q</span><span>SCR<sub>NR</sub> / (n − k)</span></span> ~ F(q, n − k)<span class="note">q: número de restricciones · k: parámetros del modelo no restringido</span></div>
+<p class="lead">Comparas un modelo <b>restringido</b> (imponiendo la hipótesis nula) con uno <b>no restringido</b>. Si al imponer la restricción la RSS crece mucho, la restricción no es creíble.</p>
+<div class="eq">F = <span class="frac"><span>(RSS<sub>R</sub> − RSS<sub>NR</sub>) / q</span><span>RSS<sub>NR</sub> / (n − k)</span></span> ~ F(q, n − k)<span class="note">q: número de restricciones · k: parámetros del modelo no restringido</span></div>
 <p>Regla: si <span class="m">F &gt; F<sub>crítico</sub></span> (o p-valor &lt; α), se rechaza H₀.</p></section>
 <p class="link"><b>Clave para el parcial:</b> la prueba de Chow <b>es</b> esta prueba F. El modelo restringido es "los mismos coeficientes para todos" y el no restringido es "coeficientes distintos en cada submuestra".</p>`,
 deep:[
-{k:"Fórmula", t:"La prueba F en términos de R²", html:`<div class="eq">F = <span class="frac"><span>(R²<sub>NR</sub> − R²<sub>R</sub>) / q</span><span>(1 − R²<sub>NR</sub>) / (n − k)</span></span></div><p>Sale de dividir numerador y denominador entre SCT. Solo vale si los dos modelos tienen <b>la misma variable dependiente</b>. Para la significancia global (todas las pendientes iguales a cero), R²<sub>R</sub> = 0 y queda <span class="m">F = [R²/(k−1)] / [(1−R²)/(n−k)]</span>.</p>`},
+{k:"Fórmula", t:"La prueba F en términos de R²", html:`<div class="eq">F = <span class="frac"><span>(R²<sub>NR</sub> − R²<sub>R</sub>) / q</span><span>(1 − R²<sub>NR</sub>) / (n − k)</span></span></div><p>Sale de dividir numerador y denominador entre TSS. Solo vale si los dos modelos tienen <b>la misma variable dependiente</b>. Para la significancia global (todas las pendientes iguales a cero), R²<sub>R</sub> = 0 y queda <span class="m">F = [R²/(k−1)] / [(1−R²)/(n−k)]</span>.</p>`},
 {k:"Conceptos", t:"p-valor, errores tipo I y II", html:`<p>El <b>p-valor</b> es la probabilidad de observar un estadístico tan extremo como el obtenido si H₀ fuera cierta. No es la probabilidad de que H₀ sea cierta.</p><div class="tbl"><table><tr><th></th><th>H₀ cierta</th><th>H₀ falsa</th></tr><tr><td>Rechazo H₀</td><td>Error tipo I (prob. α)</td><td>Correcto (potencia)</td></tr><tr><td>No rechazo</td><td>Correcto</td><td>Error tipo II</td></tr></table></div><p>"No rechazar" no es lo mismo que "aceptar": puede que simplemente no haya suficiente información para detectar el efecto.</p>`}],
 code:{r:String.raw`library(car)
 linearHypothesis(m, c("x1 = 0", "x2 = 0"))
-anova(m_restringido, m)   # F con las SCR`, stata:String.raw`reg y x1 x2 x3
+anova(m_restringido, m)   # F con las RSS`, stata:String.raw`reg y x1 x2 x3
 test x1 x2          // H0: b1 = b2 = 0
 test x1 = x2        // H0: b1 = b2`, py:String.raw`m.f_test("x1 = 0, x2 = 0")
 m.compare_f_test(m_restringido)   # (F, p, q)`},
 q:"En y = β₀ + β₁x₁ + β₂x₂ + u, ¿cuántas restricciones tiene H₀: β₁ = β₂ = 0?",
-a:"q = 2. Se estima el modelo restringido solo con intercepto y se compara su SCR con la del modelo completo."},
+a:"q = 2. Se estima el modelo restringido solo con intercepto y se compara su RSS con la del modelo completo."},
 
 {id:"dicotomicas", t:"Variables dicotómicas e interacciones", exam:true, html:`
 <section><h3>Cambio en el intercepto</h3>
@@ -423,17 +423,17 @@ a:"Tres. El trimestre omitido queda como base, y cada coeficiente mide la difere
 <p class="lead">¿Los coeficientes del modelo son los mismos en dos submuestras? Por ejemplo, antes y después de una reforma tributaria, de la pandemia, o entre hombres y mujeres. Si no lo son, hay <b>cambio estructural</b> y un solo modelo para toda la muestra sería engañoso.</p>
 <div class="eq">H₀: β<sup>(1)</sup> = β<sup>(2)</sup> &nbsp;(no hay cambio) &nbsp;&nbsp;&nbsp; H₁: β<sup>(1)</sup> ≠ β<sup>(2)</sup></div></section>
 <section><h3>El estadístico</h3>
-<div class="eq">F = <span class="frac"><span>[SCR<sub>R</sub> − (SCR₁ + SCR₂)] / k</span><span>(SCR₁ + SCR₂) / (n − 2k)</span></span> ~ F(k, n − 2k)<span class="note">SCR<sub>R</sub>: modelo con toda la muestra · SCR₁, SCR₂: cada submuestra por separado · k: parámetros incluido el intercepto</span></div></section>
+<div class="eq">F = <span class="frac"><span>[RSS<sub>R</sub> − (RSS₁ + RSS₂)] / k</span><span>(RSS₁ + RSS₂) / (n − 2k)</span></span> ~ F(k, n − 2k)<span class="note">RSS<sub>R</sub>: modelo con toda la muestra · RSS₁, RSS₂: cada submuestra por separado · k: parámetros incluido el intercepto</span></div></section>
 <section><h3>Paso a paso para el examen</h3>
 <ol class="steps">
-<li>Estima el modelo con <b>toda</b> la muestra y anota SCR<sub>R</sub> (n observaciones).</li>
-<li>Estima el mismo modelo en la submuestra 1 (n₁ obs.) y en la 2 (n₂ obs.). Anota SCR₁ y SCR₂.</li>
-<li>Suma: SCR<sub>NR</sub> = SCR₁ + SCR₂.</li>
+<li>Estima el modelo con <b>toda</b> la muestra y anota RSS<sub>R</sub> (n observaciones).</li>
+<li>Estima el mismo modelo en la submuestra 1 (n₁ obs.) y en la 2 (n₂ obs.). Anota RSS₁ y RSS₂.</li>
+<li>Suma: RSS<sub>NR</sub> = RSS₁ + RSS₂.</li>
 <li>Calcula F con k restricciones y n − 2k grados de libertad en el denominador.</li>
 <li>Busca F crítico en la tabla F(k, n − 2k) al nivel α (o usa el p-valor).</li>
 <li>Concluye: si F &gt; F crítico, rechazas H₀ y hay evidencia de cambio estructural.</li></ol></section>
 <section><h3>Ejemplo resuelto</h3>
-<p>n = 30 (15 + 15), modelo simple (k = 2). SCR<sub>R</sub> = 420, SCR₁ = 120, SCR₂ = 150.</p>
+<p>n = 30 (15 + 15), modelo simple (k = 2). RSS<sub>R</sub> = 420, RSS₁ = 120, RSS₂ = 150.</p>
 <div class="eq">F = <span class="frac"><span>(420 − 270) / 2</span><span>270 / 26</span></span> = <span class="frac"><span>75</span><span>10,385</span></span> ≈ 7,22<span class="note">F crítico al 5 % con (2, 26) ≈ 3,37 → 7,22 &gt; 3,37: se rechaza H₀</span></div></section>
 <section><h3>Laboratorio: mueve el quiebre y mira qué pasa</h3>
 <div class="sim" id="sim"></div></section>
@@ -443,11 +443,11 @@ a:"Tres. El trimestre omitido queda como base, y cada coeficiente mide la difere
 <section><h3>Supuestos y variantes</h3>
 <ul><li><b>El punto de quiebre se conoce de antemano</b> (una fecha o un grupo definido por teoría). Si se elige mirando los datos, el F sale inflado.</li>
 <li><b>Misma varianza del error</b> en ambas submuestras. Se puede revisar con F = σ̂₁² / σ̂₂².</li>
-<li><b>Chow predictiva</b>: si una submuestra tiene menos observaciones que parámetros (n₂ &lt; k), no se puede estimar por separado y se usa F = [(SCR<sub>R</sub> − SCR₁)/n₂] / [SCR₁/(n₁ − k)] ~ F(n₂, n₁ − k).</li></ul></section>
+<li><b>Chow predictiva</b>: si una submuestra tiene menos observaciones que parámetros (n₂ &lt; k), no se puede estimar por separado y se usa F = [(RSS<sub>R</sub> − RSS₁)/n₂] / [RSS₁/(n₁ − k)] ~ F(n₂, n₁ − k).</li></ul></section>
 <p class="warn"><b>Error común:</b> usar k = número de regresoras. En Chow, k cuenta también el intercepto: con 3 regresoras, k = 4 y los grados de libertad son (4, n − 8).</p>`,
 deep:[
-{k:"Demostración", t:"Por qué Chow es una prueba F restringida", html:`<p>El modelo no restringido permite coeficientes distintos en cada submuestra; con dicotómicas se escribe con 2k parámetros. Su SCR es exactamente SCR₁ + SCR₂, porque estimar el modelo con todas las interacciones equivale a estimar cada submuestra por separado.</p><p>El restringido impone k igualdades (cada coeficiente igual en ambas submuestras), así que q = k. Sustituyendo en la fórmula general de la F, con 2k parámetros en el no restringido, se obtiene exactamente la fórmula de Chow con n − 2k grados de libertad.</p>`},
-{k:"Variante", t:"Comprobar varianzas iguales antes de Chow", html:`<div class="eq">F = <span class="frac"><span>σ̂₁²</span><span>σ̂₂²</span></span> = <span class="frac"><span>SCR₁/(n₁ − k)</span><span>SCR₂/(n₂ − k)</span></span> ~ F(n₁ − k, n₂ − k)<span class="note">Pon la varianza mayor en el numerador y compara con el F crítico</span></div><p>En el ejemplo resuelto: σ̂₁² = 120/13 = 9,23 y σ̂₂² = 150/13 = 11,54. F = 11,54/9,23 = 1,25, menor que F crítico (13, 13) ≈ 2,58. Las varianzas son compatibles y la prueba de Chow es válida.</p>`},
+{k:"Demostración", t:"Por qué Chow es una prueba F restringida", html:`<p>El modelo no restringido permite coeficientes distintos en cada submuestra; con dicotómicas se escribe con 2k parámetros. Su RSS es exactamente RSS₁ + RSS₂, porque estimar el modelo con todas las interacciones equivale a estimar cada submuestra por separado.</p><p>El restringido impone k igualdades (cada coeficiente igual en ambas submuestras), así que q = k. Sustituyendo en la fórmula general de la F, con 2k parámetros en el no restringido, se obtiene exactamente la fórmula de Chow con n − 2k grados de libertad.</p>`},
+{k:"Variante", t:"Comprobar varianzas iguales antes de Chow", html:`<div class="eq">F = <span class="frac"><span>σ̂₁²</span><span>σ̂₂²</span></span> = <span class="frac"><span>RSS₁/(n₁ − k)</span><span>RSS₂/(n₂ − k)</span></span> ~ F(n₁ − k, n₂ − k)<span class="note">Pon la varianza mayor en el numerador y compara con el F crítico</span></div><p>En el ejemplo resuelto: σ̂₁² = 120/13 = 9,23 y σ̂₂² = 150/13 = 11,54. F = 11,54/9,23 = 1,25, menor que F crítico (13, 13) ≈ 2,58. Las varianzas son compatibles y la prueba de Chow es válida.</p>`},
 {k:"Avanzado", t:"Cuando no sabes dónde está el quiebre", html:`<p><b>Quandt-Andrews (sup-F):</b> calcula el F de Chow para cada posible punto de quiebre (dejando fuera, por ejemplo, el 15 % inicial y final) y toma el máximo. Ese máximo no sigue una distribución F; tiene sus propios valores críticos (Andrews, 1993).</p><p><b>CUSUM:</b> suma acumulada de residuos recursivos. Si la línea se sale de las bandas de confianza, hay inestabilidad en los parámetros. Es visual y no requiere fijar un punto.</p><p><b>Bai-Perron:</b> permite estimar varios quiebres a la vez.</p>`}],
 code:{r:String.raw`library(strucchange)
 sctest(y ~ x, data = df, type = "Chow", point = 30)
@@ -468,8 +468,8 @@ b = smf.ols("y ~ x", data=df.iloc[30:]).fit()
 k, n = 2, len(df)
 F = ((r.ssr - (a.ssr + b.ssr)) / k) / ((a.ssr + b.ssr) / (n - 2*k))
 p = f.sf(F, k, n - 2*k)`},
-q:"Modelo con 3 regresoras e intercepto, n = 60 dividido 35/25. SCR_R = 900, SCR₁ = 320, SCR₂ = 280. ¿Hay cambio estructural al 5 %?",
-a:"k = 4, gl = (4, 52). SCR_NR = 600. F = [(900 − 600)/4] / [600/52] = 75 / 11,54 ≈ 6,50. F crítico (4, 52) al 5 % ≈ 2,55. Como 6,50 > 2,55 se rechaza H₀: hay evidencia de cambio estructural."}
+q:"Modelo con 3 regresoras e intercepto, n = 60 dividido 35/25. RSS_R = 900, RSS₁ = 320, RSS₂ = 280. ¿Hay cambio estructural al 5 %?",
+a:"k = 4, gl = (4, 52). RSS_NR = 600. F = [(900 − 600)/4] / [600/52] = 75 / 11,54 ≈ 6,50. F crítico (4, 52) al 5 % ≈ 2,55. Como 6,50 > 2,55 se rechaza H₀: hay evidencia de cambio estructural."}
 ];
 
 const BRANCHES = [
@@ -493,7 +493,7 @@ const BRANCHES = [
 <li><b>MCG factible</b>: estimas h(xᵢ) a partir de los residuos y luego aplicas MCP.</li></ol></section>`,
 deep:[
 {k:"Intuición", t:"Por qué MCP es más eficiente", html:`<p>MCO le da el mismo peso a todas las observaciones. Pero las que tienen varianza alta son menos informativas: su dato está más contaminado por ruido. MCP les da menos peso (1/σᵢ²), y así el estimador aprovecha mejor la información. Si Var(uᵢ) = σ²xᵢ, la ecuación transformada es:</p><div class="eq">yᵢ/√xᵢ = β₀(1/√xᵢ) + β₁√xᵢ + uᵢ/√xᵢ<span class="note">El nuevo error tiene varianza constante σ²</span></div>`},
-{k:"Variante", t:"Goldfeld-Quandt", html:`<p>Ordena las observaciones según la variable que sospechas causa la heterocedasticidad, quita un bloque central (por ejemplo, el 20 %) y estima por separado el tercio inferior y el superior. Luego <span class="m">F = SCR₂/SCR₁</span> (con sus grados de libertad). Fíjate que es la misma prueba de varianzas iguales que se usa antes de Chow.</p>`}],
+{k:"Variante", t:"Goldfeld-Quandt", html:`<p>Ordena las observaciones según la variable que sospechas causa la heterocedasticidad, quita un bloque central (por ejemplo, el 20 %) y estima por separado el tercio inferior y el superior. Luego <span class="m">F = RSS₂/RSS₁</span> (con sus grados de libertad). Fíjate que es la misma prueba de varianzas iguales que se usa antes de Chow.</p>`}],
 code:{r:String.raw`library(lmtest); library(sandwich)
 bptest(m)                                            # Breusch-Pagan
 bptest(m, ~ x1 * x2 + I(x1^2) + I(x2^2), data = df)  # White
@@ -592,7 +592,7 @@ a:"VIF = 1/(1 − 0,95) = 20. La varianza de β̂₂ es 20 veces la que tendría
 <li>En <b>x</b>: produce <b>sesgo de atenuación</b>; β̂ se acerca a cero. Se corrige con variables instrumentales.</li></ul></section>`,
 deep:[
 {k:"Demostración", t:"De dónde sale la fórmula del sesgo", html:`<p>El estimador del modelo corto es β̃₁ = Σ(x₁ᵢ − x̄₁)yᵢ / Σ(x₁ᵢ − x̄₁)². Sustituyendo el modelo verdadero de yᵢ:</p><div class="eq">β̃₁ = β₁ + β₂·<span class="frac"><span>Σ(x₁ᵢ − x̄₁)x₂ᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span> + <span class="frac"><span>Σ(x₁ᵢ − x̄₁)uᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span></div><p>La fracción del medio es δ̃₁ y el último término tiene esperanza cero. Tomando esperanzas queda la fórmula.</p>`},
-{k:"Conceptos", t:"Criterios de información AIC y BIC", html:`<p>Para elegir entre modelos no anidados (que no son versiones restringidas uno del otro), se usan:</p><div class="eq">AIC = ln(SCR/n) + 2k/n &nbsp;&nbsp;&nbsp; BIC = ln(SCR/n) + k·ln(n)/n</div><p>Se prefiere el de menor valor. El BIC penaliza más los parámetros adicionales y tiende a elegir modelos más pequeños.</p>`}],
+{k:"Conceptos", t:"Criterios de información AIC y BIC", html:`<p>Para elegir entre modelos no anidados (que no son versiones restringidas uno del otro), se usan:</p><div class="eq">AIC = ln(RSS/n) + 2k/n &nbsp;&nbsp;&nbsp; BIC = ln(RSS/n) + k·ln(n)/n</div><p>Se prefiere el de menor valor. El BIC penaliza más los parámetros adicionales y tiende a elegir modelos más pequeños.</p>`}],
 code:{r:String.raw`library(lmtest)
 resettest(m, power = 2:3, type = "fitted")
 AIC(m1, m2); BIC(m1, m2)`, stata:String.raw`reg y x1 x2
@@ -779,8 +779,8 @@ const WORKSHOPS=[
  d:"Escribe tus propios datos y mira cada operación de β̂ = (X′X)⁻¹X′y. Después parte la matriz por columnas, para ver el teorema de Frisch-Waugh-Lovell, o por filas, que es la base de la prueba de Chow."},
 {id:"t-geometria",t:"Geometría de MCO en 3D",anchor:"mco-matricial",links:["matrices","mco-matricial","supuestos"],sim:"wsGeo",html:WSBOX,
  d:"MCO es una proyección. Con tres observaciones se puede ver: y se proyecta sobre el plano que generan las columnas de X, y el residuo queda perpendicular a ese plano."},
-{id:"t-plano",t:"Plano de regresión y superficie de la SCR",anchor:"mco-matricial",links:["mco-simple","mco-matricial","multicol"],sim:"wsPlane",html:WSBOX,
- d:"Con dos regresoras, la recta de regresión se vuelve un plano. Gíralo, cambia la correlación entre x₁ y x₂ y mira cómo la superficie de la SCR pasa de un tazón a un valle alargado cuando hay multicolinealidad."},
+{id:"t-plano",t:"Plano de regresión y superficie de la RSS",anchor:"mco-matricial",links:["mco-simple","mco-matricial","multicol"],sim:"wsPlane",html:WSBOX,
+ d:"Con dos regresoras, la recta de regresión se vuelve un plano. Gíralo, cambia la correlación entre x₁ y x₂ y mira cómo la superficie de la RSS pasa de un tazón a un valle alargado cuando hay multicolinealidad."},
 {id:"t-calc",t:"Calculadora de pruebas",anchor:"chow",links:["inferencia","chow","hetero","autocorr"],sim:"wsCalc",html:WSBOX,
  d:"Escribe los datos del ejercicio y obtén el procedimiento completo: la sustitución numérica, el valor crítico, el p-valor y la gráfica de la distribución. Sirve para Chow, F general, varianzas iguales, Breusch-Pagan y Durbin-Watson."}
 ];
@@ -925,7 +925,7 @@ SIMS.mco=function(){
   const R=rng(4), E=normals(R,20), X=[], Y=[];
   for(let i=0;i<20;i++){const x=+(0.5+R()*9.5).toFixed(2);X.push(x);Y.push(7+2.5*x+3*E[i])}
   const best=ols(X,Y);
-  $("sim").innerHTML=`<p>Mueve la recta candidata. Los segmentos rojos son los residuos. MCO es la única recta con la SCR más baja posible.</p>
+  $("sim").innerHTML=`<p>Mueve la recta candidata. Los segmentos rojos son los residuos. MCO es la única recta con la RSS más baja posible.</p>
   <div class="ctr">${slider("cb0","Intercepto candidato",-5,20,"any",3)}${slider("cb1","Pendiente candidata",0,5,"any",3.5)}</div>
   <div class="plot" id="plot"></div><div class="res" id="res"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn solid" type="button" id="fit">Ajustar por MCO</button><span id="msg" style="align-self:center;font-weight:600"></span></div>`;
@@ -938,8 +938,8 @@ SIMS.mco=function(){
     b+=`<line x1="${f.sx(0)}" y1="${f.sy(cl(best.b0))}" x2="${f.sx(10)}" y2="${f.sy(cl(best.b0+best.b1*10))}" stroke="var(--muted)" stroke-dasharray="5 5" stroke-width="1.5"/>`;
     b+=`<line x1="${f.sx(0)}" y1="${f.sy(cl(b0))}" x2="${f.sx(10)}" y2="${f.sy(cl(b0+b1*10))}" stroke="var(--ink)" stroke-width="2.5"/>`;
     $("plot").innerHTML=`<svg viewBox="0 0 600 320" role="img" aria-label="Datos, recta candidata y residuos"><defs><clipPath id="cp"><rect x="46" y="12" width="542" height="272"/></clipPath></defs>${f.g}<g clip-path="url(#cp)">${b}</g></svg>`;
-    $("res").innerHTML=[["SCR de tu recta",fmt(scr,1)],["SCR de MCO",fmt(best.scr,1)],["β̂₀ MCO",fmt(best.b0)],["β̂₁ MCO",fmt(best.b1)],["R² MCO",fmt(best.r2,3)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
-    const gap=scr/best.scr-1; $("msg").textContent=gap<0.005?"Llegaste al mínimo: esta es la recta de MCO.":`Tu SCR es ${fmt(gap*100,1)} % mayor que la de MCO.`;
+    $("res").innerHTML=[["RSS de tu recta",fmt(scr,1)],["RSS de MCO",fmt(best.scr,1)],["β̂₀ MCO",fmt(best.b0)],["β̂₁ MCO",fmt(best.b1)],["R² MCO",fmt(best.r2,3)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    const gap=scr/best.scr-1; $("msg").textContent=gap<0.005?"Llegaste al mínimo: esta es la recta de MCO.":`Tu RSS es ${fmt(gap*100,1)} % mayor que la de MCO.`;
     $("msg").style.color=gap<0.005?"var(--good)":"var(--muted)";};
   ["cb0","cb1"].forEach(i=>$(i).addEventListener("input",run));
   $("fit").onclick=()=>{$("cb0").value=best.b0;$("cb1").value=best.b1;run()};
@@ -963,7 +963,7 @@ SIMS.chow=function(){
     const ln=(m,c,d)=>`<line x1="${f.sx(10)}" y1="${f.sy(m.b0+m.b1*10)}" x2="${f.sx(50)}" y2="${f.sy(m.b0+m.b1*50)}" stroke="${c}" stroke-width="${d?2:2.5}" ${d?'stroke-dasharray="6 5"':""}/>`;
     let pts="";XS.forEach((x,i)=>pts+=`<circle cx="${f.sx(x).toFixed(1)}" cy="${f.sy(Y[i]).toFixed(1)}" r="4" fill="${i<nb?"var(--line)":"var(--branch)"}" fill-opacity=".75"/>`);
     $("plot").innerHTML=svg(f,pts+ln(p,"var(--muted)",1)+ln(a,"var(--line)")+ln(b,"var(--branch)"),"Dispersión de los dos periodos con sus rectas");
-    $("res").innerHTML=[["SCR restringida",fmt(p.scr,1)],["SCR₁",fmt(a.scr,1)],["SCR₂",fmt(b.scr,1)],["F de Chow",fmt(F)],[`F crítico (${k}, ${d2})`,fmt(fc)],["p-valor",pv<1e-4?"< 0,0001":fmt(pv,4)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    $("res").innerHTML=[["RSS restringida",fmt(p.scr,1)],["RSS₁",fmt(a.scr,1)],["RSS₂",fmt(b.scr,1)],["F de Chow",fmt(F)],[`F crítico (${k}, ${d2})`,fmt(fc)],["p-valor",pv<1e-4?"< 0,0001":fmt(pv,4)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
     const ver=$("ver");
     if(pv<.05){ver.className="verdict rej";ver.textContent=`F = ${fmt(F)} > ${fmt(fc)}: se rechaza H₀ al 5 %. Hay evidencia de cambio estructural.`}
     else{ver.className="verdict acc";ver.textContent=`F = ${fmt(F)} ≤ ${fmt(fc)}: no se rechaza H₀ al 5 %. Los datos son compatibles con una sola relación.`}};
@@ -1134,8 +1134,8 @@ SIMS.wsMat=function(){
     if(view==="pasos"){
       let s7=SING;
       if(r){const s2=r.scr/(n-k),ee=r.inv.map((q,i)=>Math.sqrt(s2*q[i])),my=y.reduce((a,b)=>a+b)/n,sct=y.reduce((a,b)=>a+(b-my)**2,0);
-        s7=`<div class="tbl"><table><tr><th>Mes</th><th>y</th><th>ŷ = Xβ̂</th><th>û = y − ŷ</th><th>û²</th></tr>${y.map((v,i)=>`<tr><td class="num">${i+1}</td><td class="num">${fm(v)}</td><td class="num">${fm(r.yh[i])}</td><td class="num">${fm(r.u[i])}</td><td class="num">${fm(r.u[i]**2)}</td></tr>`).join("")}<tr><td colspan="4"><b>SCR = Σû²</b></td><td class="num"><b>${fm(r.scr)}</b></td></tr></table></div>
-        <div class="res"><div><small>σ̂² = SCR/(n − k)</small><b>${fm(s2)}</b></div><div><small>ee(β̂₀)</small><b>${fm(ee[0])}</b></div><div><small>ee(β̂₁)</small><b>${fm(ee[1])}</b></div><div><small>ee(β̂₂)</small><b>${fm(ee[2])}</b></div><div><small>R²</small><b>${fmt(1-r.scr/sct,3)}</b></div></div>
+        s7=`<div class="tbl"><table><tr><th>Mes</th><th>y</th><th>ŷ = Xβ̂</th><th>û = y − ŷ</th><th>û²</th></tr>${y.map((v,i)=>`<tr><td class="num">${i+1}</td><td class="num">${fm(v)}</td><td class="num">${fm(r.yh[i])}</td><td class="num">${fm(r.u[i])}</td><td class="num">${fm(r.u[i]**2)}</td></tr>`).join("")}<tr><td colspan="4"><b>RSS = Σû²</b></td><td class="num"><b>${fm(r.scr)}</b></td></tr></table></div>
+        <div class="res"><div><small>σ̂² = RSS/(n − k)</small><b>${fm(s2)}</b></div><div><small>ee(β̂₀)</small><b>${fm(ee[0])}</b></div><div><small>ee(β̂₁)</small><b>${fm(ee[1])}</b></div><div><small>ee(β̂₂)</small><b>${fm(ee[2])}</b></div><div><small>R²</small><b>${fmt(1-r.scr/sct,3)}</b></div></div>
         <p>Los errores estándar son la raíz de la diagonal de σ̂²(X′X)⁻¹. Con ellos se arman las pruebas t.</p>`}
       const st=[
         ["Arma la matriz X y el vector y",`<div class="mscroll"><div class="mrow">${mat(X,"X",{sub:n+"×3",cls:(i,j)=>j===0?"b3":""})}${mat(colv(y),"y",{sub:n+"×1"})}</div></div><p>La columna de unos (resaltada) acompaña al intercepto β₀. Cada fila es un mes y cada columna, una variable.</p>`],
@@ -1144,7 +1144,7 @@ SIMS.wsMat=function(){
         ["Invierte X′X",r?`<div class="mscroll"><div class="mrow">${mat(r.inv,"(X′X)⁻¹")}<span class="op">→</span>${mat(MM(XtX,r.inv),"(X′X)(X′X)⁻¹",{sub:"= I"})}</div></div><p>El determinante de X′X es <b>${fm(DET3(XtX))}</b>. Si fuera cero, no habría inversa. Al multiplicar X′X por su inversa sale la identidad, y así se comprueba.</p>`:SING],
         ["Multiplica X′y",`<div class="mscroll"><div class="mrow">${mat(Xty,"X′y",{sub:"3×1",click:"xty"})}</div></div><div class="expl" id="ex-xty">Toca una celda de X′y para ver la cuenta.</div>`],
         ["Obtén β̂ = (X′X)⁻¹X′y",r?`<div class="mscroll"><div class="mrow">${mat(r.inv,"(X′X)⁻¹")}<span class="op">·</span>${mat(Xty,"X′y")}<span class="op">=</span>${mat(colv(r.b),"β̂",{cls:()=>"b1"})}</div></div><div class="eq">ŷ = ${fm(r.b[0])} ${sgn(r.b[1])} ${fm(Math.abs(r.b[1]))}·x₁ ${sgn(r.b[2])} ${fm(Math.abs(r.b[2]))}·x₂</div><p>Con el precio constante, una unidad más de publicidad se asocia con ${fm(Math.abs(r.b[1]))} unidades ${r.b[1]>=0?"más":"menos"} de ventas. Con la publicidad constante, una unidad más de precio se asocia con ${fm(Math.abs(r.b[2]))} unidades ${r.b[2]>=0?"más":"menos"}.</p>`:SING],
-        ["Residuos, SCR y errores estándar",s7]];
+        ["Residuos, RSS y errores estándar",s7]];
       let h=st.slice(0,step).map(([t,b],i)=>`<div class="stepc${i>=shown?" fresh":""}"><h4><span class="n">${i+1}</span>${t}</h4>${b}</div>`).join("");
       h+=`<div class="row">${step<7?`<button class="btn solid" type="button" data-act="next">Siguiente paso (${step+1} de 7)</button><button class="btn" type="button" data-act="all">Ver todos</button>`:""}${step>1?`<button class="btn" type="button" data-act="reset">Empezar de nuevo</button>`:""}</div>`;
       v.innerHTML=h;shown=step;
@@ -1190,15 +1190,15 @@ SIMS.wsMat=function(){
     let ch="";
     if(!r)ch=SING;
     else if(ra&&rb){const nr=ra.scr+rb.scr,d2=n-2*k;
-      if(nr<1e-12)ch=`<p class="warn"><b>SCR₁ + SCR₂ = 0.</b> Cada periodo se ajusta perfecto; agrega meses o cambia el punto de corte.</p>`;
+      if(nr<1e-12)ch=`<p class="warn"><b>RSS₁ + RSS₂ = 0.</b> Cada periodo se ajusta perfecto; agrega meses o cambia el punto de corte.</p>`;
       else{const F=((r.scr-nr)/k)/(nr/d2),c=fcrit(k,d2),p=fp(F,k,d2);mem.chow={scrR:r.scr,scr1:ra.scr,scr2:rb.scr,n,k};
         ch=`<div class="eq">F = <span class="frac"><span>(${fm(r.scr)} − ${fm(nr)}) / ${k}</span><span>${fm(nr)} / ${d2}</span></span> = ${fm(F)} &nbsp;&nbsp; F crítico 5 % (${k}, ${d2}) = ${fm(c)}</div>
         <div class="verdict ${p<.05?"rej":"acc"}">${p<.05?`Se rechaza H₀ (p = ${pf(p)}): hay evidencia de cambio estructural entre los dos periodos.`:`No se rechaza H₀ (p = ${pf(p)}): no hay evidencia de cambio estructural.`}</div>
         <div class="row"><button class="btn solid" type="button" data-act="calc">Ver el procedimiento en la calculadora →</button></div>`}}
     else if(r&&(ra||rb)){const big=ra?{res:ra,m:rs}:{res:rb,m:n-rs},ns=n-big.m,d2=big.m-k;
-      if(big.res.scr<1e-12)ch=`<p class="warn"><b>La parte grande se ajusta perfecto</b> (SCR = 0); agrega meses.</p>`;
+      if(big.res.scr<1e-12)ch=`<p class="warn"><b>La parte grande se ajusta perfecto</b> (RSS = 0); agrega meses.</p>`;
       else{const F=((r.scr-big.res.scr)/ns)/(big.res.scr/d2),c=fcrit(ns,d2),p=fp(F,ns,d2);
-        ch=`<p>Una parte tiene solo ${ns} ${ns===1?"mes":"meses"}, menos de los k + 1 = 4 necesarios para estimarla sola. Se usa la <b>Chow predictiva</b>:</p><div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>grande</sub>) / n<sub>pequeña</sub></span><span>SCR<sub>grande</sub> / (n<sub>grande</sub> − k)</span></span> = <span class="frac"><span>(${fm(r.scr)} − ${fm(big.res.scr)}) / ${ns}</span><span>${fm(big.res.scr)} / ${d2}</span></span> = ${fm(F)}</div><div class="verdict ${p<.05?"rej":"acc"}">F crítico 5 % (${ns}, ${d2}) = ${fm(c)}. ${p<.05?"Se rechaza H₀: los meses de la parte pequeña no se ajustan a la relación de la grande.":"No se rechaza H₀: la parte pequeña es compatible con la relación estimada en la grande."}</div>`}}
+        ch=`<p>Una parte tiene solo ${ns} ${ns===1?"mes":"meses"}, menos de los k + 1 = 4 necesarios para estimarla sola. Se usa la <b>Chow predictiva</b>:</p><div class="eq">F = <span class="frac"><span>(RSS<sub>R</sub> − RSS<sub>grande</sub>) / n<sub>pequeña</sub></span><span>RSS<sub>grande</sub> / (n<sub>grande</sub> − k)</span></span> = <span class="frac"><span>(${fm(r.scr)} − ${fm(big.res.scr)}) / ${ns}</span><span>${fm(big.res.scr)} / ${d2}</span></span> = ${fm(F)}</div><div class="verdict ${p<.05?"rej":"acc"}">F crítico 5 % (${ns}, ${d2}) = ${fm(c)}. ${p<.05?"Se rechaza H₀: los meses de la parte pequeña no se ajustan a la relación de la grande.":"No se rechaza H₀: la parte pequeña es compatible con la relación estimada en la grande."}</div>`}}
     else ch=`<p class="warn"><b>Ninguna parte tiene suficientes meses.</b> Con k = 3 parámetros cada periodo necesita al menos 4 observaciones para estimarse solo.</p>`;
     $("fv").innerHTML=`<div class="stepc"><h4><span class="n">1</span>Partir por filas</h4><div class="eq">X = [ X⁽¹⁾ ; X⁽²⁾ ] &nbsp;&nbsp; y = [ y⁽¹⁾ ; y⁽²⁾ ]</div>
       <div class="mscroll"><div class="mrow">${mat(X,"X",{cls:rc})}${mat(colv(y),"y",{cls:rc})}</div></div></div>
@@ -1206,7 +1206,7 @@ SIMS.wsMat=function(){
       <div class="mscroll"><div class="mrow">${mat(A1,"X⁽¹⁾′X⁽¹⁾",{cls:()=>"b1"})}<span class="op">+</span>${mat(A2,"X⁽²⁾′X⁽²⁾",{cls:()=>"b2"})}<span class="op">=</span>${mat(XtX,"X′X")}</div></div>
       <p>Partir por filas no cambia X′X: lo descompone en la información de cada periodo. Lo mismo ocurre con X′y. El modelo restringido usa la suma (un solo β̂); el no restringido usa cada parte por separado (un β̂ por periodo).</p></div>
     <div class="stepc"><h4><span class="n">3</span>Tres regresiones y la prueba de Chow</h4>
-      <div class="tbl"><table><tr><th>Modelo</th><th>n</th><th>β̂₀</th><th>β̂₁</th><th>β̂₂</th><th>SCR</th></tr>${row("Toda la muestra (restringido)",n,r)}${row("Periodo 1",rs,ra)}${row("Periodo 2",n-rs,rb)}</table></div>${ch}</div>`;
+      <div class="tbl"><table><tr><th>Modelo</th><th>n</th><th>β̂₀</th><th>β̂₁</th><th>β̂₂</th><th>RSS</th></tr>${row("Toda la muestra (restringido)",n,r)}${row("Periodo 1",rs,ra)}${row("Periodo 2",n-rs,rb)}</table></div>${ch}</div>`;
   }
 };
 
@@ -1222,7 +1222,7 @@ SIMS.wsGeo=function(){
     <div class="verdict rej" id="gver" hidden></div>
     <div class="res" id="res"></div></div>
   <div class="stepc"><h4>Las matrices de proyección</h4><div class="eq">P = X(X′X)⁻¹X′ &nbsp;&nbsp; ŷ = Py &nbsp;&nbsp; M = I − P &nbsp;&nbsp; û = My</div><div class="mscroll"><div class="mrow" id="gpm"></div></div><div id="gchk"></div></div>
-  <div class="stepc"><h4>Cómo leer el dibujo</h4><p>Cada eje es una observación, así que un punto del espacio es una columna completa de datos. Toda combinación β₀·1 + β₁·x vive en el plano azul. MCO elige la combinación más cercana a y, y esa es ŷ. La distancia más corta de un punto a un plano es la perpendicular, por eso û forma un ángulo recto con el plano. Esa perpendicularidad es la condición X′û = 0 de las ecuaciones normales, y ‖û‖² es la SCR.</p></div>`;
+  <div class="stepc"><h4>Cómo leer el dibujo</h4><p>Cada eje es una observación, así que un punto del espacio es una columna completa de datos. Toda combinación β₀·1 + β₁·x vive en el plano azul. MCO elige la combinación más cercana a y, y esa es ŷ. La distancia más corta de un punto a un plano es la perpendicular, por eso û forma un ángulo recto con el plano. Esa perpendicularidad es la condición X′û = 0 de las ecuaciones normales, y ‖û‖² es la RSS.</p></div>`;
   const sc=Scene3D($("c3"));sc.center=[.35,.35,.35];rotBtn(sc);
   const ids=["gy1","gy2","gy3","gx1","gx2","gx3"];ids.forEach(i=>$(i).addEventListener("input",upd));
   let dir=null;$("edge").onclick=()=>{if(dir)sc.tween(dir)};
@@ -1249,18 +1249,18 @@ SIMS.wsGeo=function(){
     sc.set(items);
     const nv=cross(u1,u2);dir=nrm(yh)>1e-6?unit(cross(nv,unit(yh))):u2;
     const Pm=MM(MM(X,inv),TR(X)),Mm=SUB(EYE(3),Pm),xu=MM(TR(X),colv(u)).map(q=>q[0]),ny=dot(y,y),nh=dot(yh,yh),nu=dot(u,u);
-    $("res").innerHTML=[["β̂₀",fm(b[0])],["β̂₁",fm(b[1])],["ŷ",vec(yh)],["û",vec(u)],["SCR = ‖û‖²",fm(nu)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    $("res").innerHTML=[["β̂₀",fm(b[0])],["β̂₁",fm(b[1])],["ŷ",vec(yh)],["û",vec(u)],["RSS = ‖û‖²",fm(nu)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
     $("gpm").innerHTML=mat(Pm,"P",{cls:()=>"b1"})+mat(Mm,"M = I − P",{cls:()=>"b3"});
     $("gchk").innerHTML=`<div class="res"><div><small>X′û</small><b>${vec(xu)}</b></div><div><small>traza(P)</small><b>${fm(Pm[0][0]+Pm[1][1]+Pm[2][2])}</b></div><div><small>‖y‖²</small><b>${fm(ny)}</b></div><div><small>‖ŷ‖² + ‖û‖²</small><b>${fm(nh)} + ${fm(nu)}</b></div></div><p>X′û = 0: el residuo es perpendicular a las dos columnas de X. La traza de P es 2, el número de parámetros. Y se cumple Pitágoras: ‖y‖² = ‖ŷ‖² + ‖û‖². P y M son simétricas e idempotentes: proyectar dos veces es lo mismo que proyectar una.</p>`;
   }
 };
 
-// ---------- Taller 3: plano de regresión y superficie de la SCR ----------
+// ---------- Taller 3: plano de regresión y superficie de la RSS ----------
 SIMS.wsPlane=function(){
   let seed=11,view="plano";const ws=$("ws");
   ws.innerHTML=`<div class="sim">
-    <div class="seg" role="group" aria-label="Vista" id="pv"><button type="button" data-pv="plano" aria-pressed="true">Datos y plano</button><button type="button" data-pv="scr" aria-pressed="false">Superficie de la SCR</button></div>
-    <canvas class="c3" id="c3" role="img" aria-label="Vista 3D del plano de regresión o de la superficie de la SCR"></canvas>
+    <div class="seg" role="group" aria-label="Vista" id="pv"><button type="button" data-pv="plano" aria-pressed="true">Datos y plano</button><button type="button" data-pv="scr" aria-pressed="false">Superficie de la RSS</button></div>
+    <canvas class="c3" id="c3" role="img" aria-label="Vista 3D del plano de regresión o de la superficie de la RSS"></canvas>
     <div class="row"><span class="hint">Arrastra para girar · rueda para acercar</span><button class="btn" type="button" id="rot">Girar solo</button><button class="btn" type="button" id="pnew">Nueva muestra</button></div>
     <div class="legend" id="plg"></div>
     <p>50 observaciones simuladas con y = 2 + β₁x₁ + β₂x₂ + u.</p>
@@ -1294,8 +1294,8 @@ SIMS.wsPlane=function(){
       items.push(txt([0,-1.3,-1],"x₁",{s:13,c:"--ink",bold:1}),txt([1.3,0,-1],"x₂",{s:13,c:"--ink",bold:1}),txt([-1,-1,1.2],"y",{s:13,c:"--ink",bold:1}),
         txt([-1,-1.15,-1.08],fmt(a1,1)),txt([1,-1.15,-1.08],fmt(c1,1)),txt([1.15,-1,-1.08],fmt(a2,1)),txt([1.15,1,-1.08],fmt(c2,1)),txt([-1.12,-1.12,-1],fmt(ay,1)),txt([-1.12,-1.12,1],fmt(cy,1)));
     }else{
-      $("plg").innerHTML=`<span><i style="background:var(--line)"></i>SCR baja</span><span><i style="background:var(--branch)"></i>SCR alta</span><span><i style="background:var(--ink);height:9px;width:9px;border-radius:50%"></i>Mínimo: β̂ de MCO</span><span><i style="background:var(--good);height:9px;width:9px;border-radius:50%"></i>Valor verdadero</span>`;
-      $("pnote").textContent="Con ρ cerca de 0 la superficie es un tazón con un mínimo claro. Con ρ alto se vuelve un valle alargado: muchas combinaciones de β₁ y β₂ dan casi la misma SCR, y por eso los errores estándar crecen. Para cada par (β₁, β₂) se usa el β₀ óptimo.";
+      $("plg").innerHTML=`<span><i style="background:var(--line)"></i>RSS baja</span><span><i style="background:var(--branch)"></i>RSS alta</span><span><i style="background:var(--ink);height:9px;width:9px;border-radius:50%"></i>Mínimo: β̂ de MCO</span><span><i style="background:var(--good);height:9px;width:9px;border-radius:50%"></i>Valor verdadero</span>`;
+      $("pnote").textContent="Con ρ cerca de 0 la superficie es un tazón con un mínimo claro. Con ρ alto se vuelve un valle alargado: muchas combinaciones de β₁ y β₂ dan casi la misma RSS, y por eso los errores estándar crecen. Para cada par (β₁, β₂) se usa el β₀ óptimo.";
       const f=(u,v)=>Syy-2*u*S1y-2*v*S2y+u*u*S11+2*u*v*S12+v*v*S22,Wd=2,G=22,u0=r.b[1]-Wd,v0=r.b[2]-Wd,h=2*Wd/G;
       const grid=[];let mx=-Infinity;for(let i=0;i<=G;i++){grid.push([]);for(let j=0;j<=G;j++){const z=f(u0+i*h,v0+j*h);grid[i].push(z);mx=Math.max(mx,z)}}
       const mn=r.scr,Z=z=>-1+2*(z-mn)/(mx-mn),Nu=u=>-1+2*(u-u0)/(2*Wd),Nv=v=>-1+2*(v-v0)/(2*Wd);
@@ -1303,11 +1303,11 @@ SIMS.wsPlane=function(){
         items.push({type:"poly",pts:[[Nu(u0+i*h),Nv(v0+j*h),Z(zs[0])],[Nu(u0+(i+1)*h),Nv(v0+j*h),Z(zs[1])],[Nu(u0+(i+1)*h),Nv(v0+(j+1)*h),Z(zs[2])],[Nu(u0+i*h),Nv(v0+(j+1)*h),Z(zs[3])]],mix:Math.sqrt(t),op:.93,stroke:"--card",sa:.45})}
       items.push({type:"pt",p:[0,0,-1],r:5.5,c:"--ink",bias:-30},txt([0,0,-1],"β̂",{c:"--ink",s:13,bold:1,dy:-14,bias:-70}));
       if(Math.abs(B1-r.b[1])<Wd&&Math.abs(B2-r.b[2])<Wd)items.push({type:"pt",p:[Nu(B1),Nv(B2),Z(f(B1,B2))],r:5.5,c:"--good",bias:-30});
-      items.push(txt([0,-1.3,-1],"β₁",{s:13,c:"--ink",bold:1}),txt([1.3,0,-1],"β₂",{s:13,c:"--ink",bold:1}),txt([-1,-1,1.2],"SCR",{s:13,c:"--ink",bold:1}),
+      items.push(txt([0,-1.3,-1],"β₁",{s:13,c:"--ink",bold:1}),txt([1.3,0,-1],"β₂",{s:13,c:"--ink",bold:1}),txt([-1,-1,1.2],"RSS",{s:13,c:"--ink",bold:1}),
         txt([-1,-1.15,-1.08],fmt(u0,1)),txt([1,-1.15,-1.08],fmt(u0+2*Wd,1)),txt([1.15,-1,-1.08],fmt(v0,1)),txt([1.15,1,-1.08],fmt(v0+2*Wd,1)));
     }
     sc.set(items);
-    $("res").innerHTML=[["β̂₁ (ee)",`${fmt(r.b[1],2)} (${fmt(ee[0],2)})`],["β̂₂ (ee)",`${fmt(r.b[2],2)} (${fmt(ee[1],2)})`],["Corr(x₁, x₂)",fmt(rr,3)],["VIF",fmt(1/(1-rr*rr),2)],["R²",fmt(1-r.scr/Syy,3)],["SCR",fmt(r.scr,1)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
+    $("res").innerHTML=[["β̂₁ (ee)",`${fmt(r.b[1],2)} (${fmt(ee[0],2)})`],["β̂₂ (ee)",`${fmt(r.b[2],2)} (${fmt(ee[1],2)})`],["Corr(x₁, x₂)",fmt(rr,3)],["VIF",fmt(1/(1-rr*rr),2)],["R²",fmt(1-r.scr/Syy,3)],["RSS",fmt(r.scr,1)]].map(([s,v])=>`<div><small>${s}</small><b>${v}</b></div>`).join("");
   }
 };
 
@@ -1345,9 +1345,9 @@ function dwGauge(d,dl,du){const W=600,L=16,R=16,sx=v=>L+Math.max(0,Math.min(4,v)
 SIMS.wsCalc=function(){
   const ws=$("ws");
   const TABS={
-    chow:{t:"Chow",f:[["scrR","SCR restringida (toda la muestra)",420],["scr1","SCR₁ (submuestra 1)",120],["scr2","SCR₂ (submuestra 2)",150],["n","n total",30],["k","k (parámetros con intercepto)",2]]},
-    f:{t:"F general",f:[["scrR","SCR restringida",1250],["scrNR","SCR no restringida",980],["q","q (restricciones)",2],["n","n",60],["k","k (parámetros del no restringido)",4]]},
-    vr:{t:"Varianzas iguales",f:[["scr1","SCR₁",120],["n1","n₁",15],["scr2","SCR₂",150],["n2","n₂",15],["k","k (parámetros)",2]]},
+    chow:{t:"Chow",f:[["scrR","RSS restringida (toda la muestra)",420],["scr1","RSS₁ (submuestra 1)",120],["scr2","RSS₂ (submuestra 2)",150],["n","n total",30],["k","k (parámetros con intercepto)",2]]},
+    f:{t:"F general",f:[["scrR","RSS restringida",1250],["scrNR","RSS no restringida",980],["q","q (restricciones)",2],["n","n",60],["k","k (parámetros del no restringido)",4]]},
+    vr:{t:"Varianzas iguales",f:[["scr1","RSS₁",120],["n1","n₁",15],["scr2","RSS₂",150],["n2","n₂",15],["k","k (parámetros)",2]]},
     bp:{t:"Breusch-Pagan",f:[["n","n",100],["r2","R² de la regresión auxiliar",0.08],["p","Regresoras en la auxiliar",3]]},
     dw:{t:"Durbin-Watson",f:[["d","Estadístico d",0.6],["dl","d_L (de la tabla)",1.35],["du","d_U (de la tabla)",1.49]]}};
   const vals={};Object.entries(TABS).forEach(([k,o])=>{vals[k]={};o.f.forEach(([id,,v])=>vals[k][id]=v)});
@@ -1366,23 +1366,23 @@ SIMS.wsCalc=function(){
     chow:v=>{const{scrR,scr1,scr2,n,k}=v,nr=scr1+scr2,d2=n-2*k;
       if(!(k>=1)||!Number.isInteger(k))return err("k debe ser un entero positivo.");
       if(d2<=0)return err(`n − 2k = ${fm(d2)}. Debe ser positivo: cada submuestra necesita más observaciones que parámetros.`);
-      if(nr<=0)return err("SCR₁ + SCR₂ debe ser positiva.");
-      if(scrR<nr)return err("la SCR restringida no puede ser menor que SCR₁ + SCR₂, porque el modelo restringido nunca ajusta mejor.");
+      if(nr<=0)return err("RSS₁ + RSS₂ debe ser positiva.");
+      if(scrR<nr)return err("la RSS restringida no puede ser menor que RSS₁ + RSS₂, porque el modelo restringido nunca ajusta mejor.");
       const F=((scrR-nr)/k)/(nr/d2),c=fcrit(k,d2,al),p=fp(F,k,d2);
       return stp(1,"Hipótesis",`<div class="eq">H₀: los ${fm(k)} coeficientes son iguales en ambas submuestras &nbsp;&nbsp; H₁: al menos uno cambia</div>`)+
-        stp(2,"SCR del modelo no restringido",`<div class="eq">SCR<sub>NR</sub> = SCR₁ + SCR₂ = ${fm(scr1)} + ${fm(scr2)} = ${fm(nr)}</div>`)+
-        stp(3,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / k</span><span>SCR<sub>NR</sub> / (n − 2k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(nr)}) / ${fm(k)}</span><span>${fm(nr)} / (${fm(n)} − 2·${fm(k)})</span></span> = <span class="frac"><span>${fm((scrR-nr)/k)}</span><span>${fm(nr/d2)}</span></span> = ${fm(F)}</div>`)+
+        stp(2,"RSS del modelo no restringido",`<div class="eq">RSS<sub>NR</sub> = RSS₁ + RSS₂ = ${fm(scr1)} + ${fm(scr2)} = ${fm(nr)}</div>`)+
+        stp(3,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(RSS<sub>R</sub> − RSS<sub>NR</sub>) / k</span><span>RSS<sub>NR</sub> / (n − 2k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(nr)}) / ${fm(k)}</span><span>${fm(nr)} / (${fm(n)} − 2·${fm(k)})</span></span> = <span class="frac"><span>${fm((scrR-nr)/k)}</span><span>${fm(nr/d2)}</span></span> = ${fm(F)}</div>`)+
         stp(4,"Decisión",`<div class="eq">F crítico: F<sub>${ap()}</sub>(${fm(k)}, ${fm(d2)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("F",k,d2,F,c)}${verd(F>c,`F = ${fm(F)} &gt; ${fm(c)}: se rechaza H₀ al ${ap()}. Hay evidencia de cambio estructural.`,`F = ${fm(F)} ≤ ${fm(c)}: no se rechaza H₀ al ${ap()}. No hay evidencia de cambio estructural.`)}`)},
     f:v=>{const{scrR,scrNR,q,n,k}=v,d2=n-k;
       if(!(q>=1)||!Number.isInteger(q))return err("q debe ser un entero positivo.");
       if(d2<=0)return err("n − k debe ser positivo.");
-      if(scrNR<=0||scrR<scrNR)return err("la SCR restringida debe ser mayor o igual que la no restringida, y esta, positiva.");
+      if(scrNR<=0||scrR<scrNR)return err("la RSS restringida debe ser mayor o igual que la no restringida, y esta, positiva.");
       const F=((scrR-scrNR)/q)/(scrNR/d2),c=fcrit(q,d2,al),p=fp(F,q,d2);
-      return stp(1,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / q</span><span>SCR<sub>NR</sub> / (n − k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(scrNR)}) / ${fm(q)}</span><span>${fm(scrNR)} / ${fm(d2)}</span></span> = ${fm(F)}</div>`)+
+      return stp(1,"Estadístico F",`<div class="eq">F = <span class="frac"><span>(RSS<sub>R</sub> − RSS<sub>NR</sub>) / q</span><span>RSS<sub>NR</sub> / (n − k)</span></span> = <span class="frac"><span>(${fm(scrR)} − ${fm(scrNR)}) / ${fm(q)}</span><span>${fm(scrNR)} / ${fm(d2)}</span></span> = ${fm(F)}</div>`)+
         stp(2,"Decisión",`<div class="eq">F crítico: F<sub>${ap()}</sub>(${fm(q)}, ${fm(d2)}) = ${fm(c)} &nbsp;&nbsp; p-valor = ${pf(p)}</div>${distChart("F",q,d2,F,c)}${verd(F>c,`Se rechaza H₀ al ${ap()}: las ${fm(q)} restricciones no son compatibles con los datos.`,`No se rechaza H₀ al ${ap()}: las restricciones son compatibles con los datos.`)}`)},
     vr:v=>{const{scr1,n1,scr2,n2,k}=v,d1=n1-k,d2=n2-k;
       if(d1<=0||d2<=0)return err("cada submuestra necesita más observaciones que parámetros.");
-      if(scr1<=0||scr2<=0)return err("las SCR deben ser positivas.");
+      if(scr1<=0||scr2<=0)return err("las RSS deben ser positivas.");
       const s1=scr1/d1,s2=scr2/d2,big=s1>=s2,F=big?s1/s2:s2/s1,a=big?d1:d2,b=big?d2:d1,c=fcrit(a,b,al),p=fp(F,a,b);
       return stp(1,"Varianza estimada en cada submuestra",`<div class="eq">σ̂₁² = <span class="frac"><span>${fm(scr1)}</span><span>${fm(n1)} − ${fm(k)}</span></span> = ${fm(s1)} &nbsp;&nbsp; σ̂₂² = <span class="frac"><span>${fm(scr2)}</span><span>${fm(n2)} − ${fm(k)}</span></span> = ${fm(s2)}</div>`)+
         stp(2,"Estadístico F (la mayor arriba)",`<div class="eq">F = <span class="frac"><span>${fm(big?s1:s2)}</span><span>${fm(big?s2:s1)}</span></span> = ${fm(F)} &nbsp;&nbsp; gl = (${fm(a)}, ${fm(b)})</div>`)+
