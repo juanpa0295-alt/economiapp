@@ -91,7 +91,17 @@ sol:String.raw`<h5>a) Significado y signos</h5><p>Y son los años de educación 
 <tr><th colspan="5">Suma rural</th><th>0,3400</th></tr></table></div></li>
 <li>El RSS del modelo completo (no restringido) es la suma de los dos: \(RSS_{NR}=3{,}8824+0{,}34=4{,}2222\), y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
 <li>Con los 8 jóvenes, \(\sum y^2=1661\) y el promedio general es \(\bar y=113/8=14{,}125\). \(TSS=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
-<li>Errores estándar \(\sqrt{s^2[(X'X)^{-1}]_{jj}}\): 2,666; 0,249; 1,431 y 0,205.</li></ol>
+<li><b>Errores estándar.</b> Miden qué tan preciso es cada coeficiente: \(S_{b_j}=\sqrt{s^2\,c_{jj}}\), donde \(c_{jj}\) es el elemento j de la diagonal de \((X'X)^{-1}\). Se usa la misma \(s^2=1{,}0556\) para las dos zonas, porque es un solo modelo con una sola varianza del error.<br>
+Como X′X es diagonal por bloques, se invierte cada bloque 2 × 2 por separado:<br>
+<b>Urbana:</b> \(\begin{bmatrix}n&\sum x\\\sum x&\sum x^2\end{bmatrix}^{-1}=\begin{bmatrix}4&42\\42&458\end{bmatrix}^{-1}=\dfrac1{68}\begin{bmatrix}458&-42\\-42&4\end{bmatrix}\), con diagonal \(458/68=6{,}7353\) y \(4/68=0{,}0588\).<br>
+<b>Rural:</b> \(\begin{bmatrix}4&26\\26&194\end{bmatrix}^{-1}=\dfrac1{100}\begin{bmatrix}194&-26\\-26&4\end{bmatrix}\), con diagonal \(1{,}94\) y \(0{,}04\).
+<div class="tbl"><table><tr><th>Coeficiente</th><th>c<sub>jj</sub></th><th>Varianza = s²·c<sub>jj</sub></th><th>Error estándar</th></tr>
+<tr><td>β₁ (intercepto urbano)</td><td>6,7353</td><td>1,0556 × 6,7353 = 7,1095</td><td>√7,1095 = 2,666</td></tr>
+<tr><td>β₂ (pendiente urbana)</td><td>0,0588</td><td>1,0556 × 0,0588 = 0,0621</td><td>√0,0621 = 0,249</td></tr>
+<tr><td>β₃ (intercepto rural)</td><td>1,94</td><td>1,0556 × 1,94 = 2,0478</td><td>√2,0478 = 1,431</td></tr>
+<tr><td>β₄ (pendiente rural)</td><td>0,04</td><td>1,0556 × 0,04 = 0,0422</td><td>√0,0422 = 0,205</td></tr></table></div>
+Es lo mismo que las fórmulas de la regresión simple: para la pendiente, \(S_b=\sqrt{s^2/S_{XX}}\) (urbana: \(\sqrt{1{,}0556/17}=0{,}249\)), y para el intercepto, \(S_a=\sqrt{s^2\sum x^2/(n\,S_{XX})}\) (urbana: \(\sqrt{1{,}0556(458)/(4\cdot17)}=2{,}666\)), con \(S_{XX}=\sum x^2-n\bar x^2\).<br>
+<b>Para qué sirven:</b> con ellos se arma la prueba t, \(t=b_j/S_{b_j}\). Por ejemplo, para la pendiente urbana \(t=0{,}6471/0{,}249=2{,}60\) y para la rural \(t=0{,}58/0{,}205=2{,}82\); el crítico es \(t_{0{,}025}(4)=2{,}776\).</li></ol>
 <p><b>Lectura del R²:</b> la renta y la zona explican el 93,5 % de la variación de los años de educación.</p>
 <h5>c) Cambio estructural</h5><ol class="steps">
 <li>H₀: β₁ = β₃ y β₂ = β₄ (una sola recta) frente a H₁: al menos una diferencia. Son q = 2 restricciones.</li>
