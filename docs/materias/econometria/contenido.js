@@ -101,16 +101,16 @@ a:"k = 4 (tres regresoras más el intercepto). X es 50×4 y X′X es 4×4."},
 <div class="eq">β̂₁ = <span class="frac"><span>Σ(xᵢ − x̄)(yᵢ − ȳ)</span><span>Σ(xᵢ − x̄)²</span></span>&nbsp;&nbsp;&nbsp; β̂₀ = ȳ − β̂₁x̄</div></section>
 <section><h3>Laboratorio: intenta ganarle a MCO</h3><div class="sim" id="sim"></div></section>
 <section><h3>Descomposición de la variación</h3>
-<div class="eq">SCT = SCE + SCR &nbsp;&nbsp;&nbsp; R² = <span class="frac"><span>SCE</span><span>SCT</span></span> = 1 − <span class="frac"><span>SCR</span><span>SCT</span></span><span class="note">SCT: suma de cuadrados total · SCE: explicada · SCR: de los residuos</span></div>
-<p>Guarda bien la <b>SCR</b>: es la pieza central de la prueba F y de la prueba de Chow.</p></section>
+<div class="eq">TSS = ESS + RSS &nbsp;&nbsp;&nbsp; R² = <span class="frac"><span>ESS</span><span>TSS</span></span> = 1 − <span class="frac"><span>RSS</span><span>TSS</span></span><span class="note">TSS: suma de cuadrados total · ESS: explicada · RSS: de los errores (la notación del curso; en otros textos SCT, SCE y SCR)</span></div>
+<p>Guarda bien la <b>RSS</b>: es la pieza central de la prueba F y de la prueba de Chow.</p></section>
 <p class="warn"><b>Error común:</b> leer un R² alto como prueba de causalidad. El R² solo dice qué tanto de la variación de y acompaña a la de x dentro de la muestra.</p>`,
 deep:[
 {k:"Demostración", t:"De dónde salen las fórmulas", html:`<p>Minimizamos <span class="m">S = Σ(yᵢ − β₀ − β₁xᵢ)²</span>. Derivando e igualando a cero:</p><div class="eq">∂S/∂β₀ = −2Σûᵢ = 0 &nbsp;&nbsp;&nbsp; ∂S/∂β₁ = −2Σxᵢûᵢ = 0</div><p>La primera condición da <span class="m">ȳ = β̂₀ + β̂₁x̄</span>. Sustituyendo en la segunda y despejando se obtiene β̂₁. Estas dos condiciones implican propiedades que siempre se cumplen con intercepto: los residuos suman cero, no están correlacionados con x, y la recta pasa por el punto (x̄, ȳ).</p>`},
-{k:"Conceptos", t:"El R² ajustado", html:`<div class="eq">R̄² = 1 − <span class="frac"><span>SCR / (n − k)</span><span>SCT / (n − 1)</span></span></div><p>El R² nunca baja al agregar una variable, aunque sea irrelevante. El R² ajustado penaliza cada parámetro adicional y puede bajar. Sirve para comparar modelos con la misma variable dependiente y distinto número de regresoras, no para decidir si una variable es significativa (para eso está la prueba t).</p>`}],
+{k:"Conceptos", t:"El R² ajustado", html:`<div class="eq">R̄² = 1 − <span class="frac"><span>RSS / (n − k)</span><span>TSS / (n − 1)</span></span></div><p>El R² nunca baja al agregar una variable, aunque sea irrelevante. El R² ajustado penaliza cada parámetro adicional y puede bajar. Sirve para comparar modelos con la misma variable dependiente y distinto número de regresoras, no para decidir si una variable es significativa (para eso está la prueba t).</p>`}],
 code:{r:String.raw`m <- lm(ventas ~ publicidad, data = df)
 summary(m)          # coeficientes, R², prueba F
-sum(resid(m)^2)     # SCR`, stata:String.raw`reg ventas publicidad
-display e(rss)      // SCR
+sum(resid(m)^2)     # RSS`, stata:String.raw`reg ventas publicidad
+display e(rss)      // RSS
 display e(r2)       // R²`, py:String.raw`m = smf.ols("ventas ~ publicidad", data=df).fit()
 m.params, m.ssr, m.rsquared`},
 q:"Con los datos de la estación anterior (x̄ = 4, ȳ = 17,25), Σ(x−x̄)(y−ȳ) = 25 y Σ(x−x̄)² = 10. Calcula β̂₁ y β̂₀.",
@@ -121,7 +121,7 @@ a:"β̂₁ = 25/10 = 2,5. β̂₀ = 17,25 − 2,5·4 = 7,25. Cada unidad adicion
 <div class="eq">β̂ = (X′X)⁻¹X′y<span class="note">Sale de minimizar u′u = (y − Xβ)′(y − Xβ) y despejar β</span></div>
 <p class="lead">Cada <span class="m">β̂ⱼ</span> se lee <b>ceteris paribus</b>: el efecto de <span class="m">xⱼ</span> sobre <span class="m">y</span> manteniendo constantes las demás regresoras.</p></section>
 <section><h3>Varianza y error estándar</h3>
-<div class="eq">Var(β̂) = σ²(X′X)⁻¹ &nbsp;&nbsp;&nbsp; σ̂² = <span class="frac"><span>SCR</span><span>n − k</span></span><span class="note">La raíz de cada elemento de la diagonal de σ̂²(X′X)⁻¹ es el error estándar de ese coeficiente</span></div></section>
+<div class="eq">Var(β̂) = σ²(X′X)⁻¹ &nbsp;&nbsp;&nbsp; σ̂² = <span class="frac"><span>RSS</span><span>n − k</span></span><span class="note">La raíz de cada elemento de la diagonal de σ̂²(X′X)⁻¹ es el error estándar de ese coeficiente</span></div></section>
 <section><h3>Grados de libertad</h3>
 <p>Se pierde un grado de libertad por cada parámetro estimado. Por eso se divide entre <span class="m">n − k</span> y no entre <span class="m">n</span>. Este mismo conteo aparece en el denominador de la prueba de Chow como <span class="m">n − 2k</span>, porque ahí se estiman dos modelos.</p></section>`,
 deep:[
@@ -129,7 +129,7 @@ deep:[
 {k:"Intuición", t:"Teorema de Frisch-Waugh-Lovell", html:`<p>¿Qué significa exactamente "manteniendo constantes las demás"? El teorema lo responde: el β̂₁ de la regresión múltiple es igual al que obtienes en dos pasos:</p><ol><li>Regresa x₁ sobre las demás regresoras y guarda el residuo r̂₁ (la parte de x₁ que las otras no explican).</li><li>Regresa y sobre r̂₁.</li></ol><p>Así, β̂₁ usa solo la variación de x₁ que no comparte con las demás. Por eso, si x₁ casi no tiene variación propia (multicolinealidad), su estimación es imprecisa.</p>`}],
 code:{r:String.raw`m <- lm(y ~ x1 + x2 + x3, data = df)
 vcov(m)       # σ̂²(X'X)⁻¹
-sigma(m)^2    # σ̂² = SCR/(n−k)`, stata:String.raw`reg y x1 x2 x3
+sigma(m)^2    # σ̂² = RSS/(n−k)`, stata:String.raw`reg y x1 x2 x3
 matrix list e(V)     // matriz de varianzas
 display e(rmse)^2    // σ̂²`, py:String.raw`m = smf.ols("y ~ x1 + x2 + x3", data=df).fit()
 m.cov_params()   # σ̂²(X'X)⁻¹
@@ -167,21 +167,21 @@ a:"No. Siguen siendo insesgados. Lo que se daña es la varianza estimada: los er
 <section><h3>Prueba t: un solo coeficiente</h3>
 <div class="eq">t = <span class="frac"><span>β̂ⱼ − βⱼ⁰</span><span>ee(β̂ⱼ)</span></span> ~ t(n − k)</div></section>
 <section><h3>Prueba F: varias restricciones a la vez</h3>
-<p class="lead">Comparas un modelo <b>restringido</b> (imponiendo la hipótesis nula) con uno <b>no restringido</b>. Si al imponer la restricción la SCR crece mucho, la restricción no es creíble.</p>
-<div class="eq">F = <span class="frac"><span>(SCR<sub>R</sub> − SCR<sub>NR</sub>) / q</span><span>SCR<sub>NR</sub> / (n − k)</span></span> ~ F(q, n − k)<span class="note">q: número de restricciones · k: parámetros del modelo no restringido</span></div>
+<p class="lead">Comparas un modelo <b>restringido</b> (imponiendo la hipótesis nula) con uno <b>no restringido</b>. Si al imponer la restricción la RSS crece mucho, la restricción no es creíble.</p>
+<div class="eq">F = <span class="frac"><span>(RSS<sub>R</sub> − RSS<sub>NR</sub>) / q</span><span>RSS<sub>NR</sub> / (n − k)</span></span> ~ F(q, n − k)<span class="note">q: número de restricciones · k: parámetros del modelo no restringido</span></div>
 <p>Regla: si <span class="m">F &gt; F<sub>crítico</sub></span> (o p-valor &lt; α), se rechaza H₀.</p></section>
 <p class="link"><b>Clave para el parcial:</b> la prueba de Chow <b>es</b> esta prueba F. El modelo restringido es "los mismos coeficientes para todos" y el no restringido es "coeficientes distintos en cada submuestra".</p>`,
 deep:[
-{k:"Fórmula", t:"La prueba F en términos de R²", html:`<div class="eq">F = <span class="frac"><span>(R²<sub>NR</sub> − R²<sub>R</sub>) / q</span><span>(1 − R²<sub>NR</sub>) / (n − k)</span></span></div><p>Sale de dividir numerador y denominador entre SCT. Solo vale si los dos modelos tienen <b>la misma variable dependiente</b>. Para la significancia global (todas las pendientes iguales a cero), R²<sub>R</sub> = 0 y queda <span class="m">F = [R²/(k−1)] / [(1−R²)/(n−k)]</span>.</p>`},
+{k:"Fórmula", t:"La prueba F en términos de R²", html:`<div class="eq">F = <span class="frac"><span>(R²<sub>NR</sub> − R²<sub>R</sub>) / q</span><span>(1 − R²<sub>NR</sub>) / (n − k)</span></span></div><p>Sale de dividir numerador y denominador entre TSS. Solo vale si los dos modelos tienen <b>la misma variable dependiente</b>. Para la significancia global (todas las pendientes iguales a cero), R²<sub>R</sub> = 0 y queda <span class="m">F = [R²/(k−1)] / [(1−R²)/(n−k)]</span>.</p>`},
 {k:"Conceptos", t:"p-valor, errores tipo I y II", html:`<p>El <b>p-valor</b> es la probabilidad de observar un estadístico tan extremo como el obtenido si H₀ fuera cierta. No es la probabilidad de que H₀ sea cierta.</p><div class="tbl"><table><tr><th></th><th>H₀ cierta</th><th>H₀ falsa</th></tr><tr><td>Rechazo H₀</td><td>Error tipo I (prob. α)</td><td>Correcto (potencia)</td></tr><tr><td>No rechazo</td><td>Correcto</td><td>Error tipo II</td></tr></table></div><p>"No rechazar" no es lo mismo que "aceptar": puede que simplemente no haya suficiente información para detectar el efecto.</p>`}],
 code:{r:String.raw`library(car)
 linearHypothesis(m, c("x1 = 0", "x2 = 0"))
-anova(m_restringido, m)   # F con las SCR`, stata:String.raw`reg y x1 x2 x3
+anova(m_restringido, m)   # F con las RSS`, stata:String.raw`reg y x1 x2 x3
 test x1 x2          // H0: b1 = b2 = 0
 test x1 = x2        // H0: b1 = b2`, py:String.raw`m.f_test("x1 = 0, x2 = 0")
 m.compare_f_test(m_restringido)   # (F, p, q)`},
 q:"En y = β₀ + β₁x₁ + β₂x₂ + u, ¿cuántas restricciones tiene H₀: β₁ = β₂ = 0?",
-a:"q = 2. Se estima el modelo restringido solo con intercepto y se compara su SCR con la del modelo completo."},
+a:"q = 2. Se estima el modelo restringido solo con intercepto y se compara su RSS con la del modelo completo."},
 
 {id:"dicotomicas", t:"Variables dicotómicas e interacciones", exam:true, html:`
 <section><h3>Cambio en el intercepto</h3>
@@ -207,17 +207,17 @@ a:"Tres. El trimestre omitido queda como base, y cada coeficiente mide la difere
 <p class="lead">¿Los coeficientes del modelo son los mismos en dos submuestras? Por ejemplo, antes y después de una reforma tributaria, de la pandemia, o entre hombres y mujeres. Si no lo son, hay <b>cambio estructural</b> y un solo modelo para toda la muestra sería engañoso.</p>
 <div class="eq">H₀: β<sup>(1)</sup> = β<sup>(2)</sup> &nbsp;(no hay cambio) &nbsp;&nbsp;&nbsp; H₁: β<sup>(1)</sup> ≠ β<sup>(2)</sup></div></section>
 <section><h3>El estadístico</h3>
-<div class="eq">F = <span class="frac"><span>[SCR<sub>R</sub> − (SCR₁ + SCR₂)] / k</span><span>(SCR₁ + SCR₂) / (n − 2k)</span></span> ~ F(k, n − 2k)<span class="note">SCR<sub>R</sub>: modelo con toda la muestra · SCR₁, SCR₂: cada submuestra por separado · k: parámetros incluido el intercepto</span></div></section>
+<div class="eq">F = <span class="frac"><span>[RSS<sub>R</sub> − (RSS₁ + RSS₂)] / k</span><span>(RSS₁ + RSS₂) / (n − 2k)</span></span> ~ F(k, n − 2k)<span class="note">RSS<sub>R</sub>: modelo con toda la muestra · RSS₁, RSS₂: cada submuestra por separado · k: parámetros incluido el intercepto</span></div></section>
 <section><h3>Paso a paso para el examen</h3>
 <ol class="steps">
-<li>Estima el modelo con <b>toda</b> la muestra y anota SCR<sub>R</sub> (n observaciones).</li>
-<li>Estima el mismo modelo en la submuestra 1 (n₁ obs.) y en la 2 (n₂ obs.). Anota SCR₁ y SCR₂.</li>
-<li>Suma: SCR<sub>NR</sub> = SCR₁ + SCR₂.</li>
+<li>Estima el modelo con <b>toda</b> la muestra y anota RSS<sub>R</sub> (n observaciones).</li>
+<li>Estima el mismo modelo en la submuestra 1 (n₁ obs.) y en la 2 (n₂ obs.). Anota RSS₁ y RSS₂.</li>
+<li>Suma: RSS<sub>NR</sub> = RSS₁ + RSS₂.</li>
 <li>Calcula F con k restricciones y n − 2k grados de libertad en el denominador.</li>
 <li>Busca F crítico en la tabla F(k, n − 2k) al nivel α (o usa el p-valor).</li>
 <li>Concluye: si F &gt; F crítico, rechazas H₀ y hay evidencia de cambio estructural.</li></ol></section>
 <section><h3>Ejemplo resuelto</h3>
-<p>n = 30 (15 + 15), modelo simple (k = 2). SCR<sub>R</sub> = 420, SCR₁ = 120, SCR₂ = 150.</p>
+<p>n = 30 (15 + 15), modelo simple (k = 2). RSS<sub>R</sub> = 420, RSS₁ = 120, RSS₂ = 150.</p>
 <div class="eq">F = <span class="frac"><span>(420 − 270) / 2</span><span>270 / 26</span></span> = <span class="frac"><span>75</span><span>10,385</span></span> ≈ 7,22<span class="note">F crítico al 5 % con (2, 26) ≈ 3,37 → 7,22 &gt; 3,37: se rechaza H₀</span></div></section>
 <section><h3>Laboratorio: mueve el quiebre y mira qué pasa</h3>
 <div class="sim" id="sim"></div></section>
@@ -227,11 +227,11 @@ a:"Tres. El trimestre omitido queda como base, y cada coeficiente mide la difere
 <section><h3>Supuestos y variantes</h3>
 <ul><li><b>El punto de quiebre se conoce de antemano</b> (una fecha o un grupo definido por teoría). Si se elige mirando los datos, el F sale inflado.</li>
 <li><b>Misma varianza del error</b> en ambas submuestras. Se puede revisar con F = σ̂₁² / σ̂₂².</li>
-<li><b>Chow predictiva</b>: si una submuestra tiene menos observaciones que parámetros (n₂ &lt; k), no se puede estimar por separado y se usa F = [(SCR<sub>R</sub> − SCR₁)/n₂] / [SCR₁/(n₁ − k)] ~ F(n₂, n₁ − k).</li></ul></section>
+<li><b>Chow predictiva</b>: si una submuestra tiene menos observaciones que parámetros (n₂ &lt; k), no se puede estimar por separado y se usa F = [(RSS<sub>R</sub> − RSS₁)/n₂] / [RSS₁/(n₁ − k)] ~ F(n₂, n₁ − k).</li></ul></section>
 <p class="warn"><b>Error común:</b> usar k = número de regresoras. En Chow, k cuenta también el intercepto: con 3 regresoras, k = 4 y los grados de libertad son (4, n − 8).</p>`,
 deep:[
-{k:"Demostración", t:"Por qué Chow es una prueba F restringida", html:`<p>El modelo no restringido permite coeficientes distintos en cada submuestra; con dicotómicas se escribe con 2k parámetros. Su SCR es exactamente SCR₁ + SCR₂, porque estimar el modelo con todas las interacciones equivale a estimar cada submuestra por separado.</p><p>El restringido impone k igualdades (cada coeficiente igual en ambas submuestras), así que q = k. Sustituyendo en la fórmula general de la F, con 2k parámetros en el no restringido, se obtiene exactamente la fórmula de Chow con n − 2k grados de libertad.</p>`},
-{k:"Variante", t:"Comprobar varianzas iguales antes de Chow", html:`<div class="eq">F = <span class="frac"><span>σ̂₁²</span><span>σ̂₂²</span></span> = <span class="frac"><span>SCR₁/(n₁ − k)</span><span>SCR₂/(n₂ − k)</span></span> ~ F(n₁ − k, n₂ − k)<span class="note">Pon la varianza mayor en el numerador y compara con el F crítico</span></div><p>En el ejemplo resuelto: σ̂₁² = 120/13 = 9,23 y σ̂₂² = 150/13 = 11,54. F = 11,54/9,23 = 1,25, menor que F crítico (13, 13) ≈ 2,58. Las varianzas son compatibles y la prueba de Chow es válida.</p>`},
+{k:"Demostración", t:"Por qué Chow es una prueba F restringida", html:`<p>El modelo no restringido permite coeficientes distintos en cada submuestra; con dicotómicas se escribe con 2k parámetros. Su RSS es exactamente RSS₁ + RSS₂, porque estimar el modelo con todas las interacciones equivale a estimar cada submuestra por separado.</p><p>El restringido impone k igualdades (cada coeficiente igual en ambas submuestras), así que q = k. Sustituyendo en la fórmula general de la F, con 2k parámetros en el no restringido, se obtiene exactamente la fórmula de Chow con n − 2k grados de libertad.</p>`},
+{k:"Variante", t:"Comprobar varianzas iguales antes de Chow", html:`<div class="eq">F = <span class="frac"><span>σ̂₁²</span><span>σ̂₂²</span></span> = <span class="frac"><span>RSS₁/(n₁ − k)</span><span>RSS₂/(n₂ − k)</span></span> ~ F(n₁ − k, n₂ − k)<span class="note">Pon la varianza mayor en el numerador y compara con el F crítico</span></div><p>En el ejemplo resuelto: σ̂₁² = 120/13 = 9,23 y σ̂₂² = 150/13 = 11,54. F = 11,54/9,23 = 1,25, menor que F crítico (13, 13) ≈ 2,58. Las varianzas son compatibles y la prueba de Chow es válida.</p>`},
 {k:"Avanzado", t:"Cuando no sabes dónde está el quiebre", html:`<p><b>Quandt-Andrews (sup-F):</b> calcula el F de Chow para cada posible punto de quiebre (dejando fuera, por ejemplo, el 15 % inicial y final) y toma el máximo. Ese máximo no sigue una distribución F; tiene sus propios valores críticos (Andrews, 1993).</p><p><b>CUSUM:</b> suma acumulada de residuos recursivos. Si la línea se sale de las bandas de confianza, hay inestabilidad en los parámetros. Es visual y no requiere fijar un punto.</p><p><b>Bai-Perron:</b> permite estimar varios quiebres a la vez.</p>`}],
 code:{r:String.raw`library(strucchange)
 sctest(y ~ x, data = df, type = "Chow", point = 30)
@@ -252,8 +252,8 @@ b = smf.ols("y ~ x", data=df.iloc[30:]).fit()
 k, n = 2, len(df)
 F = ((r.ssr - (a.ssr + b.ssr)) / k) / ((a.ssr + b.ssr) / (n - 2*k))
 p = f.sf(F, k, n - 2*k)`},
-q:"Modelo con 3 regresoras e intercepto, n = 60 dividido 35/25. SCR_R = 900, SCR₁ = 320, SCR₂ = 280. ¿Hay cambio estructural al 5 %?",
-a:"k = 4, gl = (4, 52). SCR_NR = 600. F = [(900 − 600)/4] / [600/52] = 75 / 11,54 ≈ 6,50. F crítico (4, 52) al 5 % ≈ 2,55. Como 6,50 > 2,55 se rechaza H₀: hay evidencia de cambio estructural."}
+q:"Modelo con 3 regresoras e intercepto, n = 60 dividido 35/25. RSS_R = 900, RSS₁ = 320, RSS₂ = 280. ¿Hay cambio estructural al 5 %?",
+a:"k = 4, gl = (4, 52). RSS_NR = 600. F = [(900 − 600)/4] / [600/52] = 75 / 11,54 ≈ 6,50. F crítico (4, 52) al 5 % ≈ 2,55. Como 6,50 > 2,55 se rechaza H₀: hay evidencia de cambio estructural."}
 ];
 
 const BRANCHES = [
@@ -277,7 +277,7 @@ const BRANCHES = [
 <li><b>MCG factible</b>: estimas h(xᵢ) a partir de los residuos y luego aplicas MCP.</li></ol></section>`,
 deep:[
 {k:"Intuición", t:"Por qué MCP es más eficiente", html:`<p>MCO le da el mismo peso a todas las observaciones. Pero las que tienen varianza alta son menos informativas: su dato está más contaminado por ruido. MCP les da menos peso (1/σᵢ²), y así el estimador aprovecha mejor la información. Si Var(uᵢ) = σ²xᵢ, la ecuación transformada es:</p><div class="eq">yᵢ/√xᵢ = β₀(1/√xᵢ) + β₁√xᵢ + uᵢ/√xᵢ<span class="note">El nuevo error tiene varianza constante σ²</span></div>`},
-{k:"Variante", t:"Goldfeld-Quandt", html:`<p>Ordena las observaciones según la variable que sospechas causa la heterocedasticidad, quita un bloque central (por ejemplo, el 20 %) y estima por separado el tercio inferior y el superior. Luego <span class="m">F = SCR₂/SCR₁</span> (con sus grados de libertad). Fíjate que es la misma prueba de varianzas iguales que se usa antes de Chow.</p>`}],
+{k:"Variante", t:"Goldfeld-Quandt", html:`<p>Ordena las observaciones según la variable que sospechas causa la heterocedasticidad, quita un bloque central (por ejemplo, el 20 %) y estima por separado el tercio inferior y el superior. Luego <span class="m">F = RSS₂/RSS₁</span> (con sus grados de libertad). Fíjate que es la misma prueba de varianzas iguales que se usa antes de Chow.</p>`}],
 code:{r:String.raw`library(lmtest); library(sandwich)
 bptest(m)                                            # Breusch-Pagan
 bptest(m, ~ x1 * x2 + I(x1^2) + I(x2^2), data = df)  # White
@@ -376,7 +376,7 @@ a:"VIF = 1/(1 − 0,95) = 20. La varianza de β̂₂ es 20 veces la que tendría
 <li>En <b>x</b>: produce <b>sesgo de atenuación</b>; β̂ se acerca a cero. Se corrige con variables instrumentales.</li></ul></section>`,
 deep:[
 {k:"Demostración", t:"De dónde sale la fórmula del sesgo", html:`<p>El estimador del modelo corto es β̃₁ = Σ(x₁ᵢ − x̄₁)yᵢ / Σ(x₁ᵢ − x̄₁)². Sustituyendo el modelo verdadero de yᵢ:</p><div class="eq">β̃₁ = β₁ + β₂·<span class="frac"><span>Σ(x₁ᵢ − x̄₁)x₂ᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span> + <span class="frac"><span>Σ(x₁ᵢ − x̄₁)uᵢ</span><span>Σ(x₁ᵢ − x̄₁)²</span></span></div><p>La fracción del medio es δ̃₁ y el último término tiene esperanza cero. Tomando esperanzas queda la fórmula.</p>`},
-{k:"Conceptos", t:"Criterios de información AIC y BIC", html:`<p>Para elegir entre modelos no anidados (que no son versiones restringidas uno del otro), se usan:</p><div class="eq">AIC = ln(SCR/n) + 2k/n &nbsp;&nbsp;&nbsp; BIC = ln(SCR/n) + k·ln(n)/n</div><p>Se prefiere el de menor valor. El BIC penaliza más los parámetros adicionales y tiende a elegir modelos más pequeños.</p>`}],
+{k:"Conceptos", t:"Criterios de información AIC y BIC", html:`<p>Para elegir entre modelos no anidados (que no son versiones restringidas uno del otro), se usan:</p><div class="eq">AIC = ln(RSS/n) + 2k/n &nbsp;&nbsp;&nbsp; BIC = ln(RSS/n) + k·ln(n)/n</div><p>Se prefiere el de menor valor. El BIC penaliza más los parámetros adicionales y tiende a elegir modelos más pequeños.</p>`}],
 code:{r:String.raw`library(lmtest)
 resettest(m, power = 2:3, type = "fitted")
 AIC(m1, m2); BIC(m1, m2)`, stata:String.raw`reg y x1 x2
@@ -563,8 +563,8 @@ const WORKSHOPS=[
  d:"Escribe tus propios datos y mira cada operación de β̂ = (X′X)⁻¹X′y. Después parte la matriz por columnas, para ver el teorema de Frisch-Waugh-Lovell, o por filas, que es la base de la prueba de Chow."},
 {id:"t-geometria",t:"Geometría de MCO en 3D",anchor:"mco-matricial",links:["matrices","mco-matricial","supuestos"],sim:"wsGeo",html:WSBOX,
  d:"MCO es una proyección. Con tres observaciones se puede ver: y se proyecta sobre el plano que generan las columnas de X, y el residuo queda perpendicular a ese plano."},
-{id:"t-plano",t:"Plano de regresión y superficie de la SCR",anchor:"mco-matricial",links:["mco-simple","mco-matricial","multicol"],sim:"wsPlane",html:WSBOX,
- d:"Con dos regresoras, la recta de regresión se vuelve un plano. Gíralo, cambia la correlación entre x₁ y x₂ y mira cómo la superficie de la SCR pasa de un tazón a un valle alargado cuando hay multicolinealidad."},
+{id:"t-plano",t:"Plano de regresión y superficie de la RSS",anchor:"mco-matricial",links:["mco-simple","mco-matricial","multicol"],sim:"wsPlane",html:WSBOX,
+ d:"Con dos regresoras, la recta de regresión se vuelve un plano. Gíralo, cambia la correlación entre x₁ y x₂ y mira cómo la superficie de la RSS pasa de un tazón a un valle alargado cuando hay multicolinealidad."},
 {id:"t-calc",t:"Calculadora de pruebas",anchor:"chow",links:["inferencia","chow","hetero","autocorr"],sim:"wsCalc",html:WSBOX,
  d:"Escribe los datos del ejercicio y obtén el procedimiento completo: la sustitución numérica, el valor crítico, el p-valor y la gráfica de la distribución. Sirve para Chow, F general, varianzas iguales, Breusch-Pagan y Durbin-Watson."}
 ];
@@ -1032,7 +1032,7 @@ RM["multicol"]=[
 data("hprice1", package = "wooldridge")
 m <- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)`},
 {t:"Correlaciones entre regresoras",x:"Una correlación alta entre dos regresoras es una primera señal (no la única).",r:String.raw`round(cor(hprice1[, c("lotsize", "sqrft", "bdrms")]), 3)`,o:"sqrft y bdrms tienen correlación de 0,53."},
-{t:"VIF a mano",x:"Se regresa cada xⱼ contra las demás. Si las otras la explican casi toda (R²ⱼ cerca de 1), su varianza se infla.",f:"VIFⱼ = 1 / (1 − R²ⱼ),  Var(β̂ⱼ) = σ² / [SCTⱼ(1 − R²ⱼ)]",r:String.raw`R2j <- summary(lm(sqrft ~ lotsize + bdrms, data = hprice1))$r.squared
+{t:"VIF a mano",x:"Se regresa cada xⱼ contra las demás. Si las otras la explican casi toda (R²ⱼ cerca de 1), su varianza se infla.",f:"VIFⱼ = 1 / (1 − R²ⱼ),  Var(β̂ⱼ) = σ² / [TSSⱼ(1 − R²ⱼ)]",r:String.raw`R2j <- summary(lm(sqrft ~ lotsize + bdrms, data = hprice1))$r.squared
 1 / (1 - R2j)
 vif(m)`,o:"VIF(sqrft) = 1,42: no hay multicolinealidad preocupante (la regla usual alerta desde 10)."},
 {t:"Colinealidad perfecta",x:"Si una variable es combinación exacta de otras, R deja el coeficiente en NA.",r:String.raw`hprice1$area_total <- hprice1$sqrft + 2 * hprice1$bdrms
@@ -1199,6 +1199,55 @@ const pBox=code=>Object.values(PBASES).filter(B=>B.re.test(code)).map(B=>{const 
   ${Object.values(PBASES).map(B=>`<section><h3>${B.t}</h3><p>${B.arch?`Archivo <code style="word-break:break-all">${B.arch}</code>. `:""}${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div>${B.code?`<details class="dp-lite"><summary>Los 50 meses en código R (por si no tienes el Excel)</summary><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(B.code)}</pre></div></details>`:""}</section>`).join("")}
   <section><h3>Las bases de las estaciones avanzadas (Wooldridge)</h3><p>Heterocedasticidad, autocorrelación, multicolinealidad, variables instrumentales, ecuaciones simultáneas, elección discreta, panel y series usan las bases del libro <i>Introducción a la econometría</i> de Jeffrey Wooldridge, que vienen en el paquete <code>wooldridge</code>: se cargan con <code>data("hprice1", package = "wooldridge")</code> y no hay que descargar nada. Sus nombres están en inglés porque así vienen en el libro (<code>wage</code> es salario, <code>price</code> precio).</p></section>
   ${Object.entries(BASES).map(([d,B])=>`<section><h3><code>${d}</code> · ${B.t}</h3><p>${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div></section>`).join("")}`}]});
+  BRANCHES.unshift({g:"Fórmulas del curso",from:"inferencia",items:[{id:"formulas-p1",t:"Fórmulas del parcial 1 (notación del profesor)",nuevo:true,html:`<section><h3>Para qué sirve</h3><p class="lead">Es la hoja «Fórmulas para el parcial 1» del profesor, ordenada por tema y con el número de ecuación que él usa en clase y en sus notebooks de R. Úsala como mapa: cada bloque dice en qué estación está el desarrollo.</p></section>
+  <section><h3>1. El modelo de k variables</h3>
+  <div class="eq">Yt = β₁ + β₂X2t + β₃X3t + … + βkXkt + μt &nbsp;&nbsp;⇔&nbsp;&nbsp; y = Xβ + μ<span class="note">Regresión poblacional. β₁ es el intercepto y k cuenta el intercepto</span></div>
+  <div class="eq">y = Xb + e = ŷ + e, &nbsp; ŷ = Xb<span class="note">Regresión muestral</span></div>
+  <div class="eq">(X′X)b = X′y &nbsp;&nbsp;⇒&nbsp;&nbsp; b = (X′X)⁻¹X′y<span class="note">Ecuaciones normales y estimador OLS (MCO)</span></div>
+  <p>Estación: <a href="#mco-matricial">Regresión múltiple en forma matricial</a>.</p></section>
+  <section><h3>2. Modelo en desviaciones a la media</h3>
+  <div class="eq">y* = X*b₂ + e, &nbsp; y* = Ay, &nbsp; X* = AX₂, &nbsp; A = Iₙ − (1/n)ii′</div>
+  <div class="eq">b₂ = (X*′X*)⁻¹X*′y* &nbsp;&nbsp;&nbsp; b₁ = Ȳ − b₂X̄₂ − b₃X̄₃ − … − bkX̄k</div></section>
+  <section><h3>3. Sumas de cuadrados y R²</h3>
+  <div class="eq">TSS = Σ(Yt − Ȳ)² = y′y − nȲ²</div>
+  <div class="eq">ESS = b′X′Xb − nȲ² = b₂′X*′X*b₂ &nbsp;&nbsp;&nbsp; RSS = e′e = Σet²</div>
+  <div class="eq">TSS = ESS + RSS &nbsp;&nbsp;&nbsp; R² = ESS/TSS<span class="note">Ecuación (16) en los notebooks</span></div></section>
+  <section><h3>4. Supuestos, media y varianza de b</h3>
+  <ul><li>X es no estocástica y de rango completo; β es constante.</li><li>μ ~ N(0, σ²Iₙ): E(μ) = 0 y var(μ) = σ²Iₙ.</li></ul>
+  <div class="eq">E(b) = β &nbsp;&nbsp;&nbsp; var(b) = σ²(X′X)⁻¹ = σ²(cᵢⱼ) &nbsp;&nbsp;&nbsp; b ~ N(β; σ²(X′X)⁻¹)</div>
+  <div class="eq">S² = RSS/(n − k) &nbsp;&nbsp;&nbsp; S²bⱼ = S²·cⱼⱼ &nbsp;&nbsp;&nbsp; cov(bᵢ, bⱼ) = S²·cᵢⱼ<span class="note">cᵢⱼ es el elemento (i, j) de (X′X)⁻¹</span></div>
+  <p>Estaciones: <a href="#supuestos">Supuestos</a> e <a href="#inferencia">Inferencia</a>.</p></section>
+  <section><h3>5. Pruebas de hipótesis: H₀: Rβ = r</h3>
+  <div class="tbl"><table><tr><th>Ecuación</th><th>Para qué</th><th>Estadístico</th><th>Distribución</th></tr>
+  <tr><td><b>F (56)</b></td><td>General: q restricciones lineales</td><td>[(Rb − r)′[R(X′X)⁻¹R′]⁻¹(Rb − r)/q] / [e′e/(n − k)]</td><td>F(q, n − k)</td></tr>
+  <tr><td><b>F (58)</b></td><td>Significancia individual, H₀: βⱼ = 0</td><td>bⱼ² / (S²cⱼⱼ)</td><td>F(1, n − k)</td></tr>
+  <tr><td><b>t (59)</b></td><td>Lo mismo con t; p-valor = 2·P(t &gt; |tc|)</td><td>bⱼ / se(bⱼ)</td><td>t(n − k)</td></tr>
+  <tr><td><b>F (60)</b></td><td>Una restricción lineal: a₁β₁ + … + akβk = a</td><td>(a₁b₁ + … + akbk − a)² / var(a₁b₁ + … + akbk)</td><td>F(1, n − k)</td></tr>
+  <tr><td><b>F (61)</b></td><td>Significancia de la regresión: β₂ = … = βk = 0</td><td>[ESS/(k − 1)] / [RSS/(n − k)] = [R²/(k − 1)] / [(1 − R²)/(n − k)]</td><td>F(k − 1, n − k)</td></tr>
+  <tr><td><b>F (64)</b></td><td>Restringido contra no restringido</td><td>[(RSS_R − RSS_NR)/q] / [RSS_NR/(n − k)]</td><td>F(q, n − k)</td></tr></table></div>
+  <div class="eq">bⱼ − se(bⱼ)·t(α/2; n − k) ≤ βⱼ ≤ bⱼ + se(bⱼ)·t(α/2; n − k)<span class="note">Intervalo de confianza del 100(1 − α) %</span></div>
+  <p class="warn"><b>Decisión con el p-valor:</b> p-valor = P(F &gt; Fc). Se rechaza H₀ si el p-valor es menor que α. En R: <code>pf(Fc, df1 = q, df2 = n - k, lower.tail = F)</code> y, para la t, <code>2*pt(abs(tc), df = n - k, lower.tail = F)</code>.</p>
+  <p>Estación: <a href="#inferencia">Inferencia: pruebas t y F</a>, con cada prueba calculada en R sobre la demanda de TV. Ejercicios resueltos: <a href="#tl-p1">Asesoría del parcial 1 y Taller 2</a>.</p></section>
+  <section><h3>6. Mínimos cuadrados restringidos</h3>
+  <div class="eq">b_R = b + (X′X)⁻¹R′[R(X′X)⁻¹R′]⁻¹(r − Rb)</div>
+  <div class="eq">ŷ_R = Xb_R &nbsp;&nbsp;&nbsp; e_R = y − Xb_R &nbsp;&nbsp;&nbsp; RSS_R = e_R′e_R</div>
+  <div class="eq">ESS_R = b_R′X′Xb_R − nȲ² + 2ŷ_R′e_R &nbsp;&nbsp;&nbsp; TSS = y′y − nȲ²</div></section>
+  <section><h3>7. Regresión lineal simple</h3>
+  <div class="eq">Yt = β₁ + β₂Xt + μt, &nbsp; μt ~ N(0, σ²)</div>
+  <div class="eq">b₂ = S_XY / S_XX = Σ(Xt − X̄)(Yt − Ȳ) / Σ(Xt − X̄)² &nbsp;&nbsp;&nbsp; b₁ = Ȳ − b₂X̄</div>
+  <div class="eq">S_XX = Σ(Xt − X̄)² = ΣXt² − nX̄² = (n − 1)S²_X</div>
+  <div class="eq">var(b₂) = σ²/S_XX &nbsp;&nbsp;&nbsp; var(b₁) = σ²ΣXt² / (n·S_XX)</div>
+  <div class="eq">ESS = b₂²·S_XX &nbsp;&nbsp;&nbsp; R² = b₂²·S_XX / S_YY &nbsp;&nbsp;&nbsp; S² = RSS/(n − 2)</div>
+  <div class="eq">S²b₂ = S²/S_XX &nbsp;&nbsp;&nbsp; S²b₁ = S²ΣXt² / (n·S_XX)</div>
+  <p>Estación: <a href="#mco-simple">Regresión simple por MCO</a>.</p></section>
+  <section><h3>8. Capítulo 2: cambio estructural</h3>
+  <div class="tbl"><table><tr><th>Ecuación</th><th>Para qué</th><th>Estadístico</th></tr>
+  <tr><td><b>F (8)</b></td><td>Pronósticos de Chow</td><td>[d′(I + X₂(X₁′X₁)⁻¹X₂′)⁻¹d / n₂] / S₁² ~ F(n₂, n₁ − k), con d = y₂ − X₂b₁</td></tr>
+  <tr><td><b>F (9)</b></td><td>La misma con las RSS</td><td>[(RSS − RSS₁)/n₂] / S₁²</td></tr>
+  <tr><td><b>(11)-(12)</b></td><td>Coeficientes recursivos</td><td>b_s = (X_s′X_s)⁻¹X_s′y_s y var(b_s) = S_s²(X_s′X_s)⁻¹, s = k + 1, …, n</td></tr>
+  <tr><td><b>(14)-(17)</b></td><td>Errores de predicción un paso adelante</td><td>vt = Yt − xt′b_(t−1); bandas 0 ± 2·SER_(t−1)·√(1 + xt′(X′X)⁻¹xt)</td></tr>
+  <tr><td><b>(21)-(22)</b></td><td>CUSUM</td><td>Wt = Σwⱼ/σ̂; bandas por (k, ±a√(n − k)) y (n, ±3a√(n − k)), con a = 0,948 al 5 %, 1,143 al 1 % y 0,85 al 10 %</td></tr></table></div>
+  <p>Estaciones: <a href="#chow">Cambio estructural y prueba de Chow</a>, <a href="#ce-pronosticos">Prueba de pronósticos de Chow</a> y <a href="#ce-recursivos">Coeficientes recursivos, errores un paso adelante y CUSUM</a>.</p></section>`}]});
   const all=[...TRUNK,...BRANCHES.flatMap(g=>g.items)];
   for(const s of all)if(RM[s.id])s.html+=block(s.id,RM[s.id]);
 })();
@@ -1211,19 +1260,19 @@ const pBox=code=>Object.values(PBASES).filter(B=>B.re.test(code)).map(B=>{const 
 BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 {id:"ce-metodo", t:"Cómo reconocer qué prueba pide un ejercicio", html:String.raw`
 <section><h3>Primero: ¿qué te da el enunciado?</h3>
-<p class="lead">Todos los ejercicios de cambio estructural se resuelven con la misma prueba F; lo que cambia es cómo se obtienen las SCR. Mira qué trae el enunciado y usa la herramienta que corresponde.</p>
+<p class="lead">Todos los ejercicios de cambio estructural se resuelven con la misma prueba F; lo que cambia es cómo se obtienen las RSS. Mira qué trae el enunciado y usa la herramienta que corresponde.</p>
 <div class="tbl"><table><tr><th>El ejercicio da…</th><th>Qué haces</th><th>Herramienta</th></tr>
 <tr><td>La tabla de datos o un archivo</td><td>Estimas el restringido, cada submuestra y el modelo con dummies</td><td><button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button></td></tr>
-<tr><td>X′X, X′y y y′y</td><td>b = (X′X)⁻¹X′y y SCR = y′y − b′X′y en cada muestra; para el restringido se suman las matrices</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · X′X, X′y, y′y</td></tr>
-<tr><td>Las SCR, o s, o R² con la STC</td><td>SCR = s²(n − k) o (1 − R²)·STC, y la F con m submuestras</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · SCR, s o R²</td></tr>
+<tr><td>X′X, X′y y y′y</td><td>b = (X′X)⁻¹X′y y RSS = y′y − b′X′y en cada muestra; para el restringido se suman las matrices</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · X′X, X′y, y′y</td></tr>
+<tr><td>Las RSS, o s, o R² con la STC</td><td>RSS = s²(n − k) o (1 − R²)·STC, y la F con m submuestras</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · RSS, s o R²</td></tr>
 <tr><td>Un modelo con dummies ya estimado</td><td>Escribes una ecuación por grupo, interpretas los δ y haces las pruebas t</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · Modelo estimado</td></tr>
-<tr><td>Un modelo restringido y uno no restringido</td><td>W, LR y LM con las dos SCR</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · Wald, LR y LM</td></tr>
+<tr><td>Un modelo restringido y uno no restringido</td><td>W, LR y LM con las dos RSS</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · Wald, LR y LM</td></tr>
 <tr><td>Solo hay que plantear, interpretar o demostrar</td><td>Defines la dummy, escribes la ecuación de cada grupo o desarrollas el álgebra</td><td>Lápiz y papel; mira el punto parecido del taller</td></tr></table></div></section>
 <section><h3>Las fórmulas que usa el curso</h3>
 <div class="tbl"><table><tr><th>Prueba</th><th>Estadístico</th><th>Distribución</th></tr>
-<tr><td>Chow (dos submuestras)</td><td>\(F=\dfrac{(SCR_R-SCR_1-SCR_2)/k}{(SCR_1+SCR_2)/(n-2k)}\)</td><td>\(F(k,\,n-2k)\)</td></tr>
-<tr><td>Chow con m submuestras</td><td>\(F=\dfrac{(SCR_R-\sum SCR_j)/[(m-1)k]}{\sum SCR_j/(n-mk)}\)</td><td>\(F((m-1)k,\,n-mk)\)</td></tr>
-<tr><td>Pronósticos de Chow</td><td>\(F=\dfrac{(SCR_R-SCR_1)/n_2}{SCR_1/(n_1-k)}\)</td><td>\(F(n_2,\,n_1-k)\)</td></tr>
+<tr><td>Chow (dos submuestras)</td><td>\(F=\dfrac{(RSS_R-RSS_1-RSS_2)/k}{(RSS_1+RSS_2)/(n-2k)}\)</td><td>\(F(k,\,n-2k)\)</td></tr>
+<tr><td>Chow con m submuestras</td><td>\(F=\dfrac{(RSS_R-\sum RSS_j)/[(m-1)k]}{\sum RSS_j/(n-mk)}\)</td><td>\(F((m-1)k,\,n-mk)\)</td></tr>
+<tr><td>Pronósticos de Chow</td><td>\(F=\dfrac{(RSS_R-RSS_1)/n_2}{RSS_1/(n_1-k)}\)</td><td>\(F(n_2,\,n_1-k)\)</td></tr>
 <tr><td>Con R² (misma Y)</td><td>\(F=\dfrac{(R^2_{NR}-R^2_R)/q}{(1-R^2_{NR})/(n-k_{NR})}\)</td><td>\(F(q,\,n-k_{NR})\)</td></tr>
 <tr><td>Forma matricial</td><td>\(F=\dfrac{(R\mathbf b-\mathbf r)'[R(X'X)^{-1}R']^{-1}(R\mathbf b-\mathbf r)}{q\,s^2}\)</td><td>\(F(q,\,n-k_{NR})\)</td></tr></table></div>
 <p class="warn"><b>k cuenta el intercepto.</b> En un modelo simple k = 2, así que con dos submuestras los grados de libertad son (2, n − 4).</p></section>
@@ -1235,7 +1284,7 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <section><h3>La idea</h3>
 <p>Se estima el modelo solo con la muestra 1, \(\mathbf b_1=(X_1'X_1)^{-1}X_1'\mathbf y_1\), y se pronostica la muestra 2 con esos coeficientes. El vector de errores de pronóstico es \(\mathbf d=\mathbf y_2-X_2\mathbf b_1\). Si los parámetros no cambiaron, d tiene media cero y varianza \(\sigma^2[I+X_2(X_1'X_1)^{-1}X_2']\): errores grandes indican cambio.</p></section>
 <section><h3>Las dos formas del estadístico</h3>
-<div class="mj">\[(8)\quad F=\frac{(SCR_R-SCR_1)/n_2}{SCR_1/(n_1-k)}\qquad\qquad(9)\quad F=\frac{\mathbf d'\left[I_{n_2}+X_2(X_1'X_1)^{-1}X_2'\right]^{-1}\mathbf d}{n_2\,s_1^2}\]</div>
+<div class="mj">\[(8)\quad F=\frac{(RSS_R-RSS_1)/n_2}{RSS_1/(n_1-k)}\qquad\qquad(9)\quad F=\frac{\mathbf d'\left[I_{n_2}+X_2(X_1'X_1)^{-1}X_2'\right]^{-1}\mathbf d}{n_2\,s_1^2}\]</div>
 <p>Las dos se distribuyen \(F(n_2,\,n_1-k)\) y dan el mismo número. La (8) solo necesita dos regresiones: toda la muestra y la muestra 1. La (9) muestra de dónde sale la prueba y con n₂ = 1 se reduce a \(d^2/\{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]\}\).</p>
 <p class="link">El ejemplo resuelto de abajo es la demostración de la media y la varianza de d (punto 1 de los Ejercicios propuestos 3).</p></section>`},
 {id:"ce-recursivos", t:"Coeficientes recursivos, errores un paso adelante y CUSUM", html:String.raw`
@@ -1264,8 +1313,8 @@ sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre></section>`},
 <p>Con \(D_t=0\) en las primeras \(n_1\) observaciones y 1 en las demás, el modelo no restringido \(Y_t=\beta_1+\delta_1D_t+\beta_2X_{2t}+\delta_2D_tX_{2t}+\dots+\mu_t\) en bloques es</p>
 <div class="mj">\[\mathbf y=\begin{bmatrix}X_1&\mathbf 0\\X_2&X_2\end{bmatrix}\begin{bmatrix}\boldsymbol\beta\\ \boldsymbol\delta\end{bmatrix}+\boldsymbol\mu,\qquad H_0:\boldsymbol\delta=\mathbf 0\iff R=[\,0_{k\times k}\;|\;I_k\,],\;\mathbf r=\mathbf 0\]</div>
 <p>Solo intercepto: R escoge δ₁ (q = 1). Solo pendientes: R escoge δ₂, …, δ_k (q = k − 1). Los puntos 9 a 11 de los Ejercicios propuestos 3 piden escribir esto con todos los elementos.</p></section>
-<section><h3>Por qué SCR_NR = SCR₁ + SCR₂ (ecuaciones 27 y 28)</h3>
-<p>El modelo con todas las interacciones permite un intercepto y unas pendientes distintos en cada grupo: para D = 0 la ecuación es \(\beta_1+\beta_2X\) y para D = 1 es \((\beta_1+\delta_1)+(\beta_2+\delta_2)X\). Como ningún parámetro se comparte, minimizar la SCR total equivale a minimizar por separado la de cada grupo. Por eso los β son los de la regresión del grupo 1 (27), los β + δ los del grupo 2, y la SCR es la suma (28).</p>
+<section><h3>Por qué RSS_NR = RSS₁ + RSS₂ (ecuaciones 27 y 28)</h3>
+<p>El modelo con todas las interacciones permite un intercepto y unas pendientes distintos en cada grupo: para D = 0 la ecuación es \(\beta_1+\beta_2X\) y para D = 1 es \((\beta_1+\delta_1)+(\beta_2+\delta_2)X\). Como ningún parámetro se comparte, minimizar la RSS total equivale a minimizar por separado la de cada grupo. Por eso los β son los de la regresión del grupo 1 (27), los β + δ los del grupo 2, y la RSS es la suma (28).</p>
 <p>En matrices: \(X'X=\begin{bmatrix}X_1'X_1+X_2'X_2&X_2'X_2\\X_2'X_2&X_2'X_2\end{bmatrix}\). Al resolver las ecuaciones normales se obtiene \(\mathbf b_\beta=(X_1'X_1)^{-1}X_1'\mathbf y_1\) y \(\mathbf b_\beta+\mathbf b_\delta=(X_2'X_2)^{-1}X_2'\mathbf y_2\).</p></section>`}]});
 
 // ---------- Herramientas: dos para resolver y tres para entender
@@ -1321,7 +1370,7 @@ sol:String.raw`<h5>a) La media</h5><ol class="steps">
 <li>Simplifica \(AA'=X_2(X_1'X_1)^{-1}\underbrace{X_1'X_1(X_1'X_1)^{-1}}_{I}X_2'=X_2(X_1'X_1)^{-1}X_2'\). Por tanto
 <div class="mj">\[\operatorname{var}(\mathbf d)=\sigma^2\left[I_{n_2}+X_2(X_1'X_1)^{-1}X_2'\right]\]</div></li></ol>
 <h5>La comparación con los residuos</h5><p>Si alguien toma \(\hat{\mathbf y}_2=X_2\mathbf b_2\) (la regresión de la muestra 2), entonces \(\mathbf d=\mathbf e_2=M_2\boldsymbol\mu_2\), con \(M_2=I-X_2(X_2'X_2)^{-1}X_2'\). Su media es cero, pero \(\operatorname{var}(\mathbf e_2)=\sigma^2M_2\) es <i>menor</i> que \(\sigma^2I\), mientras que la de b) es <i>mayor</i>: el pronóstico fuera de la muestra acumula el error de haber estimado β con otros datos. Además, con n₂ ≤ k los residuos de la muestra 2 serían todos cero, y la prueba de pronósticos existe justamente para ese caso.</p>
-<h5>Para qué sirve</h5><p>Con normalidad, \(\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/\sigma^2\sim\chi^2(n_2)\). Al reemplazar σ² por \(s_1^2=SCR_1/(n_1-k)\) sale el estadístico (9) del curso, \(F=\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/(n_2s_1^2)\sim F(n_2,n_1-k)\), que da el mismo número que la forma (8) con las SCR.</p>`,
+<h5>Para qué sirve</h5><p>Con normalidad, \(\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/\sigma^2\sim\chi^2(n_2)\). Al reemplazar σ² por \(s_1^2=RSS_1/(n_1-k)\) sale el estadístico (9) del curso, \(F=\mathbf d'[I+X_2(X_1'X_1)^{-1}X_2']^{-1}\mathbf d/(n_2s_1^2)\sim F(n_2,n_1-k)\), que da el mismo número que la forma (8) con las RSS.</p>`,
 res:String.raw`<p>\(E(\mathbf d)=\mathbf 0\): el pronóstico es insesgado si los parámetros no cambian. La varianza tiene dos partes: \(\sigma^2I\), por los errores nuevos, y \(\sigma^2X_2(X_1'X_1)^{-1}X_2'\), porque β se estimó con la muestra 1. Si \(n_2=1\), se obtiene la varianza del error de predicción individual, \(\sigma^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]\).</p>`},
 
 {id:"ep3-2", n:"2", t:"Consumo de cerveza por género: interpretar y contrastar", tipo:"Interpretación y pruebas t", temas:["dicotomicas","inferencia"], ej:"dicotomicas", tool:{id:"t-calc",pre:"coef:e2",lbl:"Abrir en la Calculadora (modelo ya estimado)"},
@@ -1343,29 +1392,29 @@ sol:String.raw`<h5>a) Interpretación</h5><ol class="steps">
 <h5>c) Contrastes</h5><ol class="steps">
 <li><b>a. Propensión marginal:</b> H₀: δ₂ = 0 frente a H₁: δ₂ ≠ 0. \(t=-0{,}13/0{,}10=-1{,}30\). Como \(|{-1{,}30}|<2{,}042\) (p = 0,204), no se rechaza H₀: no hay evidencia de que la propensión marginal difiera por género.</li>
 <li><b>b. Consumo autónomo:</b> H₀: δ₁ = 0 frente a H₁: δ₁ ≠ 0. \(t=-126/57{,}01=-2{,}21\). Como \(|{-2{,}21}|>2{,}042\) (p = 0,035), se rechaza H₀ al 5 %: el consumo autónomo de las mujeres es menor.</li>
-<li>Para probar las dos cosas a la vez (δ₁ = δ₂ = 0, cambio estructural completo) hace falta una F conjunta o las SCR de los dos modelos. Dos pruebas t por separado no bastan, porque los estimadores están correlacionados.</li></ol>`,
+<li>Para probar las dos cosas a la vez (δ₁ = δ₂ = 0, cambio estructural completo) hace falta una F conjunta o las RSS de los dos modelos. Dos pruebas t por separado no bastan, porque los estimadores están correlacionados.</li></ol>`,
 res:String.raw`<p>Hombres: \(\hat Y=186{,}47+0{,}23X\); mujeres: \(\hat Y=60{,}47+0{,}10X\). La diferencia con la misma renta es \(-126-0{,}13X\). Al 5 %, la propensión marginal no difiere por género (t = −1,30) y el consumo autónomo sí (t = −2,21).</p>`},
 
 {id:"ep3-3", n:"3", t:"Educación urbana y rural: estimar, R², cambio estructural y pronóstico", tipo:"Cálculo con datos", temas:["mco-matricial","dicotomicas","chow"], ej:"mco-matricial", tool:{id:"t-datos",pre:"educacion",lbl:"Cargar estos datos en el Laboratorio"},
 enun:String.raw`<p>Años de educación (Y) y renta familiar (X) de 8 jóvenes: urbanos (16, 8), (18, 13), (14, 9), (18, 12) y rurales (12, 7), (10, 3), (11, 6), (14, 10). Se propone \(Y_i=\beta_1D_{1i}+\beta_2D_{1i}X_i+\beta_3D_{2i}+\beta_4D_{2i}X_i+\mu_i\), con D₁ = 1 en la zona urbana y D₂ = 1 en la rural.</p><p><b>a)</b> Interprete los coeficientes y su signo esperado. <b>b)</b> Estime el modelo y explique el R². <b>c)</b> Con normalidad, contraste el cambio estructural entre zonas. <b>d)</b> Pronostique puntualmente y por intervalos los años de educación de un joven urbano con renta 10,5.</p>`,
 saber:[String.raw`<b>Sin intercepto común:</b> como \(D_1+D_2=1\), el modelo ya tiene un intercepto por zona. Agregar β₀ causaría multicolinealidad perfecta.`,
 String.raw`<b>X′X por bloques:</b> las columnas de una zona valen 0 en la otra, así que X′X es diagonal por bloques y MCO equivale a estimar <b>una regresión simple por zona</b>.`,
-String.raw`<b>Regresión simple:</b> \(b=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}\), \(a=\bar y-b\bar x\), y \(SCR=\left(\sum y^2-n\bar y^2\right)-b^2\left(\sum x^2-n\bar x^2\right)\).`,
-String.raw`<b>R² centrado:</b> \(R^2=1-SCR/STC\), con \(STC=\sum(y-\bar y)^2\). Se usa el centrado porque el modelo tiene intercepto implícito.`,
-String.raw`<b>Chow:</b> el restringido es una sola recta para todos: \(F=\dfrac{(SCR_R-SCR_{NR})/q}{SCR_{NR}/(n-k)}\), con q = 2 y k = 4.`,
+String.raw`<b>Regresión simple:</b> \(b=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}\), \(a=\bar y-b\bar x\), y \(RSS=\left(\sum y^2-n\bar y^2\right)-b^2\left(\sum x^2-n\bar x^2\right)\).`,
+String.raw`<b>R² centrado:</b> \(R^2=1-RSS/STC\), con \(STC=\sum(y-\bar y)^2\). Se usa el centrado porque el modelo tiene intercepto implícito.`,
+String.raw`<b>Chow:</b> el restringido es una sola recta para todos: \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\), con q = 2 y k = 4.`,
 String.raw`<b>Pronóstico:</b> \(\hat y_0=\mathbf x_0'\mathbf b\); \(ee(\text{media})=\sqrt{s^2\mathbf x_0'(X'X)^{-1}\mathbf x_0}\) y \(ee(\text{individual})=\sqrt{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}\).`],
 sol:String.raw`<h5>a) Significado y signos</h5><p>β₁ y β₃ son los años de educación esperados de un joven urbano y de uno rural con renta 0. β₂ y β₄ son los años adicionales por cada unidad de renta en cada zona. Signos esperados: positivos, porque más renta permite estudiar más. Se espera además β₁ &gt; β₃, por el mejor acceso a la educación en la ciudad.</p>
 <h5>b) Estimación</h5><ol class="steps">
 <li><b>Urbana</b> (n = 4): Σx = 42, Σy = 66, Σx² = 458, Σxy = 704. \(\hat\beta_2=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{44}{68}=0{,}6471\) y \(\hat\beta_1=16{,}5-0{,}6471(10{,}5)=9{,}7059\).</li>
 <li><b>Rural</b> (n = 4): Σx = 26, Σy = 47, Σx² = 194, Σxy = 320. \(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{58}{100}=0{,}58\) y \(\hat\beta_3=11{,}75-0{,}58(6{,}5)=7{,}98\).</li>
 <li>Modelo estimado: \(\hat Y=9{,}706D_1+0{,}647D_1X+7{,}980D_2+0{,}580D_2X\).</li>
-<li>SCR por zona: urbana 3,8824 y rural 0,34, así que \(SCR_{NR}=4{,}2222\) y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
+<li>RSS por zona: urbana 3,8824 y rural 0,34, así que \(RSS_{NR}=4{,}2222\) y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
 <li>\(STC=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
 <li>Errores estándar \(\sqrt{s^2[(X'X)^{-1}]_{jj}}\): 2,666; 0,249; 1,431 y 0,205.</li></ol>
 <p><b>Lectura del R²:</b> la renta y la zona explican el 93,5 % de la variación de los años de educación.</p>
 <h5>c) Cambio estructural</h5><ol class="steps">
 <li>H₀: β₁ = β₃ y β₂ = β₄ (una sola recta) frente a H₁: al menos una diferencia. Son q = 2 restricciones.</li>
-<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y \(\hat\alpha=6{,}831\). \(SCR_R=10{,}3851\).</li>
+<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y \(\hat\alpha=6{,}831\). \(RSS_R=10{,}3851\).</li>
 <li>\(F=\dfrac{(10{,}3851-4{,}2222)/2}{4{,}2222/4}=\dfrac{3{,}0815}{1{,}0556}=2{,}919\sim F(2,4)\).</li>
 <li>\(F_{0{,}05}(2,4)=6{,}944\) y p = 0,165, así que no se rechaza H₀.</li></ol>
 <p><b>Lectura:</b> con estos datos no hay evidencia de que la relación educación-renta difiera entre zonas. Con solo 8 observaciones la prueba tiene poco poder.</p>
@@ -1379,26 +1428,26 @@ res:String.raw`<p>\(\hat Y=9{,}706D_1+0{,}647D_1X+7{,}980D_2+0{,}580D_2X\), con 
 enun:String.raw`<p>Hay 500 empleados: 300 licenciados en empresariales (D = 1) con salario medio 250 y 200 administrativos (D = 0) con salario medio 150. El modelo es \(W_i=\beta_1+\beta_2D_i+\mu_i\).</p><p><b>a)</b> Muestre que \(\hat\beta_1=\bar W_A\) y \(\hat\beta_1+\hat\beta_2=\bar W_L\). <b>b)</b> Estime el modelo. <b>c)</b> Si las desviaciones típicas muestrales son 50 (licenciados) y 30 (administrativos), obtenga los errores estándar de \(\hat\beta_1\) y \(\hat\beta_2\). <b>d)</b> Halle el R². <b>e)</b> ¿Cómo contrastaría que hay diferencia salarial?</p>`,
 saber:[String.raw`<b>Ecuaciones normales:</b> \(X'X\mathbf b=X'\mathbf y\). Con una dummy, \(\sum D=n_L\) y \(\sum D^2=n_L\).`,
 String.raw`<b>Con una sola dummy, MCO da medias de grupo:</b> los residuos suman cero dentro de cada grupo, así que el ajuste de cada grupo es su media.`,
-String.raw`<b>Varianza de los estimadores:</b> \(\widehat{\operatorname{var}}(\mathbf b)=s^2(X'X)^{-1}\) con \(s^2=SCR/(n-k)\).`,
-String.raw`<b>Descomposición:</b> \(STC=SCE+SCR\) y \(R^2=SCE/STC\).`],
+String.raw`<b>Varianza de los estimadores:</b> \(\widehat{\operatorname{var}}(\mathbf b)=s^2(X'X)^{-1}\) con \(s^2=RSS/(n-k)\).`,
+String.raw`<b>Descomposición:</b> \(STC=ESS+RSS\) y \(R^2=ESS/STC\).`],
 sol:String.raw`<h5>a) La demostración</h5><ol class="steps">
 <li>\(X'X=\begin{bmatrix}n&n_L\\n_L&n_L\end{bmatrix}\) y \(X'\mathbf y=\begin{bmatrix}\sum W\\ \sum_L W\end{bmatrix}=\begin{bmatrix}n_L\bar W_L+n_A\bar W_A\\ n_L\bar W_L\end{bmatrix}\).</li>
 <li>Segunda ecuación normal: \(n_L\hat\beta_1+n_L\hat\beta_2=n_L\bar W_L\), así que \(\hat\beta_1+\hat\beta_2=\bar W_L\).</li>
 <li>Primera: \(n\hat\beta_1+n_L\hat\beta_2=n_L\bar W_L+n_A\bar W_A\). Escribe \(n=n_A+n_L\): \(n_A\hat\beta_1+n_L(\hat\beta_1+\hat\beta_2)=n_L\bar W_L+n_A\bar W_A\). Con el paso anterior queda \(n_A\hat\beta_1=n_A\bar W_A\), es decir \(\hat\beta_1=\bar W_A\).</li></ol>
 <h5>b) Estimación</h5><p>\(\hat\beta_1=150\) y \(\hat\beta_2=250-150=100\), así que \(\hat W=150+100D\). El salario medio general es \(\bar W=(300\cdot250+200\cdot150)/500=210\).</p>
 <h5>c) Errores estándar</h5><ol class="steps">
-<li>Los residuos son las desviaciones de cada salario respecto a la media de su grupo. Con la desviación típica muestral (divisor n − 1): \(SCR=(n_L-1)s_L^2+(n_A-1)s_A^2=299(50^2)+199(30^2)=926.600\).</li>
-<li>\(s^2=SCR/(n-k)=926.600/498=1.860{,}64\).</li>
+<li>Los residuos son las desviaciones de cada salario respecto a la media de su grupo. Con la desviación típica muestral (divisor n − 1): \(RSS=(n_L-1)s_L^2+(n_A-1)s_A^2=299(50^2)+199(30^2)=926.600\).</li>
+<li>\(s^2=RSS/(n-k)=926.600/498=1.860{,}64\).</li>
 <li>\((X'X)^{-1}=\dfrac{1}{n\,n_L-n_L^2}\begin{bmatrix}n_L&-n_L\\-n_L&n\end{bmatrix}=\dfrac{1}{n_Ln_A}\begin{bmatrix}n_L&-n_L\\-n_L&n\end{bmatrix}\).</li>
 <li>\(ee(\hat\beta_1)=\sqrt{s^2/n_A}=\sqrt{1.860{,}64/200}=3{,}050\).<br>\(ee(\hat\beta_2)=\sqrt{s^2\left(\tfrac1{n_L}+\tfrac1{n_A}\right)}=\sqrt{1.860{,}64\left(\tfrac1{300}+\tfrac1{200}\right)}=3{,}938\).</li></ol>
-<p class="hint">Si la desviación típica se define con divisor n, entonces SCR = 300(2.500) + 200(900) = 930.000 y los errores estándar cambian un poco (3,056 y 3,945).</p>
-<h5>d) R²</h5><p>\(SCE=\sum(\hat W-\bar W)^2=300(250-210)^2+200(150-210)^2=480.000+720.000=1.200.000\), y \(STC=SCE+SCR=2.126.600\). Por tanto \(R^2=1.200.000/2.126.600=0{,}564\).</p>
+<p class="hint">Si la desviación típica se define con divisor n, entonces RSS = 300(2.500) + 200(900) = 930.000 y los errores estándar cambian un poco (3,056 y 3,945).</p>
+<h5>d) R²</h5><p>\(ESS=\sum(\hat W-\bar W)^2=300(250-210)^2+200(150-210)^2=480.000+720.000=1.200.000\), y \(STC=ESS+RSS=2.126.600\). Por tanto \(R^2=1.200.000/2.126.600=0{,}564\).</p>
 <h5>e) Contraste</h5><p>H₀: β₂ = 0 (sin diferencia salarial) frente a H₁: β₂ ≠ 0 (o β₂ &gt; 0 si se quiere probar que los licenciados ganan más). \(t=100/3{,}938=25{,}40\sim t(498)\), y \(t_{0{,}025}\approx1{,}965\). Se rechaza H₀ con mucha holgura (p ≈ 0): hay diferencia salarial. Esta prueba t es la misma que la de diferencia de medias con varianza combinada.</p>`,
 res:String.raw`<p>\(\hat W=150+100D\), con ee de 3,050 y 3,938, y R² = 0,564. Contraste t = 25,4: los licenciados ganan en promedio 100 mil pesetas más al mes.</p>`},
 
 {id:"ep3-5", n:"5", t:"Salarios y experiencia por género: ¿es distinta la ecuación?", tipo:"Prueba de Chow con datos", temas:["dicotomicas","chow"], tool:{id:"t-datos",pre:"salarios",lbl:"Cargar estos datos en el Laboratorio"},
 enun:String.raw`<p>Hay 17 personas: 9 hombres y 8 mujeres, con su sueldo W y sus años de experiencia X (los datos están en el taller). El modelo es \(W_i=\beta_1D_{1i}+\beta_2X_{1i}+\beta_1'D_{2i}+\beta_2'X_{2i}+\mu_i\), con D₁ = 1 para los hombres, D₂ = 1 para las mujeres y \(X_{ji}=D_{ji}X_i\).</p><p><b>a)</b> Interprete y estime los coeficientes. <b>b)</b> ¿Es el género significativo? Plantee la hipótesis y haga la prueba.</p>`,
-saber:[String.raw`Es el mismo diseño del punto 3: un intercepto y una pendiente por grupo sin intercepto común. MCO equivale a una regresión simple por grupo, y \(SCR_{NR}=SCR_H+SCR_M\).`,
+saber:[String.raw`Es el mismo diseño del punto 3: un intercepto y una pendiente por grupo sin intercepto común. MCO equivale a una regresión simple por grupo, y \(RSS_{NR}=RSS_H+RSS_M\).`,
 String.raw`<b>Chow:</b> H₀: \(\beta_1=\beta_1'\) y \(\beta_2=\beta_2'\), con q = 2, k = 4 y \(F\sim F(2,\,n-4)\).`],
 sol:String.raw`<h5>a) Estimación e interpretación</h5><ol class="steps">
 <li><b>Hombres</b> (n = 9): Σx = 117, Σw = 24,06, Σx² = 2491, Σxw = 377,25. \(\hat\beta_2=\dfrac{9(377{,}25)-117(24{,}06)}{9(2491)-117^2}=\dfrac{580{,}23}{8730}=0{,}06646\) y \(\hat\beta_1=2{,}6733-0{,}06646(13)=1{,}8093\).</li>
@@ -1406,26 +1455,26 @@ sol:String.raw`<h5>a) Estimación e interpretación</h5><ol class="steps">
 <li>β₁ = 1,809 y β′₁ = 1,731 son el sueldo de entrada (sin experiencia) de hombres y mujeres. β₂ = 0,0665 y β′₂ = 0,0778 son lo que aumenta el sueldo por cada año de experiencia.</li></ol>
 <h5>b) ¿Es significativo el género?</h5><ol class="steps">
 <li>H₀: β₁ = β′₁ y β₂ = β′₂ (la misma ecuación para los dos) frente a H₁: al menos uno distinto.</li>
-<li>\(SCR_{NR}=SCR_H+SCR_M=0{,}80627+0{,}32615=1{,}13242\), con n − k = 17 − 4 = 13.</li>
-<li>Restringido, una sola recta: Σx = 247, Σw = 48,02, Σx² = 5065, Σxw = 802,5. Da \(\hat W=1{,}7933+0{,}0710X\) y \(SCR_R=1{,}20866\).</li>
+<li>\(RSS_{NR}=RSS_H+RSS_M=0{,}80627+0{,}32615=1{,}13242\), con n − k = 17 − 4 = 13.</li>
+<li>Restringido, una sola recta: Σx = 247, Σw = 48,02, Σx² = 5065, Σxw = 802,5. Da \(\hat W=1{,}7933+0{,}0710X\) y \(RSS_R=1{,}20866\).</li>
 <li>\(F=\dfrac{(1{,}20866-1{,}13242)/2}{1{,}13242/13}=\dfrac{0{,}03812}{0{,}08711}=0{,}438\sim F(2,13)\).</li>
 <li>\(F_{0{,}05}(2,13)=3{,}806\) y p = 0,655, así que no se rechaza H₀.</li></ol>`,
 res:String.raw`<p>Hombres: \(\hat W=1{,}809+0{,}0665X\); mujeres: \(\hat W=1{,}731+0{,}0778X\). F = 0,438 &lt; 3,806 (p = 0,65): el género no es significativo, y una sola ecuación de salario sirve para los dos.</p>`},
 
-{id:"ep3-6", n:"6", t:"Función de consumo en tres periodos", tipo:"Chow con m submuestras", temas:["chow"], tool:{id:"t-calc",pre:"rss:e6",lbl:"Abrir en la Calculadora (SCR o R²)"},
-enun:String.raw`<p>Una función keynesiana \(C=\beta_1+\beta_2R\) se estimó en 1964-1971 (\(\hat\beta_2=0{,}3663\)), 1972-1983 (0,8846), 1984-1990 (1,6069) y en todo 1964-1990 (\(\hat C=202{,}23+0{,}895R\), R² = 0,9974). Además, STC = 6.403.270, SCR₁ = 2.379,315, SCR₂ = 3.679,020 y SCR₃ = 1.295,861.</p><p><b>a)</b> Explique el concepto de cambio estructural. <b>b)</b> Contraste la consistencia de los parámetros en los tres periodos.</p>`,
-saber:[String.raw`<b>Chow con m submuestras:</b> \(F=\dfrac{(SCR_R-\sum_jSCR_j)/[(m-1)k]}{\sum_jSCR_j/(n-mk)}\sim F((m-1)k,\,n-mk)\).`,
-String.raw`<b>SCR a partir de R²:</b> \(R^2=1-SCR/STC\), así que \(SCR=(1-R^2)\,STC\).`,
+{id:"ep3-6", n:"6", t:"Función de consumo en tres periodos", tipo:"Chow con m submuestras", temas:["chow"], tool:{id:"t-calc",pre:"rss:e6",lbl:"Abrir en la Calculadora (RSS o R²)"},
+enun:String.raw`<p>Una función keynesiana \(C=\beta_1+\beta_2R\) se estimó en 1964-1971 (\(\hat\beta_2=0{,}3663\)), 1972-1983 (0,8846), 1984-1990 (1,6069) y en todo 1964-1990 (\(\hat C=202{,}23+0{,}895R\), R² = 0,9974). Además, STC = 6.403.270, RSS₁ = 2.379,315, RSS₂ = 3.679,020 y RSS₃ = 1.295,861.</p><p><b>a)</b> Explique el concepto de cambio estructural. <b>b)</b> Contraste la consistencia de los parámetros en los tres periodos.</p>`,
+saber:[String.raw`<b>Chow con m submuestras:</b> \(F=\dfrac{(RSS_R-\sum_jSCR_j)/[(m-1)k]}{\sum_jSCR_j/(n-mk)}\sim F((m-1)k,\,n-mk)\).`,
+String.raw`<b>RSS a partir de R²:</b> \(R^2=1-RSS/STC\), así que \(RSS=(1-R^2)\,STC\).`,
 String.raw`Años de cada periodo: 1964-1971 son 8, 1972-1983 son 12 y 1984-1990 son 7, en total n = 27.`],
 sol:String.raw`<h5>a) Concepto</h5><p>Hay cambio estructural cuando los parámetros de la relación no son los mismos en todo el periodo de la muestra. Un evento, como una crisis, un cambio de política o una reforma, modifica el consumo autónomo, la propensión marginal a consumir o ambos. Si existe y se estima una sola ecuación, los coeficientes son un promedio engañoso de relaciones distintas.</p>
 <h5>b) La prueba</h5><ol class="steps">
 <li>H₀: \(\boldsymbol\beta^{(1)}=\boldsymbol\beta^{(2)}=\boldsymbol\beta^{(3)}\) (parámetros constantes) frente a H₁: al menos uno cambia. Son q = (m − 1)k = 2·2 = 4 restricciones.</li>
-<li>\(SCR_R=(1-0{,}9974)(6.403.270)=16.648{,}50\).</li>
-<li>\(SCR_{NR}=2.379{,}315+3.679{,}020+1.295{,}861=7.354{,}196\).</li>
+<li>\(RSS_R=(1-0{,}9974)(6.403.270)=16.648{,}50\).</li>
+<li>\(RSS_{NR}=2.379{,}315+3.679{,}020+1.295{,}861=7.354{,}196\).</li>
 <li>Grados de libertad del denominador: n − mk = 27 − 6 = 21.</li>
 <li>\(F=\dfrac{(16.648{,}50-7.354{,}20)/4}{7.354{,}20/21}=\dfrac{2.323{,}58}{350{,}20}=6{,}635\sim F(4,21)\).</li>
 <li>\(F_{0{,}05}(4,21)=2{,}840\) y p = 0,0013, así que se rechaza H₀.</li></ol>
-<p class="hint">El R² viene redondeado a cuatro decimales, y SCR_R es sensible a eso: con R² entre 0,99735 y 0,99745 la F va de 6,41 a 6,86. La conclusión no cambia.</p>`,
+<p class="hint">El R² viene redondeado a cuatro decimales, y RSS_R es sensible a eso: con R² entre 0,99735 y 0,99745 la F va de 6,41 a 6,86. La conclusión no cambia.</p>`,
 res:String.raw`<p>F = 6,635 &gt; F(4, 21) = 2,84: se rechaza la consistencia de los parámetros. La función de consumo cambió entre los tres periodos. La propensión marginal pasa de 0,37 a 0,88 y a 1,61; una propensión mayor que 1 en el último periodo es económicamente rara y merece comentarse.</p>`},
 
 {id:"ep3-7", n:"7", t:"Horas de lectura: dummies de clase y la trampa de las dicótomas", tipo:"Demostración y cálculo", temas:["matrices","dicotomicas"], ej:"matrices", tool:{id:"t-datos",pre:"lectura",lbl:"Cargar el literal c en el Laboratorio"},
@@ -1451,16 +1500,16 @@ res:String.raw`<p>a) \(\hat\delta_j=\bar Y_j\). b) El intercepto es la media de 
 
 {id:"ep3-8", n:"8", t:"Guerra y paz: ¿cambió la función de consumo?", tipo:"Prueba de Chow con datos", temas:["chow","ce-dummies"], ej:"chow", tool:{id:"t-datos",pre:"consumo",lbl:"Cargar estos datos en el Laboratorio"},
 enun:String.raw`<p>Se tienen 15 años de consumo (Y) y renta disponible (X): los 5 primeros de guerra y los 10 últimos de paz (los datos están en el taller). Con \(Y_t=\beta_1+\beta_2X_t+\mu_t\), determine si hay cambio estructural en la función de consumo entre la guerra y la paz. Especifique el modelo restringido y el no restringido y las hipótesis nula y alternativa.</p>`,
-saber:[String.raw`<b>No restringido:</b> \(Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2D_tX_t+\mu_t\), con D = 1 en la paz. Estimarlo equivale a estimar cada periodo por separado (ecuación 27), y \(SCR_{NR}=SCR_1+SCR_2\) (ecuación 28).`,
+saber:[String.raw`<b>No restringido:</b> \(Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2D_tX_t+\mu_t\), con D = 1 en la paz. Estimarlo equivale a estimar cada periodo por separado (ecuación 27), y \(RSS_{NR}=RSS_1+RSS_2\) (ecuación 28).`,
 String.raw`<b>Restringido:</b> \(Y_t=\beta_1+\beta_2X_t+\mu_t\) con todas las observaciones.`,
-String.raw`<b>Estadístico de Chow:</b> \(F=\dfrac{(SCR_R-SCR_1-SCR_2)/k}{(SCR_1+SCR_2)/(n-2k)}\sim F(k,\,n-2k)\), con k = 2.`,
-String.raw`<b>SCR de una regresión simple sin calcular residuos:</b> \(SCR=S_{yy}-\hat\beta_2^2S_{xx}\), con \(S_{yy}=\sum y^2-n\bar y^2\) y \(S_{xx}=\sum x^2-n\bar x^2\).`],
+String.raw`<b>Estadístico de Chow:</b> \(F=\dfrac{(RSS_R-RSS_1-RSS_2)/k}{(RSS_1+RSS_2)/(n-2k)}\sim F(k,\,n-2k)\), con k = 2.`,
+String.raw`<b>RSS de una regresión simple sin calcular residuos:</b> \(RSS=S_{yy}-\hat\beta_2^2S_{xx}\), con \(S_{yy}=\sum y^2-n\bar y^2\) y \(S_{xx}=\sum x^2-n\bar x^2\).`],
 sol:String.raw`<ol class="steps">
 <li><b>Hipótesis.</b> H₀: δ₁ = δ₂ = 0 (la misma función en la guerra y en la paz) frente a H₁: δ₁ ≠ 0 o δ₂ ≠ 0.</li>
-<li><b>Guerra</b> (n₁ = 5): Σx = 35, Σy = 15, Σx² = 325, Σxy = 140, Σy² = 61. \(\hat\beta_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{175}{400}=0{,}4375\) y \(\hat\beta_1=3-0{,}4375(7)=-0{,}0625\). Con \(S_{yy}=61-45=16\) y \(S_{xx}=325-245=80\): \(SCR_1=16-0{,}4375^2(80)=0{,}6875\).</li>
-<li><b>Paz</b> (n₂ = 10): Σx = 110, Σy = 60, Σx² = 1540, Σxy = 828, Σy² = 448. \(\hat\beta_2=\dfrac{10(828)-110(60)}{10(1540)-110^2}=\dfrac{1680}{3300}=0{,}5091\) y \(\hat\beta_1=6-0{,}5091(11)=0{,}4000\). \(SCR_2=88-0{,}5091^2(330)=2{,}4727\).</li>
-<li><b>Restringido</b> (n = 15): Σx = 145, Σy = 75, Σx² = 1865, Σxy = 968, Σy² = 509. \(\hat\beta_2=\dfrac{15(968)-145(75)}{15(1865)-145^2}=\dfrac{3645}{6950}=0{,}5245\) y \(\hat\beta_1=-0{,}0698\). \(SCR_R=134-0{,}5245^2(463{,}33)=6{,}5561\).</li>
-<li><b>Verificación con dummies:</b> \(\hat Y=-0{,}0625+0{,}4625D+0{,}4375X+0{,}0716DX\). Los β son los de la guerra, y β + δ dan los de la paz: −0,0625 + 0,4625 = 0,4 y 0,4375 + 0,0716 = 0,5091. Además \(SCR_{NR}=3{,}1602=0{,}6875+2{,}4727\).</li>
+<li><b>Guerra</b> (n₁ = 5): Σx = 35, Σy = 15, Σx² = 325, Σxy = 140, Σy² = 61. \(\hat\beta_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{175}{400}=0{,}4375\) y \(\hat\beta_1=3-0{,}4375(7)=-0{,}0625\). Con \(S_{yy}=61-45=16\) y \(S_{xx}=325-245=80\): \(RSS_1=16-0{,}4375^2(80)=0{,}6875\).</li>
+<li><b>Paz</b> (n₂ = 10): Σx = 110, Σy = 60, Σx² = 1540, Σxy = 828, Σy² = 448. \(\hat\beta_2=\dfrac{10(828)-110(60)}{10(1540)-110^2}=\dfrac{1680}{3300}=0{,}5091\) y \(\hat\beta_1=6-0{,}5091(11)=0{,}4000\). \(RSS_2=88-0{,}5091^2(330)=2{,}4727\).</li>
+<li><b>Restringido</b> (n = 15): Σx = 145, Σy = 75, Σx² = 1865, Σxy = 968, Σy² = 509. \(\hat\beta_2=\dfrac{15(968)-145(75)}{15(1865)-145^2}=\dfrac{3645}{6950}=0{,}5245\) y \(\hat\beta_1=-0{,}0698\). \(RSS_R=134-0{,}5245^2(463{,}33)=6{,}5561\).</li>
+<li><b>Verificación con dummies:</b> \(\hat Y=-0{,}0625+0{,}4625D+0{,}4375X+0{,}0716DX\). Los β son los de la guerra, y β + δ dan los de la paz: −0,0625 + 0,4625 = 0,4 y 0,4375 + 0,0716 = 0,5091. Además \(RSS_{NR}=3{,}1602=0{,}6875+2{,}4727\).</li>
 <li>\(F=\dfrac{(6{,}5561-3{,}1602)/2}{3{,}1602/11}=\dfrac{1{,}6980}{0{,}2873}=5{,}910\sim F(2,11)\).</li>
 <li>\(F_{0{,}05}(2,11)=3{,}982\) y p = 0,018, así que se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 5,910 &gt; 3,982 (p = 0,018): hay cambio estructural, y la función de consumo es distinta en la guerra y en la paz. En la paz la propensión marginal a consumir es mayor (0,509 frente a 0,438), lo que es coherente con el racionamiento y el ahorro forzoso de la guerra.</p>`},
@@ -1470,7 +1519,7 @@ TALLERES[0].puntos.push(
 enun:String.raw`<p>El modelo no restringido es \(Y_t=\beta_1+\delta_1D_t+\beta_2X_{2t}+\delta_2D_tX_{2t}+\dots+\beta_kX_{kt}+\delta_kD_tX_{kt}+\mu_t\), con \(D_t=0\) para \(t=1,\dots,n_1\) y \(D_t=1\) para \(t=n_1+1,\dots,n\). <b>a)</b> Escríbalo como \(\mathbf y=X_{NR\_D}\boldsymbol\beta_{NR\_D}+\boldsymbol\mu\), especificando la matriz y el vector. <b>b)</b> La prueba \(H_0:\delta_1=\dots=\delta_k=0\) frente a \(H_1\): algún \(\delta_j\neq0\), escríbala como \(H_0:R\boldsymbol\beta_{NR\_D}=\mathbf r\), especificando R y r.</p>`,
 saber:[String.raw`<b>Forma matricial:</b> cada fila de X tiene los regresores de una observación en el mismo orden que el vector de parámetros.`,
 String.raw`<b>Restricciones lineales:</b> \(R\boldsymbol\beta=\mathbf r\). R tiene una fila por restricción (q filas) y una columna por parámetro. Cada fila "escoge" con un 1 el parámetro restringido.`,
-String.raw`<b>Estadístico:</b> \(F=\dfrac{(R\mathbf b-\mathbf r)'[R(X'X)^{-1}R']^{-1}(R\mathbf b-\mathbf r)}{q\,s^2}\sim F(q,\,n-2k)\). Da lo mismo que la F con las SCR.`],
+String.raw`<b>Estadístico:</b> \(F=\dfrac{(R\mathbf b-\mathbf r)'[R(X'X)^{-1}R']^{-1}(R\mathbf b-\mathbf r)}{q\,s^2}\sim F(q,\,n-2k)\). Da lo mismo que la F con las RSS.`],
 sol:String.raw`<h5>a) La matriz y el vector</h5><ol class="steps">
 <li>Ordena los parámetros por pares: \(\boldsymbol\beta_{NR\_D}=(\beta_1,\delta_1,\beta_2,\delta_2,\dots,\beta_k,\delta_k)'\), de orden 2k × 1.</li>
 <li>Cada fila de X lleva \((1,\;D_t,\;X_{2t},\;D_tX_{2t},\dots,X_{kt},\;D_tX_{kt})\). En las primeras n₁ filas D = 0, así que las columnas con D son cero; en las últimas n₂, D = 1 y esas columnas repiten las X:
@@ -1512,20 +1561,20 @@ res:String.raw`<p>Con filas \((1,X_{2t},D_tX_{2t},\dots)\): H₀: δ₂ = … = 
 
 {id:"ep3-12", n:"12", t:"Nerlove: homogeneidad en precios con las pruebas W, LR y LM", tipo:"Restricciones lineales", temas:["inferencia","especificacion"], ej:"inferencia", tool:{id:"t-calc",pre:"wlm:e12",lbl:"Abrir en la Calculadora (Wald, LR y LM)"},
 enun:String.raw`<p>Nerlove estimó la función de costos \(Y=AX^{\beta_2}P_1^{\beta_3}P_2^{\beta_4}P_3^{\beta_5}\mu\) con 29 empresas. Modelo 1 (en logaritmos):</p>
-<div class="mj">\[\widehat{\ln Y}=\underset{(1{,}96)}{-4{,}93}+\underset{(0{,}11)}{0{,}94}\ln X+\underset{(0{,}23)}{0{,}31}\ln P_1-\underset{(0{,}29)}{0{,}26}\ln P_2+\underset{(0{,}07)}{0{,}44}\ln P_3,\qquad SCR=0{,}336\]</div>
+<div class="mj">\[\widehat{\ln Y}=\underset{(1{,}96)}{-4{,}93}+\underset{(0{,}11)}{0{,}94}\ln X+\underset{(0{,}23)}{0{,}31}\ln P_1-\underset{(0{,}29)}{0{,}26}\ln P_2+\underset{(0{,}07)}{0{,}44}\ln P_3,\qquad RSS=0{,}336\]</div>
 <p>Modelo 2, con la restricción β₃ + β₄ + β₅ = 1:</p>
-<div class="mj">\[\widehat{\ln(Y/P_3)}=\underset{(0{,}16)}{-6{,}55}+\underset{(0{,}11)}{0{,}91}\ln X+\underset{(0{,}19)}{0{,}51}\ln(P_1/P_3)+\underset{(0{,}016)}{0{,}09}\ln(P_2/P_3),\qquad SCR=0{,}364\]</div>
+<div class="mj">\[\widehat{\ln(Y/P_3)}=\underset{(0{,}16)}{-6{,}55}+\underset{(0{,}11)}{0{,}91}\ln X+\underset{(0{,}19)}{0{,}51}\ln(P_1/P_3)+\underset{(0{,}016)}{0{,}09}\ln(P_2/P_3),\qquad RSS=0{,}364\]</div>
 <p><b>a)</b> Interprete los resultados. <b>b)</b> ¿Cómo averiguaría si la restricción es válida? Haga las pruebas LR, Wald y LM.</p>`,
 saber:[String.raw`<b>Modelo log-log:</b> cada coeficiente es una elasticidad: β₂ = %Δcosto / %Δproducto.`,
 String.raw`<b>Homogeneidad de grado 1 en precios:</b> si todos los precios suben 1 %, el costo sube 1 %. Eso exige β₃ + β₄ + β₅ = 1.`,
-String.raw`<b>Pruebas asintóticas</b> con q restricciones, ~χ²(q): \(W=n\dfrac{SCR_R-SCR_{NR}}{SCR_{NR}}\), \(LR=n\ln\dfrac{SCR_R}{SCR_{NR}}\) y \(LM=n\dfrac{SCR_R-SCR_{NR}}{SCR_R}\). Siempre se cumple W ≥ LR ≥ LM.`,
-String.raw`<b>F exacta:</b> \(F=\dfrac{(SCR_R-SCR_{NR})/q}{SCR_{NR}/(n-k)}\), con k = 5.`],
+String.raw`<b>Pruebas asintóticas</b> con q restricciones, ~χ²(q): \(W=n\dfrac{RSS_R-RSS_{NR}}{RSS_{NR}}\), \(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}\) y \(LM=n\dfrac{RSS_R-RSS_{NR}}{RSS_R}\). Siempre se cumple W ≥ LR ≥ LM.`,
+String.raw`<b>F exacta:</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\), con k = 5.`],
 sol:String.raw`<h5>a) Interpretación</h5><ol class="steps">
 <li><b>Modelo 1.</b> Elasticidad costo-producto 0,94 (t = 8,5): si la producción sube 1 %, el costo sube 0,94 %. Como es menor que 1, hay rendimientos crecientes a escala leves (1/0,94 ≈ 1,06).</li>
 <li>Elasticidades precio: trabajo 0,31 (t = 1,35, no significativa), capital −0,26 (signo contrario al esperado, pero t = −0,90, no significativa) y combustible 0,44 (t = 6,3). Suman 0,49, lejos de 1 en apariencia.</li>
 <li><b>Modelo 2.</b> Al imponer la homogeneidad, la elasticidad al producto es 0,91. Las de precio son 0,51 (trabajo), 0,09 (capital, ahora con el signo correcto) y, por la restricción, 1 − 0,51 − 0,09 = 0,40 (combustible).</li></ol>
 <h5>b) ¿Es válida la restricción?</h5><ol class="steps">
-<li>H₀: β₃ + β₄ + β₅ = 1 frente a H₁: β₃ + β₄ + β₅ ≠ 1, con q = 1, n = 29, \(SCR_R=0{,}364\) (modelo 2) y \(SCR_{NR}=0{,}336\) (modelo 1).</li>
+<li>H₀: β₃ + β₄ + β₅ = 1 frente a H₁: β₃ + β₄ + β₅ ≠ 1, con q = 1, n = 29, \(RSS_R=0{,}364\) (modelo 2) y \(RSS_{NR}=0{,}336\) (modelo 1).</li>
 <li>\(W=29\,\dfrac{0{,}364-0{,}336}{0{,}336}=2{,}417\).</li>
 <li>\(LR=29\ln\dfrac{0{,}364}{0{,}336}=2{,}321\).</li>
 <li>\(LM=29\,\dfrac{0{,}364-0{,}336}{0{,}364}=2{,}231\).</li>
@@ -1581,32 +1630,32 @@ intro:`Los diez problemas del capítulo 4 que pide el taller. Los problemas 4.5 
 puntos:[
 {id:"d-41", n:"4.1", t:"Prueba de pronósticos con una observación nueva", tipo:"Pronósticos de Chow con matrices", temas:["ce-pronosticos","matrices"], tool:{id:"t-calc",pre:"mat:d41",lbl:"Abrir en la Calculadora (matrices)"},
 enun:String.raw`<p>Una regresión simple con 20 observaciones da \(X'X=\begin{bmatrix}20&10\\10&30\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}30\\40\end{bmatrix}\) y \(\mathbf y'\mathbf y=75\). Llega una observación nueva con X = 2 y Y = 4. Haga una prueba de Chow de constancia de los parámetros.</p>`,
-saber:[String.raw`\(\mathbf b=(X'X)^{-1}X'\mathbf y\), \(SCR=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y\) y \(s^2=SCR/(n-k)\).`,
+saber:[String.raw`\(\mathbf b=(X'X)^{-1}X'\mathbf y\), \(RSS=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y\) y \(s^2=RSS/(n-k)\).`,
 String.raw`<b>Inversa 2 × 2:</b> \(\begin{bmatrix}a&b\\c&d\end{bmatrix}^{-1}=\dfrac1{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}\).`,
 String.raw`<b>Pronósticos de Chow con n₂ = 1:</b> \(F=\dfrac{d^2}{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}\sim F(1,\,n-k)\), con \(d=y_0-\mathbf x_0'\mathbf b\) (punto 1 de los Ejercicios propuestos 3).`],
 sol:String.raw`<ol class="steps">
 <li>\(\det(X'X)=20(30)-10(10)=500\), así que \((X'X)^{-1}=\dfrac1{500}\begin{bmatrix}30&-10\\-10&20\end{bmatrix}\).</li>
 <li>\(\mathbf b=\dfrac1{500}\begin{bmatrix}30(30)-10(40)\\-10(30)+20(40)\end{bmatrix}=\dfrac1{500}\begin{bmatrix}500\\500\end{bmatrix}=\begin{bmatrix}1\\1\end{bmatrix}\), es decir \(\hat Y=1+X\).</li>
-<li>\(SCR=75-(1\cdot30+1\cdot40)=5\) y \(s^2=5/(20-2)=0{,}2778\).</li>
+<li>\(RSS=75-(1\cdot30+1\cdot40)=5\) y \(s^2=5/(20-2)=0{,}2778\).</li>
 <li>Pronóstico: \(\hat y_0=1+1(2)=3\), así que el error es d = 4 − 3 = 1.</li>
 <li>\(\mathbf x_0'(X'X)^{-1}\mathbf x_0=\dfrac{30(1)-2(10)(1)(2)+20(2^2)}{500}=\dfrac{70}{500}=0{,}14\), y el factor es 1,14.</li>
 <li>\(F=\dfrac{1^2}{0{,}2778(1{,}14)}=3{,}158\sim F(1,18)\). Equivale a t = 1,777.</li>
 <li>\(F_{0{,}05}(1,18)=4{,}414\), así que no se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 3,158 &lt; 4,414: la observación nueva es compatible con la relación estimada \(\hat Y=1+X\). No hay evidencia de cambio en los parámetros.</p>`},
 
-{id:"d-42", n:"4.2", t:"Estacionalidad y estabilidad con sumas de cuadrados", tipo:"Pruebas F con SCR", temas:["chow","dicotomicas","series"], tool:{id:"t-calc",pre:"rss:d42",lbl:"Abrir la parte de estabilidad en la Calculadora"},
-enun:String.raw`<p>Con datos trimestrales 1958-1976 se estimó \(\hat Y=2{,}20+0{,}104X_2-3{,}48X_3+0{,}34X_4\), con SCE = 109,6 y SCR = 18,48. Al agregar tres dummies estacionales, la SCE sube a 114,8. Pruebe si hay estacionalidad. Las regresiones de los subperiodos 1958.1-1968.4 y 1969.1-1976.4 dan SCR de 9,32 y 7,46. Pruebe la constancia de la relación entre los dos subperiodos.</p>`,
+{id:"d-42", n:"4.2", t:"Estacionalidad y estabilidad con sumas de cuadrados", tipo:"Pruebas F con RSS", temas:["chow","dicotomicas","series"], tool:{id:"t-calc",pre:"rss:d42",lbl:"Abrir la parte de estabilidad en la Calculadora"},
+enun:String.raw`<p>Con datos trimestrales 1958-1976 se estimó \(\hat Y=2{,}20+0{,}104X_2-3{,}48X_3+0{,}34X_4\), con ESS = 109,6 y RSS = 18,48. Al agregar tres dummies estacionales, la ESS sube a 114,8. Pruebe si hay estacionalidad. Las regresiones de los subperiodos 1958.1-1968.4 y 1969.1-1976.4 dan RSS de 9,32 y 7,46. Pruebe la constancia de la relación entre los dos subperiodos.</p>`,
 saber:[String.raw`n = 19 años × 4 = 76 trimestres; subperiodos de 44 y 32. El modelo base tiene k = 4.`,
-String.raw`<b>Con la misma variable dependiente, la STC no cambia:</b> STC = SCE + SCR = 128,08, así que si la SCE sube, la SCR baja lo mismo.`,
-String.raw`<b>F de restricciones:</b> \(F=\dfrac{(SCR_R-SCR_{NR})/q}{SCR_{NR}/(n-k_{NR})}\). <b>Chow:</b> \(F=\dfrac{(SCR_R-SCR_1-SCR_2)/k}{(SCR_1+SCR_2)/(n-2k)}\).`],
+String.raw`<b>Con la misma variable dependiente, la STC no cambia:</b> STC = ESS + RSS = 128,08, así que si la ESS sube, la RSS baja lo mismo.`,
+String.raw`<b>F de restricciones:</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k_{NR})}\). <b>Chow:</b> \(F=\dfrac{(RSS_R-RSS_1-RSS_2)/k}{(RSS_1+RSS_2)/(n-2k)}\).`],
 sol:String.raw`<h5>Estacionalidad</h5><ol class="steps">
 <li>H₀: los coeficientes de las tres dummies estacionales valen 0, con q = 3.</li>
-<li>STC = 109,6 + 18,48 = 128,08. Con las dummies, \(SCR_{NR}=128{,}08-114{,}8=13{,}28\) y \(k_{NR}=7\).</li>
+<li>STC = 109,6 + 18,48 = 128,08. Con las dummies, \(RSS_{NR}=128{,}08-114{,}8=13{,}28\) y \(k_{NR}=7\).</li>
 <li>\(F=\dfrac{(18{,}48-13{,}28)/3}{13{,}28/(76-7)}=\dfrac{1{,}7333}{0{,}1925}=9{,}01\sim F(3,69)\).</li>
 <li>\(F_{0{,}05}(3,69)=2{,}74\), así que se rechaza H₀: hay estacionalidad.</li></ol>
 <h5>Estabilidad entre subperiodos</h5><ol class="steps">
 <li>H₀: los cuatro coeficientes son iguales en los dos subperiodos, con q = k = 4.</li>
-<li>\(SCR_R=18{,}48\) (modelo original) y \(SCR_1+SCR_2=9{,}32+7{,}46=16{,}78\).</li>
+<li>\(RSS_R=18{,}48\) (modelo original) y \(RSS_1+RSS_2=9{,}32+7{,}46=16{,}78\).</li>
 <li>\(F=\dfrac{(18{,}48-16{,}78)/4}{16{,}78/(76-8)}=\dfrac{0{,}425}{0{,}2468}=1{,}72\sim F(4,68)\).</li>
 <li>\(F_{0{,}05}(4,68)=2{,}51\), así que no se rechaza H₀: la relación es estable.</li></ol>`,
 res:String.raw`<p>Estacionalidad: F = 9,01 &gt; 2,74, así que sí hay estacionalidad. Estabilidad: F = 1,72 &lt; 2,51, así que la relación es la misma en los dos subperiodos.</p>`},
@@ -1660,19 +1709,19 @@ saber:[String.raw`Los grupos no están ordenados: se define D = 1 para las famil
 String.raw`<b>Chow:</b> k = 2 y n − 2k = 8 gl. Para probar solo un intercepto distinto, q = 1 en el modelo con D sin interacción.`],
 sol:String.raw`<ol class="steps">
 <li>H₀: δ₁ = δ₂ = 0 en \(Y=\beta_1+\delta_1D+\beta_2X+\delta_2DX+u\) (el mismo comportamiento) frente a H₁: alguna diferencia.</li>
-<li>Sin aumento (n = 5): \(\hat Y=16{,}762+0{,}6986X\) y SCR = 57,193. Con aumento (n = 7): \(\hat Y=10{,}306+0{,}7452X\) y SCR = 247,900. \(SCR_{NR}=305{,}094\).</li>
-<li>Restringido: \(\hat Y=13{,}013+0{,}7285X\) y \(SCR_R=310{,}969\).</li>
+<li>Sin aumento (n = 5): \(\hat Y=16{,}762+0{,}6986X\) y RSS = 57,193. Con aumento (n = 7): \(\hat Y=10{,}306+0{,}7452X\) y RSS = 247,900. \(RSS_{NR}=305{,}094\).</li>
+<li>Restringido: \(\hat Y=13{,}013+0{,}7285X\) y \(RSS_R=310{,}969\).</li>
 <li>\(F=\dfrac{(310{,}969-305{,}094)/2}{305{,}094/8}=\dfrac{2{,}938}{38{,}137}=0{,}077\sim F(2,8)\), con crítico 4,459 y p = 0,93. No se rechaza H₀.</li>
-<li>Solo intercepto distinto: \(\hat Y=12{,}892-0{,}374D+0{,}731X\), SCR = 310,653 y \(F=\dfrac{(310{,}969-310{,}653)/1}{310{,}653/9}=0{,}009&lt;F(1,9)=5{,}117\).</li></ol>`,
+<li>Solo intercepto distinto: \(\hat Y=12{,}892-0{,}374D+0{,}731X\), RSS = 310,653 y \(F=\dfrac{(310{,}969-310{,}653)/1}{310{,}653/9}=0{,}009&lt;F(1,9)=5{,}117\).</li></ol>`,
 res:String.raw`<p>F = 0,077 (p = 0,93): las familias que tuvieron aumento de ingreso no se comportan distinto. Tampoco difiere el consumo autónomo (F = 0,009).</p>`},
 
-{id:"d-48", n:"4.8", t:"Función de producción: estabilidad entre 1929-1948 y 1949-1967", tipo:"Chow con s", temas:["chow"], tool:{id:"t-calc",pre:"rss:d48",lbl:"Abrir en la Calculadora (SCR o s)"},
+{id:"d-48", n:"4.8", t:"Función de producción: estabilidad entre 1929-1948 y 1949-1967", tipo:"Chow con s", temas:["chow"], tool:{id:"t-calc",pre:"rss:d48",lbl:"Abrir en la Calculadora (RSS o s)"},
 enun:String.raw`<p>Con datos anuales 1929-1967 (n = 39), \(\widehat{\log Q}=-3{,}8766+1{,}4106\log L+0{,}4162\log K\), con R² = 0,9937 y s = 0,03755. En 1929-1948: \(-4{,}0576+1{,}6167\log L+0{,}2197\log K\), con s = 0,04573. En 1949-1967: \(-1{,}9564+0{,}8336\log L+0{,}6631\log K\), con s = 0,02185. Pruebe la estabilidad de la función de producción entre los dos subperiodos.</p>`,
-saber:[String.raw`<b>SCR a partir de s:</b> \(s^2=SCR/(n-k)\), así que \(SCR=s^2(n-k)\). Aquí k = 3.`,
+saber:[String.raw`<b>RSS a partir de s:</b> \(s^2=RSS/(n-k)\), así que \(RSS=s^2(n-k)\). Aquí k = 3.`,
 String.raw`n₁ = 20 (1929-1948) y n₂ = 19 (1949-1967).`],
 sol:String.raw`<ol class="steps">
-<li>\(SCR_R=0{,}03755^2(39-3)=0{,}050760\).</li>
-<li>\(SCR_1=0{,}04573^2(20-3)=0{,}035551\) y \(SCR_2=0{,}02185^2(19-3)=0{,}007639\). En total, \(SCR_{NR}=0{,}043190\).</li>
+<li>\(RSS_R=0{,}03755^2(39-3)=0{,}050760\).</li>
+<li>\(RSS_1=0{,}04573^2(20-3)=0{,}035551\) y \(RSS_2=0{,}02185^2(19-3)=0{,}007639\). En total, \(RSS_{NR}=0{,}043190\).</li>
 <li>\(F=\dfrac{(0{,}050760-0{,}043190)/3}{0{,}043190/(39-6)}=\dfrac{0{,}002523}{0{,}001309}=1{,}93\sim F(3,33)\).</li>
 <li>\(F_{0{,}05}(3,33)=2{,}89\), así que no se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 1,93 &lt; 2,89: la función de producción es estable entre los dos subperiodos, aunque las elasticidades puntuales parezcan distintas.</p>`},
@@ -1680,29 +1729,204 @@ res:String.raw`<p>F = 1,93 &lt; 2,89: la función de producción es estable entr
 {id:"d-49", n:"4.9", t:"Urbano y rural con información resumida", tipo:"Chow con matrices", temas:["chow","matrices"], tool:{id:"t-calc",pre:"mat:d49",lbl:"Abrir en la Calculadora (matrices)"},
 enun:String.raw`<p>Hay 10 observaciones urbanas con \(X'X=\begin{bmatrix}20&20\\20&25\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}10\\20\end{bmatrix}\) y \(\mathbf y'\mathbf y=30\), y 10 rurales con \(X'X=\begin{bmatrix}10&10\\10&20\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}8\\20\end{bmatrix}\) y \(\mathbf y'\mathbf y=24\). Pruebe que la misma relación vale en las dos áreas.</p>`,
 saber:[String.raw`<b>Las matrices de momentos se suman:</b> si se apilan las muestras, \(X'X=X_1'X_1+X_2'X_2\), \(X'\mathbf y=X_1'\mathbf y_1+X_2'\mathbf y_2\) y \(\mathbf y'\mathbf y=\mathbf y_1'\mathbf y_1+\mathbf y_2'\mathbf y_2\). Así se obtiene el restringido sin los datos.`,
-String.raw`\(SCR=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y\) en cada muestra.`],
+String.raw`\(RSS=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y\) en cada muestra.`],
 sol:String.raw`<ol class="steps">
-<li><b>Urbano:</b> \(\det=20(25)-20(20)=100\), así que \(\mathbf b_1=\dfrac1{100}\begin{bmatrix}25&-20\\-20&20\end{bmatrix}\begin{bmatrix}10\\20\end{bmatrix}=\begin{bmatrix}-1{,}5\\2\end{bmatrix}\). \(SCR_1=30-(-1{,}5\cdot10+2\cdot20)=5\).</li>
-<li><b>Rural:</b> \(\det=100\), así que \(\mathbf b_2=\dfrac1{100}\begin{bmatrix}20&-10\\-10&10\end{bmatrix}\begin{bmatrix}8\\20\end{bmatrix}=\begin{bmatrix}-0{,}4\\1{,}2\end{bmatrix}\). \(SCR_2=24-(-3{,}2+24)=3{,}2\).</li>
-<li><b>Restringido:</b> \(X'X=\begin{bmatrix}30&30\\30&45\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}18\\40\end{bmatrix}\) y \(\mathbf y'\mathbf y=54\). \(\mathbf b=(-0{,}8667;\;1{,}4667)\) y \(SCR_R=54-(-15{,}6+58{,}667)=10{,}933\).</li>
+<li><b>Urbano:</b> \(\det=20(25)-20(20)=100\), así que \(\mathbf b_1=\dfrac1{100}\begin{bmatrix}25&-20\\-20&20\end{bmatrix}\begin{bmatrix}10\\20\end{bmatrix}=\begin{bmatrix}-1{,}5\\2\end{bmatrix}\). \(RSS_1=30-(-1{,}5\cdot10+2\cdot20)=5\).</li>
+<li><b>Rural:</b> \(\det=100\), así que \(\mathbf b_2=\dfrac1{100}\begin{bmatrix}20&-10\\-10&10\end{bmatrix}\begin{bmatrix}8\\20\end{bmatrix}=\begin{bmatrix}-0{,}4\\1{,}2\end{bmatrix}\). \(RSS_2=24-(-3{,}2+24)=3{,}2\).</li>
+<li><b>Restringido:</b> \(X'X=\begin{bmatrix}30&30\\30&45\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}18\\40\end{bmatrix}\) y \(\mathbf y'\mathbf y=54\). \(\mathbf b=(-0{,}8667;\;1{,}4667)\) y \(RSS_R=54-(-15{,}6+58{,}667)=10{,}933\).</li>
 <li>\(F=\dfrac{(10{,}933-8{,}2)/2}{8{,}2/16}=\dfrac{1{,}367}{0{,}5125}=2{,}667\sim F(2,16)\).</li>
 <li>\(F_{0{,}05}(2,16)=3{,}63\), así que no se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 2,667 &lt; 3,63: la misma relación vale en las áreas urbana y rural.</p>`},
 
-{id:"d-410", n:"4.10", t:"Gasto en vacaciones por grupos de ingreso y elasticidad común", tipo:"Chow con varianzas y prueba t", temas:["chow","inferencia"], tool:{id:"t-calc",pre:"rss:d410",lbl:"Abrir en la Calculadora (SCR o varianzas)"},
+{id:"d-410", n:"4.10", t:"Gasto en vacaciones por grupos de ingreso y elasticidad común", tipo:"Chow con varianzas y prueba t", temas:["chow","inferencia"], tool:{id:"t-calc",pre:"rss:d410",lbl:"Abrir en la Calculadora (RSS o varianzas)"},
 enun:String.raw`<p>En 256 hogares, las regresiones log-log de gasto en vacaciones sobre ingreso dan: ingreso bajo, pendiente 0,02, varianza residual 0,26 y 102 hogares; medio, 0,09, 0,42 y 102; alto, 0,14, 0,30 y 52; todos, 0,07, 0,38 y 256. Pruebe si la función de gasto es la misma en todos los grupos. ¿Qué información adicional necesitaría para probar si la elasticidad es la misma? Si la varianza del log del ingreso en la muestra completa es 24, pruebe que la elasticidad para todos los hogares es 0,10.</p>`,
-saber:[String.raw`<b>SCR a partir de la varianza residual:</b> \(SCR=s^2(n-2)\) en cada regresión simple.`,
+saber:[String.raw`<b>RSS a partir de la varianza residual:</b> \(RSS=s^2(n-2)\) en cada regresión simple.`,
 String.raw`<b>Chow con m = 3:</b> \(F\sim F((m-1)k,\,n-mk)=F(4,250)\).`,
 String.raw`<b>Error estándar de la pendiente:</b> \(ee(b)=\sqrt{s^2/\sum(x-\bar x)^2}\), con \(\sum(x-\bar x)^2=n\operatorname{var}(x)\).`],
 sol:String.raw`<h5>¿La misma función?</h5><ol class="steps">
-<li>SCR por grupo: 0,26(100) = 26, 0,42(100) = 42 y 0,30(50) = 15, que suman \(SCR_{NR}=83\).</li>
-<li>\(SCR_R=0{,}38(254)=96{,}52\).</li>
+<li>RSS por grupo: 0,26(100) = 26, 0,42(100) = 42 y 0,30(50) = 15, que suman \(RSS_{NR}=83\).</li>
+<li>\(RSS_R=0{,}38(254)=96{,}52\).</li>
 <li>\(F=\dfrac{(96{,}52-83)/4}{83/250}=\dfrac{3{,}38}{0{,}332}=10{,}18\sim F(4,250)\), con crítico 2,41. Se rechaza H₀: la función no es la misma.</li></ol>
 <h5>¿La misma elasticidad?</h5><p>Hace falta el error estándar de cada pendiente, es decir, la varianza (o la suma de cuadrados) del log del ingreso dentro de cada grupo. También se podría estimar un modelo con interceptos distintos y pendiente común y compararlo por F con el no restringido.</p>
 <h5>Elasticidad igual a 0,10</h5><ol class="steps">
 <li>\(\sum(x-\bar x)^2=256(24)=6.144\), así que \(ee(b)=\sqrt{0{,}38/6.144}=0{,}00786\).</li>
 <li>H₀: β = 0,10. \(t=\dfrac{0{,}07-0{,}10}{0{,}00786}=-3{,}81\), y \(|t|>1{,}97\), así que se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 10,18 &gt; 2,41: la función de gasto difiere entre grupos de ingreso. La elasticidad conjunta 0,07 es significativamente distinta de 0,10 (t = −3,81).</p>`}]});
+
+// ---------- Asesoría del parcial 1 y Taller 2 (regresión múltiple): los ejercicios que el profesor resolvió en su notebook de R
+TALLERES.push({id:"tl-p1", t:"Asesoría del parcial 1 y Taller 2", sub:"Regresión de k variables e inferencia: Dinardo 3.9, 3.10, 3.13, 3.20 y los puntos 1, 4, 7 y 8 del Taller 2", anchor:"inferencia",
+intro:`Los ocho ejercicios que el profesor resolvió en su notebook de R de la asesoría del parcial 1, con el <b>paso a paso</b> y las ecuaciones por su número: F (56) general, F (58) y t (59) individuales, F (60) de una restricción lineal, F (61) de la regresión y F (64) con las RSS. Los números se verificaron en R. Donde el notebook tiene un descuido (un p-valor sin <code>lower.tail = F</code>, un comentario cruzado) aparece una nota «Ojo».`,
+puntos:[
+{id:"p1-39", n:"D 3.9", t:"Todo en desviaciones: estimar y probar cinco hipótesis", tipo:"Modelo en desviaciones", temas:["inferencia","mco-matricial"],
+enun:String.raw`<p>Con n = 24 observaciones de un modelo con k = 4 (intercepto y tres regresoras) se tienen, en desviaciones a la media:</p>
+<div class="mj">\[X_*'X_*=\begin{bmatrix}10&10&5\\10&30&15\\5&15&20\end{bmatrix},\qquad X_*'\mathbf y_*=\begin{bmatrix}7\\-7\\-26\end{bmatrix},\qquad TSS=\mathbf y_*'\mathbf y_*=60\]</div>
+<p><b>a)</b> Pruebe por separado β₂ = 1, β₃ = 1 y β₄ = −2. <b>b)</b> Pruebe β₂ + β₃ + β₄ = 0. <b>c)</b> Pruebe conjuntamente β₂ = 1, β₃ = 1 y β₄ = −2.</p>`,
+saber:[String.raw`<b>Modelo en desviaciones:</b> \(\mathbf b_2=(X_*'X_*)^{-1}X_*'\mathbf y_*\), \(ESS=\mathbf b_2'X_*'X_*\mathbf b_2\), \(RSS=TSS-ESS\) y \(S^2=RSS/(n-k)\), con k contando el intercepto.`,
+String.raw`<b>Un coeficiente contra un valor:</b> \(F=\dfrac{(b_j-\beta_j^0)^2}{S^2_{b_j}}\sim F(1,n-k)\).`,
+String.raw`<b>Una restricción lineal, ecuación (60):</b> \(F=\dfrac{(a_2b_2+a_3b_3+a_4b_4-a)^2}{\operatorname{var}(a_2b_2+a_3b_3+a_4b_4)}\), y la varianza de una suma incluye dos veces cada covarianza.`,
+String.raw`<b>Conjunta, ecuación (56) con R = I:</b> \(F=\dfrac{(\mathbf b_2-\mathbf r)'X_*'X_*(\mathbf b_2-\mathbf r)/q}{S^2}\sim F(q,n-k)\).`],
+sol:String.raw`<ol class="steps">
+<li>\((X_*'X_*)^{-1}=\begin{bmatrix}0{,}15&-0{,}05&0\\-0{,}05&0{,}07&-0{,}04\\0&-0{,}04&0{,}08\end{bmatrix}\) y \(\mathbf b_2=(1{,}4;\;0{,}2;\;-1{,}8)\).</li>
+<li>\(ESS=1{,}4(7)+0{,}2(-7)-1{,}8(-26)=55{,}2\), \(RSS=60-55{,}2=4{,}8\), \(S^2=4{,}8/20=0{,}24\) y R² = 0,92.</li>
+<li>\(\operatorname{var}(\mathbf b_2)=0{,}24(X_*'X_*)^{-1}\): varianzas 0,036, 0,0168 y 0,0192; covarianzas −0,012, 0 y −0,0096.</li>
+<li><b>a)</b> β₂ = 1: \(F=(1{,}4-1)^2/0{,}036=4{,}444\), p = 0,048. β₃ = 1: \(F=(0{,}2-1)^2/0{,}0168=38{,}10\), p ≈ 0. β₄ = −2: \(F=(-1{,}8+2)^2/0{,}0192=2{,}083\), p = 0,164. El crítico es \(F_{0{,}05}(1,20)=4{,}351\).</li>
+<li><b>b)</b> \(b_2+b_3+b_4=-0{,}2\) y la varianza de la suma es la suma de todos los elementos de var(b₂): 0,0288. \(F=0{,}04/0{,}0288=1{,}389\), p = 0,252.</li>
+<li><b>c)</b> \(\mathbf b_2-\mathbf r=(0{,}4;\,-0{,}8;\,0{,}2)\), \((\mathbf b_2-\mathbf r)'X_*'X_*(\mathbf b_2-\mathbf r)=11{,}2\) y \(F=(11{,}2/3)/0{,}24=15{,}56\), contra \(F_{0{,}05}(3,20)=3{,}098\).</li></ol>
+<pre class="code"><code>n=24; k=4
+XatXa=matrix(nrow=3, ncol=3, byrow=T, c(10,10,5, 10,30,15, 5,15,20))
+Xatya=cbind(c(7,-7,-26)); XatXa_inv=solve(XatXa)
+(b2v=XatXa_inv%*%Xatya)
+TSS=60; (ESS=(t(b2v)%*%XatXa%*%b2v)[1]); (RSS=TSS-ESS); (S2=RSS/(n-k))
+(var_b2=S2*XatXa_inv)
+(Fc_b2=((b2v[1]-1)^2)/var_b2[1,1]); pf(Fc_b2, df1=1, df2=n-k, lower.tail=F)
+r=cbind(c(1,1,-2))
+(Fc=(((t(b2v-r)%*%XatXa%*%(b2v-r))[1])/3)/S2); pf(Fc, df1=3, df2=n-k, lower.tail=F)</code></pre>`,
+res:String.raw`<p>Al 5 % se rechazan β₂ = 1 (por poco: p = 0,048) y β₃ = 1; no se rechazan β₄ = −2 ni β₂ + β₃ + β₄ = 0. La conjunta se rechaza (F = 15,56 &gt; 3,098): aunque β₄ = −2 sea compatible con los datos, las tres igualdades a la vez no lo son.</p>`},
+
+{id:"p1-310", n:"D 3.10", t:"De X′X y X′y al estimador y a la significancia de β₂", tipo:"Estimación con matrices", temas:["mco-matricial","inferencia","matrices"],
+enun:String.raw`<p>Con n = 10 observaciones y k = 3 se tiene:</p>
+<div class="mj">\[X'X=\begin{bmatrix}10&30&40\\30&92&119\\40&119&163\end{bmatrix},\qquad X'\mathbf y=\begin{bmatrix}20\\59\\88\end{bmatrix},\qquad \mathbf y'\mathbf y=88{,}2\]</div>
+<p>Estime el modelo, obtenga las sumas de cuadrados y pruebe la significancia de β₂.</p>`,
+saber:[String.raw`La primera fila de X′X y de X′y da n, las sumas de las X y \(\sum Y\): aquí \(\bar Y=20/10=2\).`,
+String.raw`\(TSS=\mathbf y'\mathbf y-n\bar Y^2\), \(ESS=\mathbf b'X'X\mathbf b-n\bar Y^2\) y \(RSS=TSS-ESS\).`,
+String.raw`<b>Prueba t, ecuación (59):</b> \(t=b_j/S_{b_j}\sim t(n-k)\), con p-valor \(2P(t_{n-k}>|t_c|)\).`],
+sol:String.raw`<ol class="steps">
+<li>\(\det(X'X)=50\) y \((X'X)^{-1}=\begin{bmatrix}16{,}7&-2{,}6&-2{,}2\\-2{,}6&0{,}6&0{,}2\\-2{,}2&0{,}2&0{,}4\end{bmatrix}\).</li>
+<li>\(\mathbf b=(X'X)^{-1}X'\mathbf y=(-13;\;1;\;3)\).</li>
+<li>\(TSS=88{,}2-10(2^2)=48{,}2\); \(\mathbf b'X'X\mathbf b=\mathbf b'X'\mathbf y=-13(20)+59+3(88)=63\), así que \(ESS=63-40=23\) y \(RSS=25{,}2\). R² = 0,477.</li>
+<li>\(S^2=25{,}2/7=3{,}6\), \(S^2_{b_2}=3{,}6(0{,}6)=2{,}16\) y \(S_{b_2}=1{,}470\).</li>
+<li>\(t=1/1{,}470=0{,}680\), con p-valor 0,518; el crítico es \(t_{0{,}025}(7)=2{,}365\).</li></ol>
+<pre class="code"><code>k=3; n=10
+(XtX=matrix(nrow=3, ncol=3, c(10,30,40, 30,92,119, 40,119,163)))
+(Xty=cbind(c(20,59,88)))
+(XtX_inv=solve(XtX)); (b=XtX_inv%*%Xty)
+yb=20/n; (TSS=88.2-n*yb^2); (ESS=(t(b)%*%XtX%*%b)[1]-n*yb^2); (RSS=TSS-ESS)
+(S2=RSS/(n-k)); (var_b=S2*XtX_inv); (Sb2=sqrt(var_b[2,2]))
+(tb2=b[2]/Sb2); (pb2=2*pt(abs(tb2), df=n-k, lower.tail=F))</code></pre>`,
+res:String.raw`<p>Ŷ = −13 + X₂ + 3X₃, con R² = 0,477. Para β₂, t = 0,68 (p = 0,52): X₂ no es significativa. (Para β₃, t = 3/1,2 = 2,5 con p = 0,041: X₃ sí lo es.)</p>`},
+
+{id:"p1-313", n:"D 3.13", t:"Hipótesis conjunta sobre intercepto y pendiente", tipo:"F general (56)", temas:["inferencia"],
+enun:String.raw`<p>Una regresión simple con n = 30 observaciones da \(\mathbf b=(0{,}24;\;0{,}94)'\), RSS = 28,56 y \(X'X=\begin{bmatrix}30&300\\300&3052\end{bmatrix}\). Pruebe la hipótesis conjunta H₀: β₁ = 0 y β₂ = 1.</p>`,
+saber:[String.raw`<b>F general (56) con R = I₂:</b> \(F=\dfrac{(\mathbf b-\mathbf r)'X'X(\mathbf b-\mathbf r)/q}{S^2}\sim F(q,\,n-k)\), con q = 2 y \(\mathbf r=(0;1)'\).`,
+String.raw`\(S^2=RSS/(n-k)\). En regresión simple con intercepto, k = 2.`],
+sol:String.raw`<ol class="steps">
+<li>\(\mathbf b-\mathbf r=(0{,}24;\,-0{,}06)\).</li>
+<li>\((\mathbf b-\mathbf r)'X'X(\mathbf b-\mathbf r)=30(0{,}24^2)+2(300)(0{,}24)(-0{,}06)+3052(0{,}06^2)=1{,}728-8{,}64+10{,}987=4{,}075\).</li>
+<li>\(S^2=28{,}56/28=1{,}02\) y \(F=(4{,}075/2)/1{,}02=1{,}998\sim F(2,28)\), con p-valor 0,155; el crítico es 3,340.</li></ol>
+<div class="warn"><b>Ojo con el notebook:</b> en la asesoría el código tiene <code>k=0</code>, así que divide por n = 30: S² = 0,952 y F = 2,140 (p = 0,135). La conclusión es la misma, pero con intercepto y pendiente estimados lo usual es k = 2 y 28 grados de libertad. Confirma con el profesor cuál pide.</div>
+<pre class="code"><code>b=cbind(c(0.24,0.94)); r=cbind(c(0,1)); k=2; q=2; n=30
+RSS=28.56; (S2=RSS/(n-k))
+(XtX=matrix(nrow=2, ncol=2, c(30,300,300,3052)))
+(Fc=((t(b-r)%*%XtX%*%(b-r))[1]/q)/S2)
+(pv=pf(Fc, df1=q, df2=n-k, lower.tail=F))</code></pre>`,
+res:String.raw`<p>F = 2,00 &lt; 3,34 (p = 0,155): no se rechaza H₀. Los datos son compatibles con intercepto 0 y pendiente 1.</p>`},
+
+{id:"p1-320", n:"D 3.20", t:"Estimar, R², significancia de β₂ y modelo restringido", tipo:"F (58) y F (64)", temas:["inferencia","mco-matricial"],
+enun:String.raw`<p>Con n = 33 observaciones y k = 3 se tiene:</p>
+<div class="mj">\[X'X=\begin{bmatrix}33&0&0\\0&40&20\\0&20&60\end{bmatrix},\qquad X'\mathbf y=\begin{bmatrix}132\\24\\92\end{bmatrix},\qquad TSS=150\]</div>
+<p>Estime el modelo, calcule R², pruebe la significancia de β₂ y verifique el resultado estimando el modelo restringido sin X₂.</p>`,
+saber:[String.raw`Como \(\sum X_2=\sum X_3=0\), las regresoras ya están en desviaciones y X′X es diagonal por bloques: \(b_1=\bar Y=132/33=4\).`,
+String.raw`<b>F (58):</b> \(F=b_j^2/S^2_{b_j}\sim F(1,n-k)\). <b>F (64):</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\). Para la misma hipótesis dan el mismo valor.`],
+sol:String.raw`<ol class="steps">
+<li>Bloque de las pendientes: \(\begin{bmatrix}40&20\\20&60\end{bmatrix}^{-1}=\dfrac1{2000}\begin{bmatrix}60&-20\\-20&40\end{bmatrix}=\begin{bmatrix}0{,}03&-0{,}01\\-0{,}01&0{,}02\end{bmatrix}\).</li>
+<li>\(\mathbf b=(4;\;-0{,}2;\;1{,}6)\): \(b_2=0{,}03(24)-0{,}01(92)=-0{,}2\) y \(b_3=-0{,}01(24)+0{,}02(92)=1{,}6\).</li>
+<li>\(ESS=\mathbf b'X'\mathbf y-n\bar Y^2=[4(132)-0{,}2(24)+1{,}6(92)]-33(16)=142{,}4\); \(RSS=7{,}6\); R² = 0,949; \(S^2=7{,}6/30=0{,}2533\).</li>
+<li>\(S^2_{b_2}=0{,}2533(0{,}03)=0{,}0076\) y \(F=(-0{,}2)^2/0{,}0076=5{,}263\), con p-valor 0,029; el crítico es \(F_{0{,}05}(1,30)=4{,}171\).</li>
+<li><b>Restringido</b> (sin X₂): \(X'X=\operatorname{diag}(33,60)\), \(\mathbf b_R=(4;\;92/60)=(4;\;1{,}5333)\), \(ESS_R=92^2/60=141{,}07\) y \(RSS_R=8{,}933\).</li>
+<li>\(F=\dfrac{(8{,}933-7{,}6)/1}{7{,}6/30}=5{,}263\): igual que la F (58).</li></ol>
+<pre class="code"><code>k=3; n=33
+(XtX=matrix(nrow=k, ncol=k, c(33,0,0, 0,40,20, 0,20,60))); (Xty=cbind(c(132,24,92))); (Yb=132/n)
+(XtX_inv=solve(XtX)); (b=XtX_inv%*%Xty)
+TSS=150; (ESS=(t(b)%*%XtX%*%b)[1]-n*Yb^2); (RSS=TSS-ESS); (R2=ESS/TSS); (S2=RSS/(n-k))
+(var_b=S2*XtX_inv); (Fc=b[2]^2/var_b[2,2]); pf(Fc, df1=1, df2=n-k, lower.tail=F)
+XtX_r=diag(c(33,60)); Xty_r=cbind(c(132,92)); (br=solve(XtX_r)%*%Xty_r)
+(ESSR=(t(br)%*%XtX_r%*%br)[1]-n*Yb^2); (RSSr=TSS-ESSR)
+(Fc_64=(RSSr-RSS)/(RSS/(n-k)))</code></pre>`,
+res:String.raw`<p>Ŷ = 4 − 0,2X₂ + 1,6X₃, con R² = 0,949. F = 5,263 &gt; 4,171 (p = 0,029): β₂ es significativo al 5 %, y el modelo restringido confirma el mismo valor de F.</p>`},
+
+{id:"p1-t21", n:"T2-1", t:"Demanda de cerveza: elasticidades y tres restricciones", tipo:"F (58), F (60) y F (64)", temas:["inferencia","variables"],
+enun:String.raw`<p>Con datos de 1960 a 2011 (n = 52) se estima \(\ln Y_t=\beta_1+\beta_2\ln X_{2t}+\beta_3\ln X_{3t}+\beta_4\ln X_{4t}+\beta_5\ln X_{5t}+\mu_t\), donde Y es la cantidad de cerveza, X₂ su precio, X₃ el precio de otros licores, X₄ el precio de otros bienes y X₅ el ingreso.</p>
+<div class="tbl"><table><tr><th></th><th>b</th><th>Error estándar</th></tr><tr><td>Intercepto</td><td>−2,3232</td><td>3,0481</td></tr><tr><td>ln X₂</td><td>−0,9821</td><td>0,2454</td></tr><tr><td>ln X₃</td><td>−0,4702</td><td>0,5342</td></tr><tr><td>ln X₄</td><td>0,1663</td><td>0,0879</td></tr><tr><td>ln X₅</td><td>0,8079</td><td>0,3215</td></tr></table></div>
+<p>Error estándar de la regresión S = 0,0696, R² = 0,725. De var(b): var(b₂) = 0,06021, var(b₄) = 0,00773 y cov(b₂, b₄) = 0,00405. RSS de los modelos restringidos: con β₂ + 4β₄ = 0, 0,23; con β₂ + β₃ + β₄ + β₅ = 0, 0,24; con β₃ = β₄ = 0, 0,24096.</p>
+<p><b>c)</b> ¿Se acepta que la elasticidad precio es −1,6? <b>d)</b> Pruebe β₂ + 4β₄ = 0 con la F (56) y con la F (64). <b>e)</b> ¿La suma de las elasticidades es cero? <b>f)</b> Pruebe β₃ = β₄ = 0.</p>`,
+saber:[String.raw`En un modelo log-log cada β es una elasticidad.`,
+String.raw`<b>RSS a partir de S:</b> \(RSS_{NR}=(n-k)S^2\).`,
+String.raw`<b>F (60):</b> para β₂ + 4β₄ = 0, \(\operatorname{var}(b_2+4b_4)=\operatorname{var}(b_2)+16\operatorname{var}(b_4)+8\operatorname{cov}(b_2,b_4)\).`,
+String.raw`<b>F (64):</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\sim F(q,n-k)\); el denominador es S².`],
+sol:String.raw`<ol class="steps">
+<li>\(S^2=0{,}0696^2=0{,}004844\) y \(RSS_{NR}=47(0{,}004844)=0{,}2277\).</li>
+<li><b>c)</b> \(F=\dfrac{(-0{,}9821+1{,}6)^2}{0{,}06021}=6{,}341\sim F(1,47)\), con p-valor 0,015 &lt; 0,05: se rechaza β₂ = −1,6.</li>
+<li><b>d)</b> De la (56) con R = [0 1 0 4 0]: \(F=\dfrac{(b_2+4b_4)^2}{\operatorname{var}(b_2+4b_4)}=\dfrac{(-0{,}3169)^2}{0{,}06021+16(0{,}00773)+8(0{,}00405)}=\dfrac{0{,}1004}{0{,}2163}=0{,}464\). El modelo restringido es \(\ln Y_t=\beta_1+\beta_3\ln X_{3t}+\beta_4(\ln X_{4t}-4\ln X_{2t})+\beta_5\ln X_{5t}+\mu_t\). Con la (64): \(F=(0{,}23-0{,}2277)/0{,}004844=0{,}480\), p = 0,49. La pequeña diferencia es redondeo del RSS.</li>
+<li><b>e)</b> Con la (64) y el modelo 3: \(F=(0{,}24-0{,}2277)/0{,}004844=2{,}544\), p = 0,117. Con la F de una restricción: \(\sum b=-0{,}4781\), var = 0,0931 (suma de todo el bloque de var(b)) y F = 2,455, p = 0,124.</li>
+<li><b>f)</b> q = 2, \(R=\begin{bmatrix}0&0&1&0&0\\0&0&0&1&0\end{bmatrix}\), r = 0: \(F=\dfrac{(0{,}24096-0{,}2277)/2}{0{,}004844}=1{,}371\), p = 0,264; el crítico es \(F_{0{,}05}(2,47)=3{,}195\).</li></ol>
+<div class="warn"><b>Ojo con el notebook:</b> en d), e) y f) el p-valor está escrito <code>pf(Fc, df1, df2)</code> sin <code>lower.tail = F</code>, y eso da la probabilidad acumulada (1 − p). El p-valor correcto es <code>pf(Fc, df1, df2, lower.tail = F)</code>. En e) además usa <code>df1 = qd</code> en vez de <code>qe</code> (ambos valen 1).</div>
+<pre class="code"><code>n=52; k=5; alpha=0.05
+S=0.0696; S2=S^2; (RSSNR=(n-k)*S2)
+RSSR_M2=0.23; RSSR_M3=0.24; RSSR_M4=0.24096
+(Fc_58_c=((-0.9821-(-1.6))^2)/0.06021); pf(Fc_58_c, df1=1, df2=n-k, lower.tail=F)
+(Fc_d=((RSSR_M2-RSSNR)/1)/S2); pf(Fc_d, df1=1, df2=n-k, lower.tail=F)
+(Fc_e=((RSSR_M3-RSSNR)/1)/S2); pf(Fc_e, df1=1, df2=n-k, lower.tail=F)
+(Fc_f=((RSSR_M4-RSSNR)/2)/S2); pf(Fc_f, df1=2, df2=n-k, lower.tail=F)</code></pre>`,
+res:String.raw`<p>La elasticidad precio no es −1,6 (p = 0,015). No se rechazan β₂ + 4β₄ = 0 (F ≈ 0,47), ni que las elasticidades sumen cero (F ≈ 2,5; p ≈ 0,12), ni β₃ = β₄ = 0 (F = 1,37; p = 0,26): los precios de otros licores y de otros bienes no son conjuntamente significativos.</p>`},
+
+{id:"p1-t24", n:"T2-4", t:"Demanda de televisores: intervalos y β₂ + β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia","mco-matricial"], tool:{id:"t-datos",pre:"tv",lbl:"Abrir la base de TV en el Laboratorio de datos"},
+enun:String.raw`<p>Con los 48 meses de demanda de televisores Yt, precio X2t y publicidad X3t (la base del Ejemplo 1) se estiman el modelo (1) \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\mu_t\) y el modelo (2), con la restricción β₃ = −β₂. Se tiene b = (10,3017274; −0,0059941; 0,0051071), con errores estándar 0,2440101, 0,0001610 y 0,0008146, cov(b₂, b₃) = 5,399229·10⁻⁸, RSS<sub>NR</sub> = 1,21268 y RSS<sub>R</sub> = 1,239267.</p>
+<p><b>b)</b> Intervalos de confianza del 95 %. <b>c)</b> Pruebe β₂ + β₃ = 0 por todas las formas posibles.</p>`,
+saber:[String.raw`<b>Intervalo:</b> \(b_j\pm t_{\alpha/2}(n-k)\,S_{b_j}\), con \(t_{0{,}025}(45)=2{,}0141\).`,
+String.raw`<b>F (60)</b> con la varianza de b₂ + b₃ y <b>F (64)</b> con las RSS: prueban lo mismo y dan igual.`],
+sol:String.raw`<ol class="steps">
+<li><b>b)</b> β₁: 10,3017 ± 2,0141(0,2440) = [9,8103; 10,7932]. β₂: [−0,006318; −0,005670]. β₃: [0,003466; 0,006748]. Ninguno contiene el cero.</li>
+<li><b>c)</b> R = [0 1 1], r = 0, q = 1. \(F_{60}=\dfrac{(-0{,}0059941+0{,}0051071)^2}{0{,}0001610^2+0{,}0008146^2+2(5{,}399229\cdot10^{-8})}=0{,}9866\).</li>
+<li>\(F_{64}=\dfrac{1{,}239267-1{,}21268}{1{,}21268/45}=0{,}9866\sim F(1,45)\), con p-valor 0,326; el crítico es 4,057.</li></ol>
+<pre class="code"><code>(ta2=qt(0.025, df=45, lower.tail=F))
+b1=10.3017274; sb1=0.2440101; c(b1-sb1*ta2, b1+sb1*ta2)
+b2=-0.0059941; sb2=0.0001610; b3=0.0051071; sb3=0.0008146; Sb2b3=5.399229*10^(-8)
+RSSR=1.239267; RSSNR=1.21268
+(F_60=((b2+b3)^2)/(sb2^2+sb3^2+2*Sb2b3))
+(F_64=(RSSR-RSSNR)/(RSSNR/45))
+(pv=pf(F_64, df1=1, df2=45, lower.tail=F))</code></pre>`,
+res:String.raw`<p>Los tres coeficientes son significativos y con el signo esperado (precio negativo, publicidad positiva). F = 0,987 (p = 0,33): no se rechaza β₂ + β₃ = 0, es decir, un aumento de una unidad en la publicidad compensa el de una unidad en el precio.</p>`},
+
+{id:"p1-t27", n:"T2-7", t:"Importaciones de EE. UU.: β₂ + β₃ = 1 con F, Wald, LR y LM", tipo:"Restricción lineal", temas:["inferencia","mv-pruebas"],
+enun:String.raw`<p>Con datos de 1975 a 2005 (n = 31) se estima \(\ln Y_t=\beta_1+\beta_2\ln X_{2t}+\beta_3\ln X_{3t}+\mu_t\), con Y las importaciones, X₂ el PIB y X₃ el IPC: b = (1,4376; 1,8301; −0,8433), con errores estándar 0,2696, 0,1822 y 0,2838; var(b₂) = 0,03319016, var(b₃) = 0,08053829, cov(b₂, b₃) = −0,05132072; RSS<sub>NR</sub> = 0,1408056. El modelo restringido con β₂ + β₃ = 1 da RSS<sub>R</sub> = 0,1408846.</p>
+<p><b>b)</b> Intervalos de confianza del 95 %. <b>c)</b> Pruebe H₀: β₂ + β₃ = 1 con la F y con las pruebas de Wald, LR y LM.</p>`,
+saber:[String.raw`<b>F (60) con a = 1:</b> \(F=\dfrac{(b_2+b_3-1)^2}{\operatorname{var}(b_2)+\operatorname{var}(b_3)+2\operatorname{cov}(b_2,b_3)}\sim F(1,n-k)\).`,
+String.raw`<b>Con las RSS:</b> \(W=\dfrac{n(RSS_R-RSS_{NR})}{RSS_{NR}}\), \(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}\), \(LM=\dfrac{n(RSS_R-RSS_{NR})}{RSS_R}\), las tres \(\chi^2(q)\) y con W ≥ LR ≥ LM.`],
+sol:String.raw`<ol class="steps">
+<li><b>b)</b> \(t_{0{,}025}(28)=2{,}0484\). β₁: [0,885; 1,990]. β₂: [1,457; 2,203]. β₃: [−1,425; −0,262].</li>
+<li><b>c)</b> \(b_2+b_3-1=-0{,}0132\) y la varianza de la suma es \(0{,}03319+0{,}08054-2(0{,}05132)=0{,}011087\). \(F=0{,}0132^2/0{,}011087=0{,}0157\), con p-valor 0,90.</li>
+<li>\(F_{64}=\dfrac{0{,}1408846-0{,}1408056}{0{,}1408056/28}=0{,}0157\): el mismo valor.</li>
+<li>\(W=31(0{,}000079)/0{,}1408056=0{,}01739\), \(LR=31\ln(0{,}1408846/0{,}1408056)=0{,}01739\) y \(LM=31(0{,}000079)/0{,}1408846=0{,}01738\), todas muy por debajo de \(\chi^2_{0{,}05}(1)=3{,}841\).</li></ol>
+<div class="warn"><b>Ojo con el notebook:</b> el comentario dice «Probar Beta2+Beta3=0», pero el código calcula \((b_2+b_3-1)^2\): la hipótesis es β₂ + β₃ = 1, como en el enunciado.</div>
+<pre class="code"><code>n=31; k=3; a=0.05
+b2=1.8301; S2b2=0.03319016; b3=-0.8433; S2b3=0.08053829; Sb2b3=-0.05132072
+RSS_NR=0.1408056; RSS_R=0.1408846
+(Fc_E7=((b2+b3-1)^2)/(S2b2+S2b3+2*Sb2b3))
+(pv_E7=pf(Fc_E7, df1=1, df2=n-k, lower.tail=F))
+(Fc_E7_RSS=(RSS_R-RSS_NR)/(RSS_NR/(n-k)))
+(W=n*(RSS_R-RSS_NR)/RSS_NR); (LR=n*log(RSS_R/RSS_NR)); (LM=n*(RSS_R-RSS_NR)/RSS_R)
+qchisq(0.95, 1)</code></pre>`,
+res:String.raw`<p>F = 0,016 (p = 0,90) y W ≈ LR ≈ LM ≈ 0,017 &lt; 3,841: no se rechaza β₂ + β₃ = 1. La elasticidad de las importaciones al PIB es 1,83 y al IPC −0,84, las dos significativas.</p>`},
+
+{id:"p1-t28", n:"T2-8", t:"Demanda de un artículo: intervalos y β₂ + 3β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia"],
+enun:String.raw`<p>Con datos de 1971 a 2005 (n = 35) se estima \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\beta_4X_{4t}+\mu_t\), con Y la demanda, X₂ el precio, X₃ el ingreso y X₄ el precio de un sustituto: b = (72,2928; −5,8139; 1,6672; 1,5408), con errores estándar 6,9550, 0,4970, 0,7148 y 0,5542; S = 3,531 con 31 grados de libertad y R² = 0,9742. De var(b): var(b₂) = 0,24705304, var(b₃) = 0,51093128 y cov(b₂, b₃) = 0,09828469. El modelo restringido con β₂ + 3β₃ = 0 da \(\mathbf b_R=(72{,}195361;\,-5{,}732889;\,1{,}910963;\,1{,}396949)\), ESS<sub>R</sub> = 14.619,98 y TSS = 15.008.</p>
+<p><b>b)</b> Intervalos de confianza del 95 %. <b>d)</b> Escriba H₀: β₂ + 3β₃ = 0 como Rβ = r, verifique que b<sub>R</sub> cumple la restricción y haga la prueba por todas las formas posibles.</p>`,
+saber:[String.raw`<b>F (60) con pesos:</b> \(\operatorname{var}(b_2+3b_3)=\operatorname{var}(b_2)+9\operatorname{var}(b_3)+6\operatorname{cov}(b_2,b_3)\).`,
+String.raw`\(RSS_R=TSS-ESS_R\) y \(RSS_{NR}=(n-k)S^2\).`],
+sol:String.raw`<ol class="steps">
+<li><b>b)</b> \(t_{0{,}025}(31)=2{,}0395\). β₁: [58,108; 86,478]. β₂: [−6,828; −4,800]. β₃: [0,209; 3,125]. β₄: [0,411; 2,671]. Ninguno contiene el cero y los signos son los esperados: precio negativo, ingreso y precio del sustituto positivos.</li>
+<li><b>d)</b> R = [0 1 3 0], r = 0, q = 1. Verificación: \(-5{,}732889+3(1{,}910963)=0\), b<sub>R</sub> cumple la restricción.</li>
+<li>\(b_2+3b_3=-5{,}8139+3(1{,}6672)=-0{,}8123\) y \(\operatorname{var}=0{,}24705+9(0{,}51093)+6(0{,}09828)=5{,}4351\). \(F_{60}=0{,}8123^2/5{,}4351=0{,}1214\).</li>
+<li>\(RSS_R=15.008-14.619{,}98=388{,}02\) y \(RSS_{NR}=31(3{,}531^2)=386{,}507\). \(F_{64}=\dfrac{388{,}02-386{,}507}{386{,}507/31}=0{,}1214\sim F(1,31)\), con p-valor 0,730; el crítico es 4,160.</li></ol>
+<pre class="code"><code>n=35; k=4; a=0.05
+(ta2=qt(a/2, df=n-k, lower.tail=F))
+b2=-5.8139; se_b2=0.4970; c(b2-se_b2*ta2, b2+se_b2*ta2)
+b3=1.6672; S2_b2=0.24705304; S2_b3=0.51093128; Sb2b3=0.09828469
+(FC=((b2+3*b3)^2)/(S2_b2+9*S2_b3+6*Sb2b3)); (pv=pf(FC, df1=1, df2=n-k, lower.tail=F))
+TSS=15008; ESS_R=14619.98; (RSS_R=TSS-ESS_R)
+S=3.531; (RSS_NR=(n-k)*(S^2))
+(FC_1=((RSS_R-RSS_NR)/(RSS_NR/(n-k))))</code></pre>`,
+res:String.raw`<p>F = 0,121 (p = 0,73): no se rechaza β₂ + 3β₃ = 0. Las dos formas de la prueba coinciden.</p>`}]});
 
 
 // ===================== AJUSTE AL PROGRAMA 1504110 =====================
@@ -1719,13 +1943,13 @@ ins("inferencia",[
 <p>y sus estimadores son \(\hat\beta_{MV}=(X'X)^{-1}X'y\) (igual a MCO) y \(\hat\sigma^2_{MV}=e'e/n\) (sesgado pero consistente). El EMV es consistente, asintóticamente normal y eficiente: su varianza asintótica es la inversa de la matriz de información, \(I(\theta)^{-1}\).</p></section>
 <section><h3>Tres formas de probar restricciones \(R\beta=r\)</h3>
 <div class="tbl"><table><tr><th>Prueba</th><th>Qué estima</th><th>Idea</th><th>En el modelo lineal</th></tr>
-<tr><td>Razón de verosimilitud (LR)</td><td>Los dos modelos</td><td>¿Cuánto cae \(\ln L\) al imponer la restricción?</td><td>\(LR=n\ln\frac{SCR_R}{SCR_{NR}}\)</td></tr>
-<tr><td>Wald (W)</td><td>Solo el no restringido</td><td>¿Qué tan lejos está \(R\hat\beta\) de \(r\)?</td><td>\(W=n\frac{SCR_R-SCR_{NR}}{SCR_{NR}}\)</td></tr>
-<tr><td>Multiplicadores de Lagrange (LM)</td><td>Solo el restringido</td><td>¿Qué tan empinada es \(\ln L\) en la restricción?</td><td>\(LM=n\frac{SCR_R-SCR_{NR}}{SCR_R}=nR^2_{aux}\)</td></tr></table></div>
+<tr><td>Razón de verosimilitud (LR)</td><td>Los dos modelos</td><td>¿Cuánto cae \(\ln L\) al imponer la restricción?</td><td>\(LR=n\ln\frac{RSS_R}{RSS_{NR}}\)</td></tr>
+<tr><td>Wald (W)</td><td>Solo el no restringido</td><td>¿Qué tan lejos está \(R\hat\beta\) de \(r\)?</td><td>\(W=n\frac{RSS_R-RSS_{NR}}{RSS_{NR}}\)</td></tr>
+<tr><td>Multiplicadores de Lagrange (LM)</td><td>Solo el restringido</td><td>¿Qué tan empinada es \(\ln L\) en la restricción?</td><td>\(LM=n\frac{RSS_R-RSS_{NR}}{RSS_R}=nR^2_{aux}\)</td></tr></table></div>
 <p>Las tres son asintóticamente \(\chi^2_q\) bajo \(H_0\) y en muestras finitas cumplen \(W\ge LR\ge LM\). La prueba \(F\) es la versión exacta (con normalidad) de Wald: \(W=qF\cdot\frac{n}{n-k}\).</p></section>
 <section><h3>Regresión restringida</h3><p>Minimizar \(e'e\) sujeto a \(R\beta=r\) da \(\hat\beta_R=\hat\beta-(X'X)^{-1}R'[R(X'X)^{-1}R']^{-1}(R\hat\beta-r)\). Ejemplos: rendimientos constantes a escala en una Cobb-Douglas (\(\beta_K+\beta_L=1\)), igualdad de coeficientes.</p></section>
 ${LABX("las tres pruebas con los mismos datos")}`,
-qs:[{q:"Con n = 50, SCR_R = 120 y SCR_NR = 100, calcule W, LR y LM.",a:"W = 50·20/100 = 10; LR = 50·ln(1,2) = 9,12; LM = 50·20/120 = 8,33. Se cumple W ≥ LR ≥ LM."}]}]);
+qs:[{q:"Con n = 50, RSS_R = 120 y RSS_NR = 100, calcule W, LR y LM.",a:"W = 50·20/100 = 10; LR = 50·ln(1,2) = 9,12; LM = 50·20/120 = 8,33. Se cumple W ≥ LR ≥ LM."}]}]);
 const B2=["multicol","hetero","autocorr","especificacion"].map(take).filter(Boolean),B4=["vi","simultaneas"].map(take).filter(Boolean),B6=["discreta"].map(take).filter(Boolean);
 ins("chow",[
 {id:"diagnostico", t:"Diagnóstico: residuos, normalidad, no linealidad y observaciones influyentes", sim:"diag", html:String.raw`

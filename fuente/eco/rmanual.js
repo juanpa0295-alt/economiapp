@@ -462,7 +462,7 @@ RM["multicol"]=[
 data("hprice1", package = "wooldridge")
 m <- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)`},
 {t:"Correlaciones entre regresoras",x:"Una correlación alta entre dos regresoras es una primera señal (no la única).",r:String.raw`round(cor(hprice1[, c("lotsize", "sqrft", "bdrms")]), 3)`,o:"sqrft y bdrms tienen correlación de 0,53."},
-{t:"VIF a mano",x:"Se regresa cada xⱼ contra las demás. Si las otras la explican casi toda (R²ⱼ cerca de 1), su varianza se infla.",f:"VIFⱼ = 1 / (1 − R²ⱼ),  Var(β̂ⱼ) = σ² / [SCTⱼ(1 − R²ⱼ)]",r:String.raw`R2j <- summary(lm(sqrft ~ lotsize + bdrms, data = hprice1))$r.squared
+{t:"VIF a mano",x:"Se regresa cada xⱼ contra las demás. Si las otras la explican casi toda (R²ⱼ cerca de 1), su varianza se infla.",f:"VIFⱼ = 1 / (1 − R²ⱼ),  Var(β̂ⱼ) = σ² / [TSSⱼ(1 − R²ⱼ)]",r:String.raw`R2j <- summary(lm(sqrft ~ lotsize + bdrms, data = hprice1))$r.squared
 1 / (1 - R2j)
 vif(m)`,o:"VIF(sqrft) = 1,42: no hay multicolinealidad preocupante (la regla usual alerta desde 10)."},
 {t:"Colinealidad perfecta",x:"Si una variable es combinación exacta de otras, R deja el coeficiente en NA.",r:String.raw`hprice1$area_total <- hprice1$sqrft + 2 * hprice1$bdrms
@@ -629,6 +629,55 @@ const pBox=code=>Object.values(PBASES).filter(B=>B.re.test(code)).map(B=>{const 
   ${Object.values(PBASES).map(B=>`<section><h3>${B.t}</h3><p>${B.arch?`Archivo <code style="word-break:break-all">${B.arch}</code>. `:""}${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div>${B.code?`<details class="dp-lite"><summary>Los 50 meses en código R (por si no tienes el Excel)</summary><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(B.code)}</pre></div></details>`:""}</section>`).join("")}
   <section><h3>Las bases de las estaciones avanzadas (Wooldridge)</h3><p>Heterocedasticidad, autocorrelación, multicolinealidad, variables instrumentales, ecuaciones simultáneas, elección discreta, panel y series usan las bases del libro <i>Introducción a la econometría</i> de Jeffrey Wooldridge, que vienen en el paquete <code>wooldridge</code>: se cargan con <code>data("hprice1", package = "wooldridge")</code> y no hay que descargar nada. Sus nombres están en inglés porque así vienen en el libro (<code>wage</code> es salario, <code>price</code> precio).</p></section>
   ${Object.entries(BASES).map(([d,B])=>`<section><h3><code>${d}</code> · ${B.t}</h3><p>${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div></section>`).join("")}`}]});
+  BRANCHES.unshift({g:"Fórmulas del curso",from:"inferencia",items:[{id:"formulas-p1",t:"Fórmulas del parcial 1 (notación del profesor)",nuevo:true,html:`<section><h3>Para qué sirve</h3><p class="lead">Es la hoja «Fórmulas para el parcial 1» del profesor, ordenada por tema y con el número de ecuación que él usa en clase y en sus notebooks de R. Úsala como mapa: cada bloque dice en qué estación está el desarrollo.</p></section>
+  <section><h3>1. El modelo de k variables</h3>
+  <div class="eq">Yt = β₁ + β₂X2t + β₃X3t + … + βkXkt + μt &nbsp;&nbsp;⇔&nbsp;&nbsp; y = Xβ + μ<span class="note">Regresión poblacional. β₁ es el intercepto y k cuenta el intercepto</span></div>
+  <div class="eq">y = Xb + e = ŷ + e, &nbsp; ŷ = Xb<span class="note">Regresión muestral</span></div>
+  <div class="eq">(X′X)b = X′y &nbsp;&nbsp;⇒&nbsp;&nbsp; b = (X′X)⁻¹X′y<span class="note">Ecuaciones normales y estimador OLS (MCO)</span></div>
+  <p>Estación: <a href="#mco-matricial">Regresión múltiple en forma matricial</a>.</p></section>
+  <section><h3>2. Modelo en desviaciones a la media</h3>
+  <div class="eq">y* = X*b₂ + e, &nbsp; y* = Ay, &nbsp; X* = AX₂, &nbsp; A = Iₙ − (1/n)ii′</div>
+  <div class="eq">b₂ = (X*′X*)⁻¹X*′y* &nbsp;&nbsp;&nbsp; b₁ = Ȳ − b₂X̄₂ − b₃X̄₃ − … − bkX̄k</div></section>
+  <section><h3>3. Sumas de cuadrados y R²</h3>
+  <div class="eq">TSS = Σ(Yt − Ȳ)² = y′y − nȲ²</div>
+  <div class="eq">ESS = b′X′Xb − nȲ² = b₂′X*′X*b₂ &nbsp;&nbsp;&nbsp; RSS = e′e = Σet²</div>
+  <div class="eq">TSS = ESS + RSS &nbsp;&nbsp;&nbsp; R² = ESS/TSS<span class="note">Ecuación (16) en los notebooks</span></div></section>
+  <section><h3>4. Supuestos, media y varianza de b</h3>
+  <ul><li>X es no estocástica y de rango completo; β es constante.</li><li>μ ~ N(0, σ²Iₙ): E(μ) = 0 y var(μ) = σ²Iₙ.</li></ul>
+  <div class="eq">E(b) = β &nbsp;&nbsp;&nbsp; var(b) = σ²(X′X)⁻¹ = σ²(cᵢⱼ) &nbsp;&nbsp;&nbsp; b ~ N(β; σ²(X′X)⁻¹)</div>
+  <div class="eq">S² = RSS/(n − k) &nbsp;&nbsp;&nbsp; S²bⱼ = S²·cⱼⱼ &nbsp;&nbsp;&nbsp; cov(bᵢ, bⱼ) = S²·cᵢⱼ<span class="note">cᵢⱼ es el elemento (i, j) de (X′X)⁻¹</span></div>
+  <p>Estaciones: <a href="#supuestos">Supuestos</a> e <a href="#inferencia">Inferencia</a>.</p></section>
+  <section><h3>5. Pruebas de hipótesis: H₀: Rβ = r</h3>
+  <div class="tbl"><table><tr><th>Ecuación</th><th>Para qué</th><th>Estadístico</th><th>Distribución</th></tr>
+  <tr><td><b>F (56)</b></td><td>General: q restricciones lineales</td><td>[(Rb − r)′[R(X′X)⁻¹R′]⁻¹(Rb − r)/q] / [e′e/(n − k)]</td><td>F(q, n − k)</td></tr>
+  <tr><td><b>F (58)</b></td><td>Significancia individual, H₀: βⱼ = 0</td><td>bⱼ² / (S²cⱼⱼ)</td><td>F(1, n − k)</td></tr>
+  <tr><td><b>t (59)</b></td><td>Lo mismo con t; p-valor = 2·P(t &gt; |tc|)</td><td>bⱼ / se(bⱼ)</td><td>t(n − k)</td></tr>
+  <tr><td><b>F (60)</b></td><td>Una restricción lineal: a₁β₁ + … + akβk = a</td><td>(a₁b₁ + … + akbk − a)² / var(a₁b₁ + … + akbk)</td><td>F(1, n − k)</td></tr>
+  <tr><td><b>F (61)</b></td><td>Significancia de la regresión: β₂ = … = βk = 0</td><td>[ESS/(k − 1)] / [RSS/(n − k)] = [R²/(k − 1)] / [(1 − R²)/(n − k)]</td><td>F(k − 1, n − k)</td></tr>
+  <tr><td><b>F (64)</b></td><td>Restringido contra no restringido</td><td>[(RSS_R − RSS_NR)/q] / [RSS_NR/(n − k)]</td><td>F(q, n − k)</td></tr></table></div>
+  <div class="eq">bⱼ − se(bⱼ)·t(α/2; n − k) ≤ βⱼ ≤ bⱼ + se(bⱼ)·t(α/2; n − k)<span class="note">Intervalo de confianza del 100(1 − α) %</span></div>
+  <p class="warn"><b>Decisión con el p-valor:</b> p-valor = P(F &gt; Fc). Se rechaza H₀ si el p-valor es menor que α. En R: <code>pf(Fc, df1 = q, df2 = n - k, lower.tail = F)</code> y, para la t, <code>2*pt(abs(tc), df = n - k, lower.tail = F)</code>.</p>
+  <p>Estación: <a href="#inferencia">Inferencia: pruebas t y F</a>, con cada prueba calculada en R sobre la demanda de TV. Ejercicios resueltos: <a href="#tl-p1">Asesoría del parcial 1 y Taller 2</a>.</p></section>
+  <section><h3>6. Mínimos cuadrados restringidos</h3>
+  <div class="eq">b_R = b + (X′X)⁻¹R′[R(X′X)⁻¹R′]⁻¹(r − Rb)</div>
+  <div class="eq">ŷ_R = Xb_R &nbsp;&nbsp;&nbsp; e_R = y − Xb_R &nbsp;&nbsp;&nbsp; RSS_R = e_R′e_R</div>
+  <div class="eq">ESS_R = b_R′X′Xb_R − nȲ² + 2ŷ_R′e_R &nbsp;&nbsp;&nbsp; TSS = y′y − nȲ²</div></section>
+  <section><h3>7. Regresión lineal simple</h3>
+  <div class="eq">Yt = β₁ + β₂Xt + μt, &nbsp; μt ~ N(0, σ²)</div>
+  <div class="eq">b₂ = S_XY / S_XX = Σ(Xt − X̄)(Yt − Ȳ) / Σ(Xt − X̄)² &nbsp;&nbsp;&nbsp; b₁ = Ȳ − b₂X̄</div>
+  <div class="eq">S_XX = Σ(Xt − X̄)² = ΣXt² − nX̄² = (n − 1)S²_X</div>
+  <div class="eq">var(b₂) = σ²/S_XX &nbsp;&nbsp;&nbsp; var(b₁) = σ²ΣXt² / (n·S_XX)</div>
+  <div class="eq">ESS = b₂²·S_XX &nbsp;&nbsp;&nbsp; R² = b₂²·S_XX / S_YY &nbsp;&nbsp;&nbsp; S² = RSS/(n − 2)</div>
+  <div class="eq">S²b₂ = S²/S_XX &nbsp;&nbsp;&nbsp; S²b₁ = S²ΣXt² / (n·S_XX)</div>
+  <p>Estación: <a href="#mco-simple">Regresión simple por MCO</a>.</p></section>
+  <section><h3>8. Capítulo 2: cambio estructural</h3>
+  <div class="tbl"><table><tr><th>Ecuación</th><th>Para qué</th><th>Estadístico</th></tr>
+  <tr><td><b>F (8)</b></td><td>Pronósticos de Chow</td><td>[d′(I + X₂(X₁′X₁)⁻¹X₂′)⁻¹d / n₂] / S₁² ~ F(n₂, n₁ − k), con d = y₂ − X₂b₁</td></tr>
+  <tr><td><b>F (9)</b></td><td>La misma con las RSS</td><td>[(RSS − RSS₁)/n₂] / S₁²</td></tr>
+  <tr><td><b>(11)-(12)</b></td><td>Coeficientes recursivos</td><td>b_s = (X_s′X_s)⁻¹X_s′y_s y var(b_s) = S_s²(X_s′X_s)⁻¹, s = k + 1, …, n</td></tr>
+  <tr><td><b>(14)-(17)</b></td><td>Errores de predicción un paso adelante</td><td>vt = Yt − xt′b_(t−1); bandas 0 ± 2·SER_(t−1)·√(1 + xt′(X′X)⁻¹xt)</td></tr>
+  <tr><td><b>(21)-(22)</b></td><td>CUSUM</td><td>Wt = Σwⱼ/σ̂; bandas por (k, ±a√(n − k)) y (n, ±3a√(n − k)), con a = 0,948 al 5 %, 1,143 al 1 % y 0,85 al 10 %</td></tr></table></div>
+  <p>Estaciones: <a href="#chow">Cambio estructural y prueba de Chow</a>, <a href="#ce-pronosticos">Prueba de pronósticos de Chow</a> y <a href="#ce-recursivos">Coeficientes recursivos, errores un paso adelante y CUSUM</a>.</p></section>`}]});
   const all=[...TRUNK,...BRANCHES.flatMap(g=>g.items)];
   for(const s of all)if(RM[s.id])s.html+=block(s.id,RM[s.id]);
 })();
