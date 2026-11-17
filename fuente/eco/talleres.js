@@ -71,16 +71,16 @@ String.raw`<b>Chow:</b> el restringido es una sola recta para todos: \(F=\dfrac{
 String.raw`<b>Pronóstico:</b> \(\hat y_0=\mathbf x_0'\mathbf b\); \(ee(\text{media})=\sqrt{s^2\mathbf x_0'(X'X)^{-1}\mathbf x_0}\) y \(ee(\text{individual})=\sqrt{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}\).`],
 sol:String.raw`<h5>a) Significado y signos</h5><p>Y son los años de educación y X la renta familiar. β₁ y β₃ son los interceptos: los años de educación esperados de un joven urbano y de uno rural cuando la renta es 0. β₂ y β₄ son las pendientes, los coeficientes que acompañan a la renta X: cuántos años <b>de educación</b> más se esperan cuando la renta familiar sube una unidad, β₂ en la zona urbana y β₄ en la rural. Signos esperados: positivos, porque más renta permite estudiar más. Se espera además β₁ &gt; β₃, por el mejor acceso a la educación en la ciudad.</p>
 <h5>b) Estimación</h5><ol class="steps">
-<li><b>Urbana</b> (n = 4): Σx = 42, Σy = 66, Σx² = 458, Σxy = 704. \(\hat\beta_2=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{44}{68}=0{,}6471\) y \(\hat\beta_1=16{,}5-0{,}6471(10{,}5)=9{,}7059\).</li>
-<li><b>Rural</b> (n = 4): Σx = 26, Σy = 47, Σx² = 194, Σxy = 320. \(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{58}{100}=0{,}58\) y \(\hat\beta_3=11{,}75-0{,}58(6{,}5)=7{,}98\).</li>
+<li><b>Urbana</b> (n = 4): Σx = 42, Σy = 66, Σx² = 458, Σxy = 704. Promedios: \(\bar x_U=42/4=10{,}5\) (renta media urbana) y \(\bar y_U=66/4=16{,}5\) (educación media urbana).<br>Pendiente: \(\hat\beta_2=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{44}{68}=0{,}6471\).<br>Intercepto: \(\hat\beta_1=\bar y_U-\hat\beta_2\bar x_U=16{,}5-0{,}6471(10{,}5)=9{,}7059\).</li>
+<li><b>Rural</b> (n = 4): Σx = 26, Σy = 47, Σx² = 194, Σxy = 320. Promedios: \(\bar x_R=26/4=6{,}5\) y \(\bar y_R=47/4=11{,}75\).<br>Pendiente: \(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{58}{100}=0{,}58\).<br>Intercepto: \(\hat\beta_3=\bar y_R-\hat\beta_4\bar x_R=11{,}75-0{,}58(6{,}5)=7{,}98\).</li>
 <li>Modelo estimado: \(\hat Y=9{,}706D_1+0{,}647D_1X+7{,}980D_2+0{,}580D_2X\).</li>
 <li>RSS por zona: urbana 3,8824 y rural 0,34, así que \(RSS_{NR}=4{,}2222\) y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
-<li>\(TSS=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
+<li>Con los 8 jóvenes, \(\sum y^2=1661\) y el promedio general es \(\bar y=113/8=14{,}125\). \(TSS=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
 <li>Errores estándar \(\sqrt{s^2[(X'X)^{-1}]_{jj}}\): 2,666; 0,249; 1,431 y 0,205.</li></ol>
 <p><b>Lectura del R²:</b> la renta y la zona explican el 93,5 % de la variación de los años de educación.</p>
 <h5>c) Cambio estructural</h5><ol class="steps">
 <li>H₀: β₁ = β₃ y β₂ = β₄ (una sola recta) frente a H₁: al menos una diferencia. Son q = 2 restricciones.</li>
-<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y \(\hat\alpha=6{,}831\). \(RSS_R=10{,}3851\).</li>
+<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y, con los promedios generales \(\bar x=68/8=8{,}5\) y \(\bar y=113/8=14{,}125\), \(\hat\alpha=14{,}125-0{,}8581(8{,}5)=6{,}831\). \(RSS_R=10{,}3851\).</li>
 <li>\(F=\dfrac{(10{,}3851-4{,}2222)/2}{4{,}2222/4}=\dfrac{3{,}0815}{1{,}0556}=2{,}919\sim F(2,4)\).</li>
 <li>\(F_{0{,}05}(2,4)=6{,}944\) y p = 0,165, así que no se rechaza H₀.</li></ol>
 <p><b>Lectura:</b> con estos datos no hay evidencia de que la relación educación-renta difiera entre zonas. Con solo 8 observaciones la prueba tiene poco poder.</p>
