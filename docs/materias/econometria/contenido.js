@@ -572,8 +572,24 @@ const WORKSHOPS=[
 // =====================================================================
 // MANUAL EN R: cada explicación con su par «fórmula | código R», pensado para quien empieza de cero.
 // Se agrega al final de cada lección (después del contenido y antes de «Para profundizar»).
-// Datos: paquete wooldridge (los ejemplos del libro de Wooldridge), así no hace falta descargar archivos.
+// Datos: las bases del profesor (Econometría I, U. de A.) en las estaciones del curso; el paquete wooldridge en las estaciones avanzadas.
 // =====================================================================
+// ---------- bases del curso (prof. Sergio Restrepo, Econometría I, U. de A.)
+const TV_DF=String.raw`Datos <- data.frame(
+  Mes = 1:50,
+  Yt  = c(5.12, 5.05, 4.91, 5.03, 4.61, 4.53, 3.27, 4.23, 4.61, 4.49, 4.39, 4.21, 4.04, 3.88, 3.12, 2.89, 2.76, 2.22, 2.78, 2.36, 2.53, 2.63, 2.26, 2.94, 2.41, 2.12, 2.19, 2.47, 2.62, 2.46, 2.29, 2.12, 2.09, 1.91, 2.01, 1.95, 1.87, 2.1, 1.89, 1.98, 1.9, 2.17, 2.18, 2.22, 1.95, 2.18, 2.09, 2.07, NA, NA),
+  X2t = c(904, 964, 979, 949, 994, 1055, 1205, 1145, 1055, 1115, 1130, 1145, 1175, 1235, 1251, 1266, 1296, 1326, 1356, 1371, 1386, 1341, 1401, 1311, 1371, 1416, 1401, 1356, 1326, 1296, 1371, 1401, 1431, 1446, 1446, 1454, 1439, 1471, 1460, 1436, 1431, 1449, 1442, 1431, 1421, 1416, 1440, 1446, 1425, 1436),
+  X3t = c(129.518, 100, 72.289, 53.614, 48.193, 57.831, 79.518, 108.434, 137.349, 159.036, 168.675, 163.253, 144.578, 116.867, 87.349, 62.651, 49.398, 48.193, 65.663, 51.205, 60.241, 61.446, 59.639, 90.361, 54.217, 48.193, 45.181, 48.193, 43.373, 39.759, 63.253, 65.06, 67.47, 78.916, 87.349, 84.337, 66.265, 88.554, 81.325, 73.494, 69.277, 83.132, 68.072, 70.482, 75.301, 66.265, 70.482, 78.313, 64.458, 75.301))`;
+const TVLOAD=String.raw`library(readxl)
+setwd("D:/Eco1")     # la carpeta donde guardaste el Excel del profesor
+Datos = read_excel("Datos_Ejemplo_1_Demanda_TV_Precio_Pub.xls")
+Datos = data.frame(Datos)
+head(Datos)
+n = 48; k = 3          # los meses 49 y 50 no tienen Yt: se dejan para pronosticar
+Yt  = Datos$Yt[1:n]
+X2t = Datos$X2t[1:n]
+X3t = Datos$X3t[1:n]`;
+
 const RM={};
 RM["r-cero"]=[
 {t:"Instala R y RStudio",x:"R es el programa que hace los cálculos; RStudio es la ventana cómoda donde lo usas. Instala primero R (cran.r-project.org) y después RStudio Desktop (posit.co). Abre RStudio: a la izquierda arriba escribes el <b>script</b> (archivo .R), abajo está la <b>consola</b>, a la derecha el <b>entorno</b> (tus objetos) y los gráficos.",r:String.raw`# Crea un script nuevo: File > New File > R Script
@@ -612,225 +628,359 @@ df$salario          # una columna
 df[2, ]             # la fila 2
 df[df$mujer == 1, ] # solo las mujeres
 df$ln_sal <- log(df$salario)   # crear una variable nueva`,o:"Una tabla de 5 filas y 3 columnas; al final aparece la columna ln_sal."},
-{t:"Paquetes: instalar una vez, cargar cada vez",x:"Los paquetes agregan funciones. Se instalan <b>una sola vez</b> con <code>install.packages()</code> y se cargan <b>en cada sesión</b> con <code>library()</code>. Estos son los que usa este manual.",r:String.raw`install.packages(c("wooldridge", "lmtest", "sandwich", "car", "AER",
-                   "plm", "strucchange", "tseries", "tidyr", "forecast"))
-library(wooldridge)   # datos del libro de Wooldridge
-library(lmtest)       # pruebas sobre modelos (Breusch-Pagan, Durbin-Watson...)`,no:1,o:"La instalación tarda unos minutos la primera vez. Si R pregunta por un «mirror», elige cualquiera."},
-{t:"Cargar datos de ejemplo y explorarlos",x:"El paquete <code>wooldridge</code> trae las bases del libro. <code>wage1</code> tiene 526 trabajadores de EE. UU. (1976) con salario, educación, experiencia y más. Antes de estimar, <b>siempre</b> mira los datos.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-head(wage1[, c("wage", "educ", "exper", "female")])   # primeras filas
-str(wage1[, 1:5])        # tipo de cada variable
-summary(wage1$wage)      # mínimo, cuartiles, media, máximo
-sum(is.na(wage1$wage))   # cuántos datos faltan`,o:"El salario por hora va de 0,53 a 24,98 dólares, con media 5,90 y sin datos faltantes."},
+{t:"Paquetes: instalar una vez, cargar cada vez",x:"Los paquetes agregan funciones. Se instalan <b>una sola vez</b> con <code>install.packages()</code> y se cargan <b>en cada sesión</b> con <code>library()</code>. Los primeros son los que usa el profesor en sus notebooks; los demás sirven para las estaciones avanzadas.",r:String.raw`install.packages(c("readxl", "car", "tseries", "nortest", "lmtest", "moments", "strucchange"))
+install.packages(c("wooldridge", "sandwich", "AER", "plm", "tidyr", "forecast"))   # estaciones avanzadas
+library(readxl)       # leer Excel (read_excel)
+library(car)          # qqPlot y linearHypothesis
+library(tseries)      # jarque.bera.test
+library(strucchange)  # CUSUM y cambio estructural`,no:1,o:"La instalación tarda unos minutos la primera vez. Si R pregunta por un «mirror», elige cualquiera. Como dice el profesor: una vez instalados, pon # delante de install.packages para no reinstalar."},
+{t:"Cargar la base del curso y explorarla",x:"Los ejemplos del manual usan las bases del profesor. La primera es la del <b>Ejemplo 1</b>: demanda mensual de televisores (<code>Yt</code>), precio (<code>X2t</code>) e inversión en publicidad (<code>X3t</code>). Guarda el Excel en una carpeta, dile a R que trabaje ahí con <code>setwd()</code> y léelo con <code>read_excel()</code>. Si no tienes el Excel, en la estación «Las bases del curso» está el código para crear la misma tabla. Antes de estimar, <b>siempre</b> mira los datos.",r:String.raw`rm(list = ls())        # limpia la memoria
+library(readxl)
+setwd("D:/Eco1")       # cambia la ruta por la de tu carpeta
+Datos = read_excel("Datos_Ejemplo_1_Demanda_TV_Precio_Pub.xls")
+Datos = data.frame(Datos)
+attach(Datos)          # permite llamar las columnas por su nombre: Yt, X2t, X3t
+head(Datos)            # primeras filas
+str(Datos)             # tipo de cada variable
+summary(Datos)         # mínimo, cuartiles, media, máximo
+sum(is.na(Yt))         # cuántos datos faltan`,o:"50 meses; la demanda va de 1,87 a 5,12 con media 2,92, y faltan 2 datos de Yt (los meses 49 y 50, que se dejan para pronosticar)."},
 {t:"Leer tus propios datos (Excel o CSV)",x:"Para tus talleres: guarda el archivo en una carpeta, dile a R que trabaje ahí y léelo. En Colombia los CSV suelen usar punto y coma y coma decimal: por eso <code>read.csv2</code>.",r:String.raw`setwd("C:/Users/tu_usuario/Documents/econometria")  # carpeta de trabajo
 getwd()                                  # comprueba dónde estás
 datos <- read.csv("datos.csv")           # separador coma, punto decimal
 datos <- read.csv2("datos.csv")          # separador ; y coma decimal
-# install.packages("readxl")
 library(readxl)
 datos <- read_excel("datos.xlsx", sheet = 1)`,no:1,o:"Si sale «cannot open file», revisa el nombre del archivo y la carpeta. En RStudio también sirve Session > Set Working Directory."},
-{t:"Gráficos básicos",x:"Un histograma muestra la distribución de una variable; un diagrama de dispersión muestra la relación entre dos.",r:String.raw`data("wage1", package = "wooldridge")
-hist(wage1$wage, main = "Salario por hora", xlab = "US$ por hora", col = "grey")
-plot(wage1$educ, wage1$wage, xlab = "Años de educación", ylab = "Salario")
-abline(lm(wage ~ educ, data = wage1), col = "red")   # recta de MCO`,o:"Un histograma sesgado a la derecha (pocos salarios muy altos) y una nube de puntos con pendiente positiva."},
-{t:"Ayuda y errores frecuentes",x:"Con <code>?función</code> abres la ayuda. Los errores más comunes al empezar: olvidar cargar el paquete, escribir mal el nombre de una variable (R distingue mayúsculas) y usar coma decimal en el código (en R el decimal es el punto).",r:String.raw`?lm                     # ayuda de la función lm
-names(wage1)[1:6]       # nombres exactos de las variables
+{t:"Gráficos básicos",x:"Un histograma muestra la distribución de una variable; un diagrama de dispersión muestra la relación entre dos.",r:String.raw`hist(Yt, main = "Demanda mensual de TV", xlab = "Yt", col = "grey")
+plot(X2t, Yt, xlab = "Precio", ylab = "Demanda", pch = 8, col = "red")
+abline(lm(Yt ~ X2t), lty = 2)   # recta de MCO`,o:"Un histograma con muchos meses de demanda baja (cerca de 2) y una nube de puntos con pendiente negativa: a mayor precio, menor demanda."},
+{t:"Ayuda y errores frecuentes",x:"Con <code>?función</code> abres la ayuda. Los errores más comunes al empezar: olvidar cargar el paquete, escribir mal el nombre de una variable (R distingue mayúsculas: <code>yt</code> no es <code>Yt</code>) y usar coma decimal en el código (en R el decimal es el punto).",r:String.raw`?lm                     # ayuda de la función lm
+names(Datos)            # nombres exactos de las variables
 3.5 + 1                 # bien: el decimal es punto
-# 3,5 + 1               # mal: da error`,o:"La ayuda se abre en el panel derecho; los nombres son wage, educ, exper, tenure, nonwhite, female."}];
+# 3,5 + 1               # mal: da error`,o:"La ayuda se abre en el panel derecho; los nombres son Mes, Yt, X2t y X3t."}];
 
 RM["variables"]=[
-{t:"Carga los datos de la lección",x:"Usamos <code>wage1</code>: salario por hora (<code>wage</code>), su logaritmo (<code>lwage</code>), años de educación (<code>educ</code>), experiencia (<code>exper</code>) y si es mujer (<code>female</code>).",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")`},
-{t:"Variable dependiente e independiente",x:"La dependiente <span class=\"m\">y</span> es la que queremos explicar (el salario); la independiente <span class=\"m\">x</span> la explica (la educación). En la fórmula de R se escribe <code>y ~ x</code>, que se lee «y en función de x».",f:"y = β₀ + β₁x + u",r:String.raw`y <- wage1$wage    # dependiente
-x <- wage1$educ    # independiente
-m <- lm(wage ~ educ, data = wage1)
-coef(m)`,o:"β̂₀ = −0,905 y β̂₁ = 0,541: cada año de educación se asocia con 0,54 dólares más por hora."},
-{t:"Escalas: nominal, ordinal, intervalo y razón",x:"Una variable <b>nominal</b> solo clasifica (sexo, región): en R va como <code>factor</code>. Una <b>ordinal</b> además ordena (estrato): <code>factor(..., ordered = TRUE)</code>. Las de <b>intervalo</b> y <b>razón</b> son numéricas; solo las de razón (cero real, como el salario) admiten logaritmo.",r:String.raw`wage1$sexo <- factor(wage1$female, levels = c(0, 1), labels = c("hombre", "mujer"))
-table(wage1$sexo)
-wage1$region <- factor(ifelse(wage1$south == 1, "sur",
-                        ifelse(wage1$west == 1, "oeste",
-                        ifelse(wage1$northcen == 1, "centro norte", "noreste"))))
-table(wage1$region)
-summary(wage1$wage)   # razón: tiene cero real`,o:"274 hombres y 252 mujeres; cuatro regiones."},
-{t:"Continuas y discretas",x:"Una variable <b>continua</b> puede tomar cualquier valor en un rango (salario); una <b>discreta</b> toma valores contables (número de dependientes).",r:String.raw`head(unique(wage1$wage))      # muchos valores distintos: continua
-table(wage1$numdep)           # pocos valores enteros: discreta`,o:"numdep va de 0 a 6 dependientes."},
-{t:"Modelo nivel-nivel",x:"Si x sube una unidad, y cambia β₁ unidades.",f:"wage = β₀ + β₁·educ",r:String.raw`coef(lm(wage ~ educ, data = wage1))`,o:"β̂₁ = 0,541 dólares por hora por año de educación."},
-{t:"Modelo log-nivel (semielasticidad)",x:"Con el logaritmo en la dependiente, si x sube una unidad, y cambia aproximadamente 100·β₁ %. El cambio exacto es 100·(e^β₁ − 1).",f:"ln(wage) = β₀ + β₁·educ  ⇒  %Δwage ≈ 100·β₁",r:String.raw`m_ln <- lm(log(wage) ~ educ, data = wage1)
-b1 <- coef(m_ln)["educ"]
-100 * b1                # aproximación (%)
-100 * (exp(b1) - 1)     # cambio exacto (%)`,o:"8,27 % aproximado y 8,63 % exacto por cada año de educación."},
-{t:"Modelo nivel-log",x:"Si x sube 1 %, y cambia β₁/100 unidades.",f:"y = β₀ + β₁·ln(x)  ⇒  Δy ≈ (β₁/100)·%Δx",r:String.raw`data("ceosal1", package = "wooldridge")   # salarios de gerentes y ventas
-m_nl <- lm(salary ~ log(sales), data = ceosal1)
-coef(m_nl)["log(sales)"] / 100   # miles de US$ por cada 1 % más de ventas`,o:"Cerca de 2,6: si las ventas suben 1 %, el salario sube unos 2.600 dólares al año (salary está en miles)."},
-{t:"Modelo log-log (elasticidad)",x:"Con logaritmo en ambos lados, β₁ es una elasticidad: si x sube 1 %, y cambia β₁ %.",f:"ln(y) = β₀ + β₁·ln(x)  ⇒  β₁ = %Δy / %Δx",r:String.raw`m_ll <- lm(log(salary) ~ log(sales), data = ceosal1)
-coef(m_ll)["log(sales)"]`,o:"0,257: si las ventas suben 1 %, el salario del gerente sube 0,257 %."}];
+{t:"Carga la base del curso",x:"Usamos la base del <b>Ejemplo 1</b> del profesor: 48 meses de demanda de televisores. <code>Yt</code> es la demanda, <code>X2t</code> el precio y <code>X3t</code> la inversión en publicidad. Los meses 49 y 50 traen precio y publicidad pero no demanda: son para pronosticar.",r:TVLOAD,o:"Una tabla con las columnas Mes, Yt, X2t y X3t."},
+{t:"Variable dependiente e independientes",x:"La dependiente <span class=\"m\">Yt</span> es la que queremos explicar (la demanda); las independientes la explican (precio y publicidad). En R se escribe <code>Yt ~ X2t + X3t</code>, que se lee «Yt en función de X2t y X3t». El profesor numera los coeficientes desde β₁, que es el intercepto.",f:"Yt = β₁ + β₂X2t + β₃X3t + μt",r:String.raw`eq1 = lm(Yt ~ X2t + X3t)
+coef(eq1)`,o:"b₁ = 10,3017, b₂ = −0,005994 y b₃ = 0,005107: si el precio sube una unidad, la demanda baja 0,006; si la publicidad sube una unidad, la demanda sube 0,0051."},
+{t:"Escalas: nominal, ordinal, intervalo y razón",x:"Una variable <b>nominal</b> solo clasifica (por ejemplo, el trimestre o si la persona es mujer): en R va como <code>factor</code>. Una <b>ordinal</b> además ordena (estrato). Las de <b>intervalo</b> y <b>razón</b> son numéricas; solo las de razón (cero real, como el precio o la demanda) admiten logaritmo.",r:String.raw`trimestre = factor(rep(1:4, length.out = 12), labels = c("T1", "T2", "T3", "T4"))
+table(trimestre)                                       # nominal
+estrato = factor(c(2, 3, 1, 3, 2), levels = 1:3, ordered = TRUE)
+estrato                                                # ordinal
+summary(X2t)                                           # razón: tiene cero real`,o:"Tres meses en cada trimestre; los estratos salen ordenados 1 < 2 < 3; el precio va de 904 a 1.471."},
+{t:"Continuas y discretas",x:"Una variable <b>continua</b> puede tomar cualquier valor en un rango (la publicidad X3t tiene decimales); una <b>discreta</b> toma valores contables (el mes).",r:String.raw`head(unique(X3t))     # valores con decimales: continua
+range(Datos$Mes)      # 1, 2, ..., 50: discreta`,o:"X3t toma valores como 129,518 y 72,289; el mes va de 1 a 50."},
+{t:"Modelo nivel-nivel (Ejemplo 1)",x:"Cada β mide el cambio de Yt, en sus unidades, cuando la regresora sube una unidad.",f:"Yt = β₁ + β₂X2t + β₃X3t + μt",r:String.raw`summary(eq1)$coefficients`,o:"β̂₂ = −0,005994 (precio) y β̂₃ = 0,005107 (publicidad), los dos con p-valor prácticamente cero."},
+{t:"Modelo multiplicativo, log-log (Ejemplo 2)",x:"El profesor estima la demanda en logaritmos. Con logaritmo a los dos lados, cada β es una <b>elasticidad</b>: si la regresora sube 1 %, Yt cambia β %.",f:"ln Yt = β₁ + β₂ ln X2t + β₃ ln X3t + μt  ⇒  β₂ = %ΔYt / %ΔX2t",r:String.raw`library(tseries)
+lny = log(Yt); lnX2t = log(X2t); lnX3t = log(X3t)
+eq1_ln = lm(lny ~ lnX2t + lnX3t)
+summary(eq1_ln)
+jarque.bera.test(resid(eq1_ln))     # normalidad de los errores`,o:"ln Yt = 16,522 − 2,2467 ln X2t + 0,1345 ln X3t, con R² = 0,939. Si el precio sube 1 %, la demanda cae 2,25 % (demanda elástica); si la publicidad sube 1 %, la demanda sube 0,13 %. Jarque-Bera = 2,03 (p = 0,363): los errores son normales."},
+{t:"Modelo log-nivel (semielasticidad)",x:"Con el logaritmo solo en Yt, si la regresora sube una unidad, Yt cambia aproximadamente 100·β %. El cambio exacto es 100·(e^β − 1).",f:"ln Yt = β₁ + β₂X2t  ⇒  %ΔYt ≈ 100·β₂",r:String.raw`m_ln = lm(log(Yt) ~ X2t)
+b2 = coef(m_ln)["X2t"]
+100 * b2                # aproximación (%)
+100 * (exp(b2) - 1)     # cambio exacto (%)`,o:"−0,199 %: cada unidad más de precio reduce la demanda cerca de 0,2 %."},
+{t:"Modelo nivel-log",x:"Con el logaritmo solo en la regresora, si X sube 1 %, Yt cambia β/100 unidades.",f:"Yt = β₁ + β₂ ln X2t  ⇒  ΔYt ≈ (β₂/100)·%ΔX2t",r:String.raw`m_nl = lm(Yt ~ log(X2t))
+coef(m_nl)["log(X2t)"] / 100`,o:"−0,0767: si el precio sube 1 %, la demanda baja 0,077 unidades."}];
 
 RM["datos"]=[
-{t:"Corte transversal",x:"Muchas unidades (personas, empresas) observadas en un mismo momento. El orden de las filas no importa.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-dim(wage1)           # 526 personas, 24 variables, un solo año`,o:"526 filas y 24 columnas."},
-{t:"Serie de tiempo",x:"Una unidad (un país) observada en muchos períodos. El orden sí importa, y en R conviene convertirla en objeto <code>ts</code> indicando el año inicial y la frecuencia.",r:String.raw`data("phillips", package = "wooldridge")   # EE. UU., 1948-2003
-head(phillips[, c("year", "unem", "inf")])
-unem <- ts(phillips$unem, start = 1948, frequency = 1)   # anual
-plot(unem, ylab = "Desempleo (%)")`,o:"Una serie anual de desempleo e inflación desde 1948."},
-{t:"Datos de panel",x:"Las mismas unidades seguidas en varios períodos: se identifica cada fila con el <b>individuo</b> y el <b>período</b>.",r:String.raw`data("wagepan", package = "wooldridge")   # 545 hombres, 1980-1987
-head(wagepan[, c("nr", "year", "lwage", "union")])
-length(unique(wagepan$nr)); table(wagepan$year)[1:3]`,o:"545 individuos, cada uno con 8 años: 4.360 filas."},
-{t:"Cortes transversales agrupados",x:"Muestras distintas de varios años juntas (no son las mismas personas). Se agrega una dicotómica por año.",r:String.raw`data("cps78_85", package = "wooldridge")`,no:1,o:"Se trabaja como un corte transversal con dicotómicas de año (y78, y85…)."},
-{t:"Formato largo y formato ancho",x:"En formato <b>largo</b> hay una fila por individuo y período (el que piden los paquetes de panel). En formato <b>ancho</b> hay una fila por individuo y una columna por período. <code>tidyr</code> pasa de uno a otro.",r:String.raw`library(tidyr)
-largo <- wagepan[wagepan$nr %in% c(13, 17), c("nr", "year", "lwage")]
-ancho <- pivot_wider(largo, names_from = year, values_from = lwage, names_prefix = "lwage_")
-ancho                         # una fila por persona
-de_vuelta <- pivot_longer(ancho, cols = starts_with("lwage_"),
-                          names_to = "year", names_prefix = "lwage_", values_to = "lwage")
-head(de_vuelta)`,o:"Dos filas (una por persona) con 8 columnas de salario, y de vuelta 16 filas."}];
+{t:"Serie de tiempo: la demanda mensual",x:"Una unidad observada en muchos períodos. El orden sí importa, y en R conviene convertirla en objeto <code>ts</code> indicando el inicio y la frecuencia (12 si es mensual, 4 si es trimestral, 1 si es anual).",r:String.raw`${TVLOAD}
+Yts = ts(Yt, frequency = 12)      # 48 meses = 4 años
+Yts
+plot(Yts, main = "Demanda mensual de TV", xlab = "Año", ylab = "Yt")`,o:"La demanda baja de cerca de 5 a cerca de 2 en los primeros dos años y luego se estabiliza."},
+{t:"Serie anual: el ahorro (Capítulo 2)",x:"Así arma el profesor la serie de ahorro de 1970 a 1995 en el Ejemplo 2 del capítulo 2, y marca con una línea el año del posible quiebre.",r:String.raw`Datos2 = data.frame(read_excel("Datos_Ejem2_Ingreso_Ahorro_2026_2.xls"))
+Yts2 = ts(Datos2$Yt, start = 1970, end = 1995, frequency = 1)
+plot(Yts2, type = "l", main = "Diagrama de dispersión", xlab = "Tiempo", ylab = "Ahorro")
+abline(v = 1984, col = "red", lty = 2)`,no:1,o:"La serie de ahorro con una línea roja punteada en 1984. Necesitas el Excel del capítulo 2 del profesor."},
+{t:"Serie trimestral: ventas (Ejemplo 9)",x:"Con datos trimestrales la frecuencia es 4 y el inicio se da como año y trimestre.",r:String.raw`Datos9 = data.frame(read_excel("Datos_Ejemplo_9_Estac.xls"))
+yt = ts(Datos9$y, frequency = 4, start = c(1978, 1), end = c(1985, 4))
+plot(yt, main = "Ventas trimestrales", xlab = "Tiempo", ylab = "Ventas")`,no:1,o:"32 trimestres de ventas con un patrón que se repite cada año. Necesitas el Excel del Ejemplo 9."},
+{t:"Corte transversal",x:"Muchas unidades observadas en un mismo momento; el orden de las filas no importa. Ejemplo: los 17 trabajadores del punto 5 de los Ejercicios propuestos 3 (sueldo, años de experiencia y si es mujer).",r:String.raw`sal = data.frame(
+  sueldo = c(3.14, 3.32, 3.61, 1.65, 2.64, 3.64, 2.46, 1.69, 1.91, 3.10, 1.98, 2.14, 2.61, 3.60, 3.38, 3.50, 3.65),
+  exper  = c(13, 16, 30, 2, 8, 31, 10, 1, 6, 15, 4, 7, 13, 27, 19, 25, 20),
+  mujer  = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1))
+dim(sal)
+table(sal$mujer)`,o:"17 filas y 3 columnas: 9 hombres y 8 mujeres."},
+{t:"Datos de panel y formato largo o ancho",x:"Las mismas unidades seguidas en varios períodos: cada fila se identifica con la <b>unidad</b> y el <b>período</b>. En formato <b>largo</b> hay una fila por unidad y período; en formato <b>ancho</b>, una fila por unidad y una columna por período. <code>tidyr</code> pasa de uno a otro. (Ejemplo inventado: ventas de tres tiendas en tres años.)",r:String.raw`library(tidyr)
+largo = data.frame(tienda = rep(c("A", "B", "C"), each = 3),
+                   anio   = rep(2023:2025, times = 3),
+                   ventas = c(10, 12, 13, 8, 9, 11, 15, 14, 16))
+ancho = pivot_wider(largo, names_from = anio, values_from = ventas, names_prefix = "v_")
+ancho                         # una fila por tienda
+pivot_longer(ancho, cols = starts_with("v_"), names_to = "anio",
+             names_prefix = "v_", values_to = "ventas")`,o:"Tres filas con las columnas v_2023, v_2024 y v_2025, y de vuelta las 9 filas."}];
 
 RM["matrices"]=[
-{t:"Escribe X y y",x:"Cada fila de X es una observación; la primera columna son unos (el intercepto) y la segunda la regresora. Con 4 observaciones del ejemplo de la lección:",f:"y = Xβ + u,  X = [1 x]",r:String.raw`X <- cbind(1, c(2, 3, 5, 6))   # cbind pega columnas
-y <- c(12, 15, 20, 22)
+{t:"Escribe X y y",x:"Cada fila de X es una observación; la primera columna son unos (el intercepto) y la segunda la regresora. Con 4 observaciones del ejemplo de la lección:",f:"y = Xβ + μ,  X = [1 x]",r:String.raw`X = cbind(1, c(2, 3, 5, 6))   # cbind pega columnas
+y = c(12, 15, 20, 22)
 X
 dim(X)                          # n × k`,o:"Una matriz de 4 × 2."},
 {t:"Transpuesta y producto",x:"<code>t()</code> transpone y <code>%*%</code> multiplica matrices (el <code>*</code> solo multiplica elemento por elemento).",f:"X′X = [n Σx; Σx Σx²],  X′y = [Σy; Σxy]",r:String.raw`t(X)
-XtX <- t(X) %*% X
-Xty <- t(X) %*% y
+XtX = t(X) %*% X
+Xty = t(X) %*% y
 XtX; Xty`,o:"X′X = [4 16; 16 74] y X′y = [69; 301]."},
 {t:"Inversa",x:"<code>solve(A)</code> da la inversa A⁻¹. Comprueba que A·A⁻¹ es la identidad.",f:"(X′X)⁻¹ = (1/det)·[Σx² −Σx; −Σx n]",r:String.raw`det(XtX)                 # 4·74 − 16² = 40
-XtX_inv <- solve(XtX)
+XtX_inv = solve(XtX)
 XtX_inv
 round(XtX %*% XtX_inv, 10)   # identidad`,o:"El determinante es 40 y la inversa [1,85 −0,4; −0,4 0,1]."},
-{t:"El estimador β̂ = (X′X)⁻¹X′y",x:"Es toda la regresión por MCO en una línea.",f:"β̂ = (X′X)⁻¹ X′y",r:String.raw`b <- XtX_inv %*% Xty
+{t:"El estimador b = (X′X)⁻¹X′y",x:"Es toda la regresión por MCO en una línea.",f:"b = (X′X)⁻¹ X′y",r:String.raw`b = XtX_inv %*% Xty
 b
-coef(lm(y ~ X[, 2]))    # comprobación con lm`,o:"β̂₀ = 7,25 y β̂₁ = 2,5 por los dos caminos."}];
+coef(lm(y ~ X[, 2]))    # comprobación con lm`,o:"b₁ = 7,25 y b₂ = 2,5 por los dos caminos."},
+{t:"Cuando te dan X′X y X′y (Dinardo 3.10, asesoría del parcial)",x:"En los ejercicios del parcial no hay datos: te dan las matrices. Así las escribe el profesor en R, columna por columna o con <code>matrix()</code>.",r:String.raw`c1 = cbind(c(10, 30, 40)); c2 = cbind(c(30, 92, 119)); c3 = cbind(c(40, 119, 163))
+XtX = cbind(c1, c2, c3)
+XtX1 = matrix(nrow = 3, ncol = 3, c(10, 30, 40, 30, 92, 119, 40, 119, 163))   # otra forma
+Xty = cbind(c(20, 59, 88))
+b = solve(XtX) %*% Xty
+b`,o:"b = (−13; 1; 3)."}];
 
 RM["mco-simple"]=[
-{t:"Carga los datos",x:"Salario por hora contra años de educación (Wooldridge, ejemplo 2.4).",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-y <- wage1$wage; x <- wage1$educ; n <- length(y)`},
-{t:"La pendiente con la fórmula",x:"MCO escoge la recta que hace mínima la suma de los residuos al cuadrado. La pendiente es la covarianza entre x y y dividida por la varianza de x.",f:"β̂₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)²",r:String.raw`b1 <- sum((x - mean(x)) * (y - mean(y))) / sum((x - mean(x))^2)
-b1
-cov(x, y) / var(x)      # lo mismo`,o:"0,5414."},
-{t:"El intercepto",x:"La recta de MCO pasa por el punto de medias.",f:"β̂₀ = ȳ − β̂₁ x̄",r:String.raw`b0 <- mean(y) - b1 * mean(x)
-b0`,o:"−0,9049."},
-{t:"Lo mismo con lm()",x:"<code>lm()</code> hace todo el cálculo; <code>summary()</code> muestra coeficientes, errores estándar, t, p-valores, R² y la prueba F.",r:String.raw`m <- lm(wage ~ educ, data = wage1)
-summary(m)`,o:"Los mismos −0,905 y 0,541, con R² = 0,165."},
-{t:"Valores ajustados y residuos",x:"El valor ajustado es el punto sobre la recta; el residuo, la distancia vertical hasta el dato. Por construcción, los residuos suman cero y no están correlacionados con x.",f:"ŷᵢ = β̂₀ + β̂₁xᵢ,  ûᵢ = yᵢ − ŷᵢ",r:String.raw`yhat <- fitted(m); u <- resid(m)
-head(cbind(y, yhat, u), 3)
-sum(u)            # ≈ 0
-sum(x * u)        # ≈ 0`,o:"Las dos sumas dan prácticamente cero (del orden de 10⁻¹²)."},
-{t:"Descomposición de la variación y R²",x:"La variación total de y se reparte en la que explica el modelo y la que queda en los residuos.",f:"SCT = Σ(yᵢ − ȳ)² = SCE + SCR,  R² = SCE/SCT = 1 − SCR/SCT",r:String.raw`SCT <- sum((y - mean(y))^2)
-SCE <- sum((yhat - mean(y))^2)
-SCR <- sum(u^2)
-c(SCT = SCT, SCE_mas_SCR = SCE + SCR)
-SCE / SCT
-summary(m)$r.squared   # comprobación`,o:"SCT = 7.160,4 = SCE + SCR y R² = 0,1648: la educación explica el 16,5 % de la variación del salario."},
-{t:"Gráfico de la regresión",x:"Dibuja los datos y la recta estimada.",r:String.raw`plot(x, y, xlab = "educ", ylab = "wage", pch = 16, col = "grey")
-abline(m, col = "red", lwd = 2)`}];
+{t:"Carga los datos",x:"Para el modelo simple tomamos solo el precio: demanda de TV contra precio, con la base del Ejemplo 1.",r:TVLOAD},
+{t:"La pendiente con la fórmula",x:"MCO escoge la recta que hace mínima la suma de los errores al cuadrado. La pendiente es la covarianza entre X y Y dividida por la varianza de X.",f:"b₂ = Σ(X2t − X̄₂)(Yt − Ȳ) / Σ(X2t − X̄₂)²",r:String.raw`b2 = sum((X2t - mean(X2t)) * (Yt - mean(Yt))) / sum((X2t - mean(X2t))^2)
+b2
+cov(X2t, Yt) / var(X2t)      # lo mismo`,o:"−0,0064096."},
+{t:"El intercepto",x:"La recta de MCO pasa por el punto de medias.",f:"b₁ = Ȳ − b₂X̄₂",r:String.raw`b1 = mean(Yt) - b2 * mean(X2t)
+b1`,o:"11,2449."},
+{t:"Lo mismo con lm()",x:"<code>lm()</code> hace todo el cálculo; <code>summary()</code> muestra coeficientes, errores estándar, t, p-valores, R² y la prueba F.",r:String.raw`eq_s = lm(Yt ~ X2t)
+summary(eq_s)`,o:"Los mismos 11,2449 y −0,0064096, con R² = 0,9577."},
+{t:"Yt estimado y errores de estimación",x:"Ŷt es el punto sobre la recta; et es la distancia vertical hasta el dato. Por construcción, los errores suman cero y no están correlacionados con X.",f:"Ŷt = b₁ + b₂X2t,  et = Yt − Ŷt",r:String.raw`Yte = fitted(eq_s); et = resid(eq_s)
+head(cbind(Yt, Yte, et), 3)
+sum(et)            # ≈ 0
+sum(X2t * et)      # ≈ 0`,o:"Las dos sumas dan prácticamente cero (del orden de 10⁻¹²)."},
+{t:"Sumas de cuadrados y R²",x:"La variación total de Yt se reparte en la que explica el modelo y la que queda en los errores. El profesor las llama TSS, ESS y RSS.",f:"TSS = Σ(Yt − Ȳ)² = ESS + RSS,  R² = ESS/TSS = 1 − RSS/TSS",r:String.raw`TSS = sum((Yt - mean(Yt))^2)
+ESS = sum((Yte - mean(Yt))^2)
+RSS = sum(et^2)
+c(TSS = TSS, ESS_mas_RSS = ESS + RSS)
+ESS / TSS
+summary(eq_s)$r.squared   # comprobación`,o:"TSS = 53,6715 = 51,3997 + 2,2718 y R² = 0,9577: el precio explica el 95,8 % de la variación de la demanda."},
+{t:"Gráfico de la regresión",x:"Dibuja los datos y la recta estimada.",r:String.raw`plot(X2t, Yt, xlab = "Precio", ylab = "Demanda", pch = 8, col = "red")
+abline(eq_s, lty = 2)`}];
 
 RM["mco-matricial"]=[
-{t:"El modelo con varias regresoras",x:"Salario (en logaritmo) contra educación, experiencia y antigüedad (Wooldridge, ejemplo 3.2).",f:"ln(wage) = β₀ + β₁educ + β₂exper + β₃tenure + u",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-m <- lm(lwage ~ educ + exper + tenure, data = wage1)
-coef(m)`,o:"0,284 + 0,092·educ + 0,0041·exper + 0,022·tenure."},
-{t:"Arma X y y",x:"<code>model.matrix()</code> arma la matriz X con la columna de unos.",r:String.raw`X <- model.matrix(m)
-y <- wage1$lwage
-n <- nrow(X); k <- ncol(X)
-c(n = n, k = k)
-head(X, 3)`,o:"n = 526 y k = 4 (el intercepto cuenta)."},
-{t:"β̂ con matrices",x:"La misma fórmula de la estación anterior, ahora con cuatro columnas.",f:"β̂ = (X′X)⁻¹X′y",r:String.raw`b <- solve(t(X) %*% X) %*% t(X) %*% y
-cbind(b, coef(m))`,o:"Las dos columnas son iguales."},
-{t:"Varianza del error y grados de libertad",x:"Se divide por n − k porque se estimaron k parámetros.",f:"σ̂² = SCR / (n − k)",r:String.raw`u <- y - X %*% b
-s2 <- sum(u^2) / (n - k)
-s2
-sigma(m)^2        # comprobación
-n - k             # grados de libertad`,o:"σ̂² = 0,1944 con 522 grados de libertad."},
-{t:"Matriz de varianzas y errores estándar",x:"Los errores estándar son la raíz de la diagonal de σ̂²(X′X)⁻¹.",f:"Var(β̂) = σ̂²(X′X)⁻¹,  ee(β̂ⱼ) = √[Var(β̂)]ⱼⱼ",r:String.raw`V <- s2 * solve(t(X) %*% X)
-ee <- sqrt(diag(V))
-cbind(ee, summary(m)$coefficients[, "Std. Error"])`,o:"ee(educ) = 0,0073, igual a lo que reporta summary."}];
+{t:"Matrices de datos (Ejemplo 1)",x:"Como en el notebook del profesor: X0 tiene las 50 filas (con la columna de unos), X las primeras 48 y y la demanda de esos 48 meses.",f:"y = Xβ + μ,  X = [1 X2t X3t]",r:String.raw`library(readxl)
+Datos = data.frame(read_excel("Datos_Ejemplo_1_Demanda_TV_Precio_Pub.xls"))
+n = 48; k = 3; alpha = 0.05
+X0 = as.matrix(cbind(1, Datos[, 3:4]))   # 50 filas: 1, X2t, X3t
+X  = X0[1:n, ]
+y  = cbind(Datos[1:n, 2])
+X2t = cbind(X[, 2]); X3t = cbind(X[, 3])
+dim(X)`,o:"X es de 48 × 3."},
+{t:"X′X, su determinante y su inversa",x:"<code>t(X)</code> es la transpuesta, <code>det()</code> el determinante y <code>solve()</code> la inversa.",f:"X′X = [n ΣX2 ΣX3; ΣX2 ΣX2² ΣX2X3; ΣX3 ΣX2X3 ΣX3²]",r:String.raw`(XtX = t(X) %*% X)
+(det_XtX = det(XtX))
+(XtX_inv = solve(XtX))`,o:"X′X = [48 62.352 3.791,564; 62.352 82.246.350 4.823.454; 3.791,564 4.823.454 348.387,5], con determinante 2,4386·10¹²."},
+{t:"El estimador b",x:"La misma fórmula del modelo simple, ahora con tres columnas.",f:"b = (X′X)⁻¹X′y",r:String.raw`(Xty = t(X) %*% y)
+(b = XtX_inv %*% Xty)`,o:"X′y = (140,10; 173.970,78; 11.926,43) y b = (10,3017; −0,005994; 0,005107)."},
+{t:"Yt contra Yt estimado",x:"Si el modelo ajusta bien, los puntos (Yt, Ŷt) quedan cerca de la recta de 45°.",f:"ŷ = Xb",r:String.raw`ye = cbind(X %*% b)
+plot(y, ye, pch = 8, col = "red", main = "Yt vs Yte", xlab = "Demanda observada", ylab = "Demanda estimada")
+abline(a = 0, b = 1, lty = 2)
+plot(y, type = "l", ylim = c(1, 6), ylab = "Yt - Yte", xlab = "Indice")
+lines(ye, col = "red", lty = 2)
+legend(x = 25, y = 6, legend = c("Observado", "Estimado"), lty = c(1, 2), col = c("black", "red"))`,o:"Los puntos casi sobre la recta de 45° y las dos líneas casi encima una de otra."},
+{t:"Pronósticos para los meses 49 y 50",x:"Con los precios y la publicidad de los meses 49 y 50 se pronostica la demanda.",f:"ŷf = Xf·b",r:String.raw`(Xf = X0[49:50, ])
+(yf = cbind(Xf %*% b))`,o:"2,0893 para el mes 49 y 2,0787 para el mes 50."},
+{t:"Propiedades de los errores: media cero y X′e = 0",x:"Con intercepto, la media de los errores es cero y X′e = 0 (las ecuaciones normales). Por eso la media de Ŷt es igual a la media de Yt.",f:"ē = 0,  X′e = 0,  Ȳ = mean(Ŷ)",r:String.raw`e = y - ye
+round(mean(e), 4)
+round(t(X) %*% e, 4)
+c(mean(y), mean(ye))`,o:"Media 0, X′e = (0; 0; 0) y las dos medias valen 2,91875."},
+{t:"Sumas de cuadrados de varias formas",x:"El profesor calcula el TSS de tres formas, el ESS y el RSS de dos, y verifica la ecuación (16): TSS = ESS + RSS.",f:"TSS = y′y − nȲ² = (n − 1)s²y,  ESS = b′X′Xb − nȲ²,  RSS = e′e",r:String.raw`TSS  = sum((y - mean(y))^2)
+TSS1 = (t(y) %*% y - n * mean(y)^2)[1]
+TSS2 = (n - 1) * sd(y)^2
+ESS  = (t(b) %*% XtX %*% b - n * mean(y)^2)[1]
+ESS1 = sum((ye - mean(ye))^2)
+RSS  = sum(e^2)
+RSS1 = (t(e) %*% e)[1]
+c(TSS, TSS1, TSS2, ESS, ESS1, RSS, RSS1, ESS + RSS)
+(R2 = ESS / TSS)`,o:"TSS = 53,6715 (por las tres formas), ESS = 52,4588, RSS = 1,2127 y R² = 0,9774."},
+{t:"Lo mismo con lm() y lo que se puede sacar",x:"Del modelo y de su resumen salen los residuos, el RSS (<code>deviance</code>), los coeficientes, R², R² ajustado, AIC, SC y (X′X)⁻¹.",r:String.raw`eq1 = lm(y ~ X2t + X3t)
+seq1 = summary(eq1)
+seq1
+deviance(eq1)            # RSS
+seq1$r.squared; seq1$adj.r.squared
+AIC(eq1); BIC(eq1)       # AIC y SC
+seq1$cov.unscaled        # (X'X)^-1`,o:"RSS = 1,2127, R² = 0,9774, R² ajustado = 0,9764, AIC = −32,34 y SC = −24,86."},
+{t:"Modelo en desviaciones a la media (Ejemplo 3)",x:"La matriz A = Iₙ − (1/n)ii′ resta la media a cada columna. Con las variables en desviaciones se estiman b₂ y b₃ sin intercepto, y el intercepto se recupera con las medias.",f:"X* = A·X₂,  y* = A·y,  b₂ = (X*′X*)⁻¹X*′y*,  b₁ = Ȳ − b₂X̄₂ − b₃X̄₃",r:String.raw`I = cbind(rep(1, n))
+A = diag(n) - (1/n) * I %*% t(I)
+X2 = as.matrix(X[, 2:3])
+Xa = A %*% X2; ya = A %*% y
+(XatXa = t(Xa) %*% Xa)
+(Xatya = t(Xa) %*% ya)
+(b2 = solve(XatXa) %*% Xatya)
+(b1a = mean(y) - b2[1] * mean(X2t) - b2[2] * mean(X3t))`,o:"X*′X* = [1.251.102 −101.787,2; −101.787,2 48.888,34], X*′y* = (−8.019,12; 859,804), y los mismos b₂ = −0,005994, b₃ = 0,005107 y b₁ = 10,3017."},
+{t:"Sumas de cuadrados en desviaciones y lm() sin intercepto",x:"En desviaciones, TSS = y*′y* y ESS = b₂′X*′X*b₂: dan lo mismo que en niveles. En <code>lm()</code> el <code>− 1</code> quita el intercepto.",f:"TSS = y*′y*,  ESS = b₂′X*′X*b₂,  RSS = e*′e*",r:String.raw`ea = ya - Xa %*% b2
+c(TSSa = (t(ya) %*% ya)[1], ESSa = (t(b2) %*% XatXa %*% b2)[1], RSSa = (t(ea) %*% ea)[1])
+x2a = Xa[, 1]; x3a = Xa[, 2]
+summary(lm(ya ~ x2a + x3a - 1))`,o:"TSS = 53,6715, ESS = 52,4588 y RSS = 1,2127, igual que en niveles."}];
 
 RM["supuestos"]=[
-{t:"Estima el modelo de trabajo",x:"Revisamos los supuestos sobre el modelo de la estación anterior.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-m <- lm(lwage ~ educ + exper + tenure, data = wage1)`},
-{t:"Sin colinealidad perfecta",x:"Ninguna regresora puede ser combinación lineal exacta de otras. Si lo es, R no puede invertir X′X y muestra NA en el coeficiente.",f:"rango(X) = k",r:String.raw`wage1$educ2 <- 2 * wage1$educ           # copia exacta de educ
-coef(lm(lwage ~ educ + educ2, data = wage1))
-qr(model.matrix(m))$rank                # debe ser k = 4`,o:"El coeficiente de educ2 sale NA; el rango del modelo bueno es 4."},
-{t:"Media condicional cero (lo que sí se puede revisar)",x:"E(u|x) = 0 no se puede probar con los residuos, porque MCO los fuerza a tener media cero y a no correlacionarse con las x. Lo que sí sirve es graficar los residuos contra cada x y buscar patrones (por ejemplo, curvatura).",f:"E(u | x₁, …, x_k) = 0",r:String.raw`u <- resid(m)
-mean(u); cor(u, wage1$educ)      # ≈ 0 siempre, por construcción
-plot(wage1$exper, u, xlab = "exper", ylab = "residuo")
-abline(h = 0, col = "red")`,o:"Media y correlación prácticamente cero (del orden de 10⁻¹⁶). En el gráfico, si los residuos dibujan una curva en vez de una nube plana, falta un término como exper²."},
-{t:"Homocedasticidad: mira el abanico",x:"La varianza del error debe ser constante. Si los residuos se abren como un abanico al subir los valores ajustados, hay heterocedasticidad (estación de heterocedasticidad).",f:"Var(u | x) = σ²",r:String.raw`plot(fitted(m), resid(m), xlab = "ajustados", ylab = "residuos")
+{t:"Estima el modelo de trabajo",x:"Revisamos los supuestos sobre el Ejemplo 1 (demanda de TV contra precio y publicidad).",r:String.raw`${TVLOAD}
+eq1 = lm(Yt ~ X2t + X3t)
+e = resid(eq1)
+alpha = 0.05`},
+{t:"Sin colinealidad perfecta",x:"Ninguna regresora puede ser combinación lineal exacta de otras. Si lo es, det(X′X) = 0, R no puede invertir X′X y muestra NA en el coeficiente.",f:"rango(X) = k",r:String.raw`X4t = 2 * X2t                          # copia exacta del precio
+coef(lm(Yt ~ X2t + X4t))
+qr(model.matrix(eq1))$rank             # debe ser k = 3`,o:"El coeficiente de X4t sale NA; el rango del modelo bueno es 3."},
+{t:"Media cero y X′e = 0 (lo que sí se puede revisar)",x:"E(μ|X) = 0 no se puede probar con los errores de estimación, porque MCO los fuerza a tener media cero y a cumplir X′e = 0. Lo que sí sirve es graficarlos contra cada regresora y buscar patrones (por ejemplo, curvatura).",f:"E(μt) = 0",r:String.raw`round(mean(e), 4); round(t(model.matrix(eq1)) %*% e, 4)
+plot(X2t, e, xlab = "Precio", ylab = "et"); abline(h = 0, col = "red")`,o:"Media y X′e iguales a cero. En el gráfico se busca una nube plana alrededor de cero."},
+{t:"Varianza constante: mira el abanico",x:"La varianza del error debe ser constante. Si los errores se abren como un abanico al subir Ŷt, hay heterocedasticidad (estación de heterocedasticidad).",f:"Var(μt) = σ²",r:String.raw`plot(fitted(eq1), e, xlab = "Yt estimado", ylab = "et")
 abline(h = 0, col = "red")`},
-{t:"Normalidad de los errores",x:"Hace falta para que t y F sean exactas en muestras pequeñas. Se mira con un histograma, un gráfico QQ y la prueba de Shapiro-Wilk (H₀: normalidad). Con muestras grandes importa poco.",r:String.raw`hist(resid(m), breaks = 30)
-qqnorm(resid(m)); qqline(resid(m), col = "red")
-shapiro.test(resid(m))`,o:"W = 0,989 con p-valor 0,0008: se rechaza la normalidad, pero con n = 526 la inferencia sigue siendo válida en forma aproximada."},
-{t:"Los cuatro gráficos de diagnóstico",x:"R tiene un atajo con los cuatro gráficos clásicos.",r:String.raw`par(mfrow = c(2, 2)); plot(m); par(mfrow = c(1, 1))`}];
+{t:"Normalidad 1: histograma con la curva normal",x:"El profesor superpone la normal con media 0 y desviación sd(e) sobre el histograma de frecuencias relativas.",r:String.raw`me = round(mean(e), 4)
+hist(e, seq(-0.44, 0.40, by = 0.12), prob = TRUE, main = "Histograma de residuales",
+     xlab = "Errores de estimación", ylab = "Freq. Relativa", xlim = c(-0.5, 0.5))
+curve(dnorm(x, mean = me, sd = sd(e)), col = "red", lty = 2, lwd = 2, add = TRUE)`,o:"Un histograma con forma de campana, centrado en cero."},
+{t:"Normalidad 2: cajas y bigotes",x:"Si la caja es simétrica y la media (el asterisco) queda cerca de la mediana, no hay asimetría marcada.",r:String.raw`boxplot(e, main = "Gráfico de cajas y bigotes", horizontal = TRUE)
+points(mean(e), pch = 8, col = "blue", y = 1)`},
+{t:"Normalidad 3: gráfico de probabilidad normal",x:"<code>qqPlot()</code> del paquete car pone bandas de confianza: si los puntos quedan dentro, la normalidad es razonable.",r:String.raw`library(car)
+qqPlot(e, pch = 8, main = "Gráfico de probabilidad normal", xlab = "Percentiles teóricos",
+       ylab = "Percentiles muestrales", col = "red", col.lines = "black")`,o:"Los puntos siguen la línea y quedan dentro de las bandas."},
+{t:"Normalidad 4: prueba de Jarque-Bera",x:"H₀: los errores son normales. JB combina la asimetría S y la curtosis K de los errores y se compara con una ji cuadrado con 2 grados de libertad.",f:"JB = n·[S²/6 + (K − 3)²/24]  ~  χ²(2)",r:String.raw`library(tseries)
+p_jb = jarque.bera.test(e)
+p_jb
+(jb_c = p_jb$statistic)
+(pv_jb = pchisq(jb_c, df = 2, lower.tail = FALSE))
+if (pv_jb >= alpha) "El supuesto de normalidad es válido" else "No se acepta la hipótesis de normalidad"`,o:"JB = 1,1217 con p-valor 0,5707 > 0,05: el supuesto de normalidad es válido."}];
 
 RM["inferencia"]=[
-{t:"Estima el modelo",x:"Mismo modelo de salarios.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-m <- lm(lwage ~ educ + exper + tenure, data = wage1)
-n <- nobs(m); k <- length(coef(m))`},
-{t:"Estadístico t a mano",x:"Para H₀: βⱼ = 0, se divide el coeficiente por su error estándar.",f:"t = (β̂ⱼ − 0) / ee(β̂ⱼ)  ~  t(n − k)",r:String.raw`b  <- coef(m)["exper"]
-ee <- sqrt(diag(vcov(m)))["exper"]
-t  <- b / ee
-t`,o:"t = 2,39 para exper."},
-{t:"Valor crítico y decisión",x:"Con α = 5 % a dos colas, se rechaza H₀ si |t| supera el valor crítico.",f:"Rechazo si |t| > t(α/2; n − k)",r:String.raw`tc <- qt(0.975, df = n - k)
-tc
-abs(t) > tc`,o:"Valor crítico 1,965: como 2,39 > 1,965, se rechaza H₀; la experiencia es significativa al 5 %."},
-{t:"p-valor",x:"Es la probabilidad de un t tan extremo si H₀ fuera cierta.",f:"p = 2·P(T > |t|)",r:String.raw`2 * pt(-abs(t), df = n - k)
-summary(m)$coefficients["exper", ]`,o:"p = 0,017, igual al de summary."},
-{t:"Intervalo de confianza",x:"El intervalo al 95 % contiene los valores de β que no se rechazarían.",f:"β̂ⱼ ± t(0,025; n − k)·ee(β̂ⱼ)",r:String.raw`c(b - tc * ee, b + tc * ee)
-confint(m, "exper", level = 0.95)`,o:"[0,0007; 0,0075] por los dos caminos."},
-{t:"Prueba F de varias restricciones",x:"Para H₀: β_exper = β_tenure = 0 se compara el modelo restringido (sin esas variables) con el no restringido.",f:"F = [(SCRᵣ − SCRₙᵣ)/q] / [SCRₙᵣ/(n − k)]  ~  F(q, n − k)",r:String.raw`mr  <- lm(lwage ~ educ, data = wage1)          # restringido
-SCRr <- sum(resid(mr)^2); SCRnr <- sum(resid(m)^2); q <- 2
-F <- ((SCRr - SCRnr) / q) / (SCRnr / (n - k))
-F
-qf(0.95, q, n - k)              # valor crítico
-1 - pf(F, q, n - k)             # p-valor`,o:"F = 49,7, mucho mayor que el crítico 3,01 (p-valor prácticamente cero): se rechaza que exper y tenure sean conjuntamente cero."},
-{t:"La misma F con funciones",x:"<code>anova()</code> compara dos modelos anidados y <code>linearHypothesis()</code> (paquete car) prueba restricciones escritas como texto, incluso de igualdad.",r:String.raw`anova(mr, m)
-library(car)
-linearHypothesis(m, c("exper = 0", "tenure = 0"))
-linearHypothesis(m, "exper = tenure")    # H0: los dos efectos son iguales`,o:"La misma F = 49,7. La última prueba (exper = tenure) da F = 17,95: los dos efectos no son iguales."}];
+{t:"Estima el modelo (Ejemplo 4)",x:"Mismo modelo de demanda. Se guardan X′X, su inversa, b y las sumas de cuadrados, porque las pruebas las usan.",r:String.raw`${TVLOAD}
+X = cbind(1, X2t, X3t); y = cbind(Yt); a = 0.05
+XtX = t(X) %*% X; XtX_inv = solve(XtX)
+b = XtX_inv %*% t(X) %*% y
+e = y - X %*% b
+TSS = sum((y - mean(y))^2); RSS = sum(e^2); ESS = TSS - RSS
+eq1 = lm(Yt ~ X2t + X3t)`},
+{t:"Varianza estimada y errores estándar",x:"σ² se estima dividiendo el RSS por n − k. La varianza estimada de b es S²(X′X)⁻¹ y los errores estándar son la raíz de su diagonal.",f:"S² = RSS/(n − k),  var(b) = S²(X′X)⁻¹,  S_bi = √var(b)ᵢᵢ",r:String.raw`(S2 = RSS / (n - k))
+(var_b = S2 * XtX_inv)
+(Sb = sqrt(diag(var_b)))
+vcov(eq1)          # comprobación con R`,o:"S² = 0,026948 y errores estándar 0,24401, 0,00016104 y 0,00081464."},
+{t:"La F general, ecuación (56)",x:"Toda hipótesis lineal se escribe Rβ = r, con q restricciones. Para H₀: β₁ = 0, R = [1 0 0], r = 0 y q = 1.",f:"F = [(Rb − r)′ [R(X′X)⁻¹R′]⁻¹ (Rb − r) / q] / S²  ~  F(q, n − k)",r:String.raw`qb1 = 1; Rb1 = rbind(c(1, 0, 0)); rb1 = cbind(0)
+Fc_56_b1 = ((t(Rb1 %*% b - rb1) %*% solve(Rb1 %*% XtX_inv %*% t(Rb1)) %*% (Rb1 %*% b - rb1))[1] / qb1) / S2
+Fc_56_b1
+pf(Fc_56_b1, df1 = qb1, df2 = n - k, lower.tail = FALSE)`,o:"F = 1.782,4 con p-valor prácticamente cero: β₁ es distinto de cero."},
+{t:"Un solo coeficiente: F (58) y t (59)",x:"Para H₀: βᵢ = 0, la F (58) es b²/S²bᵢ y la t (59) es b/S_bᵢ; se cumple F = t². <b>Ojo:</b> el p-valor de t lleva <code>abs()</code>; sin él, un coeficiente negativo como el del precio da un p-valor cercano a 2.",f:"F = bᵢ²/S²bᵢ  ~  F(1, n − k),  t = bᵢ/S_bᵢ  ~  t(n − k)",r:String.raw`(Fc_58_b1 = b[1]^2 / var_b[1, 1])
+(tc = b / Sb)                                  # las tres t
+(pv = 2 * pt(abs(tc), df = n - k, lower.tail = FALSE))
+ifelse(pv < a, "significativo", "no significativo")`,o:"F = 1.782,4 = 42,218². Las t son 42,22, −37,22 y 6,27, todas con p-valor menor que 0,05: precio y publicidad son significativos."},
+{t:"Significancia de la regresión: F (56) y F (61)",x:"H₀: β₂ = β₃ = 0. Con la (56), R = [0 I₂] y q = k − 1. La (61) usa las sumas de cuadrados y da lo mismo.",f:"F = [ESS/(k − 1)] / [RSS/(n − k)]  ~  F(k − 1, n − k)",r:String.raw`q = k - 1; R = cbind(0, diag(2)); r = cbind(c(0, 0))
+(Fc_56_SR = ((t(R %*% b - r) %*% solve(R %*% XtX_inv %*% t(R)) %*% (R %*% b - r))[1] / q) / S2)
+(Fc_61 = (ESS / (k - 1)) / (RSS / (n - k)))
+pf(Fc_61, df1 = k - 1, df2 = n - k, lower.tail = FALSE)`,o:"F = 973,32 por las dos fórmulas, con p-valor prácticamente cero: la regresión es significativa."},
+{t:"Intervalos de confianza del 95 %",x:"b ± t(α/2; n − k)·S_b. Con <code>confint()</code> salen todos; con <code>parm</code> y <code>level</code> uno solo con otra confianza.",f:"bᵢ ± t(α/2; n − k)·S_bᵢ",r:String.raw`(ta2 = qt(a/2, df = n - k, lower.tail = FALSE))
+c(LI_b1 = b[1] - ta2 * Sb[1], LS_b1 = b[1] + ta2 * Sb[1])
+confint(eq1)
+confint(eq1, parm = 3, level = 0.80)`,o:"t = 2,0141. β₁ ∈ [9,8103; 10,7932], β₂ ∈ [−0,006318; −0,005670], β₃ ∈ [0,003466; 0,006748]; al 80 %, β₃ ∈ [0,004048; 0,006167]."},
+{t:"H₀: β₂ + β₃ = 0 con F (56) y F (60)",x:"Una sola restricción con dos coeficientes. La (60) usa la varianza de la suma, que incluye la covarianza.",f:"F = (b₂ + b₃)² / [S²b₂ + S²b₃ + 2·cov(b₂, b₃)]",r:String.raw`qd = 1; Rd = rbind(c(0, 1, 1)); rd = cbind(0)
+(Fc_56_d = ((t(Rd %*% b - rd) %*% solve(Rd %*% XtX_inv %*% t(Rd)) %*% (Rd %*% b - rd))[1] / qd) / S2)
+S2b2b3 = var_b[2, 2] + var_b[3, 3] + 2 * var_b[2, 3]
+(Fc_60_d = (b[2] + b[3])^2 / S2b2b3)
+pf(Fc_60_d, 1, n - k, lower.tail = FALSE)`,o:"F = 0,9866 por las dos fórmulas, con p-valor 0,326: no se rechaza que β₂ + β₃ = 0."},
+{t:"Con linearHypothesis() del paquete car",x:"La restricción se escribe como texto con los nombres de las variables. También acepta varias a la vez, o la matriz R con el vector r en <code>rhs</code>.",r:String.raw`library(car)
+linearHypothesis(eq1, "X2t + X3t = 0", test = "F")
+linearHypothesis(eq1, c("X2t + X3t = 0", "(Intercept) = 10"), test = "F")
+Rd1 = rbind(c(0, 1, 1), c(1, 0, 0)); rd1 = cbind(c(0, 10))
+linearHypothesis(eq1, Rd1, rhs = rd1, test = "F")`,o:"F = 0,9866 (p = 0,326) para la primera; para las dos juntas, F = 0,7719 (p = 0,468): tampoco se rechazan."},
+{t:"Estimador restringido y F (64)",x:"El modelo estimado sujeto a Rβ = r tiene un RSS mayor. La (64) compara el RSS restringido con el no restringido y da la misma F.",f:"b_R = b + (X′X)⁻¹R′[R(X′X)⁻¹R′]⁻¹(r − Rb),  F = [(RSS_R − RSS_NR)/q] / [RSS_NR/(n − k)]",r:String.raw`(br = b + XtX_inv %*% t(Rd) %*% solve(Rd %*% XtX_inv %*% t(Rd)) %*% (rd - Rd %*% b))
+er = y - X %*% br
+(RSSr = sum(er^2))
+(Fc_64 = ((RSSr - RSS) / qd) / (RSS / (n - k)))`,o:"b_R = (10,1232; −0,005905; 0,005905), RSS_R = 1,2393 y F = 0,9866, la misma de antes."},
+{t:"El modelo restringido con restriktor",x:"El paquete <code>restriktor</code> estima el modelo con la restricción escrita como texto. Su S² usa n − k + q grados de libertad.",f:"RSS_R = (n − k + q)·S²_R",r:String.raw`# install.packages("restriktor")
+library(restriktor)
+eq1_r = restriktor(eq1, constraints = "X2t + X3t == 0;")
+seq1_r = summary(eq1_r)
+seq1_r
+(RSS_R = (n - k + 1) * seq1_r$s2)`,no:1,o:"Los mismos coeficientes restringidos y RSS_R = 1,2393."}];
 
 RM["dicotomicas"]=[
-{t:"Carga los datos",x:"<code>female</code> vale 1 si la persona es mujer y 0 si es hombre.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-table(wage1$female)`},
-{t:"Cambio en el intercepto",x:"La dicotómica desplaza la recta en paralelo: δ₀ es la diferencia promedio entre los grupos con la misma educación y experiencia.",f:"wage = β₀ + δ₀·female + β₁·educ + … + u",r:String.raw`m1 <- lm(wage ~ female + educ + exper + tenure, data = wage1)
-coef(m1)["female"]`,o:"δ̂₀ = −1,81: con la misma educación, experiencia y antigüedad, las mujeres ganan 1,81 dólares menos por hora."},
-{t:"En logaritmos, la diferencia es porcentual",x:"Con ln(wage), la diferencia exacta entre grupos es 100·(e^δ₀ − 1).",f:"%Δ = 100·(e^δ̂₀ − 1)",r:String.raw`m2 <- lm(lwage ~ female + educ + exper + tenure, data = wage1)
-d <- coef(m2)["female"]
-100 * (exp(d) - 1)`,o:"−26,0 %: a igualdad de lo demás, las mujeres ganan 26 % menos por hora."},
-{t:"Cambio en la pendiente: interacción",x:"Si el efecto de la educación es distinto para hombres y mujeres, se agrega el producto female·educ. En R, <code>female * educ</code> incluye female, educ y su interacción.",f:"ln(wage) = β₀ + δ₀female + β₁educ + δ₁(female·educ) + …",r:String.raw`m3 <- lm(lwage ~ female * educ + exper + tenure, data = wage1)
-coef(summary(m3))[c("female", "educ", "female:educ"), ]`,o:"δ̂₁ es pequeño y no significativo: el retorno de la educación no difiere entre hombres y mujeres en esta muestra."},
-{t:"Varias categorías y la trampa de las dicotómicas",x:"Con g categorías se incluyen g − 1 dicotómicas: la que se omite es la <b>base</b>. Si se incluyen todas con intercepto, hay colinealidad perfecta. Con un factor, R omite la base solo; <code>relevel()</code> cambia cuál es.",r:String.raw`wage1$region <- factor(ifelse(wage1$south == 1, "sur", ifelse(wage1$west == 1, "oeste",
-                       ifelse(wage1$northcen == 1, "centro norte", "noreste"))))
-wage1$region <- relevel(wage1$region, ref = "noreste")
-coef(lm(lwage ~ educ + region, data = wage1))`,o:"Tres coeficientes de región, cada uno comparado con el noreste."}];
+{t:"Los datos: sueldo, experiencia y sexo",x:"Punto 5 de los Ejercicios propuestos 3: 17 trabajadores. <code>mujer</code> vale 1 si es mujer y 0 si es hombre.",r:String.raw`sal = data.frame(
+  sueldo = c(3.14, 3.32, 3.61, 1.65, 2.64, 3.64, 2.46, 1.69, 1.91, 3.10, 1.98, 2.14, 2.61, 3.60, 3.38, 3.50, 3.65),
+  exper  = c(13, 16, 30, 2, 8, 31, 10, 1, 6, 15, 4, 7, 13, 27, 19, 25, 20),
+  mujer  = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1))
+table(sal$mujer)`,o:"9 hombres y 8 mujeres."},
+{t:"Cambio en el intercepto",x:"La dicotómica desplaza la recta en paralelo: su coeficiente es la diferencia promedio de sueldo entre mujeres y hombres con la misma experiencia.",f:"sueldo = β₁ + β₂·exper + δ·mujer + μ",r:String.raw`m1 = lm(sueldo ~ exper + mujer, data = sal)
+summary(m1)$coefficients`,o:"δ̂ = 0,094 con p-valor 0,52: a igual experiencia, no hay diferencia significativa de sueldo entre mujeres y hombres."},
+{t:"Cambio en la pendiente: interacción",x:"Si el efecto de la experiencia es distinto para mujeres y hombres, se agrega el producto mujer·exper. En R, <code>exper * mujer</code> incluye exper, mujer y su interacción.",f:"sueldo = β₁ + β₂exper + δ₁mujer + δ₂(mujer·exper) + μ",r:String.raw`m2 = lm(sueldo ~ exper * mujer, data = sal)
+summary(m2)$coefficients`,o:"δ̂₂ = 0,0113 con p-valor 0,51: el efecto de la experiencia no difiere entre mujeres y hombres."},
+{t:"Dicotómicas estacionales (Ejemplo 9)",x:"Así crea el profesor las dicotómicas trimestrales con <code>ifelse()</code>. <b>Ojo:</b> en el notebook usa <code>n = 8</code> y <code>ts()</code> repite el patrón hasta 32 trimestres; es más claro generar las 32 de una vez con <code>length.out = 32</code>.",f:"Qⱼt = 1 si t está en el trimestre j, 0 si no",r:String.raw`library(readxl)
+Datos9 = data.frame(read_excel("Datos_Ejemplo_9_Estac.xls"))
+yt = ts(Datos9$y, frequency = 4, start = c(1978, 1), end = c(1985, 4))
+trimestre = rep(1:4, length.out = 32)
+Q1 = ts(ifelse(trimestre == 1, 1, 0), frequency = 4, start = c(1978, 1))
+Q2 = ts(ifelse(trimestre == 2, 1, 0), frequency = 4, start = c(1978, 1))
+Q3 = ts(ifelse(trimestre == 3, 1, 0), frequency = 4, start = c(1978, 1))
+Q4 = ts(ifelse(trimestre == 4, 1, 0), frequency = 4, start = c(1978, 1))
+data.frame(trimestre, Q1, Q2, Q3, Q4)[1:8, ]`,no:1,o:"Cada fila tiene un solo 1, en la columna de su trimestre. Necesitas el Excel del Ejemplo 9."},
+{t:"Efecto estacional y la trampa de las dicotómicas",x:"Con las cuatro dicotómicas el modelo va <b>sin intercepto</b> (el <code>− 1</code>), porque Q1 + Q2 + Q3 + Q4 = 1 sería colinealidad perfecta con la columna de unos. Cada coeficiente es la venta media de su trimestre.",f:"yt = δ₁Q1t + δ₂Q2t + δ₃Q3t + δ₄Q4t + μt",r:String.raw`eq1 = lm(yt ~ Q1 + Q2 + Q3 + Q4 - 1)
+summary(eq1)`,no:1,o:"Cuatro coeficientes, uno por trimestre: son las ventas medias de cada trimestre."},
+{t:"Serie desestacionalizada",x:"Los errores de estimación de ese modelo son las ventas sin el componente estacional.",r:String.raw`et = ts(resid(eq1), frequency = 4, start = c(1978, 1), end = c(1985, 4))
+plot(et, type = "l", main = "Ventas desestacionalizadas", xlab = "Tiempo", ylab = "Ventas")`,no:1,o:"Una serie que fluctúa alrededor de cero sin el patrón trimestral."}];
 
 RM["chow"]=[
-{t:"La pregunta y los datos",x:"¿La ecuación de salarios es la misma para hombres y para mujeres? Se estima la ecuación con todos (agrupada) y por separado.",r:String.raw`library(wooldridge)
-data("wage1", package = "wooldridge")
-f  <- lwage ~ educ + exper + tenure
-mp <- lm(f, data = wage1)                      # agrupada
-m1 <- lm(f, data = subset(wage1, female == 0)) # hombres
-m2 <- lm(f, data = subset(wage1, female == 1)) # mujeres`},
-{t:"Las tres SCR",x:"La SCR agrupada nunca es menor que la suma de las dos SCR separadas.",r:String.raw`SCRp <- sum(resid(mp)^2); SCR1 <- sum(resid(m1)^2); SCR2 <- sum(resid(m2)^2)
-c(SCRp = SCRp, SCR1 = SCR1, SCR2 = SCR2)
-n <- nrow(wage1); k <- length(coef(mp))`,o:"SCRp = 101,46; SCR₁ = 49,55; SCR₂ = 39,04."},
-{t:"El estadístico de Chow",x:"Compara cuánto empeora el ajuste al obligar a los dos grupos a tener los mismos coeficientes.",f:"F = [(SCRp − SCR₁ − SCR₂)/k] / [(SCR₁ + SCR₂)/(n − 2k)]  ~  F(k, n − 2k)",r:String.raw`F <- ((SCRp - SCR1 - SCR2) / k) / ((SCR1 + SCR2) / (n - 2 * k))
-F
-qf(0.95, k, n - 2 * k)
-1 - pf(F, k, n - 2 * k)`,o:"F = 18,8, muy por encima del crítico 2,39: los coeficientes difieren entre hombres y mujeres."},
-{t:"Versión con dicotómicas (equivalente)",x:"Interactuar todas las variables con la dicotómica y probar que todas las interacciones y la dicotómica son cero da exactamente la misma F.",r:String.raw`mi <- lm(lwage ~ female * (educ + exper + tenure), data = wage1)
-anova(mp, mi)`,o:"La misma F = 18,8, con 4 y 518 grados de libertad."},
-{t:"Chow en una serie de tiempo",x:"Con datos en el tiempo, la pregunta es si hubo un quiebre en una fecha conocida. <code>strucchange</code> lo calcula indicando la observación del quiebre; con fecha desconocida, <code>Fstats</code> prueba todas.",r:String.raw`library(strucchange)
-data("phillips", package = "wooldridge")
-corte <- which(phillips$year == 1974)          # observación del quiebre
-sctest(inf ~ unem, data = phillips, type = "Chow", point = corte)
-fs <- Fstats(inf ~ unem, data = phillips)       # quiebre desconocido
-sctest(fs)
-phillips$year[fs$breakpoint]`,o:"Con el quiebre en 1974, F = 2,88 (p = 0,065): no se rechaza al 5 %. Buscando el quiebre, sup-F = 14,9 (p = 0,012) señala 1967."}];
+{t:"Datos y modelo (Capítulo 2, Ejemplo 2)",x:"Ahorro (Yt) contra ingreso (Xt), 1970-1995 (n = 26). La pregunta: ¿cambió la relación después de 1984? Se parte la muestra en n₁ = 15 (1970-1984) y n₂ = 11 (1985-1995).",f:"Yt = β₁ + β₂Xt + μt",r:String.raw`library(readxl); library(car); library(tseries); library(strucchange)
+setwd("D:/eco1_26_2/Capitulo2/")
+Datos = data.frame(read_excel("Datos_Ejem2_Ingreso_Ahorro_2026_2.xls"))
+Xt = cbind(Datos$Xt); Yt = cbind(Datos$Yt)
+n = 26; n1 = 15; n2 = 11; k = 2; alpha = 0.05
+X1t = cbind(Xt[1:15]);  Y1t = cbind(Yt[1:15])    # 1970-1984
+X2t = cbind(Xt[16:26]); Y2t = cbind(Yt[16:26])   # 1985-1995`},
+{t:"Diagramas de dispersión por período",x:"Antes de las pruebas, el profesor compara la recta de toda la muestra con las de cada subperíodo.",r:String.raw`plot(Xt, Yt, main = "Periodo 1970 - 1995", xlab = "Ingreso", ylab = "Ahorro", pch = 8, col = "red")
+abline(lm(Yt ~ Xt), lty = 2)
+par(mfrow = c(1, 2))
+plot(X1t, Y1t, main = "1970 - 1984", xlab = "Ingreso", ylab = "Ahorro", pch = 8, col = "red"); abline(lm(Y1t ~ X1t), lty = 2)
+plot(X2t, Y2t, main = "1985 - 1995", xlab = "Ingreso", ylab = "Ahorro", pch = 8, col = "red"); abline(lm(Y2t ~ X2t), lty = 2)
+par(mfrow = c(1, 1))`,o:"Si las pendientes de los dos subperíodos se ven muy distintas, hay indicio de cambio estructural."},
+{t:"Modelo completo y por subperíodos",x:"Se valida el modelo con toda la muestra (incluida la normalidad) y se guardan los RSS: el de toda la muestra y el de la muestra 1.",r:String.raw`eq1 = lm(Yt ~ Xt); summary(eq1)
+jarque.bera.test(resid(eq1))
+(RSS = deviance(eq1))                            # muestra completa
+eq1_m1 = lm(Y1t ~ X1t); (RSS1 = deviance(eq1_m1))  # muestra 1
+eq1_m2 = lm(Y2t ~ X2t); (RSS2 = deviance(eq1_m2))  # muestra 2`},
+{t:"Pasos 1 a 4: estimar con la muestra 1 y pronosticar la 2",x:"Se estima b₁ solo con 1970-1984, se pronostica el ahorro de 1985-1995 y se calcula el vector d de errores de pronóstico.",f:"b₁ = (X₁′X₁)⁻¹X₁′y₁,  S₁² = RSS₁/(n₁ − k),  d = y₂ − X₂b₁",r:String.raw`X1 = cbind(1, X1t); y1 = Y1t
+X2 = cbind(1, X2t); y2 = Y2t
+X1tX1_inv = solve(t(X1) %*% X1)
+(b1 = X1tX1_inv %*% t(X1) %*% y1)
+e1t = y1 - X1 %*% b1
+(S12 = sum(e1t^2) / (n1 - k))
+y2p = X2 %*% b1                 # pronóstico de y2
+(d = y2 - y2p)`,o:"Si los errores de pronóstico d son grandes y casi todos del mismo signo, el modelo de 1970-1984 no sirve para 1985-1995."},
+{t:"Paso 5: la F de la ecuación (8)",x:"H₀: hay estabilidad de parámetros. La F compara el tamaño de los errores de pronóstico con la varianza de la muestra 1.",f:"F = [d′ (I + X₂(X₁′X₁)⁻¹X₂′)⁻¹ d / n₂] / S₁²  ~  F(n₂, n₁ − k)",r:String.raw`IN2 = diag(n2)
+(FC_8 = ((t(d) %*% solve(IN2 + X2 %*% X1tX1_inv %*% t(X2)) %*% d)[1] / n2) / S12)
+(PV_8 = pf(FC_8, n2, n1 - k, lower.tail = FALSE))
+if (PV_8 >= alpha) "Hay estabilidad de parámetros" else "Hay inestabilidad de parámetros"`},
+{t:"La F de la ecuación (9)",x:"La misma prueba con los RSS: la de toda la muestra contra la de la muestra 1. Da el mismo valor que la (8).",f:"F = [(RSS − RSS₁)/n₂] / S₁²  ~  F(n₂, n₁ − k)",r:String.raw`(FC_9 = ((RSS - RSS1) / n2) / S12)
+FC_8`,o:"FC_9 y FC_8 coinciden."},
+{t:"Coeficientes recursivos (Ejemplo 3)",x:"Se estima el modelo con las primeras s observaciones, s = 4, …, 26, y se grafica cada b con su intervalo del 95 %. Si a partir de cierto s los coeficientes se estabilizan, no hay cambio estructural.",f:"b_s = (X_s′X_s)⁻¹X_s′y_s",r:String.raw`v_b2 = Li_b2 = Ls_b2 = numeric(n)
+for (s in 4:n) {
+  eq_s  = lm(Yt[1:s] ~ Xt[1:s])
+  b2s   = coef(eq_s)[2]
+  se_b2 = sqrt(vcov(eq_s)[2, 2])
+  ta2s  = qt(0.025, df = s - k, lower.tail = FALSE)
+  v_b2[s] = b2s; Li_b2[s] = b2s - ta2s * se_b2; Ls_b2[s] = b2s + ta2s * se_b2
+}
+plot(Li_b2[5:26], type = "l", lty = 2, col = "red3", main = "Coeficientes recursivos para Beta 2",
+     ylab = "Li - b2 - Ls", xlab = "Indice", ylim = c(-0.05, 0.2))
+lines(Ls_b2[5:26], lty = 2, col = "blue3"); lines(v_b2[5:26])
+legend("topright", legend = c("Li", "Ls", "b2"), col = c("red3", "blue3", 1), lty = c(2, 2, 1))`,o:"La trayectoria de b₂ con sus bandas. En el notebook se hace lo mismo para b₁."},
+{t:"Residuales recursivos (Ejemplo 4)",x:"Con los datos hasta t − 1 se predice Yt y se guarda el error de predicción un paso adelante vt, con bandas de ±2 errores estándar. Puntos fuera de las bandas sugieren inestabilidad. <b>Ojo:</b> en el notebook dice <code>Yt[1:t-1]</code>, que R lee como (1:t) − 1; lo claro es <code>Yt[1:(t-1)]</code>.",f:"vt = Yt − xt′b_(t−1),  SER_Vt = SER_(t−1)·√(1 + xt′(X′X)⁻¹xt)",r:String.raw`X = cbind(1, Xt)
+vt = Li = Ls = numeric(n)
+for (t in (k + 2):n) {
+  eq_t = lm(Yt[1:(t - 1)] ~ Xt[1:(t - 1)]); s_t = summary(eq_t)
+  xt = rbind(X[t, ])
+  vt[t] = Yt[t] - xt %*% coef(eq_t)
+  ser_vt = s_t$sigma * sqrt(1 + (xt %*% s_t$cov.unscaled %*% t(xt))[1])
+  Li[t] = -2 * ser_vt; Ls[t] = 2 * ser_vt
+}
+plot(Li[4:n], type = "l", lty = 2, col = 2, main = "Residuales recursivos", ylab = "Li - vt - Ls", ylim = c(-80, 80))
+lines(Ls[4:n], lty = 2, col = 4); lines(vt[4:n])`},
+{t:"Prueba CUSUM (Ejemplo 5)",x:"Suma acumulada de los residuales recursivos escalados. Si la línea se sale de las bandas, se rechaza la estabilidad de parámetros.",f:"Wt = Σ wⱼ / σ̂,  bandas ±a√(n − k) y ±3a√(n − k), a = 0,948 al 5 %",r:String.raw`library(strucchange)
+P_CUSUM = efp(Datos$Yt ~ Datos$Xt, type = "Rec-CUSUM")
+sctest(P_CUSUM)
+plot(P_CUSUM, main = "Prueba CUSUM")`,o:"El gráfico de la CUSUM con sus bandas al 5 % y el p-valor de la prueba."},
+{t:"Chow clásico con dos grupos",x:"Cuando el quiebre separa dos grupos (o dos períodos con suficientes datos), se compara el RSS agrupado con la suma de los RSS separados. Ejemplo con los 17 trabajadores de los Ejercicios propuestos 3: ¿la ecuación de sueldo es la misma para mujeres y hombres?",f:"F = [(RSS_p − RSS₁ − RSS₂)/k] / [(RSS₁ + RSS₂)/(n − 2k)]  ~  F(k, n − 2k)",r:String.raw`sal = data.frame(
+  sueldo = c(3.14, 3.32, 3.61, 1.65, 2.64, 3.64, 2.46, 1.69, 1.91, 3.10, 1.98, 2.14, 2.61, 3.60, 3.38, 3.50, 3.65),
+  exper  = c(13, 16, 30, 2, 8, 31, 10, 1, 6, 15, 4, 7, 13, 27, 19, 25, 20),
+  mujer  = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1))
+mp = lm(sueldo ~ exper, data = sal)
+m1 = lm(sueldo ~ exper, data = subset(sal, mujer == 0))
+m2 = lm(sueldo ~ exper, data = subset(sal, mujer == 1))
+RSSp = deviance(mp); RSS1 = deviance(m1); RSS2 = deviance(m2); n = 17; k = 2
+(F = ((RSSp - RSS1 - RSS2) / k) / ((RSS1 + RSS2) / (n - 2 * k)))
+pf(F, k, n - 2 * k, lower.tail = FALSE)
+anova(mp, lm(sueldo ~ mujer * exper, data = sal))    # la misma F con dicotómicas`,o:"RSS_p = 1,2087, RSS₁ = 0,8063, RSS₂ = 0,3261; F = 0,438 con p-valor 0,655: no hay cambio estructural entre mujeres y hombres."}];
 
 RM["hetero"]=[
 {t:"Modelo de precios de vivienda",x:"Precio de 88 casas contra tamaño del lote, área construida y alcobas (Wooldridge, ejemplo 8.4).",r:String.raw`library(wooldridge); library(lmtest); library(sandwich)
@@ -889,27 +1039,25 @@ vif(m)`,o:"VIF(sqrft) = 1,42: no hay multicolinealidad preocupante (la regla usu
 coef(lm(price ~ sqrft + bdrms + area_total, data = hprice1))`,o:"area_total sale NA."}];
 
 RM["especificacion"]=[
-{t:"Datos",x:"Ecuación de salarios.",r:String.raw`library(wooldridge); library(lmtest)
-data("wage1", package = "wooldridge")`},
-{t:"Sesgo por variable omitida",x:"Si se omite x₂ y está correlacionada con x₁, el coeficiente de x₁ absorbe parte de su efecto. En la muestra se cumple exactamente la descomposición de abajo, con δ̃₁ de regresar x₂ contra x₁.",f:"β̃₁ = β̂₁ + β̂₂·δ̃₁",r:String.raw`largo <- lm(lwage ~ educ + exper, data = wage1)
-corto <- lm(lwage ~ educ, data = wage1)
-d1 <- coef(lm(exper ~ educ, data = wage1))["educ"]
-c(corto = coef(corto)["educ"],
-  formula = coef(largo)["educ"] + coef(largo)["exper"] * d1)`,o:"Los dos valores son idénticos: 0,0827. Como la experiencia se correlaciona negativamente con la educación, omitirla subestima el retorno de la educación (0,098 en el modelo largo)."},
-{t:"Variables irrelevantes",x:"Incluir una variable que no importa no sesga, pero puede aumentar los errores estándar.",r:String.raw`set.seed(1); wage1$ruido <- rnorm(nrow(wage1))
-coef(summary(lm(lwage ~ educ + exper + ruido, data = wage1)))[c("educ", "ruido"), ]`,o:"El coeficiente de educ casi no cambia (0,098) y el de ruido no es significativo (p = 0,48)."},
-{t:"Prueba RESET de Ramsey a mano",x:"Si potencias de los valores ajustados ayudan a explicar y, falta algo de forma funcional.",f:"y = Xβ + γ₁ŷ² + γ₂ŷ³ + e,  H₀: γ₁ = γ₂ = 0 (prueba F)",r:String.raw`m <- lm(wage ~ educ + exper + tenure, data = wage1)
-wage1$yh2 <- fitted(m)^2; wage1$yh3 <- fitted(m)^3
-mr <- lm(wage ~ educ + exper + tenure + yh2 + yh3, data = wage1)
-anova(m, mr)
-resettest(m, power = 2:3, type = "fitted")`,o:"Las dos dan F = 11,57 (p ≈ 0,00001): se rechaza la forma lineal en niveles."},
-{t:"Comparar modelos no anidados: AIC y BIC",x:"Con la misma variable dependiente, se prefiere el de menor AIC o BIC.",r:String.raw`m1 <- lm(lwage ~ educ + exper + tenure, data = wage1)
-m2 <- lm(lwage ~ educ + exper + I(exper^2) + tenure, data = wage1)
-AIC(m1, m2); BIC(m1, m2)`,o:"AIC 604,6 contra 637,1 y BIC 630,2 contra 658,4: gana el modelo con exper²."},
-{t:"Error de medición en x: atenuación",x:"Si x se mide con error aleatorio, su coeficiente se acerca a cero.",r:String.raw`set.seed(2)
-wage1$educ_mal <- wage1$educ + rnorm(nrow(wage1), sd = 2)
-c(bien = coef(lm(lwage ~ educ, data = wage1))["educ"],
-  con_error = coef(lm(lwage ~ educ_mal, data = wage1))["educ_mal"])`,o:"El coeficiente cae de 0,083 a 0,054: el error de medición lo atenúa hacia cero."}];
+{t:"Datos",x:"Demanda de TV del Ejemplo 1: el modelo completo tiene precio y publicidad.",r:String.raw`${TVLOAD}
+library(lmtest)
+largo = lm(Yt ~ X2t + X3t)`},
+{t:"Sesgo por variable omitida",x:"Si se omite X3t y está correlacionada con X2t, el coeficiente de X2t absorbe parte de su efecto. En la muestra se cumple exactamente la descomposición de abajo, con d̃ de regresar X3t contra X2t.",f:"b̃₂ = b₂ + b₃·d̃",r:String.raw`corto = lm(Yt ~ X2t)
+d = coef(lm(X3t ~ X2t))["X2t"]
+c(corto = coef(corto)["X2t"],
+  formula = coef(largo)["X2t"] + coef(largo)["X3t"] * d)`,o:"Los dos valores son idénticos: −0,006410. Como la publicidad se correlaciona negativamente con el precio (d̃ = −0,081), omitirla exagera el efecto del precio (−0,005994 en el modelo completo)."},
+{t:"Variables irrelevantes",x:"Incluir una variable que no importa no sesga, pero puede aumentar los errores estándar.",r:String.raw`set.seed(1); ruido = rnorm(n)
+coef(summary(lm(Yt ~ X2t + X3t + ruido)))[c("X2t", "ruido"), ]`,o:"El coeficiente del precio casi no cambia (−0,005999) y el de ruido no es significativo (p = 0,47)."},
+{t:"Prueba RESET de Ramsey a mano",x:"Si potencias de Yt estimado ayudan a explicar Yt, falta algo de forma funcional.",f:"Yt = Xβ + γ₁Ŷt² + γ₂Ŷt³ + e,  H₀: γ₁ = γ₂ = 0 (prueba F)",r:String.raw`yh2 = fitted(largo)^2; yh3 = fitted(largo)^3
+mr = lm(Yt ~ X2t + X3t + yh2 + yh3)
+anova(largo, mr)
+resettest(largo, power = 2:3, type = "fitted")`,o:"Las dos dan F = 5,61 (p = 0,0068): se rechaza la forma lineal; vale la pena probar el modelo en logaritmos del Ejemplo 2."},
+{t:"Comparar modelos: AIC y SC",x:"Con la misma variable dependiente, se prefiere el de menor AIC o SC (BIC en R).",r:String.raw`m2 = lm(Yt ~ X2t + I(X2t^2) + X3t)
+AIC(largo, m2); BIC(largo, m2)`,o:"AIC −32,34 contra −30,77 y SC −24,86 contra −21,41: gana el modelo sin el precio al cuadrado."},
+{t:"Error de medición en X: atenuación",x:"Si la regresora se mide con error aleatorio, su coeficiente se acerca a cero.",r:String.raw`set.seed(2)
+X2_mal = X2t + rnorm(n, sd = 100)
+c(bien = coef(lm(Yt ~ X2t))["X2t"],
+  con_error = coef(lm(Yt ~ X2_mal))["X2_mal"])`,o:"El coeficiente pasa de −0,0064 a −0,0044: el error de medición lo atenúa hacia cero."}];
 
 RM["vi"]=[
 {t:"Datos: mujeres que trabajan",x:"Retorno de la educación con la educación del padre como instrumento (Wooldridge, ejemplo 15.1). La educación es endógena porque se correlaciona con la habilidad, que no se observa.",r:String.raw`library(wooldridge); library(AER)
@@ -1006,12 +1154,15 @@ adf.test(resid(r))      # ojo: los críticos correctos son los de Engle-Granger`
 (function(){
   const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
+// ---------- bases del curso (las del profesor), detectadas por el nombre del archivo o el código
+const PBASES={
+ tv:{re:/Datos_Ejemplo_1_Demanda_TV/,arch:"Datos_Ejemplo_1_Demanda_TV_Precio_Pub.xls",t:"Ejemplo 1 · Demanda mensual de televisores",d:"Base de los Ejemplos 1 a 5 del capítulo 1. Son 50 meses: los 48 primeros tienen demanda y se usan para estimar; los meses 49 y 50 solo traen precio y publicidad y se usan para pronosticar.",
+  v:{Mes:"Número del mes (1 a 50)",Yt:"Demanda mensual de televisores: la variable dependiente",X2t:"Precio de los televisores",X3t:"Inversión en publicidad"},code:TV_DF},
+ sal:{re:/sueldo = c\(/,t:"Ejercicios propuestos 3, punto 5 · Sueldos por sexo",d:"17 trabajadores (corte transversal). Los datos van escritos en el mismo código.",v:{sueldo:"Sueldo del trabajador",exper:"Años de experiencia",mujer:"1 si es mujer, 0 si es hombre"}},
+ ahorro:{re:/Ingreso_Ahorro/,arch:"Datos_Ejem2_Ingreso_Ahorro_2026_2.xls",t:"Capítulo 2, Ejemplo 2 · Ahorro e ingreso, 1970-1995",d:"Serie anual de 26 años. Es la base de los Ejemplos 2 a 5 del capítulo 2 (Chow, coeficientes y residuales recursivos, CUSUM). El Excel está en el Classroom del curso.",v:{date:"Año (1970 a 1995)",Yt:"Ahorro personal: la variable dependiente",Xt:"Ingreso personal disponible"}},
+ estac:{re:/Datos_Ejemplo_9_Estac/,arch:"Datos_Ejemplo_9_Estac.xls",t:"Ejemplo 9 · Ventas trimestrales, 1978-1985",d:"32 trimestres de ventas para estudiar la estacionalidad con dicotómicas. El Excel está en el Classroom del curso.",v:{y:"Ventas del trimestre"}}};
 // ---------- diccionario de las bases del paquete wooldridge que usa el manual
 const BASES={
- wage1:{t:"Salarios de trabajadores de EE. UU. (1976)",d:"Encuesta de Población Actual (CPS) de 1976: 526 trabajadores. Cada fila es una persona. Es la base clásica del libro de Wooldridge para estudiar de qué depende el salario (la «ecuación de Mincer»). <b>wage</b> es «salario» en inglés: por eso aparece en todas partes.",
-  v:{wage:"Salario promedio por hora, en dólares de 1976",lwage:"Logaritmo natural de wage, log(wage). Con lwage como Y, 100·β es el cambio % del salario",educ:"Años de educación",exper:"Años de experiencia laboral potencial",tenure:"Años con el empleador actual (antigüedad)",nonwhite:"1 si la persona no es blanca, 0 si es blanca",female:"1 si es mujer, 0 si es hombre",married:"1 si está casado(a)",numdep:"Número de dependientes (personas a cargo)",smsa:"1 si vive en un área metropolitana",northcen:"1 si vive en la región centro-norte",south:"1 si vive en el sur",west:"1 si vive en el oeste (la región base, con todas en 0, es el noreste)",construc:"1 si trabaja en construcción",ndurman:"1 si trabaja en manufactura de bienes no durables",trcommpu:"1 si trabaja en transporte, comunicaciones o servicios públicos",trade:"1 si trabaja en comercio",services:"1 si trabaja en servicios",profserv:"1 si trabaja en servicios profesionales",profocc:"1 si tiene ocupación profesional",clerocc:"1 si tiene ocupación administrativa (oficina)",servocc:"1 si tiene ocupación de servicios",expersq:"exper al cuadrado: permite que el efecto de la experiencia se agote",tenursq:"tenure al cuadrado"}},
- ceosal1:{t:"Salarios de gerentes generales (CEO) de EE. UU. (1990)",d:"209 gerentes generales de empresas grandes. Cada fila es un gerente y su empresa.",
-  v:{salary:"Salario anual del gerente, en miles de dólares",pcsalary:"Cambio porcentual del salario entre 1989 y 1990",sales:"Ventas de la empresa en 1990, en millones de dólares",roe:"Rentabilidad sobre el patrimonio (ROE) promedio 1988-1990, en %",pcroe:"Cambio porcentual del ROE",ros:"Rentabilidad de la acción de la empresa 1988-1990, en %",indus:"1 si es una empresa industrial",finance:"1 si es una empresa financiera",consprod:"1 si es una empresa de productos de consumo",utility:"1 si es una empresa de servicios públicos",lsalary:"log(salary)",lsales:"log(sales)"}},
  hprice1:{t:"Precios de vivienda en Boston (1990)",d:"88 casas vendidas. Cada fila es una casa.",
   v:{price:"Precio de venta, en miles de dólares",assess:"Avalúo de la casa, en miles de dólares",bdrms:"Número de habitaciones",lotsize:"Tamaño del lote, en pies cuadrados",sqrft:"Área construida, en pies cuadrados",colonial:"1 si la casa es de estilo colonial",lprice:"log(price)",lassess:"log(assess)",llotsize:"log(lotsize)",lsqrft:"log(sqrft)"}},
  intdef:{t:"Tasas de interés, inflación y déficit de EE. UU. (1948-2003)",d:"Serie de tiempo anual: cada fila es un año.",
@@ -1022,27 +1173,32 @@ const BASES={
   v:{year:"Año",unem:"Tasa de desempleo civil, en %",inf:"Inflación anual (IPC), en %",inf_1:"inf del año anterior",unem_1:"unem del año anterior",cinf:"Cambio de la inflación: inf − inf_1",cunem:"Cambio del desempleo: unem − unem_1"}},
  wagepan:{t:"Panel de salarios de hombres jóvenes de EE. UU. (1980-1987)",d:"545 hombres observados durante 8 años (4.360 filas): cada fila es una persona en un año. Es datos de panel.",
   v:{nr:"Identificador de la persona",year:"Año (1980 a 1987)",lwage:"log del salario por hora",union:"1 si pertenece a un sindicato",married:"1 si está casado",educ:"Años de educación",exper:"Años de experiencia",expersq:"exper al cuadrado",black:"1 si es negro",hisp:"1 si es hispano",hours:"Horas trabajadas en el año",poorhlth:"1 si tiene mala salud",rur:"1 si vive en zona rural",south:"1 si vive en el sur",nrthcen:"1 si vive en el centro-norte",nrtheast:"1 si vive en el noreste",d81:"1 si el año es 1981 (lo mismo d82 a d87; 1980 es la base)"}}};
-const basesBox=steps=>{const code=steps.map(s=>s.r).join("\n"),ds=[...new Set([...code.matchAll(/data\("(\w+)"/g)].map(m=>m[1]))].filter(d=>BASES[d]);if(!ds.length)return"";
+const pBox=code=>Object.values(PBASES).filter(B=>B.re.test(code)).map(B=>{const row=v=>`<tr><td><code>${v}</code></td><td>${B.v[v]}</td></tr>`;
+    return `<div class="basebox"><p class="lbl" style="margin:0 0 4px">Base de datos de esta lección</p><p style="margin:0"><b>${B.t}</b>${B.arch?` · archivo <code style="word-break:break-all">${B.arch}</code>`:""}. ${B.d}</p>
+    <div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.keys(B.v).map(row).join("")}</table></div>
+    ${B.code?`<details class="dp-lite"><summary>¿No tienes el Excel? Crea la misma tabla en R</summary><p class="hint" style="margin:4px 0">Pega este bloque en lugar de las líneas <code>setwd()</code> y <code>read_excel()</code>; lo demás queda igual.</p><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(B.code)}</pre></div></details>`:""}</div>`}).join("");
+  const basesBox=steps=>{const code=steps.map(s=>s.r).join("\n"),pb=pBox(code),ds=[...new Set([...code.matchAll(/data\("(\w+)"/g)].map(m=>m[1]))].filter(d=>BASES[d]);if(!ds.length)return pb;
   return ds.map(d=>{const B=BASES[d],used=Object.keys(B.v).filter(v=>new RegExp("\\b"+v+"\\b").test(code)),rest=Object.keys(B.v).filter(v=>!used.includes(v));
     const row=v=>`<tr><td><code>${v}</code></td><td>${B.v[v]}</td></tr>`;
     return `<div class="basebox"><p class="lbl" style="margin:0 0 4px">Base de datos de esta lección</p><p style="margin:0"><code>${d}</code> · <b>${B.t}</b>. ${B.d}</p>
     ${used.length?`<div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${used.map(row).join("")}</table></div>`:""}
     ${rest.length?`<details class="dp-lite"><summary>Las demás variables de ${d}</summary><div class="tbl"><table>${rest.map(row).join("")}</table></div></details>`:""}
-    <p class="hint" style="margin:6px 0 0">Los nombres están en inglés porque así vienen en el libro de Wooldridge. En R puedes verlos con <code>names(${d})</code> y la documentación completa con <code>?${d}</code>.</p></div>`}).join("")};
+    <p class="hint" style="margin:6px 0 0">Los nombres están en inglés porque así vienen en el libro de Wooldridge. En R puedes verlos con <code>names(${d})</code> y la documentación completa con <code>?${d}</code>.</p></div>`}).join("")+pb};
   const block=(id,steps)=>{const all=steps.filter(s=>!s.no).map(s=>"# "+s.t+"\n"+s.r).join("\n\n");
     return `<section class="rman"><h3>Manual en R: fórmula | código</h3><p class="hint">Cada paso tiene a la izquierda la idea y la fórmula, y a la derecha el mismo cálculo en R. Copia los bloques en orden en un script de RStudio${id==="r-cero"?"":" (si es tu primera vez, empieza por la estación «R desde cero»)"}.</p>
     ${basesBox(steps)}
     <ol class="rm">${steps.map(s=>`<li><div class="rm-x"><b>${s.t}</b><p>${s.x}</p>${s.f?`<div class="eq">${s.f}</div>`:""}</div><div class="rm-r"><span class="lbl">Código R</span><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(s.r)}</pre></div>${s.o?`<p class="rm-o"><b>Verás:</b> ${s.o}</p>`:""}</div></li>`).join("")}</ol>
     <div class="dp"><button type="button" aria-expanded="false" data-dp><span class="k">Script</span><span>Todo el código de esta lección en un solo bloque</span><span class="chev">›</span></button><div class="dpb"><div><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(all)}</pre></div></div></div></div></section>`};
   TRUNK.unshift({id:"r-cero",t:"R desde cero: instalar, objetos y datos",nuevo:true,html:`<section><h3>La idea</h3><p class="lead">Esta estación es el paso 0 del manual. Aquí instalas R, aprendes a crear objetos y variables, a cargar una base de datos y a mirarla. Después, en cada lección, cada explicación viene con su fórmula y su equivalente en código R.</p>
-  <ul><li>Trabaja siempre en un <b>script</b> (.R), no directo en la consola: así guardas lo que hiciste.</li><li>Ejecuta línea por línea con Ctrl + Enter y lee lo que sale antes de seguir.</li><li>Los ejemplos usan las bases del libro de Wooldridge (paquete <code>wooldridge</code>), así los resultados que ves aquí te deben salir iguales.</li></ul></section>`,
+  <ul><li>Trabaja siempre en un <b>script</b> (.R), no directo en la consola: así guardas lo que hiciste.</li><li>Ejecuta línea por línea con Ctrl + Enter y lee lo que sale antes de seguir.</li><li>Los ejemplos de las estaciones del curso usan las bases y el código R del profesor (demanda de TV, ahorro e ingreso, ventas trimestrales), con su misma notación: b, TSS, ESS, RSS, S² y las ecuaciones numeradas. Si usas el mismo Excel, tus resultados salen iguales a los de la página. Las estaciones avanzadas usan las bases del libro de Wooldridge.</li></ul></section>`,
     qs:[{q:"¿Cuál es la diferencia entre install.packages() y library()?",a:"install.packages() descarga e instala el paquete en tu computador, una sola vez. library() lo carga en la sesión actual, cada vez que abres R."},
       {q:"¿Por qué falla 3,5 + 1 en R?",a:"Porque en R el separador decimal es el punto. La coma separa argumentos de una función. Se escribe 3.5 + 1."}]});
-  BRANCHES.unshift({g:"Bases de datos del manual",from:"r-cero",items:[{id:"bases-wooldridge",t:"¿Qué es wage1? Las bases del manual y sus variables",nuevo:true,html:`<section><h3>De dónde salen los datos</h3><p class="lead">Los ejemplos del manual usan las bases del libro <i>Introducción a la econometría</i> de Jeffrey Wooldridge, que vienen en el paquete <code>wooldridge</code> de R. Así no hay que descargar nada y tus resultados salen iguales a los de la página.</p>
-  <p>Se cargan con <code>data("wage1", package = "wooldridge")</code>. Después, <code>wage1</code> es una tabla (data frame) y cada columna se llama con <code>$</code>: <code>wage1$wage</code> es la columna wage de la tabla wage1.</p>
-  <p class="warn"><b>wage = salario.</b> La base que más se usa es <code>wage1</code> («salarios 1»): 526 trabajadores de EE. UU. en 1976. Su variable <code>wage</code> es el salario por hora y <code>lwage</code> su logaritmo. Con ella se responde, por ejemplo, cuánto sube el salario por cada año más de educación.</p></section>
-  ${Object.entries(BASES).map(([d,B])=>`<section><h3><code>${d}</code> · ${B.t}</h3><p>${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div></section>`).join("")}
-  <section><h3>Cómo leer un modelo con lwage</h3><p>En <code>lm(lwage ~ educ, data = wage1)</code> la Y es el logaritmo del salario. Si el coeficiente de educ es 0,083, un año más de educación se asocia con un salario por hora <b>8,3 % mayor</b> (100·β). Si la Y fuera wage, el mismo coeficiente se leería en dólares por hora.</p></section>`}]});
+  BRANCHES.unshift({g:"Bases de datos del manual",from:"r-cero",items:[{id:"bases-wooldridge",t:"Las bases del curso y sus variables",nuevo:true,html:`<section><h3>De dónde salen los datos</h3><p class="lead">Las estaciones del curso (de «Variables» a «Cambio estructural») usan las bases del profesor y el mismo código de sus notebooks de R: así lo que ves aquí es lo que piden la clase y el parcial.</p>
+  <p>Cada base es un Excel que se lee con <code>read_excel()</code> del paquete <code>readxl</code>, después de fijar la carpeta de trabajo con <code>setwd()</code>. Luego <code>Datos</code> es una tabla (data frame) y cada columna se llama con <code>$</code>: <code>Datos$Yt</code> es la columna Yt.</p>
+  <p class="warn"><b>Notación del profesor:</b> el intercepto es β₁ y las pendientes β₂, β₃…; X2t y X3t son la segunda y tercera columna de X (la primera son los unos). Las sumas de cuadrados se llaman TSS, ESS y RSS, la varianza estimada S² = RSS/(n − k) y las pruebas se citan por su número de ecuación: F (56), F (58), t (59), F (60), F (61), F (64) en el capítulo 1 y F (8), F (9) en el capítulo 2.</p></section>
+  ${Object.values(PBASES).map(B=>`<section><h3>${B.t}</h3><p>${B.arch?`Archivo <code style="word-break:break-all">${B.arch}</code>. `:""}${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div>${B.code?`<details class="dp-lite"><summary>Los 50 meses en código R (por si no tienes el Excel)</summary><div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(B.code)}</pre></div></details>`:""}</section>`).join("")}
+  <section><h3>Las bases de las estaciones avanzadas (Wooldridge)</h3><p>Heterocedasticidad, autocorrelación, multicolinealidad, variables instrumentales, ecuaciones simultáneas, elección discreta, panel y series usan las bases del libro <i>Introducción a la econometría</i> de Jeffrey Wooldridge, que vienen en el paquete <code>wooldridge</code>: se cargan con <code>data("hprice1", package = "wooldridge")</code> y no hay que descargar nada. Sus nombres están en inglés porque así vienen en el libro (<code>wage</code> es salario, <code>price</code> precio).</p></section>
+  ${Object.entries(BASES).map(([d,B])=>`<section><h3><code>${d}</code> · ${B.t}</h3><p>${B.d}</p><div class="tbl"><table><tr><th>Variable</th><th>Qué es</th></tr>${Object.entries(B.v).map(([v,t])=>`<tr><td><code>${v}</code></td><td>${t}</td></tr>`).join("")}</table></div></section>`).join("")}`}]});
   const all=[...TRUNK,...BRANCHES.flatMap(g=>g.items)];
   for(const s of all)if(RM[s.id])s.html+=block(s.id,RM[s.id]);
 })();
