@@ -74,13 +74,28 @@ sol:String.raw`<h5>a) Significado y signos</h5><p>Y son los años de educación 
 <li><b>Urbana</b> (n = 4): Σx = 42, Σy = 66, Σx² = 458, Σxy = 704. Promedios: \(\bar x_U=42/4=10{,}5\) (renta media urbana) y \(\bar y_U=66/4=16{,}5\) (educación media urbana).<br>Pendiente: \(\hat\beta_2=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{44}{68}=0{,}6471\).<br>Intercepto: \(\hat\beta_1=\bar y_U-\hat\beta_2\bar x_U=16{,}5-0{,}6471(10{,}5)=9{,}7059\).</li>
 <li><b>Rural</b> (n = 4): Σx = 26, Σy = 47, Σx² = 194, Σxy = 320. Promedios: \(\bar x_R=26/4=6{,}5\) y \(\bar y_R=47/4=11{,}75\).<br>Pendiente: \(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{58}{100}=0{,}58\).<br>Intercepto: \(\hat\beta_3=\bar y_R-\hat\beta_4\bar x_R=11{,}75-0{,}58(6{,}5)=7{,}98\).</li>
 <li>Modelo estimado: \(\hat Y=9{,}706D_1+0{,}647D_1X+7{,}980D_2+0{,}580D_2X\).</li>
-<li>RSS por zona: urbana 3,8824 y rural 0,34, así que \(RSS_{NR}=4{,}2222\) y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
+<li><b>RSS de cada zona</b> con \(RSS=\left(\sum y^2-n\bar y^2\right)-b^2\left(\sum x^2-n\bar x^2\right)\): la variación total de Y menos la parte que explica la recta.<br>
+<b>Urbana:</b> \(\sum y^2=16^2+18^2+14^2+18^2=1100\), así que \(\sum y^2-n\bar y^2=1100-4(16{,}5)^2=11\); \(\sum x^2-n\bar x^2=458-4(10{,}5)^2=17\). \(RSS_U=11-0{,}6471^2(17)=11-7{,}1176=3{,}8824\).<br>
+<b>Rural:</b> \(\sum y^2=12^2+10^2+11^2+14^2=561\), así que \(561-4(11{,}75)^2=8{,}75\); \(194-4(6{,}5)^2=25\). \(RSS_R=8{,}75-0{,}58^2(25)=8{,}75-8{,}41=0{,}34\).</li>
+<li><b>Comprobación con los errores</b> \(e=Y-\hat Y\), que es la definición \(RSS=\sum e^2\):
+<div class="tbl"><table><tr><th>Zona</th><th>X</th><th>Y</th><th>Ŷ</th><th>e</th><th>e²</th></tr>
+<tr><td>Urbana</td><td>8</td><td>16</td><td>14,882</td><td>1,118</td><td>1,2491</td></tr>
+<tr><td>Urbana</td><td>13</td><td>18</td><td>18,118</td><td>−0,118</td><td>0,0138</td></tr>
+<tr><td>Urbana</td><td>9</td><td>14</td><td>15,529</td><td>−1,529</td><td>2,3391</td></tr>
+<tr><td>Urbana</td><td>12</td><td>18</td><td>17,471</td><td>0,529</td><td>0,2803</td></tr>
+<tr><th colspan="5">Suma urbana</th><th>3,8824</th></tr>
+<tr><td>Rural</td><td>7</td><td>12</td><td>12,04</td><td>−0,04</td><td>0,0016</td></tr>
+<tr><td>Rural</td><td>3</td><td>10</td><td>9,72</td><td>0,28</td><td>0,0784</td></tr>
+<tr><td>Rural</td><td>6</td><td>11</td><td>11,46</td><td>−0,46</td><td>0,2116</td></tr>
+<tr><td>Rural</td><td>10</td><td>14</td><td>13,78</td><td>0,22</td><td>0,0484</td></tr>
+<tr><th colspan="5">Suma rural</th><th>0,3400</th></tr></table></div></li>
+<li>El RSS del modelo completo (no restringido) es la suma de los dos: \(RSS_{NR}=3{,}8824+0{,}34=4{,}2222\), y \(s^2=4{,}2222/(8-4)=1{,}0556\).</li>
 <li>Con los 8 jóvenes, \(\sum y^2=1661\) y el promedio general es \(\bar y=113/8=14{,}125\). \(TSS=\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\), y \(R^2=1-4{,}2222/64{,}875=0{,}935\).</li>
 <li>Errores estándar \(\sqrt{s^2[(X'X)^{-1}]_{jj}}\): 2,666; 0,249; 1,431 y 0,205.</li></ol>
 <p><b>Lectura del R²:</b> la renta y la zona explican el 93,5 % de la variación de los años de educación.</p>
 <h5>c) Cambio estructural</h5><ol class="steps">
 <li>H₀: β₁ = β₃ y β₂ = β₄ (una sola recta) frente a H₁: al menos una diferencia. Son q = 2 restricciones.</li>
-<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y, con los promedios generales \(\bar x=68/8=8{,}5\) y \(\bar y=113/8=14{,}125\), \(\hat\alpha=14{,}125-0{,}8581(8{,}5)=6{,}831\). \(RSS_R=10{,}3851\).</li>
+<li>Restringido \(Y=\alpha+\beta X\) con los 8 datos: Σx = 68, Σy = 113, Σx² = 652, Σxy = 1024. \(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{508}{592}=0{,}8581\) y, con los promedios generales \(\bar x=68/8=8{,}5\) y \(\bar y=113/8=14{,}125\), \(\hat\alpha=14{,}125-0{,}8581(8{,}5)=6{,}831\). Con la misma fórmula: \(\sum y^2-n\bar y^2=1661-8(14{,}125)^2=64{,}875\) y \(\sum x^2-n\bar x^2=652-8(8{,}5)^2=74\), así que \(RSS_R=64{,}875-0{,}8581^2(74)=64{,}875-54{,}490=10{,}3851\).</li>
 <li>\(F=\dfrac{(10{,}3851-4{,}2222)/2}{4{,}2222/4}=\dfrac{3{,}0815}{1{,}0556}=2{,}919\sim F(2,4)\).</li>
 <li>\(F_{0{,}05}(2,4)=6{,}944\) y p = 0,165, así que no se rechaza H₀.</li></ol>
 <p><b>Lectura:</b> con estos datos no hay evidencia de que la relación educación-renta difiera entre zonas. Con solo 8 observaciones la prueba tiene poco poder.</p>
