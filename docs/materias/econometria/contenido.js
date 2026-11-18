@@ -1662,8 +1662,10 @@ sol:String.raw`<ol class="steps">
 <li>\(\det(X'X)=20(30)-10(10)=500\), así que \((X'X)^{-1}=\dfrac1{500}\begin{bmatrix}30&-10\\-10&20\end{bmatrix}\).</li>
 <li>\(\mathbf b=\dfrac1{500}\begin{bmatrix}30(30)-10(40)\\-10(30)+20(40)\end{bmatrix}=\dfrac1{500}\begin{bmatrix}500\\500\end{bmatrix}=\begin{bmatrix}1\\1\end{bmatrix}\), es decir \(\hat Y=1+X\).</li>
 <li>\(RSS=75-(1\cdot30+1\cdot40)=5\) y \(s^2=5/(20-2)=0{,}2778\).</li>
-<li>Pronóstico: \(\hat y_0=1+1(2)=3\), así que el error es d = 4 − 3 = 1.</li>
-<li>\(\mathbf x_0'(X'X)^{-1}\mathbf x_0=\dfrac{30(1)-2(10)(1)(2)+20(2^2)}{500}=\dfrac{70}{500}=0{,}14\), y el factor es 1,14.</li>
+<li><b>Pronóstico para la observación nueva.</b> La recta estimada es \(\hat Y=b_1+b_2X\), con \(b_1=1\) (intercepto) y \(b_2=1\) (pendiente), es decir \(\hat Y=1+1\cdot X\). La observación nueva trae X = 2, así que se reemplaza X por 2: \(\hat y_0=1+1(2)=3\).<br>
+En forma matricial es lo mismo: la fila de la nueva observación es \(\mathbf x_0'=[1\;\;2]\) (el 1 acompaña al intercepto y el 2 es el valor de X), y \(\hat y_0=\mathbf x_0'\mathbf b=[1\;\;2]\begin{bmatrix}1\\1\end{bmatrix}=1(1)+2(1)=3\).<br>
+El error de pronóstico es lo observado menos lo pronosticado: \(d=y_0-\hat y_0=4-3=1\).</li>
+<li>Con el mismo \(\mathbf x_0=(1;\,2)\): \(\mathbf x_0'(X'X)^{-1}\mathbf x_0=\dfrac1{500}[1\;\;2]\begin{bmatrix}30&-10\\-10&20\end{bmatrix}\begin{bmatrix}1\\2\end{bmatrix}=\dfrac{30(1)^2-2(10)(1)(2)+20(2)^2}{500}=\dfrac{30-40+80}{500}=\dfrac{70}{500}=0{,}14\), y el factor es 1 + 0,14 = 1,14.</li>
 <li>\(F=\dfrac{1^2}{0{,}2778(1{,}14)}=3{,}158\sim F(1,18)\). Equivale a t = 1,777.</li>
 <li>\(F_{0{,}05}(1,18)=4{,}414\), así que no se rechaza H₀.</li></ol>`,
 res:String.raw`<p>F = 3,158 &lt; 4,414: la observación nueva es compatible con la relación estimada \(\hat Y=1+X\). No hay evidencia de cambio en los parámetros.</p>`},
