@@ -7,7 +7,56 @@ const LABX=t=>`<section><h3>Laboratorio${t?": "+t:""}</h3><div class="sim" id="s
 const ins=(after,items)=>{const i=TRUNK.findIndex(t=>t.id===after);TRUNK.splice(i<0?TRUNK.length:i+1,0,...items)};
 const take=id=>{for(const g of BRANCHES){const k=(g.items||[]).findIndex(x=>x.id===id);if(k>=0)return g.items.splice(k,1)[0]}return null};
 ins("inferencia",[
-{id:"mv-pruebas", t:"Máxima verosimilitud y las pruebas LR, Wald y LM", sim:"mvtest", html:String.raw`
+{id:"mv-estimacion", t:"Máxima verosimilitud: verosimilitud, score, Hessiana e información", html:String.raw`
+<section><h3>La idea (Dinardo, capítulo 5)</h3><p class="lead">El estimador de máxima verosimilitud (MLE) escoge el valor del parámetro θ que hace <b>más probable</b> la muestra que se observó. Se arma la probabilidad conjunta de la muestra como función de θ y se busca su máximo.</p>
+<p>Con una muestra aleatoria \(X_1,\dots,X_n\) (independientes y con la misma distribución \(f(x;\theta)\)):</p>
+<div class="mj">\[L(\theta)=\prod_{i=1}^n f(x_i;\theta)\qquad l(\theta)=\ln L(\theta)=\sum_{i=1}^n\ln f(x_i;\theta)\]</div>
+<p>Se trabaja con el logaritmo \(l(\theta)\) porque convierte el producto en suma y tiene el mismo máximo.</p></section>
+<section><h3>Los cinco objetos que pide el profesor</h3>
+<div class="tbl"><table><tr><th>Objeto</th><th>Definición</th><th>Para qué sirve</th></tr>
+<tr><td><b>Verosimilitud</b> \(L(\theta)\) y log-verosimilitud \(l(\theta)\)</td><td>\(L=\prod f(x_i;\theta)\), \(l=\ln L\)</td><td>Lo que se maximiza.</td></tr>
+<tr><td><b>Score</b> \(s(\theta)\)</td><td>\(s(\theta)=\partial l/\partial\theta\)</td><td>Igualándolo a cero se obtiene el MLE: \(s(\hat\theta)=0\). Cumple \(E[s(\theta)]=0\).</td></tr>
+<tr><td><b>Hessiana</b> \(\mathbf H\)</td><td>\(\mathbf H=\partial^2 l/\partial\theta\,\partial\theta'\)</td><td>Curvatura: si es negativa en \(\hat\theta\), es un máximo.</td></tr>
+<tr><td><b>\(\mathbf H_1\)</b> (producto exterior del score)</td><td>\(\mathbf H_1=\left(\dfrac{\partial l}{\partial\theta}\right)\left(\dfrac{\partial l}{\partial\theta}\right)'\)</td><td>Otra forma de medir la información.</td></tr>
+<tr><td><b>Matriz de información</b> \(\mathbf I(\theta)\)</td><td>\(\mathbf I(\theta)=-E(\mathbf H)=E(\mathbf H_1)\)</td><td>Su inversa es la varianza asintótica del MLE: \(\operatorname{var}(\hat\theta)=\mathbf I(\theta)^{-1}\).</td></tr></table></div>
+<p class="warn"><b>Igualdad de la información:</b> \(E(\mathbf H_1)=-E(\mathbf H)\). Como \(E[s]=0\), \(E(\mathbf H_1)=E(s\,s')=\operatorname{var}(s)\). Por eso, para verificarla, basta calcular la varianza del score.</p></section>
+<section><h3>Receta en cinco pasos</h3>
+<ol class="steps">
+<li>Escribir \(f(x;\theta)\), multiplicar las n densidades y tomar logaritmo.</li>
+<li>Derivar \(l(\theta)\): ese es el score. Igualar a cero y despejar: ese es \(\hat\theta_{MLE}\).</li>
+<li>Probar \(E[s(\theta)]=0\): reemplazar \(E(X_i)\) en el score.</li>
+<li>Derivar otra vez: la Hessiana. Tomar su esperanza y cambiar el signo: la información.</li>
+<li>Invertir la información: \(\operatorname{var}(\hat\theta_{MLE})=\mathbf I(\theta)^{-1}\).</li></ol></section>
+<section><h3>Resultados para las distribuciones del taller</h3>
+<div class="tbl"><table><tr><th>Población</th><th>\(l(\theta)\)</th><th>Score</th><th>MLE</th><th>\(\mathbf I(\theta)\)</th><th>var(MLE)</th></tr>
+<tr><td>Bernoulli: \(\theta^x(1-\theta)^{1-x}\)</td><td>\(\sum x\ln\theta+(n-\sum x)\ln(1-\theta)\)</td><td>\(\dfrac{\sum x}{\theta}-\dfrac{n-\sum x}{1-\theta}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\theta(1-\theta)}\)</td><td>\(\dfrac{\theta(1-\theta)}{n}\)</td></tr>
+<tr><td>Exponencial: \(\frac1\theta e^{-x/\theta}\)</td><td>\(-n\ln\theta-\dfrac{\sum x}{\theta}\)</td><td>\(-\dfrac n\theta+\dfrac{\sum x}{\theta^2}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\theta^2}\)</td><td>\(\dfrac{\theta^2}{n}\)</td></tr>
+<tr><td>Poisson: \(\frac{e^{-\lambda}\lambda^x}{x!}\)</td><td>\(-n\lambda+\sum x\ln\lambda-\sum\ln x!\)</td><td>\(-n+\dfrac{\sum x}{\lambda}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\lambda}\)</td><td>\(\dfrac{\lambda}{n}\)</td></tr>
+<tr><td>Geométrica: \(\theta(1-\theta)^{x-1}\)</td><td>\(n\ln\theta+(\sum x-n)\ln(1-\theta)\)</td><td>\(\dfrac n\theta-\dfrac{\sum x-n}{1-\theta}\)</td><td>\(\dfrac{1}{\bar x}\)</td><td>\(\dfrac{n}{\theta^2(1-\theta)}\)</td><td>\(\dfrac{\theta^2(1-\theta)}{n}\)</td></tr>
+<tr><td>Normal, σ² conocida</td><td>\(-\frac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x-\mu)^2}{2\sigma^2}\)</td><td>\(\dfrac{\sum(x-\mu)}{\sigma^2}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\sigma^2}\)</td><td>\(\dfrac{\sigma^2}{n}\)</td></tr>
+<tr><td>Normal, \(\theta=(\mu,\sigma^2)\)</td><td>\(-\frac n2\ln2\pi-\frac n2\ln\sigma^2-\dfrac{\sum(x-\mu)^2}{2\sigma^2}\)</td><td>\(\begin{bmatrix}\sum(x-\mu)/\sigma^2\\-\frac{n}{2\sigma^2}+\frac{\sum(x-\mu)^2}{2\sigma^4}\end{bmatrix}\)</td><td>\(\bar x\); \(\dfrac{\sum(x-\bar x)^2}{n}\)</td><td>\(\begin{bmatrix}\frac n{\sigma^2}&0\\0&\frac n{2\sigma^4}\end{bmatrix}\)</td><td>\(\dfrac{\sigma^2}{n}\); \(\dfrac{2\sigma^4}{n}\)</td></tr></table></div></section>
+<section><h3>Propiedades del MLE</h3>
+<ul><li><b>Consistente:</b> \(\hat\theta\to\theta\) cuando n crece.</li>
+<li><b>Asintóticamente normal:</b> \(\hat\theta\overset{a}{\sim}N\left(\theta,\mathbf I(\theta)^{-1}\right)\).</li>
+<li><b>Asintóticamente eficiente:</b> alcanza la cota de Cramér-Rao, \(\mathbf I(\theta)^{-1}\); ningún estimador consistente tiene menor varianza asintótica.</li>
+<li><b>Invarianza:</b> si \(\hat\theta\) es el MLE de θ, el MLE de \(g(\theta)\) es \(g(\hat\theta)\). Por ejemplo, en la exponencial \(\sigma^2=\theta^2\Rightarrow\hat\sigma^2=\bar x^2\), y la mediana \(\theta\ln2\Rightarrow\tilde\mu=\bar x\ln 2\); en la Poisson \(\sigma=\sqrt\lambda\Rightarrow\hat\sigma=\sqrt{\bar x}\).</li>
+<li>Puede ser <b>sesgado</b> en muestras pequeñas: \(\hat\sigma^2_{MLE}=\sum(x-\bar x)^2/n\) tiene sesgo, pero es consistente.</li></ul></section>
+<section><h3>El modelo de regresión lineal por máxima verosimilitud</h3>
+<p>Con \(\mathbf y=X\beta+\mu\) y \(\mu\sim N(0,\sigma^2I_n)\):</p>
+<div class="mj">\[l(\beta,\sigma^2)=-\frac n2\ln(2\pi)-\frac n2\ln\sigma^2-\frac{(\mathbf y-X\beta)'(\mathbf y-X\beta)}{2\sigma^2}\]</div>
+<ul><li>\(\hat\beta_{MLE}=(X'X)^{-1}X'\mathbf y=\mathbf b_{OLS}\): con errores normales, MCO y máxima verosimilitud coinciden en β.</li>
+<li>\(\hat\sigma^2_{MLE}=\mathbf e'\mathbf e/n=RSS/n\), distinto de \(S^2=RSS/(n-k)\).</li>
+<li>Información: \(\mathbf I(\beta,\sigma^2)=\begin{bmatrix}X'X/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\), así que \(\operatorname{var}(\hat\beta)=\sigma^2(X'X)^{-1}\).</li>
+<li>Log-verosimilitud en el máximo (lo que da <code>logLik()</code> en R): \(l=-\dfrac n2\left[1+\ln(2\pi)+\ln\left(\dfrac{RSS}{n}\right)\right]\).</li></ul>
+<pre class="code"><code>eq1 = lm(Yt ~ X2t + X3t)
+logLik(eq1)                    # log-verosimilitud en el máximo
+n = length(Yt); RSS = deviance(eq1)
+(S2_MLE = RSS / n)             # varianza MLE
+-n/2 * (1 + log(2*pi) + log(RSS/n))   # lo mismo que logLik</code></pre></section>`,
+qs:[{q:"En una muestra de una Poisson, x̄ = 3,2 con n = 50. ¿Cuál es el MLE de λ y su varianza asintótica estimada?",a:"λ̂ = x̄ = 3,2 y var(λ̂) = λ/n ≈ 3,2/50 = 0,064."},
+{q:"¿Por qué el MLE de σ en una Poisson es la raíz de x̄?",a:"Por la propiedad de invarianza: σ = √λ, así que su MLE es √λ̂ = √x̄."},
+{q:"Si un modelo lineal tiene RSS = 92.605,07 con n = 50, ¿cuál es la varianza MLE?",a:"σ̂²_MLE = RSS/n = 1.852,10 (frente a S² = RSS/(n − k) = 1.970,32 con k = 3)."}]},
+{id:"mv-pruebas", t:"Pruebas LR, Wald y LM (todas las versiones)", sim:"mvtest", html:String.raw`
 <section><h3>Estimación por máxima verosimilitud</h3><p class="lead">Con \(u\sim N(0,\sigma^2I)\), la log-verosimilitud del modelo lineal es</p>
 <div class="mj">\[\ln L(\beta,\sigma^2)=-\frac n2\ln(2\pi)-\frac n2\ln\sigma^2-\frac{(y-X\beta)'(y-X\beta)}{2\sigma^2}\]</div>
 <p>y sus estimadores son \(\hat\beta_{MV}=(X'X)^{-1}X'y\) (igual a MCO) y \(\hat\sigma^2_{MV}=e'e/n\) (sesgado pero consistente). El EMV es consistente, asintóticamente normal y eficiente: su varianza asintótica es la inversa de la matriz de información, \(I(\theta)^{-1}\).</p></section>
@@ -18,6 +67,29 @@ ins("inferencia",[
 <tr><td>Multiplicadores de Lagrange (LM)</td><td>Solo el restringido</td><td>¿Qué tan empinada es \(\ln L\) en la restricción?</td><td>\(LM=n\frac{RSS_R-RSS_{NR}}{RSS_R}=nR^2_{aux}\)</td></tr></table></div>
 <p>Las tres son asintóticamente \(\chi^2_q\) bajo \(H_0\) y en muestras finitas cumplen \(W\ge LR\ge LM\). La prueba \(F\) es la versión exacta (con normalidad) de Wald: \(W=qF\cdot\frac{n}{n-k}\).</p></section>
 <section><h3>Regresión restringida</h3><p>Minimizar \(e'e\) sujeto a \(R\beta=r\) da \(\hat\beta_R=\hat\beta-(X'X)^{-1}R'[R(X'X)^{-1}R']^{-1}(R\hat\beta-r)\). Ejemplos: rendimientos constantes a escala en una Cobb-Douglas (\(\beta_K+\beta_L=1\)), igualdad de coeficientes.</p></section>
+<section><h3>Todas las versiones de cada prueba</h3>
+<p>H₀: \(R\beta=r\) con q restricciones. Modelo no restringido (NR) y restringido (R), n observaciones y k parámetros en el NR. Las tres se comparan con \(\chi^2_{0{,}05}(q)\) (3,841 si q = 1; 5,991 si q = 2) y se rechaza H₀ si el estadístico es mayor.</p>
+<div class="tbl"><table><tr><th>Prueba</th><th>Versión</th><th>Fórmula</th><th>Qué necesitas</th></tr>
+<tr><td rowspan="2"><b>LR</b> (razón de verosimilitud)</td><td>Con las log-verosimilitudes</td><td>\(LR=2\,(l_{NR}-l_R)\)</td><td><code>logLik()</code> de los dos modelos</td></tr>
+<tr><td>Con las RSS</td><td>\(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}\)</td><td>Las dos RSS</td></tr>
+<tr><td rowspan="3"><b>W</b> (Wald)</td><td>Matricial, solo con el NR</td><td>\(W=(R\mathbf b-r)'\left[R\,\hat\sigma^2_{MLE}(X'X)^{-1}R'\right]^{-1}(R\mathbf b-r)\)</td><td>b y su varianza; \(\hat\sigma^2_{MLE}=RSS_{NR}/n\)</td></tr>
+<tr><td>A partir de la F</td><td>\(W=q\,F\,\dfrac{n}{n-k}\)</td><td>La F de la restricción (con <code>vcov()</code>, que usa S²)</td></tr>
+<tr><td>Con las RSS</td><td>\(W=n\,\dfrac{RSS_R-RSS_{NR}}{RSS_{NR}}\)</td><td>Las dos RSS</td></tr>
+<tr><td rowspan="2"><b>LM</b> (multiplicadores de Lagrange)</td><td>Regresión auxiliar, solo con el R</td><td>\(LM=nR^2_{aux}\): se regresan los errores del modelo restringido \(\mathbf e_R\) contra <b>todas</b> las regresoras del NR</td><td>Los errores del restringido</td></tr>
+<tr><td>Con las RSS</td><td>\(LM=n\,\dfrac{RSS_R-RSS_{NR}}{RSS_R}\)</td><td>Las dos RSS</td></tr></table></div>
+<ul><li><b>Relación con la F (64):</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\) es la versión exacta en muestras finitas con errores normales. Compárala con \(F_{0{,}05}(q,n-k)\).</li>
+<li><b>Orden:</b> con los mismos datos siempre \(W\ge LR\ge LM\). Puede pasar que W rechace y LM no.</li>
+<li><b>¿Por qué <code>vcov()</code> no da directamente W?</b> Porque <code>vcov()</code> usa \(S^2=RSS/(n-k)\); la varianza de máxima verosimilitud es \(RSS/n\). Por eso \(W=qF\cdot n/(n-k)\).</li>
+<li><b>Cuidado con <code>restriktor</code>:</b> su \(S^2\) del modelo restringido divide por \(n-k+q\). Por eso el profesor calcula \(RSS_R=(n-k+q)S^2_R\).</li></ul>
+<pre class="code"><code># Con el modelo NR (eq_nr) y el restringido (eq_r) ya estimados
+n = length(resid(eq_nr)); q = 1
+RSS_NR = deviance(eq_nr); RSS_R = (n - k + q) * eq_r$s2   # restriktor
+(LR  = 2 * (logLik(eq_nr) - logLik(eq_r)))
+(LR1 = n * log(RSS_R / RSS_NR))
+(W   = n * (RSS_R - RSS_NR) / RSS_NR)
+(LM  = n * (RSS_R - RSS_NR) / RSS_R)
+qchisq(0.95, df = q)                                     # valor crítico
+pchisq(LR1, df = q, lower.tail = F)                      # p-valor</code></pre></section>
 ${LABX("las tres pruebas con los mismos datos")}`,
 qs:[{q:"Con n = 50, RSS_R = 120 y RSS_NR = 100, calcule W, LR y LM.",a:"W = 50·20/100 = 10; LR = 50·ln(1,2) = 9,12; LM = 50·20/120 = 8,33. Se cumple W ≥ LR ≥ LM."}]}]);
 const B2=["multicol","hetero","autocorr","especificacion"].map(take).filter(Boolean),B4=["vi","simultaneas"].map(take).filter(Boolean),B6=["discreta"].map(take).filter(Boolean);
