@@ -89,6 +89,7 @@ function ptoBody(p,inLesson){const temas=(p.temas||[]).map(byId).filter(Boolean)
   ${p.saber&&p.saber.length?`<div class="pto-s pto-saber"><h4>Lo que necesitas saber</h4><ul>${p.saber.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
   ${inLesson?"":`<button class="btn pto-ver" type="button" data-ver>Ya lo intenté: ver la solución</button>`}
   <div class="pto-s pto-sol"><h4>Paso a paso</h4>${p.sol}</div>
+  ${p.micro?`<details class="pto-micro"><summary>Micropasos: cada cálculo, cambio y propiedad, uno por uno</summary><div class="pto-micro-b">${p.micro}</div></details>`:""}
   <div class="pto-s pto-res"><h4>Respuesta</h4>${p.res}</div>
   <div class="pto-f">${p.tool?`<button class="btn" type="button" data-tool="${p.tool.id}" data-pre="${p.tool.pre||""}">${p.tool.lbl} →</button>`:""}${inLesson?`<button class="btn" type="button" data-go="${p.tl.id}~${p.id}">Ver en el taller →</button>`:`<label class="pto-ok"><input type="checkbox" data-pdone="${p.id}" ${done["p:"+p.id]?"checked":""}> Ya lo resolví</label>`}</div>`}
 function tallerHTML(s){const n=s.puntos.length,d=s.puntos.filter(p=>done["p:"+p.id]).length;

@@ -433,7 +433,7 @@ input.rc-in:disabled,select.rc-in:disabled{opacity:.85}
 .pto-f{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--rule,rgba(127,127,127,.2));padding-top:10px}
 .pto-ok{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
 .pto-ver{display:none;align-self:flex-start}
-.tl-hide .tl-page .pto:not(.rev) .pto-sol,.tl-hide .tl-page .pto:not(.rev) .pto-res{display:none}
+.tl-hide .tl-page .pto:not(.rev) .pto-sol,.tl-hide .tl-page .pto:not(.rev) .pto-res,.tl-hide .tl-page .pto:not(.rev) .pto-micro{display:none}
 .tl-hide .tl-page .pto:not(.rev) .pto-ver{display:inline-flex}
 .pto .mj{overflow-x:auto;overflow-y:hidden;max-width:100%}
 .pto pre.ce-code{max-width:100%;overflow-x:auto}
@@ -501,3 +501,13 @@ tr.hl td{background:color-mix(in srgb,var(--good) 12%,transparent)}
 .tline .tl-a{font-family:var(--f-mono);font-weight:600;font-size:13.5px}
 @media (max-width:520px){.tline li{grid-template-columns:1fr;gap:2px}}
 .clave{border-left:4px solid var(--line);background:color-mix(in srgb,var(--line) 7%,var(--card));padding:4px 16px 8px;border-radius:0 10px 10px 0}.clave ul{margin:6px 0 0}
+
+/* micropasos de los talleres */
+details.pto-micro{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;background:var(--line-soft)}
+details.pto-micro>summary{cursor:pointer;font-weight:600;font-size:14px}
+details.pto-micro[open]>summary{margin-bottom:6px}
+.pto-micro h5{margin:12px 0 4px;font-size:14px}
+ol.mp{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+ol.mp>li{padding-left:2px}
+.mp-e{overflow-x:auto;max-width:100%}
+.mp .por{font-size:13px;color:var(--muted);margin-top:2px;padding-left:8px;border-left:2px solid var(--line)}
