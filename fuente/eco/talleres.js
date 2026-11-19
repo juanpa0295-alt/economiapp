@@ -323,6 +323,13 @@ puntos:[
 enun:String.raw`<p>Una regresión simple con 20 observaciones da \(X'X=\begin{bmatrix}20&10\\10&30\end{bmatrix}\), \(X'\mathbf y=\begin{bmatrix}30\\40\end{bmatrix}\) y \(\mathbf y'\mathbf y=75\). Llega una observación nueva con X = 2 y Y = 4. Haga una prueba de Chow de constancia de los parámetros.</p>`,
 saber:[String.raw`\(\mathbf b=(X'X)^{-1}X'\mathbf y\), \(RSS=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y\) y \(s^2=RSS/(n-k)\).`,
 String.raw`<b>Inversa 2 × 2:</b> \(\begin{bmatrix}a&b\\c&d\end{bmatrix}^{-1}=\dfrac1{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}\).`,
+String.raw`<b>Cómo se arman \(y_0\) y \(\mathbf x_0\) (la observación nueva):</b>
+<ul style="margin:4px 0 0;padding-left:18px">
+<li>\(y_0\) es el valor <b>observado</b> de Y en la observación nueva. Es un número (escalar): aquí \(y_0=4\).</li>
+<li>\(\mathbf x_0'\) es la <b>fila</b> que esa observación tendría en la matriz X: lleva un 1 en la columna del intercepto y luego el valor de cada regresora. Con regresión simple, \(\mathbf x_0'=[1\;\;X_0]=[1\;\;2]\), de tamaño 1 × k (aquí 1 × 2).</li>
+<li>\(\mathbf x_0\) es esa misma fila puesta como <b>columna</b> (k × 1): \(\mathbf x_0=\begin{bmatrix}1\\2\end{bmatrix}\).</li>
+<li>Con ellos: el pronóstico es \(\hat y_0=\mathbf x_0'\mathbf b\) (1 × k por k × 1 = un número), el error de pronóstico es \(d=y_0-\hat y_0\), y la varianza del error usa \(\mathbf x_0'(X'X)^{-1}\mathbf x_0\) (1 × k por k × k por k × 1 = un número).</li>
+<li>Si el modelo tuviera más regresoras, por ejemplo \(Y=\beta_1+\beta_2X_2+\beta_3X_3\), sería \(\mathbf x_0'=[1\;\;X_{20}\;\;X_{30}]\).</li></ul>`,
 String.raw`<b>Pronósticos de Chow con n₂ = 1:</b> \(F=\dfrac{d^2}{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}\sim F(1,\,n-k)\), con \(d=y_0-\mathbf x_0'\mathbf b\) (punto 1 de los Ejercicios propuestos 3).`],
 sol:String.raw`<ol class="steps">
 <li>\(\det(X'X)=20(30)-10(10)=500\), así que \((X'X)^{-1}=\dfrac1{500}\begin{bmatrix}30&-10\\-10&20\end{bmatrix}\).</li>
@@ -1111,3 +1118,27 @@ h("c) H₀: β₄ + 6β₃ = 0")+mp([
 [String.raw`\(LM=35\cdot\dfrac{1{,}5138}{388{,}017}=0{,}1365=35(0{,}003901352)=nR^2_{aux}\)`,"La regresión auxiliar del enunciado da el mismo LM."]])};
 for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];
 })();
+
+(function(){const mp=a=>`<ol class="mp">${a.map(([e,w])=>`<li><div class="mp-e">${e}</div>${w?`<div class="por">${w}</div>`:""}</li>`).join("")}</ol>`,h=t=>`<h5>${t}</h5>`;
+const M={"d-41":h("Lo que se lee del enunciado")+mp([
+[String.raw`\(X'X=\begin{bmatrix}n&\sum X\\\sum X&\sum X^2\end{bmatrix}=\begin{bmatrix}20&10\\10&30\end{bmatrix}\)`,String.raw`En regresión simple, X′X tiene n en la esquina, ΣX fuera de la diagonal y ΣX² abajo: n = 20, ΣX = 10, ΣX² = 30.`],
+[String.raw`\(X'\mathbf y=\begin{bmatrix}\sum Y\\\sum XY\end{bmatrix}=\begin{bmatrix}30\\40\end{bmatrix}\)`,String.raw`ΣY = 30 y ΣXY = 40. Y \(\mathbf y'\mathbf y=\sum Y^2=75\).`],
+[String.raw`\(y_0=4,\qquad\mathbf x_0'=[1\;\;2],\qquad\mathbf x_0=\begin{bmatrix}1\\2\end{bmatrix}\)`,String.raw`La observación nueva: y₀ es su Y observado; x₀′ es su fila de la matriz X (1 del intercepto y X = 2).`]])+
+h("Estimador y RSS")+mp([
+[String.raw`\(\det(X'X)=20\cdot30-10\cdot10=600-100=500\)`,String.raw`Determinante 2 × 2: ad − bc.`],
+[String.raw`\((X'X)^{-1}=\dfrac1{500}\begin{bmatrix}30&-10\\-10&20\end{bmatrix}\)`,String.raw`Inversa 2 × 2: se intercambian los de la diagonal, se cambia el signo de los de afuera y se divide por el determinante.`],
+[String.raw`\(\mathbf b=\dfrac1{500}\begin{bmatrix}30\cdot30+(-10)\cdot40\\-10\cdot30+20\cdot40\end{bmatrix}=\dfrac1{500}\begin{bmatrix}900-400\\-300+800\end{bmatrix}=\dfrac1{500}\begin{bmatrix}500\\500\end{bmatrix}=\begin{bmatrix}1\\1\end{bmatrix}\)`,String.raw`Producto matriz por vector: cada fila de la inversa por la columna X′y.`],
+[String.raw`\(\mathbf b'X'\mathbf y=[1\;\;1]\begin{bmatrix}30\\40\end{bmatrix}=30+40=70\)`,String.raw`Fila por columna: da un número. Es \(\mathbf b'X'X\mathbf b\), porque por las ecuaciones normales \(X'X\mathbf b=X'\mathbf y\).`],
+[String.raw`\(RSS=\mathbf y'\mathbf y-\mathbf b'X'\mathbf y=75-70=5\)`,String.raw`Se parte de \(RSS=\mathbf e'\mathbf e=(\mathbf y-X\mathbf b)'(\mathbf y-X\mathbf b)\) y se simplifica con las ecuaciones normales.`],
+[String.raw`\(s^2=\dfrac{RSS}{n-k}=\dfrac{5}{20-2}=\dfrac5{18}=0{,}2778\)`,String.raw`k = 2 parámetros (intercepto y pendiente).`]])+
+h("Pronóstico y su error")+mp([
+[String.raw`\(\hat y_0=\mathbf x_0'\mathbf b=[1\;\;2]\begin{bmatrix}1\\1\end{bmatrix}=1\cdot1+2\cdot1=3\)`,String.raw`Fila (1 × 2) por columna (2 × 1) = un número. Es lo mismo que reemplazar X = 2 en \(\hat Y=1+1\cdot X\).`],
+[String.raw`\(d=y_0-\hat y_0=4-3=1\)`,String.raw`Error de pronóstico: observado menos pronosticado.`],
+[String.raw`\((X'X)^{-1}\mathbf x_0=\dfrac1{500}\begin{bmatrix}30\cdot1+(-10)\cdot2\\-10\cdot1+20\cdot2\end{bmatrix}=\dfrac1{500}\begin{bmatrix}10\\30\end{bmatrix}\)`,String.raw`Primero la matriz por la columna x₀ (2 × 2 por 2 × 1 = 2 × 1).`],
+[String.raw`\(\mathbf x_0'(X'X)^{-1}\mathbf x_0=\dfrac1{500}[1\;\;2]\begin{bmatrix}10\\30\end{bmatrix}=\dfrac{10+60}{500}=\dfrac{70}{500}=0{,}14\)`,String.raw`Luego la fila x₀′ por ese resultado (1 × 2 por 2 × 1 = un número). La constante 1/500 sale del producto.`],
+[String.raw`\(\operatorname{var}(d)=\sigma^2\left[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0\right]\approx s^2(1+0{,}14)=0{,}2778(1{,}14)=0{,}3167\)`,String.raw`El 1 es la varianza del error nuevo μ₀; el 0,14 es la incertidumbre por estimar b. Se cambia σ² por s².`]])+
+h("Estadístico y decisión")+mp([
+[String.raw`\(F=\dfrac{d^2}{s^2[1+\mathbf x_0'(X'X)^{-1}\mathbf x_0]}=\dfrac{1^2}{0{,}3167}=3{,}158\)`,String.raw`Con una sola observación nueva (n₂ = 1), d es un número y la F de pronósticos se reduce a d² sobre su varianza estimada.`],
+[String.raw`\(t=\sqrt{F}=\sqrt{3{,}158}=1{,}777\)`,String.raw`Con 1 grado de libertad en el numerador, F = t².`],
+[String.raw`\(F_{0{,}05}(1,18)=4{,}414>3{,}158\)`,String.raw`Grados de libertad: 1 (una observación nueva) y n − k = 18. No se rechaza la estabilidad de los parámetros.`]])};
+for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];})();
