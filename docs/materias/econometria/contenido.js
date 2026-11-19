@@ -1955,6 +1955,147 @@ S=3.531; (RSS_NR=(n-k)*(S^2))
 (FC_1=((RSS_R-RSS_NR)/(RSS_NR/(n-k))))</code></pre>`,
 res:String.raw`<p>F = 0,121 (p = 0,73): no se rechaza β₂ + 3β₃ = 0. Las dos formas de la prueba coinciden.</p>`}]});
 
+// ---------- Ejercicios propuestos 4: estimación MLE y pruebas LR, Wald y LM (Dinardo, capítulo 5)
+TALLERES.push({id:"tl-ep4", t:"Ejercicios propuestos 4", sub:"Estimación MLE y pruebas de Wald, LR y LM (Dinardo, capítulo 5)", anchor:"mv-pruebas",
+intro:`Los diez ejercicios del profesor sobre máxima verosimilitud. Los puntos 1 a 4 y 7 son de estimación (verosimilitud, score, MLE, Hessiana, información y varianza); los puntos 5, 6, 8, 9 y 10 aplican las pruebas LR, Wald y LM «en todas las versiones posibles». Los resultados numéricos se verificaron en R. La teoría está en las estaciones <a href="#mv-estimacion">Máxima verosimilitud</a> y <a href="#mv-pruebas">Pruebas LR, Wald y LM</a>.`,
+puntos:[
+{id:"ep4-1", n:"1", t:"Exponencial: MLE, score, Hessiana e información", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>Sea \(X_1,\dots,X_n\) una m.a. de \(X\sim\exp(\theta)\), con \(f(x)=\frac1\theta e^{-x/\theta}\), x &gt; 0, \(E(X)=\theta\), \(\operatorname{var}(X)=\theta^2\) y mediana \(\theta\ln2\). Encuentre: <b>a)</b> \(L(\theta)\) y \(l(\theta)\); <b>b)</b> el score y \(\hat\theta_{MLE}\); <b>c)</b> pruebe que \(E[s(\theta)]=0\); <b>d)</b> la Hessiana y \(\mathbf H_1\); <b>e)</b> la información y verifique \(E(\mathbf H_1)=-E(\mathbf H)\); <b>f)</b> \(\operatorname{var}(\hat\theta_{MLE})\); <b>g)</b> el MLE de \(\sigma^2=\operatorname{var}(X)\) y de la mediana.</p>`,
+saber:[String.raw`\(E\left(\sum X_i\right)=n\theta\) y \(\operatorname{var}\left(\sum X_i\right)=n\theta^2\) (independencia).`,String.raw`<b>Invarianza:</b> el MLE de \(g(\theta)\) es \(g(\hat\theta)\).`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> \(L(\theta)=\prod\frac1\theta e^{-x_i/\theta}=\theta^{-n}e^{-\sum x_i/\theta}\) y \(l(\theta)=-n\ln\theta-\dfrac{\sum x_i}{\theta}\).</li>
+<li><b>b)</b> \(s(\theta)=-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}\). Igualando a cero: \(n\theta=\sum x_i\Rightarrow\hat\theta_{MLE}=\bar x\).</li>
+<li><b>c)</b> \(E[s]=-\dfrac n\theta+\dfrac{E(\sum X_i)}{\theta^2}=-\dfrac n\theta+\dfrac{n\theta}{\theta^2}=0\).</li>
+<li><b>d)</b> \(\mathbf H=\dfrac{\partial^2l}{\partial\theta^2}=\dfrac n{\theta^2}-\dfrac{2\sum x_i}{\theta^3}\) y \(\mathbf H_1=s^2=\left(-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}\right)^2\).</li>
+<li><b>e)</b> \(E(\mathbf H)=\dfrac n{\theta^2}-\dfrac{2n\theta}{\theta^3}=-\dfrac n{\theta^2}\), así que \(\mathbf I(\theta)=\dfrac n{\theta^2}\). Como \(E[s]=0\), \(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\operatorname{var}(\sum X_i)}{\theta^4}=\dfrac{n\theta^2}{\theta^4}=\dfrac n{\theta^2}=-E(\mathbf H)\). ✓</li>
+<li><b>f)</b> \(\operatorname{var}(\hat\theta_{MLE})=\mathbf I(\theta)^{-1}=\dfrac{\theta^2}{n}\) (coincide con \(\operatorname{var}(\bar x)\)).</li>
+<li><b>g)</b> Por invarianza: \(\hat\sigma^2=\hat\theta^2=\bar x^2\) y \(\tilde\mu=\hat\theta\ln2=\bar x\ln2\approx0{,}6931\,\bar x\).</li></ol>`,
+res:String.raw`<p>\(\hat\theta=\bar x\), \(\mathbf I(\theta)=n/\theta^2\), \(\operatorname{var}(\hat\theta)=\theta^2/n\), \(\hat\sigma^2=\bar x^2\) y mediana \(\bar x\ln2\).</p>`},
+
+{id:"ep4-2", n:"2", t:"Poisson: MLE de λ y de σ", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>Sea \(X_1,\dots,X_n\) una m.a. de \(X\sim\text{Poisson}(\lambda)\), con \(f(x)=\dfrac{e^{-\lambda}\lambda^x}{x!}\), x = 0, 1, 2, …, \(E(X)=\operatorname{var}(X)=\lambda\). Encuentre los literales a) a f) del punto 1 y <b>g)</b> el MLE de \(\sigma=sd(X)\).</p>`,
+saber:[String.raw`\(E(\sum X_i)=\operatorname{var}(\sum X_i)=n\lambda\).`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> \(L(\lambda)=\dfrac{e^{-n\lambda}\lambda^{\sum x_i}}{\prod x_i!}\) y \(l(\lambda)=-n\lambda+\sum x_i\ln\lambda-\sum\ln x_i!\).</li>
+<li><b>b)</b> \(s(\lambda)=-n+\dfrac{\sum x_i}{\lambda}=0\Rightarrow\hat\lambda_{MLE}=\bar x\).</li>
+<li><b>c)</b> \(E[s]=-n+\dfrac{n\lambda}{\lambda}=0\).</li>
+<li><b>d)</b> \(\mathbf H=-\dfrac{\sum x_i}{\lambda^2}\) y \(\mathbf H_1=\left(-n+\dfrac{\sum x_i}{\lambda}\right)^2\).</li>
+<li><b>e)</b> \(-E(\mathbf H)=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda=\mathbf I(\lambda)\). \(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\operatorname{var}(\sum X_i)}{\lambda^2}=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda\). ✓</li>
+<li><b>f)</b> \(\operatorname{var}(\hat\lambda)=\dfrac\lambda n\).</li>
+<li><b>g)</b> \(\sigma=\sqrt\lambda\Rightarrow\hat\sigma=\sqrt{\bar x}\) (invarianza).</li></ol>`,
+res:String.raw`<p>\(\hat\lambda=\bar x\), \(\mathbf I(\lambda)=n/\lambda\), \(\operatorname{var}(\hat\lambda)=\lambda/n\) y \(\hat\sigma=\sqrt{\bar x}\).</p>`},
+
+{id:"ep4-3", n:"3", t:"Normal con media y varianza desconocidas", tipo:"Estimación MLE con dos parámetros", temas:["mv-estimacion"],
+enun:String.raw`<p>Sea \(X_1,\dots,X_n\) una m.a. de \(X\sim N(\mu,\sigma^2)\). Encuentre: <b>a)</b> \(L\), \(l\), el score y el MLE de \(\theta=(\mu;\sigma^2)\); <b>b)</b> pruebe \(E[s]=0\); <b>c)</b> la Hessiana y la información; <b>d)</b> \(\operatorname{var}(\hat\theta_{MLE})\).</p>`,
+saber:[String.raw`\(E(X_i-\mu)=0\) y \(E(X_i-\mu)^2=\sigma^2\).`,String.raw`Con dos parámetros el score es un vector 2 × 1 y la Hessiana una matriz 2 × 2.`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> \(L=(2\pi\sigma^2)^{-n/2}\exp\left[-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\right]\) y \(l=-\dfrac n2\ln2\pi-\dfrac n2\ln\sigma^2-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\).</li>
+<li>Score: \(s(\theta)=\begin{bmatrix}\partial l/\partial\mu\\\partial l/\partial\sigma^2\end{bmatrix}=\begin{bmatrix}\dfrac{\sum(x_i-\mu)}{\sigma^2}\\-\dfrac n{2\sigma^2}+\dfrac{\sum(x_i-\mu)^2}{2\sigma^4}\end{bmatrix}\). Igualando a cero: \(\hat\mu=\bar x\) y \(\hat\sigma^2=\dfrac{\sum(x_i-\bar x)^2}{n}\).</li>
+<li><b>b)</b> \(E\left[\dfrac{\sum(X_i-\mu)}{\sigma^2}\right]=0\) y \(E\left[-\dfrac n{2\sigma^2}+\dfrac{\sum(X_i-\mu)^2}{2\sigma^4}\right]=-\dfrac n{2\sigma^2}+\dfrac{n\sigma^2}{2\sigma^4}=0\).</li>
+<li><b>c)</b> \(\mathbf H=\begin{bmatrix}-\dfrac n{\sigma^2}&-\dfrac{\sum(x_i-\mu)}{\sigma^4}\\-\dfrac{\sum(x_i-\mu)}{\sigma^4}&\dfrac n{2\sigma^4}-\dfrac{\sum(x_i-\mu)^2}{\sigma^6}\end{bmatrix}\). Su esperanza: la diagonal fuera de la principal vale 0 y \(\dfrac n{2\sigma^4}-\dfrac{n\sigma^2}{\sigma^6}=-\dfrac n{2\sigma^4}\). Entonces \(\mathbf I(\theta)=\begin{bmatrix}n/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\).</li>
+<li><b>d)</b> \(\operatorname{var}(\hat\theta)=\mathbf I^{-1}=\begin{bmatrix}\sigma^2/n&0\\0&2\sigma^4/n\end{bmatrix}\): \(\hat\mu\) y \(\hat\sigma^2\) son asintóticamente independientes.</li></ol>`,
+res:String.raw`<p>\(\hat\mu=\bar x\), \(\hat\sigma^2=\sum(x_i-\bar x)^2/n\) (sesgado; \(E(\hat\sigma^2)=\frac{n-1}n\sigma^2\)), con varianzas asintóticas \(\sigma^2/n\) y \(2\sigma^4/n\).</p>`},
+
+{id:"ep4-4", n:"4", t:"Geométrica: MLE e igualdad de la información", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>Sea \(X_1,\dots,X_n\) una m.a. de \(X\sim\text{geométrica}(\theta)\), con \(f(x;\theta)=\theta(1-\theta)^{x-1}\), x = 1, 2, 3, …, \(E(X)=1/\theta\) y \(\operatorname{var}(X)=(1-\theta)/\theta^2\). Encuentre <b>a)</b> \(L\), \(l\), el score y el MLE; <b>b)</b> pruebe \(E[s]=0\); <b>c)</b> la Hessiana, la información y la varianza asintótica de \(\hat\theta\); <b>d)</b> \(\mathbf H_1\) y verifique \(E(\mathbf H_1)=-E(\mathbf H)\).</p>`,
+saber:[String.raw`\(E(\sum X_i)=n/\theta\) y \(\operatorname{var}(\sum X_i)=n(1-\theta)/\theta^2\).`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> \(L=\theta^n(1-\theta)^{\sum x_i-n}\), \(l=n\ln\theta+\left(\sum x_i-n\right)\ln(1-\theta)\) y \(s(\theta)=\dfrac n\theta-\dfrac{\sum x_i-n}{1-\theta}\). Igualando a cero: \(n(1-\theta)=\theta(\sum x_i-n)\Rightarrow n=\theta\sum x_i\Rightarrow\hat\theta_{MLE}=\dfrac{n}{\sum x_i}=\dfrac1{\bar x}\).</li>
+<li><b>b)</b> \(E[s]=\dfrac n\theta-\dfrac{n/\theta-n}{1-\theta}=\dfrac n\theta-\dfrac{n(1-\theta)/\theta}{1-\theta}=\dfrac n\theta-\dfrac n\theta=0\).</li>
+<li><b>c)</b> \(\mathbf H=-\dfrac n{\theta^2}-\dfrac{\sum x_i-n}{(1-\theta)^2}\). \(E(\mathbf H)=-\dfrac n{\theta^2}-\dfrac{n(1-\theta)/\theta}{(1-\theta)^2}=-\dfrac n{\theta^2}-\dfrac n{\theta(1-\theta)}=-\dfrac{n}{\theta^2(1-\theta)}\). Información: \(\mathbf I(\theta)=\dfrac n{\theta^2(1-\theta)}\) y varianza asintótica \(\dfrac{\theta^2(1-\theta)}{n}\).</li>
+<li><b>d)</b> \(\mathbf H_1=s^2\). Escribiendo el score con denominador común, \(s=\dfrac{n-\theta\sum x_i}{\theta(1-\theta)}\), así que \(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\theta^2\operatorname{var}(\sum X_i)}{\theta^2(1-\theta)^2}=\dfrac{n(1-\theta)/\theta^2}{(1-\theta)^2}=\dfrac{n}{\theta^2(1-\theta)}=-E(\mathbf H)\). ✓</li></ol>
+<p class="hint">El literal e) del enunciado viene vacío en el documento del profesor.</p>`,
+res:String.raw`<p>\(\hat\theta=1/\bar x\) con varianza asintótica \(\theta^2(1-\theta)/n\).</p>`},
+
+{id:"ep4-5", n:"5", t:"Consumo en guerra y paz: cambio estructural con LR, W y LM", tipo:"Pruebas LR, W y LM", temas:["mv-pruebas","chow"],
+enun:String.raw`<p>Modelo \(Y_t=\beta_1+\beta_2X_t+\mu_t\), con Y el consumo y X la renta disponible. Las primeras 5 observaciones son de guerra y las 10 siguientes de paz:</p>
+<div class="tbl"><table><tr><th></th><th>Y</th><th>X</th></tr><tr><td>Guerra (t = 1 a 5)</td><td>1, 2, 2, 4, 6</td><td>2, 4, 6, 10, 13</td></tr><tr><td>Paz (t = 6 a 15)</td><td>1, 3, 3, 5, 6, 6, 7, 9, 9, 11</td><td>2, 4, 6, 8, 10, 12, 14, 16, 18, 20</td></tr></table></div>
+<p>Use las pruebas LR, Wald y LM para determinar si hay cambio estructural. Especifique los modelos no restringido y restringido y las hipótesis.</p>`,
+saber:[String.raw`<b>No restringido:</b> una recta para cada período, o en una sola ecuación con la dicótoma D = 1 en guerra: \(Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2(D_tX_t)+\mu_t\), k = 4. \(RSS_{NR}=RSS_{guerra}+RSS_{paz}\).`,
+String.raw`<b>Restringido:</b> una sola recta para los 15 años. H₀: \(\delta_1=\delta_2=0\) (no hay cambio estructural), q = 2.`,
+String.raw`\(l=-\frac n2\left[1+\ln2\pi+\ln(RSS/n)\right]\).`],
+sol:String.raw`<ol class="steps">
+<li><b>Guerra</b> (n₁ = 5): Σx = 35, Σy = 15, Σx² = 325, Σxy = 140, Σy² = 61. \(b_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{175}{400}=0{,}4375\), \(b_1=3-0{,}4375(7)=-0{,}0625\). \(RSS_1=(61-5\cdot3^2)-0{,}4375^2(325-5\cdot7^2)=16-15{,}3125=0{,}6875\).</li>
+<li><b>Paz</b> (n₂ = 10): Σx = 110, Σy = 60, Σx² = 1540, Σxy = 828, Σy² = 448. \(b_2=\dfrac{1680}{3300}=0{,}50909\), \(b_1=6-0{,}50909(11)=0{,}4\). \(RSS_2=88-0{,}50909^2(330)=2{,}47273\).</li>
+<li>\(RSS_{NR}=0{,}6875+2{,}47273=3{,}16023\).</li>
+<li><b>Restringido</b> (n = 15): Σx = 145, Σy = 75, Σx² = 1865, Σxy = 968, Σy² = 509. \(S_{XY}=968-145(75)/15=243\), \(S_{XX}=1865-145^2/15=463{,}333\), \(b_2=0{,}52446\), \(b_1=-0{,}06978\). \(RSS_R=134-0{,}52446^2(463{,}333)=6{,}55612\).</li>
+<li>Log-verosimilitudes: \(l_{NR}=-7{,}5[1+\ln2\pi+\ln(3{,}16023/15)]=-9{,}6035\) y \(l_R=-15{,}0767\).</li>
+<li><b>LR</b> \(=2(-9{,}6035+15{,}0767)=10{,}946\), igual a \(15\ln(6{,}55612/3{,}16023)=10{,}946\).</li>
+<li><b>W</b> \(=15\,\dfrac{6{,}55612-3{,}16023}{3{,}16023}=16{,}119\).</li>
+<li><b>LM</b> \(=15\,\dfrac{6{,}55612-3{,}16023}{6{,}55612}=7{,}770\). Con la regresión auxiliar de los errores del restringido contra 1, D, X y DX: \(R^2_{aux}=0{,}51797\) y \(nR^2=7{,}770\).</li>
+<li>Valor crítico \(\chi^2_{0{,}05}(2)=5{,}991\). Se cumple \(W\ge LR\ge LM\). Como contraste exacto, la F de Chow: \(F=\dfrac{(6{,}55612-3{,}16023)/2}{3{,}16023/11}=5{,}910\) contra \(F_{0{,}05}(2,11)=3{,}982\) (p = 0,018).</li></ol>
+<pre class="code"><code>Y = c(1,2,2,4,6, 1,3,3,5,6,6,7,9,9,11); X = c(2,4,6,10,13, 2,4,6,8,10,12,14,16,18,20)
+D = c(rep(1,5), rep(0,10)); n = 15; q = 2
+eq_nr = lm(Y ~ D + X + I(D*X)); eq_r = lm(Y ~ X)
+RSS_NR = deviance(eq_nr); RSS_R = deviance(eq_r)
+(LR = 2*(logLik(eq_nr) - logLik(eq_r))); (W = n*(RSS_R-RSS_NR)/RSS_NR); (LM = n*(RSS_R-RSS_NR)/RSS_R)
+er = resid(eq_r); n * summary(lm(er ~ D + X + I(D*X)))$r.squared   # LM = nR2
+qchisq(0.95, q)</code></pre>`,
+res:String.raw`<p>LR = 10,95, W = 16,12 y LM = 7,77, las tres mayores que 5,991: se rechaza H₀. Hay cambio estructural: la función de consumo no es la misma en guerra y en paz (en guerra la propensión marginal a consumir es 0,44 y en paz 0,51).</p>`},
+
+{id:"ep4-6", n:"6", t:"Función de producción: rendimientos constantes β₂ + β₃ = 1", tipo:"Pruebas LR, W y LM", temas:["mv-pruebas","inferencia"],
+enun:String.raw`<p>Para 1961-2010 (n = 50) se estima \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\mu_t\), con Y el producto, X₂ el capital y X₃ el trabajo: b = (−61,95519; 0,90783; 0,18000), errores estándar 53,75724, 0,11360 y 0,08364, R² = 0,9035, \(RSS_{NR}=92.605{,}07\), \(l_{NR}=-259{,}0488\), var(b₂) = 0,012904310, var(b₃) = 0,006995666, cov(b₂, b₃) = −0,008366772, Jarque-Bera = 7,4879 (p = 0,0235). El modelo restringido con β₂ + β₃ = 1 da b<sub>R</sub> = (−62,66675; 0,78197; 0,21803), \(RSS_R=97.405{,}13\) y \(l_R=-260{,}3122\).</p>
+<p><b>a)</b> Interprete. <b>b)</b> Prueba LR con las dos alternativas. <b>c)</b> Wald usando solo el modelo sin restricción. <b>d)</b> ¿Se puede hacer la LM usando únicamente el modelo restringido?</p>`,
+saber:[String.raw`<b>Wald solo con el NR:</b> \(W=\dfrac{(b_2+b_3-1)^2}{\hat\sigma^2_{MLE}\,[\text{elemento de }(X'X)^{-1}]}=F\cdot\dfrac{n}{n-k}\) para q = 1.`,String.raw`<code>vcov()</code> usa \(S^2=RSS/(n-k)\); la versión MLE multiplica por \((n-k)/n\).`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> El capital y el trabajo son significativos al 5 % (t = 7,99 y 2,15); el intercepto no (p = 0,25). Un aumento de una unidad de capital eleva el producto en 0,91 y una de trabajo en 0,18. El modelo explica el 90,35 % de la variación del producto. <b>Ojo:</b> Jarque-Bera tiene p = 0,0235 &lt; 0,05, así que se rechaza la normalidad de los errores. La verosimilitud del modelo supone errores normales, de modo que las pruebas LR, W y LM de este punto hay que leerlas con cautela.</li>
+<li><b>b)</b> H₀: β₂ + β₃ = 1 contra H₁: β₂ + β₃ ≠ 1, q = 1. Con las log-verosimilitudes: \(LR=2(-259{,}0488+260{,}3122)=2{,}527\). Con las RSS: \(LR=50\ln\dfrac{97.405{,}13}{92.605{,}07}=2{,}527\).</li>
+<li><b>c)</b> \(b_2+b_3-1=0{,}08783\). \(\operatorname{var}(b_2+b_3)=0{,}0129043+0{,}0069957-2(0{,}0083668)=0{,}0031664\). La F (60) es \(0{,}08783^2/0{,}0031664=2{,}436\) y el Wald asintótico \(W=2{,}436\cdot\dfrac{50}{47}=2{,}592\). Con las RSS da lo mismo: \(50\,\dfrac{4.800{,}06}{92.605{,}07}=2{,}592\).</li>
+<li><b>d)</b> La LM «solo con el restringido» es la versión \(nR^2_{aux}\): regresar los errores del modelo restringido contra 1, X₂ y X₃. Esos errores no vienen en la información, así que <b>no se puede</b> hacer así. Sí se puede con las dos RSS: \(LM=50\,\dfrac{4.800{,}06}{97.405{,}13}=2{,}464\).</li>
+<li>Valor crítico \(\chi^2_{0{,}05}(1)=3{,}841\); p-valores 0,112 (LR), 0,107 (W) y 0,116 (LM). Se cumple \(W\ge LR\ge LM\).</li></ol>
+<p class="hint">El profesor calcula \(RSS_R=S^2_R\,(n-(k-1))=2.029{,}273\times48\) porque <code>restriktor</code> divide la RSS por \(n-k+q\).</p>`,
+res:String.raw`<p>W = 2,59, LR = 2,53 y LM = 2,46, todas menores que 3,841: no se rechaza H₀. Los datos son compatibles con rendimientos constantes a escala.</p>`},
+
+{id:"ep4-7", n:"7", t:"Normal con varianza conocida", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>Para una población normal con μ desconocida y σ² conocida, encuentre el MLE de μ, la Hessiana, la información y la varianza del estimador.</p>`,
+saber:[String.raw`Es el punto 3 con un solo parámetro: σ² es una constante.`],
+sol:String.raw`<ol class="steps">
+<li>\(l(\mu)=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\).</li>
+<li>Score: \(s(\mu)=\dfrac{\sum(x_i-\mu)}{\sigma^2}=0\Rightarrow\hat\mu_{MLE}=\bar x\).</li>
+<li>Hessiana: \(\mathbf H=-\dfrac n{\sigma^2}\) (no depende de los datos, así que \(E(\mathbf H)=\mathbf H\)).</li>
+<li>Información: \(\mathbf I(\mu)=\dfrac n{\sigma^2}\) y \(\operatorname{var}(\hat\mu)=\dfrac{\sigma^2}{n}\).</li></ol>`,
+res:String.raw`<p>\(\hat\mu=\bar x\) con varianza \(\sigma^2/n\), que alcanza la cota de Cramér-Rao.</p>`},
+
+{id:"ep4-8", n:"8", t:"Costos de Nerlove: suma de elasticidades precio igual a 1", tipo:"F, LR, W y LM con las RSS", temas:["mv-pruebas","inferencia"],
+enun:String.raw`<p>Con 29 empresas, Nerlove estimó \(\ln Y=\ln A+\beta_2\ln X+\beta_3\ln P_1+\beta_4\ln P_2+\beta_5\ln P_3+\mu\), con Y el costo total, X el producto en kWh y P₁, P₂, P₃ los precios del trabajo, del capital y del combustible.</p>
+<p><b>Modelo 1:</b> \(\widehat{\ln Y}=-4{,}93+0{,}94\ln X+0{,}31\ln P_1-0{,}26\ln P_2+0{,}44\ln P_3\), con errores estándar (1,96) (0,11) (0,23) (0,29) (0,07) y RSS = 0,336.</p>
+<p><b>Modelo 2</b> (con \(\beta_3+\beta_4+\beta_5=1\)): \(\widehat{\ln(Y/P_3)}=-6{,}55+0{,}91\ln X+0{,}51\ln(P_1/P_3)+0{,}09\ln(P_2/P_3)\), con RSS = 0,364.</p>
+<p><b>a)</b> Interprete. <b>b)</b> ¿Cómo averiguaría si la restricción es válida?</p>`,
+saber:[String.raw`En un modelo log-log cada coeficiente es una elasticidad.`,String.raw`n = 29, k = 5, q = 1.`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> En el modelo 1, el costo sube 0,94 % por cada 1 % más de producto (economías de escala leves) y es significativo; también lo es el precio del combustible (0,44). Los precios del trabajo y del capital no son significativos y el del capital tiene signo negativo, contrario a lo esperado. En el modelo 2 la elasticidad del producto es 0,91 y la del combustible se obtiene por diferencia: \(1-0{,}51-0{,}09=0{,}40\).</li>
+<li><b>b)</b> H₀: \(\beta_3+\beta_4+\beta_5=1\). F (64): \(F=\dfrac{(0{,}364-0{,}336)/1}{0{,}336/24}=2{,}00\) contra \(F_{0{,}05}(1,24)=4{,}26\) (p = 0,170).</li>
+<li>\(W=29\,\dfrac{0{,}028}{0{,}336}=2{,}417\), \(LR=29\ln\dfrac{0{,}364}{0{,}336}=2{,}321\) y \(LM=29\,\dfrac{0{,}028}{0{,}364}=2{,}231\), contra \(\chi^2_{0{,}05}(1)=3{,}841\).</li>
+<li>También se puede con la t de \(b_3+b_4+b_5-1\), pero para eso hace falta la covarianza de los coeficientes, que no viene en el enunciado.</li></ol>`,
+res:String.raw`<p>F = 2,00; W = 2,42; LR = 2,32 y LM = 2,23: no se rechaza que las elasticidades precio sumen 1 (homogeneidad de grado uno en precios).</p>`},
+
+{id:"ep4-9", n:"9", t:"Mortalidad infantil: incluir TFT y probar β₄ + 6β₃ = 0", tipo:"Pruebas LR, W y LM en todas sus versiones", temas:["mv-pruebas","inferencia"], tool:{id:"t-datos",pre:"mi",lbl:"Abrir la base de mortalidad infantil en el Laboratorio de datos"},
+enun:String.raw`<p>Con 64 países se estiman (1) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\mu\) y (2) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\beta_4TFT+\mu\).</p>
+<p><b>Modelo (1):</b> b = (263,641586; −0,005647; −2,231586), R² = 0,7077, \(RSS_1=106.315{,}6\), \(l_1=-328{,}1012\), Jarque-Bera = 0,5594 (p = 0,736). <b>Modelo (2):</b> b = (168,306690; −0,005511; −1,768029; 12,868636), errores estándar 32,89, 0,001878, 0,248017 y 4,190533, R² = 0,7474, \(RSS_2=91.875{,}38\), \(l_2=-323{,}4298\); var(b₃) = 0,0615124, var(b₄) = 17,56056, cov(b₃, b₄) = 0,63257. Regresión auxiliar de los errores del modelo (1) contra PIBPC, TAF y TFT: \(R^2_{aux}=0{,}1358243\).</p>
+<p>Con la restricción \(\beta_4+6\beta_3=0\): \(RSS_{R1}=92.161{,}3\), \(l_R=-323{,}5293\), y la regresión auxiliar de sus errores da \(R^2_{aux1}=0{,}003102305\).</p>
+<p><b>a)</b> Interprete. <b>b)</b> Pruebe si se justifica incluir TFT con W, LR y LM en todas sus versiones. <b>c)</b> Haga lo mismo para \(\beta_4+6\beta_3=0\).</p>`,
+saber:[String.raw`Para b), el modelo restringido es el (1) y el no restringido el (2). H₀: β₄ = 0, q = 1.`,String.raw`La regresión auxiliar de los errores del restringido contra todas las regresoras es la LM: \(LM=nR^2_{aux}\).`],
+sol:String.raw`<ol class="steps">
+<li><b>a)</b> En el modelo (1), un dólar más de PIB per cápita reduce la mortalidad en 0,0056 por mil, y un punto más de alfabetismo femenino la reduce en 2,23; ambos significativos, R² = 0,71 y errores normales. En el modelo (2), un hijo más por mujer (TFT) aumenta la mortalidad en 12,87 por mil: el signo positivo es el esperado, porque más hijos se asocian con menos cuidado por niño y peores condiciones. La regresión auxiliar es significativa (F = 3,14, p = 0,032), así que TFT explica lo que el modelo (1) deja en los errores: no conviene excluirla.</li>
+<li><b>b)</b> \(LR=2(-323{,}4298+328{,}1012)=9{,}343\), o \(64\ln\dfrac{106.315{,}6}{91.875{,}38}=9{,}343\).</li>
+<li>\(W=64\,\dfrac{14.440{,}22}{91.875{,}38}=10{,}059\). Solo con el modelo (2): \(t=12{,}868636/4{,}190533=3{,}071\), \(F=t^2=9{,}430\) y \(W=9{,}430\cdot\dfrac{64}{60}=10{,}059\).</li>
+<li>\(LM=64\,\dfrac{14.440{,}22}{106.315{,}6}=8{,}693\), igual a \(nR^2_{aux}=64(0{,}1358243)=8{,}693\).</li>
+<li>Las tres superan \(\chi^2_{0{,}05}(1)=3{,}841\): se rechaza β₄ = 0. Otras pruebas: la t (59) (t = 3,07, p = 0,003) y la F (64) (F = 9,43).</li>
+<li><b>c)</b> H₀: \(\beta_4+6\beta_3=0\). \(b_4+6b_3=12{,}868636-10{,}608174=2{,}260462\) y \(\operatorname{var}(b_4+6b_3)=17{,}56056+36(0{,}0615124)+12(0{,}63257)=27{,}36585\). F (60) = \(2{,}260462^2/27{,}36585=0{,}1867\) y \(W=0{,}1867\cdot\dfrac{64}{60}=0{,}1992\), igual a \(64\,\dfrac{285{,}92}{91.875{,}38}=0{,}1992\).</li>
+<li>\(LR=2(-323{,}4298+323{,}5293)=0{,}199\), o \(64\ln\dfrac{92.161{,}3}{91.875{,}38}=0{,}1989\). \(LM=64\,\dfrac{285{,}92}{92.161{,}3}=0{,}1986=nR^2_{aux1}=64(0{,}003102305)\).</li></ol>`,
+res:String.raw`<p>b) W = 10,06, LR = 9,34 y LM = 8,69 &gt; 3,841: se justifica incluir TFT. c) W = 0,199, LR = 0,199 y LM = 0,199 &lt; 3,841: no se rechaza \(\beta_4+6\beta_3=0\). La regresión auxiliar no significativa (F = 0,06, p = 0,98) dice lo mismo: los errores del modelo restringido no tienen nada que las regresoras puedan explicar, así que imponer la restricción no le quita ajuste al modelo.</p>`},
+
+{id:"ep4-10", n:"10", t:"Demanda de un artículo: β₂ + 3β₃ = 0 con LR, W y LM", tipo:"Pruebas LR, W y LM", temas:["mv-pruebas","inferencia"],
+enun:String.raw`<p>Con datos de 1971 a 2005 (n = 35) se estima \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\beta_4X_{4t}+\mu_t\) (demanda, precio, ingreso y precio del sustituto): b = (72,2928; −5,8139; 1,6672; 1,5408), \(RSS_{NR}=386{,}5032\); var(b₂) = 0,24705304, var(b₃) = 0,51093128, cov(b₂, b₃) = 0,09828469. El modelo restringido con β₂ + 3β₃ = 0 da \(RSS_R=388{,}017\), y la regresión auxiliar de sus errores contra X₂, X₃ y X₄ da \(R^2_{aux}=0{,}003901352\) (F = 0,04, p = 0,989).</p>
+<p>Interprete la regresión auxiliar y úsela para decidir sobre H₀. Haga las pruebas LR, Wald y LM en todas las versiones posibles.</p>`,
+saber:[String.raw`n = 35, k = 4, q = 1; \(\chi^2_{0{,}05}(1)=3{,}841\).`],
+sol:String.raw`<ol class="steps">
+<li><b>Regresión auxiliar:</b> ningún coeficiente es significativo y R² = 0,0039: los errores del modelo restringido no se pueden explicar con las regresoras, así que la restricción no le quita información al modelo. \(LM=nR^2_{aux}=35(0{,}003901352)=0{,}1365\).</li>
+<li><b>LM</b> con las RSS: \(35\,\dfrac{388{,}017-386{,}5032}{388{,}017}=0{,}1365\).</li>
+<li><b>LR</b> \(=35\ln\dfrac{388{,}017}{386{,}5032}=0{,}1368\). (No se dan las log-verosimilitudes, pero daría lo mismo.)</li>
+<li><b>W</b> con las RSS: \(35\,\dfrac{1{,}5138}{386{,}5032}=0{,}1371\). Solo con el NR: \(b_2+3b_3=-0{,}8123\), \(\operatorname{var}=0{,}24705+9(0{,}51093)+6(0{,}09828)=5{,}43514\), F (60) = 0,1214 y \(W=0{,}1214\cdot\dfrac{35}{31}=0{,}1371\).</li></ol>`,
+res:String.raw`<p>W = 0,137 ≥ LR = 0,137 ≥ LM = 0,137, todas muy por debajo de 3,841: no se rechaza β₂ + 3β₃ = 0, lo mismo que concluye la regresión auxiliar y la F = 0,121 del Taller 2.</p>`}]});
+
 
 // ===================== AJUSTE AL PROGRAMA 1504110 =====================
 // Agrupa la ruta en las seis unidades del programa, sube al tronco las ramas que el programa evalúa
@@ -1964,7 +2105,56 @@ const LABX=t=>`<section><h3>Laboratorio${t?": "+t:""}</h3><div class="sim" id="s
 const ins=(after,items)=>{const i=TRUNK.findIndex(t=>t.id===after);TRUNK.splice(i<0?TRUNK.length:i+1,0,...items)};
 const take=id=>{for(const g of BRANCHES){const k=(g.items||[]).findIndex(x=>x.id===id);if(k>=0)return g.items.splice(k,1)[0]}return null};
 ins("inferencia",[
-{id:"mv-pruebas", t:"Máxima verosimilitud y las pruebas LR, Wald y LM", sim:"mvtest", html:String.raw`
+{id:"mv-estimacion", t:"Máxima verosimilitud: verosimilitud, score, Hessiana e información", html:String.raw`
+<section><h3>La idea (Dinardo, capítulo 5)</h3><p class="lead">El estimador de máxima verosimilitud (MLE) escoge el valor del parámetro θ que hace <b>más probable</b> la muestra que se observó. Se arma la probabilidad conjunta de la muestra como función de θ y se busca su máximo.</p>
+<p>Con una muestra aleatoria \(X_1,\dots,X_n\) (independientes y con la misma distribución \(f(x;\theta)\)):</p>
+<div class="mj">\[L(\theta)=\prod_{i=1}^n f(x_i;\theta)\qquad l(\theta)=\ln L(\theta)=\sum_{i=1}^n\ln f(x_i;\theta)\]</div>
+<p>Se trabaja con el logaritmo \(l(\theta)\) porque convierte el producto en suma y tiene el mismo máximo.</p></section>
+<section><h3>Los cinco objetos que pide el profesor</h3>
+<div class="tbl"><table><tr><th>Objeto</th><th>Definición</th><th>Para qué sirve</th></tr>
+<tr><td><b>Verosimilitud</b> \(L(\theta)\) y log-verosimilitud \(l(\theta)\)</td><td>\(L=\prod f(x_i;\theta)\), \(l=\ln L\)</td><td>Lo que se maximiza.</td></tr>
+<tr><td><b>Score</b> \(s(\theta)\)</td><td>\(s(\theta)=\partial l/\partial\theta\)</td><td>Igualándolo a cero se obtiene el MLE: \(s(\hat\theta)=0\). Cumple \(E[s(\theta)]=0\).</td></tr>
+<tr><td><b>Hessiana</b> \(\mathbf H\)</td><td>\(\mathbf H=\partial^2 l/\partial\theta\,\partial\theta'\)</td><td>Curvatura: si es negativa en \(\hat\theta\), es un máximo.</td></tr>
+<tr><td><b>\(\mathbf H_1\)</b> (producto exterior del score)</td><td>\(\mathbf H_1=\left(\dfrac{\partial l}{\partial\theta}\right)\left(\dfrac{\partial l}{\partial\theta}\right)'\)</td><td>Otra forma de medir la información.</td></tr>
+<tr><td><b>Matriz de información</b> \(\mathbf I(\theta)\)</td><td>\(\mathbf I(\theta)=-E(\mathbf H)=E(\mathbf H_1)\)</td><td>Su inversa es la varianza asintótica del MLE: \(\operatorname{var}(\hat\theta)=\mathbf I(\theta)^{-1}\).</td></tr></table></div>
+<p class="warn"><b>Igualdad de la información:</b> \(E(\mathbf H_1)=-E(\mathbf H)\). Como \(E[s]=0\), \(E(\mathbf H_1)=E(s\,s')=\operatorname{var}(s)\). Por eso, para verificarla, basta calcular la varianza del score.</p></section>
+<section><h3>Receta en cinco pasos</h3>
+<ol class="steps">
+<li>Escribir \(f(x;\theta)\), multiplicar las n densidades y tomar logaritmo.</li>
+<li>Derivar \(l(\theta)\): ese es el score. Igualar a cero y despejar: ese es \(\hat\theta_{MLE}\).</li>
+<li>Probar \(E[s(\theta)]=0\): reemplazar \(E(X_i)\) en el score.</li>
+<li>Derivar otra vez: la Hessiana. Tomar su esperanza y cambiar el signo: la información.</li>
+<li>Invertir la información: \(\operatorname{var}(\hat\theta_{MLE})=\mathbf I(\theta)^{-1}\).</li></ol></section>
+<section><h3>Resultados para las distribuciones del taller</h3>
+<div class="tbl"><table><tr><th>Población</th><th>\(l(\theta)\)</th><th>Score</th><th>MLE</th><th>\(\mathbf I(\theta)\)</th><th>var(MLE)</th></tr>
+<tr><td>Bernoulli: \(\theta^x(1-\theta)^{1-x}\)</td><td>\(\sum x\ln\theta+(n-\sum x)\ln(1-\theta)\)</td><td>\(\dfrac{\sum x}{\theta}-\dfrac{n-\sum x}{1-\theta}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\theta(1-\theta)}\)</td><td>\(\dfrac{\theta(1-\theta)}{n}\)</td></tr>
+<tr><td>Exponencial: \(\frac1\theta e^{-x/\theta}\)</td><td>\(-n\ln\theta-\dfrac{\sum x}{\theta}\)</td><td>\(-\dfrac n\theta+\dfrac{\sum x}{\theta^2}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\theta^2}\)</td><td>\(\dfrac{\theta^2}{n}\)</td></tr>
+<tr><td>Poisson: \(\frac{e^{-\lambda}\lambda^x}{x!}\)</td><td>\(-n\lambda+\sum x\ln\lambda-\sum\ln x!\)</td><td>\(-n+\dfrac{\sum x}{\lambda}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\lambda}\)</td><td>\(\dfrac{\lambda}{n}\)</td></tr>
+<tr><td>Geométrica: \(\theta(1-\theta)^{x-1}\)</td><td>\(n\ln\theta+(\sum x-n)\ln(1-\theta)\)</td><td>\(\dfrac n\theta-\dfrac{\sum x-n}{1-\theta}\)</td><td>\(\dfrac{1}{\bar x}\)</td><td>\(\dfrac{n}{\theta^2(1-\theta)}\)</td><td>\(\dfrac{\theta^2(1-\theta)}{n}\)</td></tr>
+<tr><td>Normal, σ² conocida</td><td>\(-\frac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x-\mu)^2}{2\sigma^2}\)</td><td>\(\dfrac{\sum(x-\mu)}{\sigma^2}\)</td><td>\(\bar x\)</td><td>\(\dfrac{n}{\sigma^2}\)</td><td>\(\dfrac{\sigma^2}{n}\)</td></tr>
+<tr><td>Normal, \(\theta=(\mu,\sigma^2)\)</td><td>\(-\frac n2\ln2\pi-\frac n2\ln\sigma^2-\dfrac{\sum(x-\mu)^2}{2\sigma^2}\)</td><td>\(\begin{bmatrix}\sum(x-\mu)/\sigma^2\\-\frac{n}{2\sigma^2}+\frac{\sum(x-\mu)^2}{2\sigma^4}\end{bmatrix}\)</td><td>\(\bar x\); \(\dfrac{\sum(x-\bar x)^2}{n}\)</td><td>\(\begin{bmatrix}\frac n{\sigma^2}&0\\0&\frac n{2\sigma^4}\end{bmatrix}\)</td><td>\(\dfrac{\sigma^2}{n}\); \(\dfrac{2\sigma^4}{n}\)</td></tr></table></div></section>
+<section><h3>Propiedades del MLE</h3>
+<ul><li><b>Consistente:</b> \(\hat\theta\to\theta\) cuando n crece.</li>
+<li><b>Asintóticamente normal:</b> \(\hat\theta\overset{a}{\sim}N\left(\theta,\mathbf I(\theta)^{-1}\right)\).</li>
+<li><b>Asintóticamente eficiente:</b> alcanza la cota de Cramér-Rao, \(\mathbf I(\theta)^{-1}\); ningún estimador consistente tiene menor varianza asintótica.</li>
+<li><b>Invarianza:</b> si \(\hat\theta\) es el MLE de θ, el MLE de \(g(\theta)\) es \(g(\hat\theta)\). Por ejemplo, en la exponencial \(\sigma^2=\theta^2\Rightarrow\hat\sigma^2=\bar x^2\), y la mediana \(\theta\ln2\Rightarrow\tilde\mu=\bar x\ln 2\); en la Poisson \(\sigma=\sqrt\lambda\Rightarrow\hat\sigma=\sqrt{\bar x}\).</li>
+<li>Puede ser <b>sesgado</b> en muestras pequeñas: \(\hat\sigma^2_{MLE}=\sum(x-\bar x)^2/n\) tiene sesgo, pero es consistente.</li></ul></section>
+<section><h3>El modelo de regresión lineal por máxima verosimilitud</h3>
+<p>Con \(\mathbf y=X\beta+\mu\) y \(\mu\sim N(0,\sigma^2I_n)\):</p>
+<div class="mj">\[l(\beta,\sigma^2)=-\frac n2\ln(2\pi)-\frac n2\ln\sigma^2-\frac{(\mathbf y-X\beta)'(\mathbf y-X\beta)}{2\sigma^2}\]</div>
+<ul><li>\(\hat\beta_{MLE}=(X'X)^{-1}X'\mathbf y=\mathbf b_{OLS}\): con errores normales, MCO y máxima verosimilitud coinciden en β.</li>
+<li>\(\hat\sigma^2_{MLE}=\mathbf e'\mathbf e/n=RSS/n\), distinto de \(S^2=RSS/(n-k)\).</li>
+<li>Información: \(\mathbf I(\beta,\sigma^2)=\begin{bmatrix}X'X/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\), así que \(\operatorname{var}(\hat\beta)=\sigma^2(X'X)^{-1}\).</li>
+<li>Log-verosimilitud en el máximo (lo que da <code>logLik()</code> en R): \(l=-\dfrac n2\left[1+\ln(2\pi)+\ln\left(\dfrac{RSS}{n}\right)\right]\).</li></ul>
+<pre class="code"><code>eq1 = lm(Yt ~ X2t + X3t)
+logLik(eq1)                    # log-verosimilitud en el máximo
+n = length(Yt); RSS = deviance(eq1)
+(S2_MLE = RSS / n)             # varianza MLE
+-n/2 * (1 + log(2*pi) + log(RSS/n))   # lo mismo que logLik</code></pre></section>`,
+qs:[{q:"En una muestra de una Poisson, x̄ = 3,2 con n = 50. ¿Cuál es el MLE de λ y su varianza asintótica estimada?",a:"λ̂ = x̄ = 3,2 y var(λ̂) = λ/n ≈ 3,2/50 = 0,064."},
+{q:"¿Por qué el MLE de σ en una Poisson es la raíz de x̄?",a:"Por la propiedad de invarianza: σ = √λ, así que su MLE es √λ̂ = √x̄."},
+{q:"Si un modelo lineal tiene RSS = 92.605,07 con n = 50, ¿cuál es la varianza MLE?",a:"σ̂²_MLE = RSS/n = 1.852,10 (frente a S² = RSS/(n − k) = 1.970,32 con k = 3)."}]},
+{id:"mv-pruebas", t:"Pruebas LR, Wald y LM (todas las versiones)", sim:"mvtest", html:String.raw`
 <section><h3>Estimación por máxima verosimilitud</h3><p class="lead">Con \(u\sim N(0,\sigma^2I)\), la log-verosimilitud del modelo lineal es</p>
 <div class="mj">\[\ln L(\beta,\sigma^2)=-\frac n2\ln(2\pi)-\frac n2\ln\sigma^2-\frac{(y-X\beta)'(y-X\beta)}{2\sigma^2}\]</div>
 <p>y sus estimadores son \(\hat\beta_{MV}=(X'X)^{-1}X'y\) (igual a MCO) y \(\hat\sigma^2_{MV}=e'e/n\) (sesgado pero consistente). El EMV es consistente, asintóticamente normal y eficiente: su varianza asintótica es la inversa de la matriz de información, \(I(\theta)^{-1}\).</p></section>
@@ -1975,6 +2165,29 @@ ins("inferencia",[
 <tr><td>Multiplicadores de Lagrange (LM)</td><td>Solo el restringido</td><td>¿Qué tan empinada es \(\ln L\) en la restricción?</td><td>\(LM=n\frac{RSS_R-RSS_{NR}}{RSS_R}=nR^2_{aux}\)</td></tr></table></div>
 <p>Las tres son asintóticamente \(\chi^2_q\) bajo \(H_0\) y en muestras finitas cumplen \(W\ge LR\ge LM\). La prueba \(F\) es la versión exacta (con normalidad) de Wald: \(W=qF\cdot\frac{n}{n-k}\).</p></section>
 <section><h3>Regresión restringida</h3><p>Minimizar \(e'e\) sujeto a \(R\beta=r\) da \(\hat\beta_R=\hat\beta-(X'X)^{-1}R'[R(X'X)^{-1}R']^{-1}(R\hat\beta-r)\). Ejemplos: rendimientos constantes a escala en una Cobb-Douglas (\(\beta_K+\beta_L=1\)), igualdad de coeficientes.</p></section>
+<section><h3>Todas las versiones de cada prueba</h3>
+<p>H₀: \(R\beta=r\) con q restricciones. Modelo no restringido (NR) y restringido (R), n observaciones y k parámetros en el NR. Las tres se comparan con \(\chi^2_{0{,}05}(q)\) (3,841 si q = 1; 5,991 si q = 2) y se rechaza H₀ si el estadístico es mayor.</p>
+<div class="tbl"><table><tr><th>Prueba</th><th>Versión</th><th>Fórmula</th><th>Qué necesitas</th></tr>
+<tr><td rowspan="2"><b>LR</b> (razón de verosimilitud)</td><td>Con las log-verosimilitudes</td><td>\(LR=2\,(l_{NR}-l_R)\)</td><td><code>logLik()</code> de los dos modelos</td></tr>
+<tr><td>Con las RSS</td><td>\(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}\)</td><td>Las dos RSS</td></tr>
+<tr><td rowspan="3"><b>W</b> (Wald)</td><td>Matricial, solo con el NR</td><td>\(W=(R\mathbf b-r)'\left[R\,\hat\sigma^2_{MLE}(X'X)^{-1}R'\right]^{-1}(R\mathbf b-r)\)</td><td>b y su varianza; \(\hat\sigma^2_{MLE}=RSS_{NR}/n\)</td></tr>
+<tr><td>A partir de la F</td><td>\(W=q\,F\,\dfrac{n}{n-k}\)</td><td>La F de la restricción (con <code>vcov()</code>, que usa S²)</td></tr>
+<tr><td>Con las RSS</td><td>\(W=n\,\dfrac{RSS_R-RSS_{NR}}{RSS_{NR}}\)</td><td>Las dos RSS</td></tr>
+<tr><td rowspan="2"><b>LM</b> (multiplicadores de Lagrange)</td><td>Regresión auxiliar, solo con el R</td><td>\(LM=nR^2_{aux}\): se regresan los errores del modelo restringido \(\mathbf e_R\) contra <b>todas</b> las regresoras del NR</td><td>Los errores del restringido</td></tr>
+<tr><td>Con las RSS</td><td>\(LM=n\,\dfrac{RSS_R-RSS_{NR}}{RSS_R}\)</td><td>Las dos RSS</td></tr></table></div>
+<ul><li><b>Relación con la F (64):</b> \(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}\) es la versión exacta en muestras finitas con errores normales. Compárala con \(F_{0{,}05}(q,n-k)\).</li>
+<li><b>Orden:</b> con los mismos datos siempre \(W\ge LR\ge LM\). Puede pasar que W rechace y LM no.</li>
+<li><b>¿Por qué <code>vcov()</code> no da directamente W?</b> Porque <code>vcov()</code> usa \(S^2=RSS/(n-k)\); la varianza de máxima verosimilitud es \(RSS/n\). Por eso \(W=qF\cdot n/(n-k)\).</li>
+<li><b>Cuidado con <code>restriktor</code>:</b> su \(S^2\) del modelo restringido divide por \(n-k+q\). Por eso el profesor calcula \(RSS_R=(n-k+q)S^2_R\).</li></ul>
+<pre class="code"><code># Con el modelo NR (eq_nr) y el restringido (eq_r) ya estimados
+n = length(resid(eq_nr)); q = 1
+RSS_NR = deviance(eq_nr); RSS_R = (n - k + q) * eq_r$s2   # restriktor
+(LR  = 2 * (logLik(eq_nr) - logLik(eq_r)))
+(LR1 = n * log(RSS_R / RSS_NR))
+(W   = n * (RSS_R - RSS_NR) / RSS_NR)
+(LM  = n * (RSS_R - RSS_NR) / RSS_R)
+qchisq(0.95, df = q)                                     # valor crítico
+pchisq(LR1, df = q, lower.tail = F)                      # p-valor</code></pre></section>
 ${LABX("las tres pruebas con los mismos datos")}`,
 qs:[{q:"Con n = 50, RSS_R = 120 y RSS_NR = 100, calcule W, LR y LM.",a:"W = 50·20/100 = 10; LR = 50·ln(1,2) = 9,12; LM = 50·20/120 = 8,33. Se cumple W ≥ LR ≥ LM."}]}]);
 const B2=["multicol","hetero","autocorr","especificacion"].map(take).filter(Boolean),B4=["vi","simultaneas"].map(take).filter(Boolean),B6=["discreta"].map(take).filter(Boolean);
