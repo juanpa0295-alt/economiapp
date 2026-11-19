@@ -761,3 +761,353 @@ sol:String.raw`<ol class="steps">
 <li><b>LR</b> \(=35\ln\dfrac{388{,}017}{386{,}5032}=0{,}1368\). (No se dan las log-verosimilitudes, pero daría lo mismo.)</li>
 <li><b>W</b> con las RSS: \(35\,\dfrac{1{,}5138}{386{,}5032}=0{,}1371\). Solo con el NR: \(b_2+3b_3=-0{,}8123\), \(\operatorname{var}=0{,}24705+9(0{,}51093)+6(0{,}09828)=5{,}43514\), F (60) = 0,1214 y \(W=0{,}1214\cdot\dfrac{35}{31}=0{,}1371\).</li></ol>`,
 res:String.raw`<p>W = 0,137 ≥ LR = 0,137 ≥ LM = 0,137, todas muy por debajo de 3,841: no se rechaza β₂ + 3β₃ = 0, lo mismo que concluye la regresión auxiliar y la F = 0,121 del Taller 2.</p>`}]});
+
+// ---------- Dinardo, capítulo 5 (problemas 5.1, 5.2, 5.3, 5.4, 5.7 y 5.8) y micropasos de Ejercicios propuestos 4
+(function(){
+// mp: lista de micropasos. Cada paso es [expresión, por qué]
+const mp=a=>`<ol class="mp">${a.map(([e,w])=>`<li><div class="mp-e">${e}</div>${w?`<div class="por">${w}</div>`:""}</li>`).join("")}</ol>`;
+const h=t=>`<h5>${t}</h5>`;
+
+TALLERES.push({id:"tl-dinardo5", t:"Dinardo, capítulo 5", nl:"problema", sub:"Problemas 5.1, 5.2, 5.3, 5.4, 5.7 y 5.8 (Johnston y Dinardo): MLE y pruebas LR, W y LM", anchor:"mv-estimacion",
+intro:String.raw`Los problemas del capítulo 5 del texto guía que pide el profesor en el punto 11 de los Ejercicios propuestos 4. Los problemas 5.7 y 5.8 usan los datos del Ejemplo 3.3 del libro (n = 5). Cada punto tiene el paso a paso y, debajo, un desplegable de <b>micropasos</b> con cada cálculo, cambio de forma y propiedad usada. Los números se verificaron en R.`,
+puntos:[
+{id:"d5-1", n:"5.1", t:"Bernoulli: media, varianza, MLE y varianza por las dos expresiones de la información", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>La variable y toma los valores 0 o 1 con \(f(y)=\theta^y(1-\theta)^{1-y}\), \(0\le\theta\le1\). Así, \(f(1)=\theta\) (éxito) y \(f(0)=1-\theta\) (fracaso). Verifique que \(E(y)=\theta\) y \(\operatorname{var}(y)=\theta(1-\theta)\). Con una muestra aleatoria de n observaciones, encuentre el MLE de θ y la varianza de su distribución muestral. Encuentre la varianza asintótica del MLE con cada una de las dos expresiones de la matriz de información de la ecuación (5.3).</p>`,
+saber:[String.raw`Ecuación (5.3): \(\mathbf I(\theta)=E\left[\left(\dfrac{\partial l}{\partial\theta}\right)\left(\dfrac{\partial l}{\partial\theta}\right)'\right]=-E\left[\dfrac{\partial^2l}{\partial\theta\,\partial\theta'}\right]\).`,String.raw`Llame \(s=\sum y_i\) al número de éxitos; \(E(s)=n\theta\) y \(\operatorname{var}(s)=n\theta(1-\theta)\).`],
+sol:String.raw`<ol class="steps">
+<li>\(E(y)=0(1-\theta)+1(\theta)=\theta\); \(E(y^2)=\theta\), así que \(\operatorname{var}(y)=\theta-\theta^2=\theta(1-\theta)\).</li>
+<li>\(L=\theta^{s}(1-\theta)^{n-s}\) y \(l=s\ln\theta+(n-s)\ln(1-\theta)\).</li>
+<li>\(\dfrac{\partial l}{\partial\theta}=\dfrac s\theta-\dfrac{n-s}{1-\theta}=0\Rightarrow\hat\theta=\dfrac sn=\bar y=p\), la proporción muestral de éxitos.</li>
+<li>Varianza de la distribución muestral: \(\operatorname{var}(p)=\dfrac{\theta(1-\theta)}{n}\).</li>
+<li>Con la Hessiana: \(-E\left[\dfrac{\partial^2l}{\partial\theta^2}\right]=\dfrac{n}{\theta(1-\theta)}\). Con el score al cuadrado: \(E\left[\left(\dfrac{\partial l}{\partial\theta}\right)^2\right]=\dfrac{n}{\theta(1-\theta)}\). Las dos dan la misma información y la varianza asintótica \(\dfrac{\theta(1-\theta)}{n}\).</li></ol>`,
+res:String.raw`<p>\(\hat\theta=p=s/n\), con \(\operatorname{var}(p)=\theta(1-\theta)/n\); las dos expresiones de la información dan \(n/[\theta(1-\theta)]\), y en este caso la varianza asintótica coincide con la exacta.</p>`,
+micro:h("Media y varianza de y")+mp([
+[String.raw`\(E(y)=\sum_y y\,f(y)=0\cdot f(0)+1\cdot f(1)\)`,"Definición de esperanza de una variable discreta: suma de cada valor por su probabilidad."],
+[String.raw`\(=0\cdot(1-\theta)+1\cdot\theta=\theta\)`,"Se reemplaza f(0) = 1 − θ y f(1) = θ."],
+[String.raw`\(E(y^2)=0^2(1-\theta)+1^2\theta=\theta\)`,"Misma definición aplicada a y². Como y solo vale 0 o 1, y² = y."],
+[String.raw`\(\operatorname{var}(y)=E(y^2)-[E(y)]^2=\theta-\theta^2\)`,"Fórmula corta de la varianza: var(y) = E(y²) − [E(y)]²."],
+[String.raw`\(=\theta(1-\theta)\)`,"Factor común θ."]])+
+h("Verosimilitud y log-verosimilitud")+mp([
+[String.raw`\(L(\theta)=\prod_{i=1}^n\theta^{y_i}(1-\theta)^{1-y_i}\)`,"Muestra aleatoria: las observaciones son independientes, así que la densidad conjunta es el producto de las marginales."],
+[String.raw`\(=\theta^{\sum y_i}(1-\theta)^{\sum(1-y_i)}\)`,String.raw`Producto de potencias de la misma base: se suman los exponentes, \(a^m a^n=a^{m+n}\).`],
+[String.raw`\(=\theta^{s}(1-\theta)^{n-s}\)`,String.raw`Se llama \(s=\sum y_i\); y \(\sum(1-y_i)=n-\sum y_i=n-s\).`],
+[String.raw`\(l(\theta)=\ln\theta^s+\ln(1-\theta)^{n-s}\)`,String.raw`Logaritmo de un producto: \(\ln(ab)=\ln a+\ln b\).`],
+[String.raw`\(=s\ln\theta+(n-s)\ln(1-\theta)\)`,String.raw`Logaritmo de una potencia: \(\ln a^k=k\ln a\).`]])+
+h("Score y MLE")+mp([
+[String.raw`\(\dfrac{\partial}{\partial\theta}\,s\ln\theta=\dfrac s\theta\)`,String.raw`Derivada del logaritmo: \(\frac{d}{d\theta}\ln\theta=\frac1\theta\); s es constante respecto a θ.`],
+[String.raw`\(\dfrac{\partial}{\partial\theta}(n-s)\ln(1-\theta)=(n-s)\cdot\dfrac{1}{1-\theta}\cdot(-1)=-\dfrac{n-s}{1-\theta}\)`,"Regla de la cadena: la derivada de ln(u) es u′/u, con u = 1 − θ y u′ = −1."],
+[String.raw`\(\dfrac s\theta-\dfrac{n-s}{1-\theta}=0\)`,"Condición de primer orden: el score se iguala a cero en el máximo."],
+[String.raw`\(s(1-\theta)=\theta(n-s)\)`,"Se multiplican los dos lados por θ(1 − θ) > 0 (se quitan los denominadores)."],
+[String.raw`\(s-s\theta=n\theta-s\theta\)`,"Se distribuye en los dos lados."],
+[String.raw`\(s=n\theta\Rightarrow\hat\theta=\dfrac sn\)`,"El término −sθ aparece en los dos lados y se cancela; se despeja θ."],
+[String.raw`\(\dfrac{\partial^2l}{\partial\theta^2}=-\dfrac s{\theta^2}-\dfrac{n-s}{(1-\theta)^2}<0\)`,"Condición de segundo orden: la segunda derivada es negativa (suma de dos términos negativos), así que es un máximo."]])+
+h("Varianza de la distribución muestral")+mp([
+[String.raw`\(\operatorname{var}(p)=\operatorname{var}\left(\dfrac sn\right)=\dfrac{1}{n^2}\operatorname{var}(s)\)`,String.raw`Propiedad: \(\operatorname{var}(aX)=a^2\operatorname{var}(X)\), con a = 1/n.`],
+[String.raw`\(\operatorname{var}(s)=\sum\operatorname{var}(y_i)=n\theta(1-\theta)\)`,"Por independencia, la varianza de una suma es la suma de las varianzas; cada una vale θ(1 − θ)."],
+[String.raw`\(\operatorname{var}(p)=\dfrac{n\theta(1-\theta)}{n^2}=\dfrac{\theta(1-\theta)}{n}\)`,"Se simplifica una n."]])+
+h("Información con la Hessiana (segunda expresión)")+mp([
+[String.raw`\(E\left[\dfrac{\partial^2l}{\partial\theta^2}\right]=-\dfrac{E(s)}{\theta^2}-\dfrac{n-E(s)}{(1-\theta)^2}\)`,"La esperanza es lineal y θ es una constante: solo s es aleatoria."],
+[String.raw`\(=-\dfrac{n\theta}{\theta^2}-\dfrac{n-n\theta}{(1-\theta)^2}=-\dfrac n\theta-\dfrac{n}{1-\theta}\)`,"E(s) = nθ; se simplifica θ en el primero y (1 − θ) en el segundo, porque n − nθ = n(1 − θ)."],
+[String.raw`\(=-\dfrac{n(1-\theta)+n\theta}{\theta(1-\theta)}=-\dfrac{n}{\theta(1-\theta)}\)`,"Denominador común θ(1 − θ); en el numerador, −nθ + nθ se cancela."],
+[String.raw`\(\mathbf I(\theta)=\dfrac{n}{\theta(1-\theta)}\)`,"La información es menos la esperanza de la Hessiana."]])+
+h("Información con el score al cuadrado (primera expresión)")+mp([
+[String.raw`\(\dfrac{\partial l}{\partial\theta}=\dfrac{s(1-\theta)-\theta(n-s)}{\theta(1-\theta)}=\dfrac{s-n\theta}{\theta(1-\theta)}\)`,"Denominador común; en el numerador, −sθ + sθ se cancela."],
+[String.raw`\(E\left[\left(\dfrac{\partial l}{\partial\theta}\right)^2\right]=\dfrac{E[(s-n\theta)^2]}{\theta^2(1-\theta)^2}\)`,"El denominador es constante y sale de la esperanza."],
+[String.raw`\(E[(s-n\theta)^2]=\operatorname{var}(s)=n\theta(1-\theta)\)`,"Como E(s) = nθ, la esperanza del cuadrado de la desviación es la varianza de s."],
+[String.raw`\(=\dfrac{n\theta(1-\theta)}{\theta^2(1-\theta)^2}=\dfrac{n}{\theta(1-\theta)}\)`,"Se simplifican θ y (1 − θ). Da lo mismo que con la Hessiana: es la igualdad de la información."],
+[String.raw`\(\operatorname{var}_a(\hat\theta)=\mathbf I(\theta)^{-1}=\dfrac{\theta(1-\theta)}{n}\)`,"La varianza asintótica es la inversa de la información."]])},
+
+{id:"d5-2", n:"5.2", t:"Uniforme en (0, α): un MLE que no sale de derivar", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>La densidad de la distribución uniforme es \(f(x\mid\alpha)=\dfrac1\alpha\), \(0&lt;x&lt;\alpha\). Encuentre el MLE de α.</p>`,
+saber:[String.raw`Cuando el soporte (los valores posibles de x) depende del parámetro, el máximo puede estar en un extremo y no donde la derivada vale cero.`],
+sol:String.raw`<ol class="steps">
+<li>\(L(\alpha)=\alpha^{-n}\) si todas las observaciones cumplen \(x_i&lt;\alpha\), es decir si \(\alpha&gt;\max x_i\); y \(L(\alpha)=0\) si alguna \(x_i\ge\alpha\).</li>
+<li>El score \(-n/\alpha\) nunca vale cero: no hay punto donde la derivada se anule.</li>
+<li>Para \(\alpha&gt;\max x_i\), \(\alpha^{-n}\) es decreciente: la verosimilitud es más grande cuanto más pequeño sea α. El valor más pequeño compatible con los datos es el máximo de la muestra.</li></ol>`,
+res:String.raw`<p>\(\hat\alpha_{MLE}=\max(x_1,\dots,x_n)=x_{(n)}\). Es sesgado hacia abajo (\(E(x_{(n)})=\frac{n}{n+1}\alpha\)), pero consistente. Es un caso donde no se cumplen las condiciones de regularidad, porque el soporte depende de α.</p>`,
+micro:mp([
+[String.raw`\(f(x_i\mid\alpha)=\dfrac1\alpha\cdot\mathbf 1(0<x_i<\alpha)\)`,"La función indicadora 𝟏(·) vale 1 si se cumple la condición y 0 si no: la densidad es cero fuera de (0, α)."],
+[String.raw`\(L(\alpha)=\prod\dfrac1\alpha\mathbf 1(0<x_i<\alpha)=\alpha^{-n}\prod\mathbf 1(x_i<\alpha)\)`,String.raw`Independencia: producto de las densidades. El producto de n veces 1/α es \(\alpha^{-n}\).`],
+[String.raw`\(\prod\mathbf 1(x_i<\alpha)=\mathbf 1(\max x_i<\alpha)\)`,"Todas las x son menores que α si y solo si la más grande lo es. Si una sola falla, el producto vale 0."],
+[String.raw`\(\dfrac{d}{d\alpha}\ln\alpha^{-n}=\dfrac{d}{d\alpha}(-n\ln\alpha)=-\dfrac n\alpha\neq0\)`,"El score nunca se anula: igualar a cero no sirve aquí."],
+[String.raw`\(\alpha_1<\alpha_2\Rightarrow\alpha_1^{-n}>\alpha_2^{-n}\)`,"Con potencia negativa, a mayor α menor valor: L decrece en α dentro de la zona permitida."],
+[String.raw`\(\hat\alpha=\max x_i\)`,"Se escoge el α más pequeño que no hace cero la verosimilitud. (Con desigualdades estrictas el máximo se alcanza en el límite; en la práctica se toma el máximo muestral.)"],
+[String.raw`\(E(x_{(n)})=\dfrac{n}{n+1}\alpha<\alpha\)`,"El máximo de n uniformes en (0, α) tiene esa media: subestima α, pero el sesgo desaparece cuando n crece."]])},
+
+{id:"d5-3", n:"5.3", t:"Estimador alternativo p* = (s + 1)/(n + 2): media, varianza y consistencia", tipo:"Propiedades de estimadores", temas:["mv-estimacion"],
+enun:String.raw`<p>Cuando ocurren s éxitos en n ensayos independientes con probabilidad de éxito θ, la proporción muestral \(p=s/n\) es el MLE de θ (problema 5.1). Considere el estimador alternativo \(p^*=\dfrac{s+1}{n+2}\). Encuentre la media y la varianza de \(p^*\) en términos de la media y la varianza de p. ¿Es \(p^*\) un estimador consistente de θ?</p>`,
+saber:[String.raw`\(E(p)=\theta\), \(\operatorname{var}(p)=\theta(1-\theta)/n\).`,String.raw`Si el sesgo y la varianza tienden a cero cuando n → ∞, el estimador es consistente (converge en media cuadrática).`],
+sol:String.raw`<ol class="steps">
+<li>Como \(s=np\): \(p^*=\dfrac{np+1}{n+2}\).</li>
+<li>\(E(p^*)=\dfrac{nE(p)+1}{n+2}=\dfrac{n\theta+1}{n+2}\).</li>
+<li>\(\operatorname{var}(p^*)=\left(\dfrac{n}{n+2}\right)^2\operatorname{var}(p)=\dfrac{n\theta(1-\theta)}{(n+2)^2}\).</li>
+<li>Sesgo: \(E(p^*)-\theta=\dfrac{1-2\theta}{n+2}\to0\), y la varianza \(\to0\). Es consistente.</li></ol>`,
+res:String.raw`<p>\(E(p^*)=\dfrac{nE(p)+1}{n+2}\) y \(\operatorname{var}(p^*)=\left(\dfrac n{n+2}\right)^2\operatorname{var}(p)\). Es sesgado (salvo si θ = 1/2), pero consistente. Tiene menor varianza que p.</p>`,
+micro:mp([
+[String.raw`\(s=np\)`,"Despejando s de p = s/n."],
+[String.raw`\(p^*=\dfrac{np+1}{n+2}=\dfrac{n}{n+2}\,p+\dfrac{1}{n+2}\)`,"Se separa la fracción: p* es una función lineal de p, de la forma a·p + c."],
+[String.raw`\(E(p^*)=\dfrac{n}{n+2}E(p)+\dfrac1{n+2}\)`,"Linealidad de la esperanza: E(a·p + c) = a·E(p) + c."],
+[String.raw`\(=\dfrac{n\theta+1}{n+2}\)`,"E(p) = θ, porque p es insesgado."],
+[String.raw`\(\operatorname{var}(p^*)=\left(\dfrac n{n+2}\right)^2\operatorname{var}(p)\)`,"var(a·p + c) = a²·var(p): la constante c no cambia la dispersión."],
+[String.raw`\(=\dfrac{n^2}{(n+2)^2}\cdot\dfrac{\theta(1-\theta)}{n}=\dfrac{n\theta(1-\theta)}{(n+2)^2}\)`,"Se reemplaza var(p) y se simplifica una n."],
+[String.raw`\(\text{sesgo}=\dfrac{n\theta+1}{n+2}-\theta=\dfrac{n\theta+1-\theta(n+2)}{n+2}=\dfrac{1-2\theta}{n+2}\)`,"Se resta θ con denominador común; nθ − nθ se cancela."],
+[String.raw`\(\lim_{n\to\infty}\dfrac{1-2\theta}{n+2}=0,\qquad\lim_{n\to\infty}\dfrac{n\theta(1-\theta)}{(n+2)^2}=0\)`,"El numerador queda fijo (o crece como n) y el denominador crece como n o como n²."],
+[String.raw`\(ECM(p^*)=\text{sesgo}^2+\operatorname{var}(p^*)\to0\Rightarrow p^*\xrightarrow{p}\theta\)`,"Si el error cuadrático medio tiende a cero, el estimador converge en probabilidad: es consistente."],
+[String.raw`\(\operatorname{var}(p^*)/\operatorname{var}(p)=\left(\dfrac{n}{n+2}\right)^2<1\)`,"p* es menos variable que p: cambia algo de sesgo por menos varianza."]])},
+
+{id:"d5-4", n:"5.4", t:"Exponencial con la muestra 1, 2, 3: estimador y estimación", tipo:"Estimación MLE", temas:["mv-estimacion"],
+enun:String.raw`<p>Se toma una muestra de tres valores x = 1, 2, 3 de la distribución exponencial \(f(x)=\dfrac1\theta e^{-x/\theta}\). Derive el <b>estimador</b> MV de θ y calcule la <b>estimación</b> MV para estos valores.</p>`,
+saber:[String.raw`El <b>estimador</b> es la fórmula (una variable aleatoria); la <b>estimación</b> es el número que da con una muestra concreta.`],
+sol:String.raw`<ol class="steps">
+<li>\(l(\theta)=-n\ln\theta-\dfrac{\sum x_i}{\theta}\) y \(\dfrac{dl}{d\theta}=-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}=0\Rightarrow\hat\theta=\bar x\) (estimador).</li>
+<li>Con la muestra: \(\sum x_i=6\), n = 3, \(\hat\theta=6/3=2\) (estimación).</li>
+<li>Verificación: \(l(\theta)=-3\ln\theta-6/\theta\); en θ = 2 el score vale \(-3/2+6/4=0\) y la segunda derivada \(3/4-12/8=-0{,}75&lt;0\).</li></ol>`,
+res:String.raw`<p>Estimador \(\hat\theta=\bar x\); estimación \(\hat\theta=2\). La varianza estimada es \(\hat\theta^2/n=4/3\).</p>`,
+micro:mp([
+[String.raw`\(L(\theta)=\prod_{i=1}^3\dfrac1\theta e^{-x_i/\theta}=\theta^{-3}e^{-(x_1+x_2+x_3)/\theta}\)`,String.raw`Independencia (producto). \((1/\theta)^3=\theta^{-3}\) y \(e^ae^be^c=e^{a+b+c}\).`],
+[String.raw`\(l(\theta)=-3\ln\theta-\dfrac{\sum x_i}{\theta}\)`,String.raw`\(\ln\theta^{-3}=-3\ln\theta\) y \(\ln e^{c}=c\).`],
+[String.raw`\(\dfrac{dl}{d\theta}=-\dfrac3\theta+\dfrac{\sum x_i}{\theta^2}\)`,String.raw`\(\frac{d}{d\theta}\ln\theta=\frac1\theta\); \(\frac{d}{d\theta}\theta^{-1}=-\theta^{-2}\), y el signo menos de adelante lo vuelve positivo.`],
+[String.raw`\(-3\theta+\sum x_i=0\Rightarrow\hat\theta=\dfrac{\sum x_i}{3}=\bar x\)`,"Se iguala a cero y se multiplica por θ² > 0."],
+[String.raw`\(\sum x_i=1+2+3=6\Rightarrow\hat\theta=2\)`,"Se reemplazan los datos."],
+[String.raw`\(\dfrac{d^2l}{d\theta^2}=\dfrac{3}{\theta^2}-\dfrac{2\sum x_i}{\theta^3}=\dfrac34-\dfrac{12}{8}=-0{,}75\)`,"Segunda derivada evaluada en θ = 2: negativa, es un máximo."]])},
+
+{id:"d5-7", n:"5.7", t:"Ejemplo 3.3: LR, W y LM para H₀: β₃ = −1 y la regresión auxiliar", tipo:"Pruebas LR, W y LM", temas:["mv-pruebas"],
+enun:String.raw`<p>Con los datos del Ejemplo 3.3 calcule los estadísticos LR, W y LM para H₀: β₃ = −1. Verifique el LM calculando el error de la regresión restringida y regresándolo contra X₂ y X₃.</p>
+<div class="tbl"><table><tr><th>Y</th><td>3</td><td>1</td><td>8</td><td>3</td><td>5</td></tr><tr><th>X₂</th><td>3</td><td>1</td><td>5</td><td>2</td><td>4</td></tr><tr><th>X₃</th><td>5</td><td>4</td><td>6</td><td>4</td><td>6</td></tr></table></div>`,
+saber:[String.raw`Del Ejemplo 3.3: \(\hat Y=4+2{,}5X_2-1{,}5X_3\) y \(\mathbf e'\mathbf e=1{,}5\) (n = 5).`,String.raw`\(W=n\dfrac{RSS_R-RSS_{NR}}{RSS_{NR}}\), \(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}\), \(LM=n\dfrac{RSS_R-RSS_{NR}}{RSS_R}=nR^2_{aux}\) (ecuaciones 5.15, 5.12 y 5.18).`],
+sol:String.raw`<ol class="steps">
+<li>Restringido: con β₃ = −1, \(Y=\beta_1+\beta_2X_2-X_3+u\), o sea \(Y+X_3=\beta_1+\beta_2X_2+u\). Con \(W=Y+X_3=(8,5,14,7,11)\): \(b_2=2{,}2\), \(b_1=2{,}4\).</li>
+<li>Errores restringidos: \(\mathbf e_*=(-1;\;0{,}4;\;0{,}6;\;0{,}2;\;-0{,}2)\) y \(\mathbf e_*'\mathbf e_*=1{,}6\).</li>
+<li>\(W=5(1{,}6-1{,}5)/1{,}5=0{,}333\); \(LR=5\ln(1{,}6/1{,}5)=0{,}323\); \(LM=5(0{,}1)/1{,}6=0{,}3125\).</li>
+<li>Regresión auxiliar: \(\hat e_*=1{,}6+0{,}3X_2-0{,}5X_3\), con RSS = 1,5 y \(R^2=1-1{,}5/1{,}6=0{,}0625\). \(nR^2=0{,}3125=LM\). ✓</li></ol>`,
+res:String.raw`<p>W = 0,333 ≥ LR = 0,323 ≥ LM = 0,3125, todas menores que \(\chi^2_{0{,}05}(1)=3{,}841\): no se rechaza β₃ = −1.</p>`,
+micro:h("Modelo restringido")+mp([
+[String.raw`\(Y=\beta_1+\beta_2X_2+\beta_3X_3+u\) con \(\beta_3=-1\)`,"Se reemplaza la restricción en el modelo."],
+[String.raw`\(Y=\beta_1+\beta_2X_2-X_3+u\Rightarrow Y+X_3=\beta_1+\beta_2X_2+u\)`,"El término −X₃ ya no tiene parámetro: se pasa a la izquierda sumando. Queda una regresión simple de W = Y + X₃ contra X₂."],
+[String.raw`\(W=(3+5,\;1+4,\;8+6,\;3+4,\;5+6)=(8,5,14,7,11)\)`,"Suma fila por fila."],
+[String.raw`\(\sum X_2=15,\ \sum X_2^2=55,\ \sum W=45,\ \sum X_2W=3(8)+1(5)+5(14)+2(7)+4(11)=157\)`,"Las sumas que pide la fórmula de la pendiente."],
+[String.raw`\(b_2=\dfrac{n\sum X_2W-\sum X_2\sum W}{n\sum X_2^2-(\sum X_2)^2}=\dfrac{5(157)-15(45)}{5(55)-15^2}=\dfrac{110}{50}=2{,}2\)`,"Fórmula de la pendiente de MCO en regresión simple."],
+[String.raw`\(b_1=\bar W-b_2\bar X_2=9-2{,}2(3)=2{,}4\)`,String.raw`La recta pasa por el punto de medias: \(\bar W=45/5=9\), \(\bar X_2=15/5=3\).`],
+[String.raw`\(\hat W=2{,}4+2{,}2X_2=(9;\;4{,}6;\;13{,}4;\;6{,}8;\;11{,}2)\)`,"Se evalúa la recta en cada X₂."],
+[String.raw`\(\mathbf e_*=W-\hat W=(-1;\;0{,}4;\;0{,}6;\;0{,}2;\;-0{,}2)\)`,"Error = observado menos estimado. (Es lo mismo que Y − Ŷ del modelo restringido, porque X₃ se suma a los dos lados.)"],
+[String.raw`\(\mathbf e_*'\mathbf e_*=1+0{,}16+0{,}36+0{,}04+0{,}04=1{,}6\)`,"Suma de los errores al cuadrado."]])+
+h("Los tres estadísticos")+mp([
+[String.raw`\(RSS_R-RSS_{NR}=1{,}6-1{,}5=0{,}1\)`,"Cuánto empeora el ajuste al imponer la restricción."],
+[String.raw`\(W=5\cdot\dfrac{0{,}1}{1{,}5}=0{,}3333\)`,"Wald: divide entre el RSS no restringido."],
+[String.raw`\(LR=5\ln\dfrac{1{,}6}{1{,}5}=5\ln(1{,}0667)=5(0{,}06454)=0{,}3227\)`,"Razón de verosimilitud con las RSS."],
+[String.raw`\(LM=5\cdot\dfrac{0{,}1}{1{,}6}=0{,}3125\)`,"Multiplicadores de Lagrange: divide entre el RSS restringido, que es mayor; por eso LM es el más pequeño."],
+[String.raw`\(W=\dfrac{(b_3+1)^2}{\hat\sigma^2_{MLE}\,c_{33}}=\dfrac{(-1{,}5+1)^2}{0{,}3(2{,}5)}=\dfrac{0{,}25}{0{,}75}=0{,}3333\)`,String.raw`Versión matricial con solo el NR: \(\hat\sigma^2_{MLE}=1{,}5/5=0{,}3\) y \(c_{33}=2{,}5\) es el elemento (3,3) de \((X'X)^{-1}=\frac1{10}\begin{bmatrix}267&45&-80\\45&10&-15\\-80&-15&25\end{bmatrix}\).`]])+
+h("Verificación del LM con la regresión auxiliar")+mp([
+[String.raw`\(\mathbf e_*=a_1+a_2X_2+a_3X_3+v\)`,"Se regresa el error restringido contra todas las regresoras del modelo no restringido."],
+[String.raw`\(\hat{\mathbf e}_*=1{,}6+0{,}3X_2-0{,}5X_3,\quad RSS_{aux}=1{,}5\)`,"El RSS de la auxiliar es el RSS no restringido: ajustar e* con X₂ y X₃ equivale a volver al modelo completo."],
+[String.raw`\(TSS_{aux}=\sum(e_{*i}-\bar e_*)^2=\sum e_{*i}^2=1{,}6\)`,"La media de e* es cero (la restricción no toca el intercepto), así que su TSS es su suma de cuadrados."],
+[String.raw`\(R^2_{aux}=1-\dfrac{1{,}5}{1{,}6}=0{,}0625\)`,"Definición de R²."],
+[String.raw`\(nR^2_{aux}=5(0{,}0625)=0{,}3125=LM\)`,String.raw`Coincide con el LM por las RSS, porque \(R^2_{aux}=(RSS_R-RSS_{NR})/RSS_R\).`]])},
+
+{id:"d5-8", n:"5.8", t:"Ejemplo 3.3: LR, W y LM para H₀: β₂ + β₃ = 0", tipo:"Pruebas LR, W y LM", temas:["mv-pruebas"],
+enun:String.raw`<p>Repita el problema 5.7 para H₀: β₂ + β₃ = 0.</p>`,
+saber:[String.raw`Con β₃ = −β₂ el modelo queda en función de \(Z=X_2-X_3\).`],
+sol:String.raw`<ol class="steps">
+<li>Restringido: \(Y=\beta_1+\beta_2(X_2-X_3)+u\), con \(Z=(-2,-3,-1,-2,-2)\): \(b_2=3{,}5\), \(b_1=11\).</li>
+<li>\(\mathbf e_*=(-1;\;0{,}5;\;0{,}5;\;-1;\;1)\) y \(\mathbf e_*'\mathbf e_*=3{,}5\).</li>
+<li>\(W=5(2)/1{,}5=6{,}667\); \(LR=5\ln(3{,}5/1{,}5)=4{,}236\); \(LM=5(2)/3{,}5=2{,}857\).</li>
+<li>Regresión auxiliar: \(\hat e_*=-7-X_2+2X_3\), RSS = 1,5, \(R^2=1-1{,}5/3{,}5=0{,}5714\) y \(nR^2=2{,}857=LM\). ✓</li></ol>`,
+res:String.raw`<p>W = 6,67 y LR = 4,24 superan 3,841 (rechazan H₀), pero LM = 2,86 no. Es el orden \(W\ge LR\ge LM\) en acción: con n = 5 las pruebas asintóticas pueden contradecirse. La F exacta, \(F=\dfrac{2/1}{1{,}5/2}=2{,}67\) contra \(F_{0{,}05}(1,2)=18{,}51\), no rechaza.</p>`,
+micro:h("Modelo restringido")+mp([
+[String.raw`\(\beta_2+\beta_3=0\Rightarrow\beta_3=-\beta_2\)`,"Se despeja un parámetro en función del otro."],
+[String.raw`\(Y=\beta_1+\beta_2X_2-\beta_2X_3+u=\beta_1+\beta_2(X_2-X_3)+u\)`,"Se reemplaza β₃ y se saca β₂ como factor común."],
+[String.raw`\(Z=X_2-X_3=(3-5,\;1-4,\;5-6,\;2-4,\;4-6)=(-2,-3,-1,-2,-2)\)`,"Nueva regresora, fila por fila."],
+[String.raw`\(\sum Z=-10,\ \sum Z^2=22,\ \sum ZY=-6-3-8-6-10=-33,\ \sum Y=20\)`,"Sumas para la fórmula de la pendiente."],
+[String.raw`\(b_2=\dfrac{5(-33)-(-10)(20)}{5(22)-(-10)^2}=\dfrac{-165+200}{110-100}=\dfrac{35}{10}=3{,}5\)`,"Fórmula de la pendiente. Ojo con los signos: menos por menos es más."],
+[String.raw`\(b_1=\bar Y-b_2\bar Z=4-3{,}5(-2)=11\)`,String.raw`Punto de medias: \(\bar Y=4\), \(\bar Z=-2\).`],
+[String.raw`\(\hat Y=11+3{,}5Z=(4;\;0{,}5;\;7{,}5;\;4;\;4)\)`,"Se evalúa en cada Z."],
+[String.raw`\(\mathbf e_*=(3-4,\;1-0{,}5,\;8-7{,}5,\;3-4,\;5-4)=(-1;\;0{,}5;\;0{,}5;\;-1;\;1)\)`,"Observado menos estimado."],
+[String.raw`\(\mathbf e_*'\mathbf e_*=1+0{,}25+0{,}25+1+1=3{,}5\)`,"Suma de cuadrados."]])+
+h("Los tres estadísticos")+mp([
+[String.raw`\(RSS_R-RSS_{NR}=3{,}5-1{,}5=2\)`,"La restricción empeora mucho el ajuste."],
+[String.raw`\(W=5\cdot\dfrac{2}{1{,}5}=6{,}667\)`,"Wald con las RSS."],
+[String.raw`\(LR=5\ln\dfrac{3{,}5}{1{,}5}=5\ln(2{,}3333)=5(0{,}8473)=4{,}236\)`,"Razón de verosimilitud."],
+[String.raw`\(LM=5\cdot\dfrac{2}{3{,}5}=2{,}857\)`,"Multiplicadores de Lagrange."],
+[String.raw`\(R(X'X)^{-1}R'=c_{22}+c_{33}+2c_{23}=1+2{,}5+2(-1{,}5)=0{,}5\)`,"Con R = [0 1 1]: la varianza de b₂ + b₃ (sin σ²) suma las dos varianzas y dos veces la covarianza."],
+[String.raw`\(W=\dfrac{(b_2+b_3)^2}{\hat\sigma^2_{MLE}(0{,}5)}=\dfrac{(2{,}5-1{,}5)^2}{0{,}3(0{,}5)}=\dfrac{1}{0{,}15}=6{,}667\)`,"Versión matricial: da lo mismo que con las RSS."]])+
+h("Regresión auxiliar y decisión")+mp([
+[String.raw`\(\hat e_*=-7-X_2+2X_3,\quad RSS_{aux}=1{,}5,\quad TSS_{aux}=3{,}5\)`,"Como en 5.7: el RSS de la auxiliar es el no restringido y su TSS es el restringido."],
+[String.raw`\(R^2_{aux}=1-\dfrac{1{,}5}{3{,}5}=0{,}5714,\qquad nR^2=2{,}857\)`,"Coincide con el LM."],
+[String.raw`\(\chi^2_{0{,}05}(1)=3{,}841:\quad W=6{,}67>3{,}84,\ LR=4{,}24>3{,}84,\ LM=2{,}86<3{,}84\)`,"Se compara cada estadístico con el valor crítico: dos rechazan y uno no."],
+[String.raw`\(F=\dfrac{(3{,}5-1{,}5)/1}{1{,}5/(5-3)}=2{,}667<F_{0{,}05}(1,2)=18{,}51\)`,"La F es exacta en muestras pequeñas con errores normales; con solo 2 grados de libertad en el denominador, no rechaza."]])}]});
+
+// ---------- micropasos de Ejercicios propuestos 4
+const M={
+"ep4-1":h("a) Verosimilitud y log-verosimilitud")+mp([
+[String.raw`\(f(x_i;\theta)=\theta^{-1}e^{-x_i/\theta}\)`,"Se escribe 1/θ como θ⁻¹ (exponente negativo) para derivar más fácil."],
+[String.raw`\(L(\theta)=\prod_{i=1}^n\theta^{-1}e^{-x_i/\theta}=\left(\theta^{-1}\right)^n\prod e^{-x_i/\theta}\)`,"Muestra aleatoria: la conjunta es el producto. Una constante multiplicada n veces es una potencia."],
+[String.raw`\(=\theta^{-n}e^{-\sum x_i/\theta}\)`,String.raw`\((a^m)^n=a^{mn}\) y \(e^{a}e^{b}=e^{a+b}\): el producto de exponenciales suma los exponentes.`],
+[String.raw`\(l(\theta)=\ln\theta^{-n}+\ln e^{-\sum x_i/\theta}\)`,String.raw`\(\ln(ab)=\ln a+\ln b\).`],
+[String.raw`\(=-n\ln\theta-\dfrac{\sum x_i}{\theta}\)`,String.raw`\(\ln a^k=k\ln a\) y \(\ln e^c=c\).`]])+
+h("b) Score y MLE")+mp([
+[String.raw`\(\dfrac{d}{d\theta}(-n\ln\theta)=-\dfrac n\theta\)`,String.raw`\(\frac{d}{d\theta}\ln\theta=\frac1\theta\).`],
+[String.raw`\(\dfrac{d}{d\theta}\left(-\sum x_i\,\theta^{-1}\right)=-\sum x_i\cdot(-1)\theta^{-2}=\dfrac{\sum x_i}{\theta^2}\)`,String.raw`Regla de la potencia \(\frac{d}{d\theta}\theta^k=k\theta^{k-1}\) con k = −1. Σxᵢ es constante respecto a θ.`],
+[String.raw`\(-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}=0\)`,"Condición de primer orden."],
+[String.raw`\(-n\theta+\sum x_i=0\)`,"Se multiplica todo por θ² > 0."],
+[String.raw`\(\hat\theta=\dfrac{\sum x_i}{n}=\bar x\)`,"Se despeja θ."],
+[String.raw`\(\mathbf H(\hat\theta)=\dfrac{n}{\bar x^2}-\dfrac{2n\bar x}{\bar x^3}=-\dfrac{n}{\bar x^2}<0\)`,"Segunda derivada en θ̂ (con Σxᵢ = n x̄): negativa, es un máximo."]])+
+h("c) La esperanza del score es cero")+mp([
+[String.raw`\(E[s(\theta)]=-\dfrac n\theta+\dfrac{E\left(\sum X_i\right)}{\theta^2}\)`,"Linealidad de la esperanza: los términos sin X salen tal cual."],
+[String.raw`\(E\left(\sum X_i\right)=\sum E(X_i)=n\theta\)`,"La esperanza de una suma es la suma de esperanzas, y cada E(Xᵢ) = θ."],
+[String.raw`\(=-\dfrac n\theta+\dfrac{n\theta}{\theta^2}=-\dfrac n\theta+\dfrac n\theta=0\)`,"Se simplifica θ."]])+
+h("d) Hessiana y H₁")+mp([
+[String.raw`\(\dfrac{d}{d\theta}\left(-n\theta^{-1}\right)=n\theta^{-2}\)`,String.raw`Regla de la potencia: \(-n\cdot(-1)\theta^{-2}\).`],
+[String.raw`\(\dfrac{d}{d\theta}\left(\sum x_i\,\theta^{-2}\right)=-2\sum x_i\,\theta^{-3}\)`,"Regla de la potencia con k = −2."],
+[String.raw`\(\mathbf H=\dfrac n{\theta^2}-\dfrac{2\sum x_i}{\theta^3},\qquad\mathbf H_1=s(\theta)^2\)`,"Con un solo parámetro, el producto exterior del score es su cuadrado."]])+
+h("e) Información e igualdad de la información")+mp([
+[String.raw`\(E(\mathbf H)=\dfrac n{\theta^2}-\dfrac{2n\theta}{\theta^3}=\dfrac n{\theta^2}-\dfrac{2n}{\theta^2}=-\dfrac n{\theta^2}\)`,"Linealidad y E(ΣXᵢ) = nθ; se simplifica θ."],
+[String.raw`\(\mathbf I(\theta)=-E(\mathbf H)=\dfrac n{\theta^2}\)`,"Definición de la información."],
+[String.raw`\(E(\mathbf H_1)=E(s^2)=\operatorname{var}(s)+[E(s)]^2=\operatorname{var}(s)\)`,String.raw`\(\operatorname{var}(Y)=E(Y^2)-[E(Y)]^2\), y E(s) = 0 por el literal c).`],
+[String.raw`\(\operatorname{var}(s)=\operatorname{var}\left(-\dfrac n\theta+\dfrac{\sum X_i}{\theta^2}\right)=\dfrac{1}{\theta^4}\operatorname{var}\left(\sum X_i\right)\)`,String.raw`\(\operatorname{var}(a+bY)=b^2\operatorname{var}(Y)\): la constante −n/θ no aporta varianza.`],
+[String.raw`\(\operatorname{var}\left(\sum X_i\right)=\sum\operatorname{var}(X_i)=n\theta^2\)`,"Por independencia, la varianza de la suma es la suma de las varianzas."],
+[String.raw`\(E(\mathbf H_1)=\dfrac{n\theta^2}{\theta^4}=\dfrac n{\theta^2}=-E(\mathbf H)\)`,"Se cumple la igualdad de la información."]])+
+h("f) y g) Varianza e invarianza")+mp([
+[String.raw`\(\operatorname{var}(\hat\theta)=\mathbf I(\theta)^{-1}=\dfrac{\theta^2}{n}\)`,"La varianza asintótica del MLE es la inversa de la información (cota de Cramér-Rao)."],
+[String.raw`\(\operatorname{var}(\bar x)=\dfrac{\operatorname{var}(\sum X_i)}{n^2}=\dfrac{n\theta^2}{n^2}=\dfrac{\theta^2}{n}\)`,"Comprobación exacta: coincide."],
+[String.raw`\(\sigma^2=\theta^2\Rightarrow\hat\sigma^2=\hat\theta^2=\bar x^2\)`,"Invarianza: el MLE de g(θ) es g(θ̂)."],
+[String.raw`\(F(m)=1-e^{-m/\theta}=\tfrac12\Rightarrow e^{-m/\theta}=\tfrac12\Rightarrow-\dfrac m\theta=\ln\tfrac12=-\ln2\Rightarrow m=\theta\ln2\)`,String.raw`De dónde sale la mediana: la acumulada vale 1/2. Se toma logaritmo y \(\ln(1/2)=-\ln2\).`],
+[String.raw`\(\tilde\mu=\hat\theta\ln2=\bar x\ln2\)`,"Invarianza otra vez."]]),
+
+"ep4-2":h("a) y b) Verosimilitud, score y MLE")+mp([
+[String.raw`\(L(\lambda)=\prod\dfrac{e^{-\lambda}\lambda^{x_i}}{x_i!}=\dfrac{e^{-n\lambda}\lambda^{\sum x_i}}{\prod x_i!}\)`,String.raw`Producto: \(e^{-\lambda}\) n veces da \(e^{-n\lambda}\) y \(\lambda^{x_1}\cdots\lambda^{x_n}=\lambda^{\sum x_i}\).`],
+[String.raw`\(l(\lambda)=-n\lambda+\sum x_i\ln\lambda-\sum\ln x_i!\)`,String.raw`\(\ln(a/b)=\ln a-\ln b\), \(\ln e^{c}=c\), \(\ln a^k=k\ln a\) y el logaritmo de un producto es la suma de logaritmos.`],
+[String.raw`\(s(\lambda)=-n+\dfrac{\sum x_i}{\lambda}\)`,String.raw`\(\frac{d}{d\lambda}(-n\lambda)=-n\); \(\frac{d}{d\lambda}\ln\lambda=\frac1\lambda\); \(\sum\ln x_i!\) no depende de λ y su derivada es 0.`],
+[String.raw`\(-n+\dfrac{\sum x_i}{\lambda}=0\Rightarrow\hat\lambda=\dfrac{\sum x_i}{n}=\bar x\)`,"Se iguala a cero y se multiplica por λ."]])+
+h("c) a f) Esperanza del score, Hessiana e información")+mp([
+[String.raw`\(E[s]=-n+\dfrac{E(\sum X_i)}{\lambda}=-n+\dfrac{n\lambda}{\lambda}=0\)`,"Linealidad de la esperanza y E(Xᵢ) = λ."],
+[String.raw`\(\mathbf H=\dfrac{d}{d\lambda}\left(\sum x_i\,\lambda^{-1}\right)=-\dfrac{\sum x_i}{\lambda^2}\)`,"Regla de la potencia con k = −1; la derivada de −n es 0."],
+[String.raw`\(-E(\mathbf H)=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda\)`,"E(ΣXᵢ) = nλ."],
+[String.raw`\(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\operatorname{var}(\sum X_i)}{\lambda^2}=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda\)`,"var(a + bY) = b²var(Y) con b = 1/λ; en la Poisson var(X) = λ, y la varianza de la suma es nλ."],
+[String.raw`\(\operatorname{var}(\hat\lambda)=\dfrac{\lambda}{n},\qquad\hat\sigma=\sqrt{\bar x}\)`,String.raw`Inversa de la información; e invarianza con \(\sigma=\sqrt{\operatorname{var}(X)}=\sqrt\lambda\).`]]),
+
+"ep4-3":h("a) Log-verosimilitud y score")+mp([
+[String.raw`\(f(x_i)=(2\pi\sigma^2)^{-1/2}\exp\left[-\dfrac{(x_i-\mu)^2}{2\sigma^2}\right]\)`,String.raw`Densidad normal, con \(1/\sqrt{a}=a^{-1/2}\).`],
+[String.raw`\(L=(2\pi\sigma^2)^{-n/2}\exp\left[-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\right]\)`,"Producto de n densidades: potencias que se suman y exponentes que se suman."],
+[String.raw`\(l=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}=-\dfrac n2\ln2\pi-\dfrac n2\ln\sigma^2-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\)`,String.raw`\(\ln a^k=k\ln a\), \(\ln e^c=c\) y \(\ln(2\pi\sigma^2)=\ln2\pi+\ln\sigma^2\).`],
+[String.raw`\(\dfrac{\partial}{\partial\mu}(x_i-\mu)^2=2(x_i-\mu)(-1)\)`,"Regla de la cadena: la derivada interna de (xᵢ − μ) respecto a μ es −1."],
+[String.raw`\(\dfrac{\partial l}{\partial\mu}=-\dfrac{\sum2(x_i-\mu)(-1)}{2\sigma^2}=\dfrac{\sum(x_i-\mu)}{\sigma^2}\)`,"Los dos signos menos se cancelan y el 2 se simplifica."],
+[String.raw`\(\dfrac{\partial l}{\partial\sigma^2}=-\dfrac{n}{2\sigma^2}+\dfrac{\sum(x_i-\mu)^2}{2\sigma^4}\)`,String.raw`Se trata σ² como una sola variable v: \(\frac{d}{dv}\ln v=\frac1v\) y \(\frac{d}{dv}v^{-1}=-v^{-2}\).`],
+[String.raw`\(\sum(x_i-\mu)=0\Rightarrow\sum x_i-n\mu=0\Rightarrow\hat\mu=\bar x\)`,"La suma de una constante n veces es n veces la constante."],
+[String.raw`\(-n\sigma^2+\sum(x_i-\hat\mu)^2=0\Rightarrow\hat\sigma^2=\dfrac{\sum(x_i-\bar x)^2}{n}\)`,"Se multiplica la segunda ecuación por 2σ⁴ y se reemplaza μ por μ̂."]])+
+h("b) Esperanza del score")+mp([
+[String.raw`\(E\left[\sum(X_i-\mu)\right]=\sum[E(X_i)-\mu]=\sum(\mu-\mu)=0\)`,"Linealidad de la esperanza."],
+[String.raw`\(E\left[\sum(X_i-\mu)^2\right]=\sum E(X_i-\mu)^2=n\sigma^2\)`,String.raw`Definición de varianza: \(E(X-\mu)^2=\sigma^2\).`],
+[String.raw`\(-\dfrac n{2\sigma^2}+\dfrac{n\sigma^2}{2\sigma^4}=-\dfrac n{2\sigma^2}+\dfrac n{2\sigma^2}=0\)`,"Se simplifica σ²."]])+
+h("c) y d) Hessiana, información y varianza")+mp([
+[String.raw`\(\dfrac{\partial^2l}{\partial\mu^2}=\dfrac{\sum(-1)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,String.raw`Se deriva \(\sum(x_i-\mu)\) respecto a μ: cada término da −1.`],
+[String.raw`\(\dfrac{\partial^2l}{\partial\mu\,\partial\sigma^2}=\sum(x_i-\mu)\cdot\dfrac{d}{dv}v^{-1}=-\dfrac{\sum(x_i-\mu)}{\sigma^4}\)`,"Derivada cruzada: se deriva el score de μ respecto a v = σ²."],
+[String.raw`\(\dfrac{\partial^2l}{\partial(\sigma^2)^2}=\dfrac{n}{2\sigma^4}-\dfrac{2\sum(x_i-\mu)^2}{2\sigma^6}=\dfrac{n}{2\sigma^4}-\dfrac{\sum(x_i-\mu)^2}{\sigma^6}\)`,String.raw`\(\frac{d}{dv}(-\frac{n}{2}v^{-1})=\frac n2v^{-2}\) y \(\frac{d}{dv}v^{-2}=-2v^{-3}\).`],
+[String.raw`\(E\left[-\dfrac{\sum(X_i-\mu)}{\sigma^4}\right]=0,\qquad E\left[\dfrac n{2\sigma^4}-\dfrac{\sum(X_i-\mu)^2}{\sigma^6}\right]=\dfrac n{2\sigma^4}-\dfrac{n\sigma^2}{\sigma^6}=-\dfrac n{2\sigma^4}\)`,"Mismas esperanzas del literal b)."],
+[String.raw`\(\mathbf I=\begin{bmatrix}n/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\Rightarrow\mathbf I^{-1}=\begin{bmatrix}\sigma^2/n&0\\0&2\sigma^4/n\end{bmatrix}\)`,"La inversa de una matriz diagonal invierte cada elemento de la diagonal."],
+[String.raw`\(E\left[\sum(X_i-\bar X)^2\right]=(n-1)\sigma^2\Rightarrow E(\hat\sigma^2)=\dfrac{n-1}{n}\sigma^2\)`,"Por qué el MLE de σ² es sesgado: se divide por n y no por n − 1."]]),
+
+"ep4-4":h("a) Verosimilitud, score y MLE")+mp([
+[String.raw`\(L=\prod\theta(1-\theta)^{x_i-1}=\theta^n(1-\theta)^{\sum(x_i-1)}\)`,"θ multiplicado n veces es θⁿ; potencias de la misma base suman exponentes."],
+[String.raw`\(\sum(x_i-1)=\sum x_i-n\)`,"La suma de n unos es n."],
+[String.raw`\(l=n\ln\theta+\left(\sum x_i-n\right)\ln(1-\theta)\)`,"Logaritmo del producto y de las potencias."],
+[String.raw`\(\dfrac{d}{d\theta}\ln(1-\theta)=\dfrac{-1}{1-\theta}\)`,"Regla de la cadena: u = 1 − θ, u′ = −1."],
+[String.raw`\(s=\dfrac n\theta-\dfrac{\sum x_i-n}{1-\theta}=0\)`,"Score igualado a cero."],
+[String.raw`\(n(1-\theta)=\theta\left(\sum x_i-n\right)\)`,"Se multiplica por θ(1 − θ)."],
+[String.raw`\(n-n\theta=\theta\sum x_i-n\theta\Rightarrow n=\theta\sum x_i\)`,"Se distribuye; −nθ se cancela en los dos lados."],
+[String.raw`\(\hat\theta=\dfrac{n}{\sum x_i}=\dfrac1{\bar x}\)`,String.raw`Se despeja θ y se usa \(\sum x_i=n\bar x\).`]])+
+h("b) Esperanza del score")+mp([
+[String.raw`\(E\left(\sum X_i-n\right)=\dfrac n\theta-n=\dfrac{n(1-\theta)}{\theta}\)`,"E(Xᵢ) = 1/θ y factor común n."],
+[String.raw`\(E[s]=\dfrac n\theta-\dfrac{n(1-\theta)/\theta}{1-\theta}=\dfrac n\theta-\dfrac n\theta=0\)`,"(1 − θ) se simplifica."]])+
+h("c) y d) Hessiana, información y H₁")+mp([
+[String.raw`\(\dfrac{d}{d\theta}\dfrac n\theta=-\dfrac n{\theta^2}\)`,"Regla de la potencia."],
+[String.raw`\(\dfrac{d}{d\theta}(1-\theta)^{-1}=(-1)(1-\theta)^{-2}(-1)=(1-\theta)^{-2}\)`,"Regla de la cadena: dos signos menos se cancelan."],
+[String.raw`\(\mathbf H=-\dfrac n{\theta^2}-\dfrac{\sum x_i-n}{(1-\theta)^2}\)`,"Se deriva cada término del score."],
+[String.raw`\(E(\mathbf H)=-\dfrac n{\theta^2}-\dfrac{n(1-\theta)/\theta}{(1-\theta)^2}=-\dfrac n{\theta^2}-\dfrac n{\theta(1-\theta)}\)`,"Se reemplaza la esperanza del literal b) y se simplifica un (1 − θ)."],
+[String.raw`\(=-\dfrac{n(1-\theta)+n\theta}{\theta^2(1-\theta)}=-\dfrac n{\theta^2(1-\theta)}\)`,"Denominador común θ²(1 − θ); −nθ + nθ se cancela."],
+[String.raw`\(s=\dfrac{n(1-\theta)-\theta(\sum x_i-n)}{\theta(1-\theta)}=\dfrac{n-\theta\sum x_i}{\theta(1-\theta)}\)`,"Score con denominador común."],
+[String.raw`\(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\theta^2\operatorname{var}(\sum X_i)}{\theta^2(1-\theta)^2}\)`,"var(a + bY) = b²var(Y) con b = −θ/[θ(1 − θ)]."],
+[String.raw`\(=\dfrac{n(1-\theta)/\theta^2}{(1-\theta)^2}=\dfrac{n}{\theta^2(1-\theta)}\)`,"var(ΣXᵢ) = n(1 − θ)/θ²; se simplifica (1 − θ). Coincide con −E(H)."]]),
+
+"ep4-7":mp([
+[String.raw`\(l(\mu)=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\)`,"Igual que el punto 3, pero σ² es un número conocido: el primer término es constante."],
+[String.raw`\(\dfrac{dl}{d\mu}=\dfrac{\sum(x_i-\mu)}{\sigma^2}\)`,"Regla de la cadena sobre (xᵢ − μ)²; la constante tiene derivada cero."],
+[String.raw`\(\sum x_i-n\mu=0\Rightarrow\hat\mu=\bar x\)`,"Se iguala a cero y se despeja."],
+[String.raw`\(\mathbf H=\dfrac{d}{d\mu}\dfrac{\sum(x_i-\mu)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,"Cada término da −1/σ²."],
+[String.raw`\(\mathbf I=-E(\mathbf H)=\dfrac n{\sigma^2},\qquad\operatorname{var}(\hat\mu)=\dfrac{\sigma^2}{n}\)`,"La Hessiana no depende de los datos: su esperanza es ella misma."]]),
+
+"ep4-5":h("Pendiente, intercepto y RSS de cada período")+mp([
+[String.raw`\(b_2=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}\)`,"Fórmula de la pendiente de MCO en regresión simple."],
+[String.raw`\(\text{Guerra: }b_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{700-525}{1625-1225}=\dfrac{175}{400}=0{,}4375\)`,"Se reemplazan las sumas."],
+[String.raw`\(b_1=\bar y-b_2\bar x=\dfrac{15}5-0{,}4375\cdot\dfrac{35}5=3-3{,}0625=-0{,}0625\)`,"La recta pasa por el punto de medias."],
+[String.raw`\(RSS=S_{YY}-b_2^2S_{XX},\quad S_{YY}=\sum y^2-n\bar y^2,\quad S_{XX}=\sum x^2-n\bar x^2\)`,"La RSS es la variación total de Y menos la explicada (ESS = b₂²S_XX)."],
+[String.raw`\(RSS_1=(61-5\cdot9)-0{,}4375^2(325-5\cdot49)=16-0{,}19141(80)=16-15{,}3125=0{,}6875\)`,"Guerra."],
+[String.raw`\(\text{Paz: }b_2=\dfrac{10(828)-110(60)}{10(1540)-110^2}=\dfrac{1680}{3300}=0{,}50909,\quad b_1=6-0{,}50909(11)=0{,}4\)`,"Mismas fórmulas con n = 10."],
+[String.raw`\(RSS_2=(448-360)-0{,}50909^2(1540-1210)=88-85{,}527=2{,}4727\)`,"Paz."],
+[String.raw`\(RSS_{NR}=RSS_1+RSS_2=3{,}1602\)`,"El modelo con D y D·X equivale a dos rectas separadas, así que su RSS es la suma."]])+
+h("Modelo restringido y log-verosimilitudes")+mp([
+[String.raw`\(S_{XY}=968-\dfrac{145(75)}{15}=243,\quad S_{XX}=1865-\dfrac{145^2}{15}=463{,}333\)`,"Sumas en desviaciones con los 15 datos."],
+[String.raw`\(b_2=\dfrac{243}{463{,}333}=0{,}52446,\quad b_1=5-0{,}52446(9{,}6667)=-0{,}0698\)`,"Pendiente e intercepto de la recta común."],
+[String.raw`\(RSS_R=(509-15\cdot25)-0{,}52446(243)=134-127{,}444=6{,}5561\)`,"ESS = b₂·S_XY = b₂²·S_XX."],
+[String.raw`\(l=-\dfrac n2\left[1+\ln2\pi+\ln\dfrac{RSS}{n}\right]\)`,"Log-verosimilitud del modelo lineal en el máximo, con σ̂² = RSS/n."],
+[String.raw`\(l_{NR}=-7{,}5\,[1+1{,}83788+\ln(0{,}21068)]=-7{,}5\,(2{,}83788-1{,}55742)=-9{,}6035\)`,"n/2 = 7,5; ln 2π = 1,83788."],
+[String.raw`\(l_R=-7{,}5\,[2{,}83788+\ln(0{,}43707)]=-7{,}5\,(2{,}83788-0{,}82766)=-15{,}0767\)`,"Igual con el restringido."]])+
+h("Estadísticos")+mp([
+[String.raw`\(LR=2(l_{NR}-l_R)=2(-9{,}6035+15{,}0767)=2(5{,}4732)=10{,}946\)`,"Versión con log-verosimilitudes."],
+[String.raw`\(LR=15\ln\dfrac{6{,}5561}{3{,}1602}=15\ln(2{,}0746)=15(0{,}72975)=10{,}946\)`,"Versión con las RSS: es la misma porque las l dependen de ln(RSS/n)."],
+[String.raw`\(RSS_R-RSS_{NR}=6{,}5561-3{,}1602=3{,}3959\)`,"Pérdida de ajuste."],
+[String.raw`\(W=15\cdot\dfrac{3{,}3959}{3{,}1602}=15(1{,}07457)=16{,}119\)`,"Wald."],
+[String.raw`\(LM=15\cdot\dfrac{3{,}3959}{6{,}5561}=15(0{,}51797)=7{,}770\)`,"Multiplicadores de Lagrange."],
+[String.raw`\(R^2_{aux}=1-\dfrac{RSS_{NR}}{RSS_R}=\dfrac{RSS_R-RSS_{NR}}{RSS_R}=0{,}51797\Rightarrow nR^2=7{,}770\)`,"En la auxiliar, el RSS es el no restringido y el TSS es el restringido (los errores restringidos tienen media cero)."],
+[String.raw`\(\chi^2_{0{,}05}(2)=5{,}991\)`,"q = 2 restricciones (δ₁ = 0 y δ₂ = 0)."]]),
+
+"ep4-6":mp([
+[String.raw`\(LR=2(l_{NR}-l_R)=2(-259{,}0488+260{,}3122)=2(1{,}2634)=2{,}5268\)`,"Restar un número negativo es sumar: −259,0488 + 260,3122."],
+[String.raw`\(LR=50\ln\dfrac{97.405{,}13}{92.605{,}07}=50\ln(1{,}051834)=50(0{,}050535)=2{,}5267\)`,"Versión con las RSS."],
+[String.raw`\(b_2+b_3-1=0{,}90783+0{,}18000-1=0{,}08783\)`,String.raw`Cuánto se aleja la estimación de la restricción: \(R\mathbf b-r\) con R = [0 1 1], r = 1.`],
+[String.raw`\(\operatorname{var}(b_2+b_3)=\operatorname{var}(b_2)+\operatorname{var}(b_3)+2\operatorname{cov}(b_2,b_3)\)`,"Varianza de una suma de variables correlacionadas."],
+[String.raw`\(=0{,}0129043+0{,}0069957+2(-0{,}0083668)=0{,}0199-0{,}0167336=0{,}0031664\)`,"La covarianza negativa reduce la varianza de la suma."],
+[String.raw`\(F=\dfrac{0{,}08783^2}{0{,}0031664}=\dfrac{0{,}0077141}{0{,}0031664}=2{,}4362\)`,"F (60): usa la varianza de vcov(), que tiene S² = RSS/(n − k)."],
+[String.raw`\(S^2=\dfrac{92.605{,}07}{47}=1.970{,}32,\qquad\hat\sigma^2_{MLE}=\dfrac{92.605{,}07}{50}=1.852{,}10\)`,"Las dos varianzas del error: dividen por n − k y por n."],
+[String.raw`\(W=F\cdot\dfrac{S^2}{\hat\sigma^2_{MLE}}=F\cdot\dfrac{n}{n-k}=2{,}4362\cdot\dfrac{50}{47}=2{,}5917\)`,"Wald asintótico: cambiar S² por σ̂²_MLE multiplica por n/(n − k)."],
+[String.raw`\(RSS_R-RSS_{NR}=97.405{,}13-92.605{,}07=4.800{,}06\)`,"Pérdida de ajuste."],
+[String.raw`\(W=50\cdot\dfrac{4.800{,}06}{92.605{,}07}=2{,}5917,\qquad LM=50\cdot\dfrac{4.800{,}06}{97.405{,}13}=2{,}4640\)`,"Versiones con las RSS."],
+[String.raw`\(RSS_R=S^2_R\,(n-k+q)=2.029{,}273\times48=97.405{,}1\)`,"Por qué el profesor multiplica por 48: restriktor divide la RSS restringida por n − k + q = 50 − 3 + 1."]]),
+
+"ep4-8":mp([
+[String.raw`\(\beta_5=1-\beta_3-\beta_4\)`,"Se despeja un coeficiente de la restricción."],
+[String.raw`\(\ln Y=\ln A+\beta_2\ln X+\beta_3\ln P_1+\beta_4\ln P_2+(1-\beta_3-\beta_4)\ln P_3\)`,"Se reemplaza en el modelo."],
+[String.raw`\(\ln Y-\ln P_3=\ln A+\beta_2\ln X+\beta_3(\ln P_1-\ln P_3)+\beta_4(\ln P_2-\ln P_3)\)`,String.raw`Se pasa \(\ln P_3\) a la izquierda y se agrupan los términos de β₃ y β₄.`],
+[String.raw`\(\ln\dfrac{Y}{P_3}=\ln A+\beta_2\ln X+\beta_3\ln\dfrac{P_1}{P_3}+\beta_4\ln\dfrac{P_2}{P_3}\)`,String.raw`\(\ln a-\ln b=\ln(a/b)\): de ahí sale el modelo 2.`],
+[String.raw`\(F=\dfrac{(0{,}364-0{,}336)/1}{0{,}336/(29-5)}=\dfrac{0{,}028}{0{,}014}=2{,}00\)`,"F (64) con q = 1 y n − k = 24."],
+[String.raw`\(W=29\cdot\dfrac{0{,}028}{0{,}336}=29(0{,}08333)=2{,}417\)`,"Wald con las RSS."],
+[String.raw`\(LR=29\ln\dfrac{0{,}364}{0{,}336}=29\ln(1{,}08333)=29(0{,}08004)=2{,}321\)`,"Razón de verosimilitud."],
+[String.raw`\(LM=29\cdot\dfrac{0{,}028}{0{,}364}=29(0{,}07692)=2{,}231\)`,"Multiplicadores de Lagrange."],
+[String.raw`\(\hat\beta_5=1-0{,}51-0{,}09=0{,}40\)`,"Elasticidad del combustible en el modelo restringido, por la restricción."]]),
+
+"ep4-9":h("b) Incluir TFT (H₀: β₄ = 0)")+mp([
+[String.raw`\(RSS_R-RSS_{NR}=106.315{,}6-91.875{,}38=14.440{,}22\)`,"El restringido es el modelo (1), sin TFT."],
+[String.raw`\(LR=2(-323{,}4298+328{,}1012)=2(4{,}6714)=9{,}343\)`,"Con las log-verosimilitudes."],
+[String.raw`\(LR=64\ln\dfrac{106.315{,}6}{91.875{,}38}=64\ln(1{,}15717)=64(0{,}14598)=9{,}343\)`,"Con las RSS."],
+[String.raw`\(W=64\cdot\dfrac{14.440{,}22}{91.875{,}38}=64(0{,}15717)=10{,}059\)`,"Wald con las RSS."],
+[String.raw`\(t=\dfrac{12{,}868636}{4{,}190533}=3{,}0709,\quad F=t^2=9{,}4303,\quad W=9{,}4303\cdot\dfrac{64}{60}=10{,}059\)`,"Wald solo con el modelo (2): para una restricción, F = t², y W = F·n/(n − k)."],
+[String.raw`\(LM=64\cdot\dfrac{14.440{,}22}{106.315{,}6}=64(0{,}135824)=8{,}693=64\,R^2_{aux}\)`,"La regresión auxiliar del enunciado (errores del modelo 1 contra PIBPC, TAF y TFT) da exactamente ese R²."]])+
+h("c) H₀: β₄ + 6β₃ = 0")+mp([
+[String.raw`\(R=[0\;\;0\;\;6\;\;1],\quad r=0\)`,"La restricción escrita como Rβ = r."],
+[String.raw`\(b_4+6b_3=12{,}868636+6(-1{,}768029)=12{,}868636-10{,}608174=2{,}260462\)`,"Se reemplazan los coeficientes del modelo (2)."],
+[String.raw`\(\operatorname{var}(6b_3+b_4)=6^2\operatorname{var}(b_3)+\operatorname{var}(b_4)+2(6)(1)\operatorname{cov}(b_3,b_4)\)`,String.raw`\(\operatorname{var}(aX+bY)=a^2\operatorname{var}X+b^2\operatorname{var}Y+2ab\operatorname{cov}(X,Y)\).`],
+[String.raw`\(=36(0{,}0615124)+17{,}56056+12(0{,}63257)=2{,}21445+17{,}56056+7{,}59084=27{,}36585\)`,"Se reemplazan los valores de var(b)."],
+[String.raw`\(F=\dfrac{2{,}260462^2}{27{,}36585}=\dfrac{5{,}10969}{27{,}36585}=0{,}18672,\quad W=0{,}18672\cdot\dfrac{64}{60}=0{,}19917\)`,"F (60) y su versión asintótica."],
+[String.raw`\(RSS_{R1}-RSS_{NR}=92.161{,}3-91.875{,}38=285{,}92\)`,"Pérdida de ajuste con la restricción."],
+[String.raw`\(W=64\cdot\dfrac{285{,}92}{91.875{,}38}=0{,}1992,\quad LM=64\cdot\dfrac{285{,}92}{92.161{,}3}=0{,}1986=64(0{,}003102305)\)`,"Versiones con las RSS y la auxiliar."],
+[String.raw`\(LR=2(-323{,}4298+323{,}5293)=2(0{,}0995)=0{,}199\)`,"Con las log-verosimilitudes."]]),
+
+"ep4-10":mp([
+[String.raw`\(b_2+3b_3=-5{,}8139+3(1{,}6672)=-5{,}8139+5{,}0016=-0{,}8123\)`,"Rb − r con R = [0 1 3 0] y r = 0."],
+[String.raw`\(\operatorname{var}(b_2+3b_3)=\operatorname{var}(b_2)+9\operatorname{var}(b_3)+2(1)(3)\operatorname{cov}(b_2,b_3)\)`,String.raw`\(\operatorname{var}(aX+bY)\) con a = 1, b = 3.`],
+[String.raw`\(=0{,}24705+9(0{,}51093)+6(0{,}09828)=0{,}24705+4{,}59838+0{,}58971=5{,}43514\)`,"Se reemplazan los valores."],
+[String.raw`\(F=\dfrac{(-0{,}8123)^2}{5{,}43514}=\dfrac{0{,}65983}{5{,}43514}=0{,}1214,\quad W=0{,}1214\cdot\dfrac{35}{31}=0{,}1371\)`,"F (60) y Wald asintótico, con n = 35 y n − k = 31."],
+[String.raw`\(RSS_R-RSS_{NR}=388{,}017-386{,}5032=1{,}5138\)`,"Pérdida de ajuste."],
+[String.raw`\(W=35\cdot\dfrac{1{,}5138}{386{,}5032}=0{,}1371,\quad LR=35\ln(1{,}003917)=35(0{,}003909)=0{,}1368\)`,"Versiones con las RSS."],
+[String.raw`\(LM=35\cdot\dfrac{1{,}5138}{388{,}017}=0{,}1365=35(0{,}003901352)=nR^2_{aux}\)`,"La regresión auxiliar del enunciado da el mismo LM."]])};
+for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];
+})();
