@@ -2477,6 +2477,335 @@ h("Estadístico y decisión")+mp([
 [String.raw`\(F_{0{,}05}(1,18)=4{,}414>3{,}158\)`,String.raw`Grados de libertad: 1 (una observación nueva) y n − k = 18. No se rechaza la estabilidad de los parámetros.`]])};
 for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];})();
 
+// ---------- micropasos de Ejercicios propuestos 3
+(function(){const mp=a=>`<ol class="mp">${a.map(([e,w])=>`<li><div class="mp-e">${e}</div>${w?`<div class="por">${w}</div>`:""}</li>`).join("")}</ol>`,h=t=>`<h5>${t}</h5>`;
+const M={
+"ep3-1":h("a) La media de d")+mp([
+[String.raw`\(\mathbf d=\mathbf y_2-X_2\mathbf b_1\)`,String.raw`Definición: lo observado en la muestra 2 menos lo que pronostica la muestra 1.`],
+[String.raw`\(\mathbf d=(X_2\boldsymbol\beta+\boldsymbol\mu_2)-X_2\mathbf b_1=\boldsymbol\mu_2-X_2(\mathbf b_1-\boldsymbol\beta)\)`,String.raw`Se reemplaza \(\mathbf y_2=X_2\boldsymbol\beta+\boldsymbol\mu_2\) y se saca \(X_2\) como factor común de \(X_2\boldsymbol\beta-X_2\mathbf b_1\).`],
+[String.raw`\(\mathbf b_1=(X_1'X_1)^{-1}X_1'(X_1\boldsymbol\beta+\boldsymbol\mu_1)=\boldsymbol\beta+(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\)`,String.raw`Se reemplaza \(\mathbf y_1\); como \((X_1'X_1)^{-1}X_1'X_1=I\), el primer término queda β.`],
+[String.raw`\(\mathbf b_1-\boldsymbol\beta=(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\)`,String.raw`Error de muestreo: lo que se aleja b₁ de β depende solo de los errores de la muestra 1.`],
+[String.raw`\(\mathbf d=\boldsymbol\mu_2-X_2(X_1'X_1)^{-1}X_1'\boldsymbol\mu_1\)`,String.raw`Se sustituye: d queda escrito solo con los dos vectores de errores.`],
+[String.raw`\(E(\mathbf d)=E(\boldsymbol\mu_2)-X_2(X_1'X_1)^{-1}X_1'E(\boldsymbol\mu_1)\)`,String.raw`Linealidad de la esperanza. Las matrices X son fijas (no aleatorias), así que salen de la esperanza.`],
+[String.raw`\(=\mathbf 0-X_2(X_1'X_1)^{-1}X_1'\mathbf 0=\mathbf 0_{n_2\times1}\)`,String.raw`Supuesto: \(E(\boldsymbol\mu_1)=E(\boldsymbol\mu_2)=\mathbf 0\).`]])+
+h("b) La varianza de d")+mp([
+[String.raw`\(\operatorname{var}(\mathbf d)=E[(\mathbf d-E\mathbf d)(\mathbf d-E\mathbf d)']=E(\mathbf d\mathbf d')\)`,String.raw`Definición de matriz de varianzas; como E(d) = 0, se resta cero.`],
+[String.raw`\(A=X_2(X_1'X_1)^{-1}X_1'\Rightarrow\mathbf d=\boldsymbol\mu_2-A\boldsymbol\mu_1\)`,String.raw`Se le da nombre a la matriz que multiplica a μ₁ para escribir menos.`],
+[String.raw`\(\mathbf d'=\boldsymbol\mu_2'-\boldsymbol\mu_1'A'\)`,String.raw`Transpuesta de una resta y de un producto: \((A\boldsymbol\mu_1)'=\boldsymbol\mu_1'A'\).`],
+[String.raw`\(A'=X_1\left[(X_1'X_1)^{-1}\right]'X_2'=X_1(X_1'X_1)^{-1}X_2'\)`,String.raw`\((ABC)'=C'B'A'\), y la inversa de una matriz simétrica es simétrica.`],
+[String.raw`\(\mathbf d\mathbf d'=\boldsymbol\mu_2\boldsymbol\mu_2'-\boldsymbol\mu_2\boldsymbol\mu_1'A'-A\boldsymbol\mu_1\boldsymbol\mu_2'+A\boldsymbol\mu_1\boldsymbol\mu_1'A'\)`,String.raw`Se multiplica término a término (como un binomio), respetando el orden porque son matrices.`],
+[String.raw`\(E(\boldsymbol\mu_2\boldsymbol\mu_1')=E(\boldsymbol\mu_1\boldsymbol\mu_2')=0\)`,String.raw`Los errores de las dos muestras no están correlacionados: los términos cruzados desaparecen.`],
+[String.raw`\(E(\boldsymbol\mu_2\boldsymbol\mu_2')=\sigma^2I_{n_2},\qquad E(\boldsymbol\mu_1\boldsymbol\mu_1')=\sigma^2I_{n_1}\)`,String.raw`Supuesto de varianza constante y sin autocorrelación.`],
+[String.raw`\(\operatorname{var}(\mathbf d)=\sigma^2I_{n_2}+A(\sigma^2I)A'=\sigma^2I_{n_2}+\sigma^2AA'\)`,String.raw`σ² es un escalar y sale; \(AIA'=AA'\).`],
+[String.raw`\(AA'=X_2(X_1'X_1)^{-1}X_1'X_1(X_1'X_1)^{-1}X_2'=X_2(X_1'X_1)^{-1}X_2'\)`,String.raw`En el medio aparece \(X_1'X_1(X_1'X_1)^{-1}=I\).`],
+[String.raw`\(\operatorname{var}(\mathbf d)=\sigma^2\left[I_{n_2}+X_2(X_1'X_1)^{-1}X_2'\right]\)`,String.raw`Factor común σ².`]]),
+
+"ep3-2":mp([
+[String.raw`\(D=0:\ \hat Y=186{,}47-126(0)+0{,}23X-0{,}13(0)X=186{,}47+0{,}23X\)`,String.raw`Ecuación de los hombres: se reemplaza D por 0 y desaparecen los términos con D.`],
+[String.raw`\(D=1:\ \hat Y=(186{,}47-126)+(0{,}23-0{,}13)X=60{,}47+0{,}10X\)`,String.raw`Ecuación de las mujeres: con D = 1 se agrupan los términos sin X (intercepto) y los que multiplican a X (pendiente).`],
+[String.raw`\(\hat Y_M-\hat Y_H=(60{,}47+0{,}10X)-(186{,}47+0{,}23X)=-126-0{,}13X\)`,String.raw`Resta de las dos ecuaciones con la misma renta X: es δ₁ + δ₂X.`],
+[String.raw`\(X=100:\ -126-0{,}13(100)=-139\)`,String.raw`Ejemplo numérico: la brecha depende de X porque las pendientes son distintas.`],
+[String.raw`\(gl=n-k=34-4=30,\qquad t_{0{,}025}(30)=2{,}042\)`,String.raw`Cuatro parámetros: β₁, δ₁, β₂ y δ₂.`],
+[String.raw`\(t_{\delta_2}=\dfrac{\hat\delta_2-0}{ee(\hat\delta_2)}=\dfrac{-0{,}13}{0{,}10}=-1{,}30\)`,String.raw`Prueba t (59): coeficiente menos el valor de H₀, dividido por su error estándar.`],
+[String.raw`\(|-1{,}30|=1{,}30<2{,}042\Rightarrow\text{no se rechaza }\delta_2=0\)`,String.raw`Se compara el valor absoluto con el crítico de dos colas.`],
+[String.raw`\(t_{\delta_1}=\dfrac{-126}{57{,}01}=-2{,}21,\qquad|-2{,}21|>2{,}042\)`,String.raw`Se rechaza δ₁ = 0: el consumo autónomo sí difiere.`]]),
+
+"ep3-3":h("b) Estimación por zona")+mp([
+[String.raw`\(X'X=\begin{bmatrix}X_U'X_U&0\\0&X_R'X_R\end{bmatrix}\)`,String.raw`Las columnas urbanas valen 0 en las filas rurales y viceversa, así que los productos cruzados son cero: el modelo equivale a dos regresiones simples separadas.`],
+[String.raw`\(\hat\beta_2=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}=\dfrac{4(704)-42(66)}{4(458)-42^2}=\dfrac{2816-2772}{1832-1764}=\dfrac{44}{68}\)`,String.raw`Fórmula de la pendiente con los 4 jóvenes urbanos.`],
+[String.raw`\(\hat\beta_1=\bar y_U-\hat\beta_2\bar x_U=16{,}5-0{,}6471(10{,}5)=16{,}5-6{,}7941=9{,}7059\)`,String.raw`La recta pasa por el punto de medias.`],
+[String.raw`\(\hat\beta_4=\dfrac{4(320)-26(47)}{4(194)-26^2}=\dfrac{1280-1222}{776-676}=\dfrac{58}{100}=0{,}58\)`,String.raw`Igual con los 4 rurales.`],
+[String.raw`\(\hat\beta_3=11{,}75-0{,}58(6{,}5)=11{,}75-3{,}77=7{,}98\)`,String.raw`Punto de medias rural.`]])+
+h("RSS, R² y errores estándar")+mp([
+[String.raw`\(RSS=S_{YY}-\hat\beta^2S_{XX}\)`,String.raw`Variación total de Y menos la explicada por la recta (ESS = b²·S_XX).`],
+[String.raw`\(RSS_U=11-0{,}6471^2(17)=11-0{,}41875(17)=11-7{,}1176=3{,}8824\)`,String.raw`\(S_{YY}=1100-4(16{,}5)^2=11\) y \(S_{XX}=458-4(10{,}5)^2=17\).`],
+[String.raw`\(RSS_R=8{,}75-0{,}58^2(25)=8{,}75-8{,}41=0{,}34\)`,String.raw`\(S_{YY}=561-4(11{,}75)^2=8{,}75\) y \(S_{XX}=194-4(6{,}5)^2=25\).`],
+[String.raw`\(RSS_{NR}=3{,}8824+0{,}34=4{,}2222,\qquad s^2=\dfrac{4{,}2222}{8-4}=1{,}0556\)`,String.raw`Un solo modelo con k = 4 parámetros: se suman las RSS y se divide por n − k.`],
+[String.raw`\(R^2=1-\dfrac{RSS}{TSS}=1-\dfrac{4{,}2222}{64{,}875}=1-0{,}0651=0{,}935\)`,String.raw`TSS con los 8 datos: \(1661-8(14{,}125)^2=64{,}875\).`],
+[String.raw`\(\begin{bmatrix}4&42\\42&458\end{bmatrix}^{-1}=\dfrac{1}{4(458)-42^2}\begin{bmatrix}458&-42\\-42&4\end{bmatrix}=\dfrac1{68}\begin{bmatrix}458&-42\\-42&4\end{bmatrix}\)`,String.raw`Inversa 2 × 2 del bloque urbano.`],
+[String.raw`\(ee(\hat\beta_2)=\sqrt{1{,}0556\cdot\dfrac4{68}}=\sqrt{0{,}0621}=0{,}249\)`,String.raw`Raíz de s² por el elemento de la diagonal.`]])+
+h("c) Chow y d) pronóstico")+mp([
+[String.raw`\(\hat\beta=\dfrac{8(1024)-68(113)}{8(652)-68^2}=\dfrac{8192-7684}{5216-4624}=\dfrac{508}{592}=0{,}8581\)`,String.raw`Recta común (restringida) con los 8 datos.`],
+[String.raw`\(RSS_R=64{,}875-0{,}8581^2(74)=64{,}875-54{,}490=10{,}3851\)`,String.raw`\(S_{XX}=652-8(8{,}5)^2=74\).`],
+[String.raw`\(F=\dfrac{(10{,}3851-4{,}2222)/2}{4{,}2222/4}=\dfrac{3{,}0815}{1{,}0556}=2{,}919\)`,String.raw`F (64): q = 2 (dos interceptos iguales y dos pendientes iguales) y n − k = 4.`],
+[String.raw`\(\hat y_0=9{,}7059+0{,}6471(10{,}5)=16{,}5\)`,String.raw`Se usa la ecuación urbana con X = 10,5.`],
+[String.raw`\(\mathbf x_0'(X'X)^{-1}\mathbf x_0=\dfrac1n+\dfrac{(x_0-\bar x)^2}{S_{XX}}=\dfrac14+\dfrac{(10{,}5-10{,}5)^2}{17}=\dfrac14\)`,String.raw`Fórmula de la regresión simple; como 10,5 es la media urbana, el segundo término es cero.`],
+[String.raw`\(ee_{media}=\sqrt{1{,}0556/4}=0{,}5137,\qquad ee_{ind}=\sqrt{1{,}0556(1+1/4)}=1{,}1487\)`,String.raw`El individual suma el 1 de la varianza del error nuevo.`],
+[String.raw`\(16{,}5\pm2{,}776(0{,}5137)=16{,}5\pm1{,}426\)`,String.raw`Intervalo para la media: [15,07; 17,93]. Con 1,1487 sale el individual: [13,31; 19,69].`]]),
+
+"ep3-4":h("a) Demostración")+mp([
+[String.raw`\(X=[\mathbf 1\;\;D]\Rightarrow X'X=\begin{bmatrix}\sum1&\sum D\\\sum D&\sum D^2\end{bmatrix}=\begin{bmatrix}n&n_L\\n_L&n_L\end{bmatrix}\)`,String.raw`ΣD cuenta los licenciados (D = 1), y D² = D porque D solo vale 0 o 1.`],
+[String.raw`\(X'\mathbf y=\begin{bmatrix}\sum W\\\sum DW\end{bmatrix}=\begin{bmatrix}n_L\bar W_L+n_A\bar W_A\\n_L\bar W_L\end{bmatrix}\)`,String.raw`ΣDW solo suma los salarios de los licenciados; y la suma de un grupo es su tamaño por su media.`],
+[String.raw`\(n_L\hat\beta_1+n_L\hat\beta_2=n_L\bar W_L\Rightarrow\hat\beta_1+\hat\beta_2=\bar W_L\)`,String.raw`Segunda ecuación normal; se divide por n_L.`],
+[String.raw`\(n\hat\beta_1+n_L\hat\beta_2=n_L\bar W_L+n_A\bar W_A\)`,String.raw`Primera ecuación normal.`],
+[String.raw`\((n_A+n_L)\hat\beta_1+n_L\hat\beta_2=n_A\hat\beta_1+n_L(\hat\beta_1+\hat\beta_2)\)`,String.raw`Se escribe n = n_A + n_L y se agrupan los términos con n_L.`],
+[String.raw`\(n_A\hat\beta_1+n_L\bar W_L=n_L\bar W_L+n_A\bar W_A\Rightarrow\hat\beta_1=\bar W_A\)`,String.raw`Se usa el paso anterior, se cancela \(n_L\bar W_L\) y se divide por n_A.`]])+
+h("b) a e) Estimación, errores estándar y R²")+mp([
+[String.raw`\(\hat\beta_1=150,\quad\hat\beta_2=\bar W_L-\bar W_A=250-150=100\)`,String.raw`Resultado de a).`],
+[String.raw`\(RSS=\sum_L(W-\bar W_L)^2+\sum_A(W-\bar W_A)^2\)`,String.raw`Los valores ajustados son las medias de cada grupo, así que los errores son las desviaciones respecto a esa media.`],
+[String.raw`\(\sum_L(W-\bar W_L)^2=(n_L-1)s_L^2=299(2500)=747.500\)`,String.raw`Definición de varianza muestral: \(s^2=\sum(W-\bar W)^2/(n-1)\).`],
+[String.raw`\(RSS=747.500+199(900)=747.500+179.100=926.600,\quad s^2=\dfrac{926.600}{498}=1.860{,}64\)`,String.raw`n − k = 500 − 2.`],
+[String.raw`\(\det(X'X)=n\,n_L-n_L^2=n_L(n-n_L)=n_Ln_A=300(200)=60.000\)`,String.raw`Factor común n_L.`],
+[String.raw`\([(X'X)^{-1}]_{11}=\dfrac{n_L}{n_Ln_A}=\dfrac1{n_A},\quad[(X'X)^{-1}]_{22}=\dfrac{n}{n_Ln_A}=\dfrac1{n_L}+\dfrac1{n_A}\)`,String.raw`Inversa 2 × 2; \(\frac{n_L+n_A}{n_Ln_A}=\frac1{n_A}+\frac1{n_L}\).`],
+[String.raw`\(ee(\hat\beta_2)=\sqrt{1.860{,}64\left(\tfrac1{300}+\tfrac1{200}\right)}=\sqrt{1.860{,}64(0{,}008333)}=\sqrt{15{,}505}=3{,}938\)`,String.raw`Raíz de s² por el elemento de la diagonal.`],
+[String.raw`\(ESS=300(250-210)^2+200(150-210)^2=300(1600)+200(3600)=1.200.000\)`,String.raw`Cada persona aporta (media de su grupo − media general)².`],
+[String.raw`\(R^2=\dfrac{1.200.000}{1.200.000+926.600}=0{,}564,\qquad t=\dfrac{100}{3{,}938}=25{,}40\)`,String.raw`TSS = ESS + RSS; y la t de β₂ = 0.`]]),
+
+"ep3-5":mp([
+[String.raw`\(\hat\beta_2=\dfrac{9(377{,}25)-117(24{,}06)}{9(2491)-117^2}=\dfrac{3395{,}25-2815{,}02}{22419-13689}=\dfrac{580{,}23}{8730}=0{,}06646\)`,String.raw`Pendiente de los hombres (n = 9).`],
+[String.raw`\(\hat\beta_1=\dfrac{24{,}06}{9}-0{,}06646\cdot\dfrac{117}9=2{,}6733-0{,}06646(13)=1{,}8093\)`,String.raw`Punto de medias.`],
+[String.raw`\(\hat\beta_2'=\dfrac{8(425{,}25)-130(23{,}96)}{8(2574)-130^2}=\dfrac{3402-3114{,}8}{20592-16900}=\dfrac{287{,}2}{3692}=0{,}07779\)`,String.raw`Pendiente de las mujeres (n = 8).`],
+[String.raw`\(\hat\beta_1'=2{,}995-0{,}07779(16{,}25)=1{,}7309\)`,String.raw`\(\bar w=23{,}96/8\), \(\bar x=130/8\).`],
+[String.raw`\(RSS_{NR}=RSS_H+RSS_M=0{,}80627+0{,}32615=1{,}13242\)`,String.raw`El modelo con D₁, D₂ y sus interacciones equivale a dos regresiones separadas.`],
+[String.raw`\(F=\dfrac{(RSS_R-RSS_{NR})/q}{RSS_{NR}/(n-k)}=\dfrac{(1{,}20866-1{,}13242)/2}{1{,}13242/13}\)`,String.raw`F (64): q = 2 (interceptos iguales y pendientes iguales), n − k = 17 − 4 = 13.`],
+[String.raw`\(=\dfrac{0{,}03812}{0{,}08711}=0{,}438&lt;F_{0{,}05}(2,13)=3{,}806\)`,String.raw`No se rechaza: una sola ecuación sirve para los dos géneros.`]]),
+
+"ep3-6":mp([
+[String.raw`\(R^2=1-\dfrac{RSS}{TSS}\Rightarrow RSS=(1-R^2)\,TSS\)`,String.raw`Se despeja la RSS de la definición de R².`],
+[String.raw`\(RSS_R=(1-0{,}9974)(6.403.270)=0{,}0026(6.403.270)=16.648{,}50\)`,String.raw`La regresión de todo el periodo es la restringida (los mismos parámetros siempre).`],
+[String.raw`\(RSS_{NR}=2.379{,}315+3.679{,}020+1.295{,}861=7.354{,}196\)`,String.raw`El no restringido son tres regresiones separadas: se suman sus RSS.`],
+[String.raw`\(q=(m-1)k=(3-1)(2)=4\)`,String.raw`Igualar tres juegos de 2 parámetros son 4 igualdades.`],
+[String.raw`\(n-mk=27-3(2)=21\)`,String.raw`El no restringido estima 6 parámetros con 27 años (1964-1990).`],
+[String.raw`\(F=\dfrac{(16.648{,}50-7.354{,}20)/4}{7.354{,}20/21}=\dfrac{9.294{,}30/4}{350{,}20}=\dfrac{2.323{,}58}{350{,}20}=6{,}635\)`,String.raw`F (64).`],
+[String.raw`\(6{,}635>F_{0{,}05}(4,21)=2{,}840\)`,String.raw`Se rechaza la estabilidad de los parámetros.`]]),
+
+"ep3-7":h("a) Sin intercepto")+mp([
+[String.raw`\(E_1E_2=E_1E_3=E_2E_3=0\)`,String.raw`Una persona está en una sola clase: el producto de dos dummies distintas siempre es cero.`],
+[String.raw`\(X'X=\begin{bmatrix}\sum E_1^2&0&0\\0&\sum E_2^2&0\\0&0&\sum E_3^2\end{bmatrix}=\operatorname{diag}(n_1,n_2,n_3)\)`,String.raw`\(E_j^2=E_j\) y su suma cuenta las personas de la clase j.`],
+[String.raw`\((X'X)^{-1}=\operatorname{diag}(1/n_1,1/n_2,1/n_3)\)`,String.raw`La inversa de una diagonal invierte cada elemento.`],
+[String.raw`\(\hat\delta_j=\dfrac{\sum_jY}{n_j}=\bar Y_j\)`,String.raw`Cada suma de la clase j dividida por su tamaño.`]])+
+h("b) Con intercepto")+mp([
+[String.raw`\(\mathbf 1=E_1+E_2+E_3\Rightarrow E_1=\mathbf 1-E_2-E_3\)`,String.raw`Toda persona está en alguna clase.`],
+[String.raw`\(\delta_1E_1+\delta_2E_2+\delta_3E_3=\delta_1+(\delta_2-\delta_1)E_2+(\delta_3-\delta_1)E_3\)`,String.raw`Se reemplaza E₁ y se agrupan los términos con E₂ y con E₃.`],
+[String.raw`\(\beta_1=\delta_1,\quad\beta_2=\delta_2-\delta_1,\quad\beta_3=\delta_3-\delta_1\)`,String.raw`Se comparan los coeficientes de los dos modelos: es el mismo modelo con otra parametrización.`],
+[String.raw`\(\hat\beta_1=\bar Y_1,\quad\hat\beta_2=\bar Y_2-\bar Y_1,\quad\hat\beta_3=\bar Y_3-\bar Y_1\)`,String.raw`Se reemplaza \(\hat\delta_j=\bar Y_j\) de a).`]])+
+h("c) Con género")+mp([
+[String.raw`\(X'X\text{: } n=10,\ \sum E_2=3,\ \sum E_3=2,\ \sum S_1=6,\ \sum E_2S_1=2,\ \sum E_3S_1=1\)`,String.raw`Cada elemento de X′X cuenta personas: por ejemplo, ΣE₂S₁ son las mujeres con educación media (2).`],
+[String.raw`\(X'\mathbf y=\left(\sum Y,\ \sum_{E_2}Y,\ \sum_{E_3}Y,\ \sum_{S_1}Y\right)'=(117,\ 36,\ 40,\ 76)'\)`,String.raw`117 = total; 36 = 12 + 14 + 10; 40 = 20 + 20; 76 = horas de las 6 mujeres.`],
+[String.raw`\(\mathbf b=(X'X)^{-1}X'\mathbf y=(6{,}324;\;3{,}592;\;12{,}113;\;3{,}127)\)`,String.raw`La inversa 4 × 4 se calcula con R o con la Calculadora de matrices.`],
+[String.raw`\(\hat Y_{H,sup}=6{,}324,\quad\hat Y_{H,media}=6{,}324+3{,}592=9{,}916,\quad\hat Y_{H,inc}=6{,}324+12{,}113=18{,}437\)`,String.raw`Hombres (S₁ = 0): intercepto más el coeficiente de su clase.`],
+[String.raw`\(\hat Y_{M}=\hat Y_H+3{,}127\Rightarrow 9{,}451;\ 13{,}043;\ 21{,}564\)`,String.raw`Mujeres: se suma 3,127 en cada clase, porque el modelo no tiene interacciones.`]]),
+
+"ep3-8":mp([
+[String.raw`\(\text{Guerra: }\hat\beta_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{175}{400}=0{,}4375,\quad\hat\beta_1=3-0{,}4375(7)=-0{,}0625\)`,String.raw`Pendiente y punto de medias con n₁ = 5.`],
+[String.raw`\(RSS_1=(61-5\cdot3^2)-0{,}4375^2(325-5\cdot7^2)=16-15{,}3125=0{,}6875\)`,String.raw`RSS = S_YY − b²S_XX.`],
+[String.raw`\(\text{Paz: }\hat\beta_2=\dfrac{1680}{3300}=0{,}5091,\quad RSS_2=88-0{,}5091^2(330)=2{,}4727\)`,String.raw`Igual con n₂ = 10: S_YY = 448 − 360, S_XX = 1540 − 1210.`],
+[String.raw`\(RSS_{NR}=0{,}6875+2{,}4727=3{,}1602\)`,String.raw`Dos regresiones separadas equivalen al modelo con D y DX.`],
+[String.raw`\(\text{Restringido: }\hat\beta_2=\dfrac{15(968)-145(75)}{15(1865)-145^2}=\dfrac{3645}{6950}=0{,}5245\)`,String.raw`Una sola recta con los 15 años.`],
+[String.raw`\(RSS_R=(509-15\cdot5^2)-0{,}5245^2\left(1865-\dfrac{145^2}{15}\right)=134-0{,}2751(463{,}33)=6{,}5561\)`,String.raw`S_YY = 134 y S_XX = 463,33.`],
+[String.raw`\(\hat\delta_1=0{,}4-(-0{,}0625)=0{,}4625,\quad\hat\delta_2=0{,}5091-0{,}4375=0{,}0716\)`,String.raw`En el modelo con dummies, δ es paz menos guerra.`],
+[String.raw`\(F=\dfrac{(6{,}5561-3{,}1602)/2}{3{,}1602/11}=\dfrac{1{,}6980}{0{,}2873}=5{,}910>3{,}982\)`,String.raw`F (64) con q = 2 y n − k = 15 − 4 = 11: se rechaza H₀.`]]),
+
+"ep3-9":mp([
+[String.raw`\(Y_t=\beta_1\cdot1+\delta_1\cdot D_t+\beta_2\cdot X_{2t}+\delta_2\cdot D_tX_{2t}+\cdots\)`,String.raw`Cada parámetro multiplica una variable: esas variables son las columnas de X, en el mismo orden que los parámetros.`],
+[String.raw`\(t\le n_1:\ (1,\,0,\,X_{2t},\,0,\dots,X_{kt},\,0)\)`,String.raw`En el primer periodo D = 0, así que las columnas con D quedan en cero.`],
+[String.raw`\(t>n_1:\ (1,\,1,\,X_{2t},\,X_{2t},\dots,X_{kt},\,X_{kt})\)`,String.raw`En el segundo periodo D = 1: la columna D es de unos y cada D·X repite la X.`],
+[String.raw`\(\dim X=n\times2k,\qquad\dim\boldsymbol\beta=2k\times1\)`,String.raw`k parámetros β y k parámetros δ.`],
+[String.raw`\(R\boldsymbol\beta=(\delta_1,\dots,\delta_k)'\)`,String.raw`Cada fila de R tiene un solo 1, en la posición de un δ (las posiciones pares 2, 4, …, 2k), y ceros en el resto.`],
+[String.raw`\(\dim R=k\times2k,\qquad\mathbf r=\mathbf 0_{k\times1}\)`,String.raw`Una fila por restricción (q = k) y una columna por parámetro.`]]),
+
+"ep3-10":mp([
+[String.raw`\(Y_t=\beta_1\cdot1+\delta_1\cdot D_t+\beta_2X_{2t}+\cdots+\beta_kX_{kt}\)`,String.raw`Solo el intercepto cambia: la única dummy es D sola, sin interacciones.`],
+[String.raw`\(\dim\boldsymbol\beta=(k+1)\times1\)`,String.raw`Los k parámetros originales más δ₁.`],
+[String.raw`\(R=[0\;\;1\;\;0\cdots0],\quad R\boldsymbol\beta=\delta_1\)`,String.raw`Un 1 en la segunda posición, la de δ₁.`],
+[String.raw`\(F=t_{\delta_1}^2=\left(\dfrac{\hat\delta_1}{ee(\hat\delta_1)}\right)^2\)`,String.raw`Con una sola restricción, la F es el cuadrado de la t; gl = (1, n − k − 1).`]]),
+
+"ep3-11":mp([
+[String.raw`\(Y_t=\beta_1+\beta_2X_{2t}+\delta_2D_tX_{2t}+\cdots+\beta_kX_{kt}+\delta_kD_tX_{kt}\)`,String.raw`Intercepto común: no hay D sola, solo las interacciones con las pendientes.`],
+[String.raw`\(\dim\boldsymbol\beta=(2k-1)\times1\)`,String.raw`k parámetros β y k − 1 parámetros δ (uno por pendiente).`],
+[String.raw`\(\dim R=(k-1)\times(2k-1),\quad\mathbf r=\mathbf 0\)`,String.raw`Una restricción por cada δ.`],
+[String.raw`\(k=2:\ \boldsymbol\beta=(\beta_1,\beta_2,\delta_2)',\ R=[0\;\;0\;\;1]\)`,String.raw`En el modelo simple, solo se prueba δ₂ = 0.`],
+[String.raw`\(gl=(k-1,\;n-(2k-1))=(k-1,\;n-2k+1)\)`,String.raw`Numerador: restricciones; denominador: n menos los parámetros del no restringido.`]]),
+
+"ep3-12":mp([
+[String.raw`\(t=\dfrac{0{,}94}{0{,}11}=8{,}5;\quad\dfrac{0{,}31}{0{,}23}=1{,}35;\quad\dfrac{-0{,}26}{0{,}29}=-0{,}90;\quad\dfrac{0{,}44}{0{,}07}=6{,}3\)`,String.raw`Cada t es el coeficiente sobre su error estándar.`],
+[String.raw`\(\dfrac1{0{,}94}=1{,}06\)`,String.raw`Si el costo crece menos que la producción, hay rendimientos crecientes a escala.`],
+[String.raw`\(\beta_5=1-\beta_3-\beta_4\Rightarrow\ln\dfrac{Y}{P_3}=\ln A+\beta_2\ln X+\beta_3\ln\dfrac{P_1}{P_3}+\beta_4\ln\dfrac{P_2}{P_3}\)`,String.raw`Se reemplaza la restricción, se pasa ln P₃ a la izquierda y se usa ln a − ln b = ln(a/b).`],
+[String.raw`\(\hat\beta_5=1-0{,}51-0{,}09=0{,}40\)`,String.raw`La elasticidad del combustible sale de la restricción.`],
+[String.raw`\(W=29\cdot\dfrac{0{,}028}{0{,}336}=2{,}417;\quad LR=29\ln\dfrac{0{,}364}{0{,}336}=2{,}321;\quad LM=29\cdot\dfrac{0{,}028}{0{,}364}=2{,}231\)`,String.raw`Las tres con las RSS; RSS_R − RSS_NR = 0,364 − 0,336 = 0,028.`],
+[String.raw`\(F=\dfrac{0{,}028/1}{0{,}336/24}=\dfrac{0{,}028}{0{,}014}=2{,}00<4{,}26\)`,String.raw`F exacta con n − k = 29 − 5 = 24.`]]),
+
+"ep3-13":mp([
+[String.raw`\(D_t=1\text{ si }t\ge2020,\quad D_t=0\text{ si }t<2020\)`,String.raw`La dummy marca los años desde la reforma.`],
+[String.raw`\(D=0:\ E(Y_t)=\beta_1+\beta_2X_t\)`,String.raw`Antes de la reforma el término δD desaparece.`],
+[String.raw`\(D=1:\ E(Y_t)=(\beta_1+\delta)+\beta_2X_t\)`,String.raw`Después, δ se suma al intercepto; la pendiente no cambia.`],
+[String.raw`\(E(Y\mid X,D=1)-E(Y\mid X,D=0)=\delta\)`,String.raw`Con la misma experiencia, δ es la diferencia de salario esperado.`],
+[String.raw`\(t=\hat\delta/ee(\hat\delta)\sim t(n-3)\)`,String.raw`Tres parámetros: β₁, δ y β₂.`]]),
+
+"ep3-14":mp([
+[String.raw`\(D=0:\ E(Y)=\beta_1+\beta_2X\)`,String.raw`Antes del evento.`],
+[String.raw`\(D=1:\ E(Y)=\beta_1+\delta_1+\beta_2X+\delta_2X=(\beta_1+\delta_1)+(\beta_2+\delta_2)X\)`,String.raw`Después: se agrupan los términos sin X y los que multiplican a X.`],
+[String.raw`\(\delta_1=\text{cambio del intercepto},\quad\delta_2=\text{cambio de la pendiente}\)`,String.raw`Se comparan las dos ecuaciones.`],
+[String.raw`\(H_0:\delta_1=\delta_2=0\Rightarrow F\text{ con }q=2\)`,String.raw`Es la prueba de Chow escrita con dummies.`]]),
+
+"ep3-15":mp([
+[String.raw`\(D=0:\ \hat Y=2+0{,}5X\)`,String.raw`Antes de la reforma.`],
+[String.raw`\(D=1:\ \hat Y=2+0{,}5X+2{,}5-0{,}25X=(2+2{,}5)+(0{,}5-0{,}25)X=4{,}5+0{,}25X\)`,String.raw`Se agrupan los términos sin X y con X.`],
+[String.raw`\(\dfrac{0{,}25}{0{,}5}=\dfrac12\)`,String.raw`La propensión marginal se reduce a la mitad.`],
+[String.raw`\(2+0{,}5X=4{,}5+0{,}25X\Rightarrow0{,}25X=2{,}5\Rightarrow X=10\)`,String.raw`Punto de corte: se igualan las dos rectas y se despeja X.`],
+[String.raw`\(X=5:\ \text{antes }2+0{,}5(5)=4{,}5;\ \text{después }4{,}5+0{,}25(5)=5{,}75\)`,String.raw`Comprobación con una renta menor que 10: antes 2 + 0,5(5) = 4,5 y después 4,5 + 0,25(5) = 5,75, así que el consumo es mayor después.`]]),
+
+"ep3-16":mp([
+[String.raw`\(S_{1t}+S_{2t}+S_{3t}+S_{4t}=1\)`,String.raw`Cada trimestre pertenece a una sola estación.`],
+[String.raw`\(\text{con intercepto: columna }\mathbf 1=S_1+S_2+S_3+S_4\Rightarrow\det(X'X)=0\)`,String.raw`Colinealidad perfecta: X′X no tiene inversa (trampa de las dicótomas).`],
+[String.raw`\(\hat\delta_j=\bar Y_j\)`,String.raw`Igual que en el ejercicio 7 a): X′X es diagonal con el número de trimestres de cada tipo.`],
+[String.raw`\(\delta_1S_1+\cdots+\delta_4S_4=\delta_1+(\delta_2-\delta_1)S_2+(\delta_3-\delta_1)S_3+(\delta_4-\delta_1)S_4\)`,String.raw`Se reemplaza S₁ = 1 − S₂ − S₃ − S₄: de ahí β₁ = δ₁ y θⱼ = δⱼ − δ₁.`],
+[String.raw`\(S_1X+S_2X+S_3X+S_4X=(S_1+S_2+S_3+S_4)X=X\)`,String.raw`En (3), X es la suma de las cuatro interacciones: incluirla también sería colinealidad perfecta.`]])};
+for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];})();
+
+// ---------- micropasos de Dinardo 4 (4.2 a 4.10) y de la Asesoría del parcial 1
+(function(){const mp=a=>`<ol class="mp">${a.map(([e,w])=>`<li><div class="mp-e">${e}</div>${w?`<div class="por">${w}</div>`:""}</li>`).join("")}</ol>`,h=t=>`<h5>${t}</h5>`;
+const M={
+"d-42":h("Estacionalidad")+mp([
+[String.raw`\(TSS=ESS+RSS=109{,}6+18{,}48=128{,}08\)`,String.raw`Descomposición de la variación total. La TSS no cambia al agregar regresoras, porque solo depende de Y.`],
+[String.raw`\(RSS_{NR}=TSS-ESS_{NR}=128{,}08-114{,}8=13{,}28\)`,String.raw`El modelo con las tres dummies es el no restringido.`],
+[String.raw`\(n=19\text{ años}\times4=76,\qquad k_{NR}=4+3=7\)`,String.raw`1958 a 1976 son 19 años de 4 trimestres; los 4 parámetros originales más 3 dummies.`],
+[String.raw`\(F=\dfrac{(18{,}48-13{,}28)/3}{13{,}28/69}=\dfrac{5{,}20/3}{0{,}19246}=\dfrac{1{,}7333}{0{,}1925}=9{,}01\)`,String.raw`F (64) con q = 3 (las tres dummies valen cero) y n − k = 69.`]])+
+h("Estabilidad entre subperiodos")+mp([
+[String.raw`\(RSS_{NR}=RSS_1+RSS_2=9{,}32+7{,}46=16{,}78\)`,String.raw`Dos regresiones separadas: se suman las RSS.`],
+[String.raw`\(n-2k=76-8=68,\qquad q=k=4\)`,String.raw`El no restringido estima 4 parámetros en cada subperiodo.`],
+[String.raw`\(F=\dfrac{(18{,}48-16{,}78)/4}{16{,}78/68}=\dfrac{0{,}425}{0{,}2468}=1{,}72<2{,}51\)`,String.raw`No se rechaza la estabilidad.`]]),
+
+"d-43":mp([
+[String.raw`\(S_1=1:\ 70-1{,}5=68{,}5;\quad S_2=1:\ 70+3{,}6=73{,}6;\quad S_3=1:\ 70+4{,}7=74{,}7;\quad\text{T4}:\ 70\)`,String.raw`Intercepto de cada trimestre: el general más la dummy de ese trimestre. El cuarto es la base (todas las dummies en 0).`],
+[String.raw`\(\hat Q_1=68{,}5-0{,}01(110)+0{,}2(100)=68{,}5-1{,}1+20=87{,}40\)`,String.raw`Se reemplazan P y Y del trimestre 1.`],
+[String.raw`\(\hat Q_2=73{,}6-0{,}01(116)+0{,}2(102)=73{,}6-1{,}16+20{,}4=92{,}84\)`,String.raw`Trimestre 2.`],
+[String.raw`\(\hat Q_3=74{,}7-1{,}22+20{,}8=94{,}28,\qquad\hat Q_4=70-1{,}14+20{,}6=89{,}46\)`,String.raw`Trimestres 3 y 4.`],
+[String.raw`\(\text{base T1}:\ 73{,}6-68{,}5=5{,}1;\ 74{,}7-68{,}5=6{,}2;\ 70-68{,}5=1{,}5\)`,String.raw`Con S₂, S₃, S₄, el intercepto es el del trimestre 1 y cada coeficiente es la diferencia con él.`],
+[String.raw`\(\text{sin intercepto}:\ \text{coeficiente de }S_j=\text{intercepto del trimestre }j\)`,String.raw`Con las cuatro dummies y sin constante, cada una lleva el intercepto completo de su trimestre.`]]),
+
+"d-44":mp([
+[String.raw`\(X=[\mathbf 1\;\;E_2\;\;E_3]\Rightarrow X'X=\begin{bmatrix}n&n_2&n_3\\n_2&n_2&0\\n_3&0&n_3\end{bmatrix}\)`,String.raw`Cada elemento cuenta personas; \(E_2E_3=0\) porque nadie está en dos clases.`],
+[String.raw`\(X'\mathbf y=\left(\sum Y,\ \sum_2Y,\ \sum_3Y\right)'=(n_1\bar Y_1+n_2\bar Y_2+n_3\bar Y_3,\ n_2\bar Y_2,\ n_3\bar Y_3)'\)`,String.raw`La suma de cada grupo es su tamaño por su media.`],
+[String.raw`\(n_2\hat\alpha_1+n_2\hat\gamma_2=n_2\bar Y_2\Rightarrow\hat\alpha_1+\hat\gamma_2=\bar Y_2\)`,String.raw`Segunda ecuación normal, dividida por n₂.`],
+[String.raw`\(\hat\alpha_1+\hat\gamma_3=\bar Y_3\)`,String.raw`Tercera ecuación normal, dividida por n₃.`],
+[String.raw`\(n\hat\alpha_1+n_2(\bar Y_2-\hat\alpha_1)+n_3(\bar Y_3-\hat\alpha_1)=n_1\bar Y_1+n_2\bar Y_2+n_3\bar Y_3\)`,String.raw`Primera ecuación con \(\hat\gamma_j=\bar Y_j-\hat\alpha_1\).`],
+[String.raw`\((n-n_2-n_3)\hat\alpha_1=n_1\bar Y_1\Rightarrow n_1\hat\alpha_1=n_1\bar Y_1\Rightarrow\hat\alpha_1=\bar Y_1\)`,String.raw`Se cancelan \(n_2\bar Y_2\) y \(n_3\bar Y_3\) en los dos lados; n − n₂ − n₃ = n₁.`]]),
+
+"d-45":mp([
+[String.raw`\(E_1+E_2+E_3=1\)`,String.raw`Por eso la primera especificación va sin constante: con las tres clases y un intercepto habría colinealidad perfecta.`],
+[String.raw`\(\hat Y(E_j,S_2=0)=\hat\alpha_j,\qquad\hat Y(E_j,S_2=1)=\hat\alpha_j+\hat\beta_2\)`,String.raw`Media estimada de cada celda: se reemplazan las dummies por 0 o 1.`],
+[String.raw`\(\mu+\alpha_1E_1+\alpha_2E_2=\alpha_3+(\alpha_1-\alpha_3)E_1+(\alpha_2-\alpha_3)E_2\)`,String.raw`Segunda especificación: la clase 3 es la base, así que el intercepto es α₃ y los demás son diferencias.`],
+[String.raw`\(\text{misma brecha }\hat\beta_2\text{ en las tres clases}\)`,String.raw`Sin interacción el modelo impone la misma diferencia por sexo: por eso no reproduce las medias de cada celda.`]]),
+
+"d-46":mp([
+[String.raw`\(E_jS_i\cdot E_{j'}S_{i'}=0\ \text{si}\ (j,i)\neq(j',i')\)`,String.raw`Cada persona está en una sola celda (clase × sexo).`],
+[String.raw`\(X'X=\operatorname{diag}(n_{11},n_{12},\dots,n_{32})\)`,String.raw`Matriz diagonal con el número de personas de cada una de las 6 celdas.`],
+[String.raw`\(\hat\theta_{ji}=\dfrac{\sum_{celda}Y}{n_{ji}}=\bar Y_{ji}\)`,String.raw`Cada coeficiente es la suma de la celda sobre su tamaño: la media observada.`],
+[String.raw`\(q=6-4=2\)`,String.raw`Para probar la interacción: el no restringido tiene 6 parámetros y el del 4.5, 4.`]]),
+
+"d-47":mp([
+[String.raw`\(\text{Sin aumento }(n=5):\ \hat Y=16{,}762+0{,}6986X,\ RSS=57{,}193\)`,String.raw`Regresión simple con las familias sin asterisco.`],
+[String.raw`\(\text{Con aumento }(n=7):\ \hat Y=10{,}306+0{,}7452X,\ RSS=247{,}900\)`,String.raw`Regresión simple con las familias con asterisco.`],
+[String.raw`\(RSS_{NR}=57{,}193+247{,}900=305{,}094\)`,String.raw`Dos rectas separadas equivalen al modelo con D y DX.`],
+[String.raw`\(RSS_R=310{,}969\)`,String.raw`Una sola recta con las 12 familias.`],
+[String.raw`\(F=\dfrac{(310{,}969-305{,}094)/2}{305{,}094/(12-4)}=\dfrac{5{,}875/2}{38{,}137}=\dfrac{2{,}938}{38{,}137}=0{,}077\)`,String.raw`F (64) con q = 2 y n − k = 8.`],
+[String.raw`\(F=\dfrac{(310{,}969-310{,}653)/1}{310{,}653/9}=\dfrac{0{,}316}{34{,}517}=0{,}009\)`,String.raw`Solo intercepto distinto: q = 1 y el no restringido tiene 3 parámetros (n − k = 9).`]]),
+
+"d-48":mp([
+[String.raw`\(s^2=\dfrac{RSS}{n-k}\Rightarrow RSS=s^2(n-k)\)`,String.raw`Se despeja la RSS del error estándar de la regresión.`],
+[String.raw`\(RSS_R=0{,}03755^2(39-3)=0{,}00141(36)=0{,}050760\)`,String.raw`Toda la muestra (restringido).`],
+[String.raw`\(RSS_1=0{,}04573^2(17)=0{,}035551,\qquad RSS_2=0{,}02185^2(16)=0{,}007639\)`,String.raw`1929-1948 son 20 años y 1949-1967 son 19; a cada uno se le restan 3 parámetros.`],
+[String.raw`\(RSS_{NR}=0{,}035551+0{,}007639=0{,}043190\)`,String.raw`Suma de los dos subperiodos.`],
+[String.raw`\(F=\dfrac{(0{,}050760-0{,}043190)/3}{0{,}043190/33}=\dfrac{0{,}002523}{0{,}001309}=1{,}93\)`,String.raw`q = k = 3 y n − 2k = 39 − 6 = 33.`]]),
+
+"d-49":mp([
+[String.raw`\(\det\begin{bmatrix}20&20\\20&25\end{bmatrix}=20(25)-20(20)=100\)`,String.raw`Determinante 2 × 2.`],
+[String.raw`\(\mathbf b_1=\dfrac1{100}\begin{bmatrix}25(10)-20(20)\\-20(10)+20(20)\end{bmatrix}=\dfrac1{100}\begin{bmatrix}-150\\200\end{bmatrix}=\begin{bmatrix}-1{,}5\\2\end{bmatrix}\)`,String.raw`Inversa 2 × 2 por X′y.`],
+[String.raw`\(RSS_1=\mathbf y'\mathbf y-\mathbf b_1'X'\mathbf y=30-(-15+40)=5\)`,String.raw`\(\mathbf b'X'\mathbf y=-1{,}5(10)+2(20)\).`],
+[String.raw`\(\mathbf b_2=\dfrac1{100}\begin{bmatrix}20(8)-10(20)\\-10(8)+10(20)\end{bmatrix}=\begin{bmatrix}-0{,}4\\1{,}2\end{bmatrix},\quad RSS_2=24-(-3{,}2+24)=3{,}2\)`,String.raw`Igual con los datos rurales (det = 10·20 − 10·10 = 100).`],
+[String.raw`\(X'X_R=\begin{bmatrix}20+10&20+10\\20+10&25+20\end{bmatrix}=\begin{bmatrix}30&30\\30&45\end{bmatrix},\quad X'\mathbf y_R=\begin{bmatrix}18\\40\end{bmatrix},\quad\mathbf y'\mathbf y_R=54\)`,String.raw`Al juntar las dos muestras, las sumas de productos se suman.`],
+[String.raw`\(\det=30(45)-30^2=450,\quad\mathbf b=\dfrac1{450}\begin{bmatrix}45(18)-30(40)\\-30(18)+30(40)\end{bmatrix}=\dfrac1{450}\begin{bmatrix}-390\\660\end{bmatrix}\)`,String.raw`b = (−0,8667; 1,4667).`],
+[String.raw`\(RSS_R=54-(-0{,}8667(18)+1{,}4667(40))=54-(-15{,}6+58{,}667)=10{,}933\)`,String.raw`Misma fórmula de la RSS.`],
+[String.raw`\(F=\dfrac{(10{,}933-8{,}2)/2}{8{,}2/16}=\dfrac{1{,}367}{0{,}5125}=2{,}667\)`,String.raw`q = 2 y n − 2k = 20 − 4 = 16.`]]),
+
+"d-410":mp([
+[String.raw`\(RSS_j=s_j^2(n_j-2)\)`,String.raw`La varianza residual es RSS/(n − k), con k = 2 en cada regresión log-log simple.`],
+[String.raw`\(26+42+15=83=RSS_{NR}\)`,String.raw`0,26(100), 0,42(100) y 0,30(50).`],
+[String.raw`\(RSS_R=0{,}38(256-2)=96{,}52\)`,String.raw`Una sola regresión con los 256 hogares.`],
+[String.raw`\(q=(3-1)(2)=4,\qquad n-3k=256-6=250\)`,String.raw`Igualar tres juegos de 2 parámetros.`],
+[String.raw`\(F=\dfrac{(96{,}52-83)/4}{83/250}=\dfrac{3{,}38}{0{,}332}=10{,}18\)`,String.raw`F (64).`],
+[String.raw`\(\operatorname{var}(\ln X)=24\Rightarrow\sum(x-\bar x)^2=n\cdot24=256(24)=6.144\)`,String.raw`La varianza (con divisor n) por n es la suma de cuadrados en desviaciones.`],
+[String.raw`\(ee(b)=\sqrt{\dfrac{s^2}{S_{XX}}}=\sqrt{\dfrac{0{,}38}{6.144}}=\sqrt{0{,}0000618}=0{,}00786\)`,String.raw`Error estándar de la pendiente en regresión simple.`],
+[String.raw`\(t=\dfrac{0{,}07-0{,}10}{0{,}00786}=-3{,}81\)`,String.raw`Prueba t contra el valor 0,10 de H₀.`]]),
+
+"p1-39":mp([
+[String.raw`\(\det(X_*'X_*)=10(30\cdot20-15^2)-10(10\cdot20-15\cdot5)+5(10\cdot15-30\cdot5)=3750-1250+0=2500\)`,String.raw`Determinante 3 × 3 por la primera fila.`],
+[String.raw`\((X_*'X_*)^{-1}=\begin{bmatrix}0{,}15&-0{,}05&0\\-0{,}05&0{,}07&-0{,}04\\0&-0{,}04&0{,}08\end{bmatrix}\)`,String.raw`Adjunta transpuesta dividida por 2500 (por ejemplo, el elemento (1,1) es (30·20 − 15²)/2500 = 375/2500 = 0,15).`],
+[String.raw`\(b_2=0{,}15(7)-0{,}05(-7)+0(-26)=1{,}05+0{,}35=1{,}4\)`,String.raw`Primera fila de la inversa por X′y.`],
+[String.raw`\(b_3=-0{,}05(7)+0{,}07(-7)-0{,}04(-26)=-0{,}35-0{,}49+1{,}04=0{,}2\)`,String.raw`Segunda fila.`],
+[String.raw`\(b_4=0-0{,}04(-7)+0{,}08(-26)=0{,}28-2{,}08=-1{,}8\)`,String.raw`Tercera fila.`],
+[String.raw`\(ESS=\mathbf b_2'X_*'\mathbf y_*=1{,}4(7)+0{,}2(-7)-1{,}8(-26)=9{,}8-1{,}4+46{,}8=55{,}2\)`,String.raw`En desviaciones, ESS = b′X*′X*b = b′X*′y* por las ecuaciones normales.`],
+[String.raw`\(S^2=\dfrac{60-55{,}2}{24-4}=\dfrac{4{,}8}{20}=0{,}24\)`,String.raw`RSS = TSS − ESS; k = 4 cuenta el intercepto.`],
+[String.raw`\(F_{\beta_2=1}=\dfrac{(1{,}4-1)^2}{0{,}24(0{,}15)}=\dfrac{0{,}16}{0{,}036}=4{,}444\)`,String.raw`Coeficiente menos el valor de H₀, al cuadrado, sobre su varianza.`],
+[String.raw`\(\operatorname{var}(b_2+b_3+b_4)=0{,}24\,(0{,}15+0{,}07+0{,}08+2(-0{,}05)+2(0)+2(-0{,}04))=0{,}24(0{,}12)=0{,}0288\)`,String.raw`Varianza de una suma: las tres varianzas más dos veces cada covarianza.`],
+[String.raw`\(X_*'X_*(\mathbf b-\mathbf r)=\begin{bmatrix}10(0{,}4)+10(-0{,}8)+5(0{,}2)\\10(0{,}4)+30(-0{,}8)+15(0{,}2)\\5(0{,}4)+15(-0{,}8)+20(0{,}2)\end{bmatrix}=\begin{bmatrix}-3\\-17\\-6\end{bmatrix}\)`,String.raw`Con \(\mathbf b-\mathbf r=(1{,}4-1;\;0{,}2-1;\;-1{,}8+2)=(0{,}4;\,-0{,}8;\,0{,}2)\): primero la matriz por el vector.`],
+[String.raw`\((\mathbf b-\mathbf r)'X_*'X_*(\mathbf b-\mathbf r)=0{,}4(-3)+(-0{,}8)(-17)+0{,}2(-6)=-1{,}2+13{,}6-1{,}2=11{,}2\)`,String.raw`Luego la fila por la columna: da un número.`],
+[String.raw`\(F=\dfrac{11{,}2/3}{0{,}24}=15{,}56\)`,String.raw`F (56) con R = I y q = 3.`]]),
+
+"p1-310":mp([
+[String.raw`\(\det(X'X)=10(92\cdot163-119^2)-30(30\cdot163-119\cdot40)+40(30\cdot119-92\cdot40)\)`,String.raw`Determinante 3 × 3 por la primera fila.`],
+[String.raw`\(=10(14996-14161)-30(4890-4760)+40(3570-3680)=8350-3900-4400=50\)`,String.raw`Se resuelven los productos de cada menor 2 × 2.`],
+[String.raw`\(c_{22}=\dfrac{10(163)-40^2}{50}=\dfrac{1630-1600}{50}=0{,}6\)`,String.raw`Elemento (2,2) de la inversa: su menor (quitando fila 2 y columna 2) sobre el determinante.`],
+[String.raw`\(\mathbf b=(X'X)^{-1}X'\mathbf y=(-13;\;1;\;3)\)`,String.raw`Producto de la inversa completa por (20; 59; 88).`],
+[String.raw`\(\bar Y=\dfrac{20}{10}=2\)`,String.raw`El primer elemento de X′y es ΣY y el (1,1) de X′X es n.`],
+[String.raw`\(TSS=88{,}2-10(2^2)=48{,}2,\qquad\mathbf b'X'\mathbf y=-13(20)+1(59)+3(88)=-260+59+264=63\)`,String.raw`TSS = y′y − nȲ².`],
+[String.raw`\(ESS=63-40=23,\quad RSS=48{,}2-23=25{,}2,\quad S^2=\dfrac{25{,}2}{7}=3{,}6\)`,String.raw`ESS = b′X′y − nȲ²; n − k = 10 − 3.`],
+[String.raw`\(S_{b_2}=\sqrt{3{,}6(0{,}6)}=\sqrt{2{,}16}=1{,}470,\qquad t=\dfrac{1}{1{,}470}=0{,}680\)`,String.raw`Prueba t (59) de β₂ = 0.`]]),
+
+"p1-313":mp([
+[String.raw`\(\mathbf b-\mathbf r=\begin{bmatrix}0{,}24-0\\0{,}94-1\end{bmatrix}=\begin{bmatrix}0{,}24\\-0{,}06\end{bmatrix}\)`,String.raw`Distancia entre la estimación y lo que dice H₀.`],
+[String.raw`\(X'X(\mathbf b-\mathbf r)=\begin{bmatrix}30(0{,}24)+300(-0{,}06)\\300(0{,}24)+3052(-0{,}06)\end{bmatrix}=\begin{bmatrix}7{,}2-18\\72-183{,}12\end{bmatrix}=\begin{bmatrix}-10{,}8\\-111{,}12\end{bmatrix}\)`,String.raw`Primero la matriz por el vector.`],
+[String.raw`\((\mathbf b-\mathbf r)'X'X(\mathbf b-\mathbf r)=0{,}24(-10{,}8)+(-0{,}06)(-111{,}12)=-2{,}592+6{,}667=4{,}075\)`,String.raw`Luego la fila por la columna: da un número.`],
+[String.raw`\(S^2=\dfrac{28{,}56}{30-2}=1{,}02\)`,String.raw`k = 2 en regresión simple con intercepto.`],
+[String.raw`\(F=\dfrac{4{,}075/2}{1{,}02}=\dfrac{2{,}0375}{1{,}02}=1{,}998\)`,String.raw`F (56) con q = 2.`]]),
+
+"p1-320":mp([
+[String.raw`\(\sum X_2=\sum X_3=0\)`,String.raw`Los ceros de la primera fila de X′X dicen que las regresoras están en desviaciones.`],
+[String.raw`\(b_1=\dfrac{132}{33}=4=\bar Y\)`,String.raw`El bloque del intercepto es independiente: 33·b₁ = 132.`],
+[String.raw`\(\det\begin{bmatrix}40&20\\20&60\end{bmatrix}=2400-400=2000\)`,String.raw`Bloque de las pendientes.`],
+[String.raw`\(b_2=\dfrac{60(24)-20(92)}{2000}=\dfrac{1440-1840}{2000}=-0{,}2,\quad b_3=\dfrac{-20(24)+40(92)}{2000}=\dfrac{3200}{2000}=1{,}6\)`,String.raw`Inversa 2 × 2 por (24; 92).`],
+[String.raw`\(\mathbf b'X'\mathbf y=4(132)-0{,}2(24)+1{,}6(92)=528-4{,}8+147{,}2=670{,}4\)`,String.raw`Producto fila por columna.`],
+[String.raw`\(ESS=670{,}4-33(4^2)=670{,}4-528=142{,}4,\quad RSS=150-142{,}4=7{,}6\)`,String.raw`ESS = b′X′y − nȲ²; RSS = TSS − ESS.`],
+[String.raw`\(S^2_{b_2}=\dfrac{7{,}6}{30}(0{,}03)=0{,}0076,\qquad F=\dfrac{0{,}04}{0{,}0076}=5{,}263\)`,String.raw`F (58): b₂² sobre su varianza.`],
+[String.raw`\(ESS_R=\dfrac{92^2}{60}=141{,}07,\qquad RSS_R=150-141{,}07=8{,}933\)`,String.raw`Sin X₂: b₃ = 92/60 y ESS_R = b₃·92.`],
+[String.raw`\(F_{64}=\dfrac{8{,}933-7{,}6}{7{,}6/30}=\dfrac{1{,}333}{0{,}2533}=5{,}263\)`,String.raw`Misma F por las RSS.`]]),
+
+"p1-t21":mp([
+[String.raw`\(S^2=0{,}0696^2=0{,}004844,\qquad RSS_{NR}=(52-5)(0{,}004844)=0{,}2277\)`,String.raw`El error estándar de la regresión es √(RSS/(n − k)).`],
+[String.raw`\(F=\dfrac{(-0{,}9821+1{,}6)^2}{0{,}06021}=\dfrac{0{,}6179^2}{0{,}06021}=\dfrac{0{,}3818}{0{,}06021}=6{,}341\)`,String.raw`c) Un coeficiente contra el valor −1,6.`],
+[String.raw`\(\operatorname{var}(b_2+4b_4)=0{,}06021+16(0{,}00773)+2(4)(0{,}00405)=0{,}06021+0{,}12368+0{,}0324=0{,}2163\)`,String.raw`d) \(\operatorname{var}(aX+bY)\) con a = 1 y b = 4.`],
+[String.raw`\(b_2+4b_4=-0{,}9821+4(0{,}1663)=-0{,}9821+0{,}6652=-0{,}3169\)`,String.raw`Se reemplazan los coeficientes.`],
+[String.raw`\(F=\dfrac{(-0{,}3169)^2}{0{,}2163}=\dfrac{0{,}1004}{0{,}2163}=0{,}464\)`,String.raw`F (60).`],
+[String.raw`\(F_{64}=\dfrac{(0{,}23-0{,}2277)/1}{0{,}004844}=\dfrac{0{,}0023}{0{,}004844}=0{,}48\)`,String.raw`Con las RSS: el denominador RSS_NR/(n − k) es S².`],
+[String.raw`\(F_f=\dfrac{(0{,}24096-0{,}2277)/2}{0{,}004844}=\dfrac{0{,}01163}{0{,}004844}=1{,}371\)`,String.raw`f) q = 2.`]]),
+
+"p1-t24":mp([
+[String.raw`\(t_{0{,}025}(45)=2{,}0141\)`,String.raw`n − k = 48 − 3.`],
+[String.raw`\(10{,}3017\pm2{,}0141(0{,}2440)=10{,}3017\pm0{,}4915\)`,String.raw`Intervalo para β₁: [9,8103; 10,7932].`],
+[String.raw`\(\operatorname{var}(b_2+b_3)=0{,}0001610^2+0{,}0008146^2+2(5{,}399\cdot10^{-8})=2{,}59\cdot10^{-8}+6{,}636\cdot10^{-7}+1{,}080\cdot10^{-7}=7{,}975\cdot10^{-7}\)`,String.raw`Las varianzas son los errores estándar al cuadrado; más dos veces la covarianza.`],
+[String.raw`\((b_2+b_3)^2=(-0{,}0059941+0{,}0051071)^2=(-0{,}000887)^2=7{,}868\cdot10^{-7}\)`,String.raw`Numerador de la F (60).`],
+[String.raw`\(F_{60}=\dfrac{7{,}868\cdot10^{-7}}{7{,}975\cdot10^{-7}}=0{,}9866\)`,String.raw`Cociente.`],
+[String.raw`\(F_{64}=\dfrac{1{,}239267-1{,}21268}{1{,}21268/45}=\dfrac{0{,}026587}{0{,}026948}=0{,}9866\)`,String.raw`Misma F con las RSS.`]]),
+
+"p1-t27":mp([
+[String.raw`\(t_{0{,}025}(28)=2{,}0484,\quad1{,}8301\pm2{,}0484(0{,}1822)=1{,}8301\pm0{,}3732\)`,String.raw`Intervalo para β₂: [1,457; 2,203].`],
+[String.raw`\(b_2+b_3-1=1{,}8301-0{,}8433-1=-0{,}0132\)`,String.raw`Distancia a la restricción β₂ + β₃ = 1.`],
+[String.raw`\(\operatorname{var}(b_2+b_3)=0{,}03319+0{,}08054+2(-0{,}05132)=0{,}11373-0{,}10264=0{,}011087\)`,String.raw`La covarianza negativa reduce la varianza de la suma.`],
+[String.raw`\(F=\dfrac{0{,}0132^2}{0{,}011087}=\dfrac{0{,}000174}{0{,}011087}=0{,}0157\)`,String.raw`F (60).`],
+[String.raw`\(RSS_R-RSS_{NR}=0{,}1408846-0{,}1408056=0{,}000079\)`,String.raw`Pérdida de ajuste mínima.`],
+[String.raw`\(W=\dfrac{31(0{,}000079)}{0{,}1408056},\quad LR=31\ln\dfrac{0{,}1408846}{0{,}1408056},\quad LM=\dfrac{31(0{,}000079)}{0{,}1408846}\)`,String.raw`Las tres valen ≈ 0,0174; W divide por el RSS no restringido y LM por el restringido.`]]),
+
+"p1-t28":mp([
+[String.raw`\(t_{0{,}025}(31)=2{,}0395,\quad-5{,}8139\pm2{,}0395(0{,}4970)=-5{,}8139\pm1{,}0136\)`,String.raw`Intervalo para β₂: [−6,828; −4,800].`],
+[String.raw`\(-5{,}732889+3(1{,}910963)=-5{,}732889+5{,}732889=0\)`,String.raw`b_R cumple la restricción β₂ + 3β₃ = 0.`],
+[String.raw`\(b_2+3b_3=-5{,}8139+5{,}0016=-0{,}8123\)`,String.raw`Rb − r con R = [0 1 3 0].`],
+[String.raw`\(\operatorname{var}=0{,}24705+9(0{,}51093)+6(0{,}09828)=0{,}24705+4{,}59838+0{,}58971=5{,}43514\)`,String.raw`\(\operatorname{var}(aX+bY)\) con a = 1 y b = 3: 9 = 3² y 6 = 2·1·3.`],
+[String.raw`\(F_{60}=\dfrac{0{,}65983}{5{,}43514}=0{,}1214\)`,String.raw`Numerador: (−0,8123)².`],
+[String.raw`\(RSS_R=15.008-14.619{,}98=388{,}02,\quad RSS_{NR}=31(3{,}531^2)=31(12{,}468)=386{,}51\)`,String.raw`RSS = TSS − ESS en el restringido; RSS = (n − k)S² en el no restringido.`],
+[String.raw`\(F_{64}=\dfrac{388{,}02-386{,}51}{386{,}51/31}=\dfrac{1{,}51}{12{,}468}=0{,}121\)`,String.raw`Misma F con las RSS.`]])};
+for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];})();
+
 
 // ===================== AJUSTE AL PROGRAMA 1504110 =====================
 // Agrupa la ruta en las seis unidades del programa, sube al tronco las ramas que el programa evalúa
