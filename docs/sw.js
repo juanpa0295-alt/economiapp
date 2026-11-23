@@ -1,6 +1,6 @@
 // Economiapp · service worker: permite instalar la app y usarla sin internet.
 // La versión y la lista de archivos las escribe build.py; no edites docs/sw.js a mano.
-const VERSION = "0d2c02818b21";
+const VERSION = "9a20684f7860";
 const CACHE = "economiapp-" + VERSION;
 const RUNTIME = "economiapp-externos";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./comun/ruta.css", "./comun/ruta.js", "./iconos/icon-192.png"];
