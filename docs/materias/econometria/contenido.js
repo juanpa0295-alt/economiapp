@@ -2334,142 +2334,181 @@ h("g) MLE de la varianza y de la mediana")+mp([
 [String.raw`\(F(m)=\int_0^m\dfrac1\theta e^{-x/\theta}dx=\left[-e^{-x/\theta}\right]_0^m=1-e^{-m/\theta}\)`,String.raw`Opcional, para ver de dónde sale \(\theta\ln2\) (el enunciado ya lo da): se integra la f(x) del enunciado para obtener la acumulada.`],
 [String.raw`\(1-e^{-m/\theta}=\tfrac12\Rightarrow e^{-m/\theta}=\tfrac12\Rightarrow-\dfrac m\theta=\ln\tfrac12=-\ln2\Rightarrow m=\theta\ln2\)`,String.raw`La mediana deja la mitad de la probabilidad a cada lado: \(F(m)=1/2\). Se toma logaritmo natural y \(\ln(1/2)=-\ln2\).`]]),
 
-"ep4-2":h("a) y b) Verosimilitud, score y MLE")+mp([
-[String.raw`\(L(\lambda)=\prod\dfrac{e^{-\lambda}\lambda^{x_i}}{x_i!}=\dfrac{e^{-n\lambda}\lambda^{\sum x_i}}{\prod x_i!}\)`,String.raw`Producto: \(e^{-\lambda}\) n veces da \(e^{-n\lambda}\) y \(\lambda^{x_1}\cdots\lambda^{x_n}=\lambda^{\sum x_i}\).`],
-[String.raw`\(l(\lambda)=-n\lambda+\sum x_i\ln\lambda-\sum\ln x_i!\)`,String.raw`\(\ln(a/b)=\ln a-\ln b\), \(\ln e^{c}=c\), \(\ln a^k=k\ln a\) y el logaritmo de un producto es la suma de logaritmos.`],
-[String.raw`\(s(\lambda)=-n+\dfrac{\sum x_i}{\lambda}\)`,String.raw`\(\frac{d}{d\lambda}(-n\lambda)=-n\); \(\frac{d}{d\lambda}\ln\lambda=\frac1\lambda\); \(\sum\ln x_i!\) no depende de λ y su derivada es 0.`],
-[String.raw`\(-n+\dfrac{\sum x_i}{\lambda}=0\Rightarrow\hat\lambda=\dfrac{\sum x_i}{n}=\bar x\)`,"Se iguala a cero y se multiplica por λ."]])+
-h("c) a f) Esperanza del score, Hessiana e información")+mp([
-[String.raw`\(E[s]=-n+\dfrac{E(\sum X_i)}{\lambda}=-n+\dfrac{n\lambda}{\lambda}=0\)`,"Linealidad de la esperanza y E(Xᵢ) = λ."],
-[String.raw`\(\mathbf H=\dfrac{d}{d\lambda}\left(\sum x_i\,\lambda^{-1}\right)=-\dfrac{\sum x_i}{\lambda^2}\)`,"Regla de la potencia con k = −1; la derivada de −n es 0."],
-[String.raw`\(-E(\mathbf H)=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda\)`,"E(ΣXᵢ) = nλ."],
-[String.raw`\(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\operatorname{var}(\sum X_i)}{\lambda^2}=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda\)`,"var(a + bY) = b²var(Y) con b = 1/λ; en la Poisson var(X) = λ, y la varianza de la suma es nλ."],
-[String.raw`\(\operatorname{var}(\hat\lambda)=\dfrac{\lambda}{n},\qquad\hat\sigma=\sqrt{\bar x}\)`,String.raw`Inversa de la información; e invarianza con \(\sigma=\sqrt{\operatorname{var}(X)}=\sqrt\lambda\).`]]),
+"ep4-2":h("Lo que da el enunciado y dónde se usa")+mp([
+[String.raw`\(f(x)=P(X=x)=\dfrac{e^{-\lambda}\lambda^{x}}{x!},\qquad x=0,1,2,3,\dots\)`,String.raw`La fdp de la observación 3 del enunciado. Se usa en a), escrita para cada \(x_i\).`],
+[String.raw`\(\mu=E(X)=\lambda\qquad\sigma^2=\operatorname{var}(X)=\lambda\)`,String.raw`Observaciones 1 y 2. \(E(X)=\lambda\) se usa en c) y e); \(\operatorname{var}(X)=\lambda\) en e) y g).`],
+[String.raw`\(X_1,\dots,X_n\ \text{m.a.}\)`,String.raw`Independientes y con la misma distribución: se multiplican las densidades (a) y se suman las varianzas (e).`],
+[String.raw`\(L(\theta),\ s(\theta)=\partial l/\partial\theta\ \text{con}\ \theta=\lambda\)`,String.raw`El enunciado conserva la notación θ del punto 1; aquí el parámetro es λ, así que donde dice θ se lee λ.`]])+
+h("a) Verosimilitud y log-verosimilitud")+mp([
+[String.raw`\(f(x_i;\lambda)=\dfrac{e^{-\lambda}\lambda^{x_i}}{x_i!}\)`,String.raw`Se toma la fdp del enunciado y se cambia x por \(x_i\).`],
+[String.raw`\(L(\lambda)=\prod_{i=1}^n\dfrac{e^{-\lambda}\lambda^{x_i}}{x_i!}=\dfrac{e^{-\lambda}\cdots e^{-\lambda}\cdot\lambda^{x_1}\cdots\lambda^{x_n}}{x_1!\cdots x_n!}\)`,String.raw`Por independencia, la conjunta es el producto; se separan numeradores y denominadores.`],
+[String.raw`\(=\dfrac{e^{-n\lambda}\,\lambda^{\sum x_i}}{\prod x_i!}\)`,String.raw`n veces \(e^{-\lambda}\) da \(e^{-n\lambda}\); \(\lambda^{x_1}\cdots\lambda^{x_n}=\lambda^{x_1+\cdots+x_n}\) (se suman exponentes).`],
+[String.raw`\(l(\lambda)=\ln e^{-n\lambda}+\ln\lambda^{\sum x_i}-\ln\prod x_i!\)`,String.raw`\(\ln\frac{ab}{c}=\ln a+\ln b-\ln c\).`],
+[String.raw`\(=-n\lambda+\sum x_i\ln\lambda-\sum\ln x_i!\)`,String.raw`\(\ln e^c=c\), \(\ln a^k=k\ln a\) y el logaritmo de un producto es la suma de logaritmos.`]])+
+h("b) Score y MLE")+mp([
+[String.raw`\(s(\lambda)=\dfrac{\partial}{\partial\lambda}(-n\lambda)+\dfrac{\partial}{\partial\lambda}\left(\sum x_i\ln\lambda\right)-\dfrac{\partial}{\partial\lambda}\left(\sum\ln x_i!\right)\)`,String.raw`Derivada término a término de \(l(\lambda)\).`],
+[String.raw`\(=-n+\dfrac{\sum x_i}{\lambda}-0\)`,String.raw`\(\frac{d}{d\lambda}(-n\lambda)=-n\); \(\frac{d}{d\lambda}\ln\lambda=\frac1\lambda\); \(\sum\ln x_i!\) son datos: no dependen de λ.`],
+[String.raw`\(-n+\dfrac{\sum x_i}{\hat\lambda}=0\ \Rightarrow\ \sum x_i=n\hat\lambda\ \Rightarrow\ \hat\lambda_{MLE}=\bar x\)`,String.raw`Se iguala a cero, se multiplica por \(\hat\lambda\) y se divide por n.`]])+
+h("c) Esperanza del score")+mp([
+[String.raw`\(E[s(\lambda)]=-n+\dfrac{1}{\lambda}E\left(\sum X_i\right)\)`,String.raw`Con \(X_i\) aleatorias; linealidad de la esperanza.`],
+[String.raw`\(E\left(\sum X_i\right)=n\lambda\ \Rightarrow\ E[s]=-n+\dfrac{n\lambda}{\lambda}=0\)`,String.raw`Cada \(E(X_i)=\lambda\) (observación 1 del enunciado).`]])+
+h("d) Hessiana y H₁")+mp([
+[String.raw`\(\mathbf H=\dfrac{\partial s}{\partial\lambda}=\dfrac{\partial}{\partial\lambda}\left(-n+\sum x_i\,\lambda^{-1}\right)=-\dfrac{\sum x_i}{\lambda^2}\)`,String.raw`Se deriva el score: la constante −n da 0 y \(\lambda^{-1}\) da \(-\lambda^{-2}\).`],
+[String.raw`\(\mathbf H_1=s^2=\left(-n+\dfrac{\sum x_i}{\lambda}\right)^2=\dfrac{\left(\sum x_i-n\lambda\right)^2}{\lambda^2}\)`,String.raw`Con un parámetro, \(\mathbf H_1\) es el score al cuadrado; denominador común λ.`]])+
+h("e) Información e igualdad")+mp([
+[String.raw`\(E(\mathbf H)=-\dfrac{E(\sum X_i)}{\lambda^2}=-\dfrac{n\lambda}{\lambda^2}=-\dfrac n\lambda\ \Rightarrow\ \mathbf I(\lambda)=\dfrac n\lambda\)`,String.raw`Definición del enunciado: \(\mathbf I=-E(\mathbf H)\).`],
+[String.raw`\(E(\mathbf H_1)=\dfrac{E[(\sum X_i-n\lambda)^2]}{\lambda^2}=\dfrac{\operatorname{var}(\sum X_i)}{\lambda^2}\)`,String.raw`\(n\lambda\) es la media de \(\sum X_i\): el numerador es su varianza.`],
+[String.raw`\(\operatorname{var}\left(\sum X_i\right)=n\lambda\ \Rightarrow\ E(\mathbf H_1)=\dfrac{n\lambda}{\lambda^2}=\dfrac n\lambda=-E(\mathbf H)\ \checkmark\)`,String.raw`Independencia y \(\operatorname{var}(X)=\lambda\) (observación 2).`]])+
+h("f) y g) Varianza e invarianza")+mp([
+[String.raw`\(\operatorname{var}(\hat\lambda)=\mathbf I^{-1}=\dfrac{\lambda}{n}\)`,String.raw`Inversa de la información.`],
+[String.raw`\(\sigma=sd(X)=\sqrt{\operatorname{var}(X)}=\sqrt\lambda\ \Rightarrow\ \hat\sigma_{MLE}=\sqrt{\hat\lambda}=\sqrt{\bar x}\)`,String.raw`Lo que pide g): σ es función de λ (observación 2) y, por invarianza, se reemplaza λ por \(\bar x\).`]]),
 
-"ep4-3":h("a) Log-verosimilitud y score")+mp([
-[String.raw`\(f(x_i)=(2\pi\sigma^2)^{-1/2}\exp\left[-\dfrac{(x_i-\mu)^2}{2\sigma^2}\right]\)`,String.raw`Densidad normal, con \(1/\sqrt{a}=a^{-1/2}\).`],
-[String.raw`\(L=(2\pi\sigma^2)^{-n/2}\exp\left[-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\right]\)`,"Producto de n densidades: potencias que se suman y exponentes que se suman."],
-[String.raw`\(l=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}=-\dfrac n2\ln2\pi-\dfrac n2\ln\sigma^2-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\)`,String.raw`\(\ln a^k=k\ln a\), \(\ln e^c=c\) y \(\ln(2\pi\sigma^2)=\ln2\pi+\ln\sigma^2\).`],
-[String.raw`\(\dfrac{\partial}{\partial\mu}(x_i-\mu)^2=2(x_i-\mu)(-1)\)`,"Regla de la cadena: la derivada interna de (xᵢ − μ) respecto a μ es −1."],
-[String.raw`\(\dfrac{\partial l}{\partial\mu}=-\dfrac{\sum2(x_i-\mu)(-1)}{2\sigma^2}=\dfrac{\sum(x_i-\mu)}{\sigma^2}\)`,"Los dos signos menos se cancelan y el 2 se simplifica."],
-[String.raw`\(\dfrac{\partial l}{\partial\sigma^2}=-\dfrac{n}{2\sigma^2}+\dfrac{\sum(x_i-\mu)^2}{2\sigma^4}\)`,String.raw`Se trata σ² como una sola variable v: \(\frac{d}{dv}\ln v=\frac1v\) y \(\frac{d}{dv}v^{-1}=-v^{-2}\).`],
-[String.raw`\(\sum(x_i-\mu)=0\Rightarrow\sum x_i-n\mu=0\Rightarrow\hat\mu=\bar x\)`,"La suma de una constante n veces es n veces la constante."],
-[String.raw`\(-n\sigma^2+\sum(x_i-\hat\mu)^2=0\Rightarrow\hat\sigma^2=\dfrac{\sum(x_i-\bar x)^2}{n}\)`,"Se multiplica la segunda ecuación por 2σ⁴ y se reemplaza μ por μ̂."]])+
+"ep4-3":h("Lo que da el enunciado (Ayuda) y dónde se usa")+mp([
+[String.raw`\(f(x_t;\mu,\sigma^2)=\dfrac{1}{\sqrt{2\pi\sigma^2}}\,e^{-\frac{(x_t-\mu)^2}{2\sigma^2}},\quad t=1,\dots,n\)`,String.raw`Ayuda (d) del enunciado: la densidad de cada observación. Se usa en a).`],
+[String.raw`\(E(X_t)=\mu\qquad\operatorname{var}(X_t)=E[(X_t-\mu)^2]=\sigma^2\qquad\operatorname{cov}(X_i,X_j)=0\)`,String.raw`Ayudas (a), (b) y (c). (a) y (b) se usan en b) y c); (c) dice que las observaciones no están correlacionadas.`],
+[String.raw`\(\boldsymbol\theta=\begin{bmatrix}\mu\\\sigma^2\end{bmatrix}\)`,String.raw`Hay dos parámetros: el score es un vector 2 × 1 y la Hessiana una matriz 2 × 2.`]])+
+h("a) Log-verosimilitud, score y MLE")+mp([
+[String.raw`\(f(x_t)=(2\pi\sigma^2)^{-1/2}\exp\left[-\dfrac{(x_t-\mu)^2}{2\sigma^2}\right]\)`,String.raw`La densidad de la Ayuda (d) con \(\frac1{\sqrt a}=a^{-1/2}\).`],
+[String.raw`\(L=\prod_{t=1}^n(2\pi\sigma^2)^{-1/2}e^{-\frac{(x_t-\mu)^2}{2\sigma^2}}=(2\pi\sigma^2)^{-n/2}\exp\left[-\dfrac{\sum(x_t-\mu)^2}{2\sigma^2}\right]\)`,String.raw`Producto por independencia: n veces la potencia −1/2 suma −n/2; los exponentes de e se suman.`],
+[String.raw`\(l=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_t-\mu)^2}{2\sigma^2}=-\dfrac n2\ln2\pi-\dfrac n2\ln\sigma^2-\dfrac{\sum(x_t-\mu)^2}{2\sigma^2}\)`,String.raw`\(\ln a^k=k\ln a\), \(\ln e^c=c\) y \(\ln(2\pi\sigma^2)=\ln2\pi+\ln\sigma^2\).`],
+[String.raw`\(\dfrac{\partial}{\partial\mu}(x_t-\mu)^2=2(x_t-\mu)(-1)\ \Rightarrow\ \dfrac{\partial l}{\partial\mu}=\dfrac{\sum(x_t-\mu)}{\sigma^2}\)`,String.raw`Regla de la cadena; los dos signos menos se cancelan y el 2 se simplifica.`],
+[String.raw`\(\dfrac{\partial l}{\partial\sigma^2}=-\dfrac{n}{2\sigma^2}+\dfrac{\sum(x_t-\mu)^2}{2\sigma^4}\)`,String.raw`Se trata \(v=\sigma^2\) como la variable: \(\frac{d}{dv}\ln v=\frac1v\) y \(\frac{d}{dv}v^{-1}=-v^{-2}\).`],
+[String.raw`\(\sum(x_t-\hat\mu)=0\Rightarrow\sum x_t-n\hat\mu=0\Rightarrow\hat\mu=\bar x\)`,String.raw`Primera componente del score igual a cero.`],
+[String.raw`\(-n\hat\sigma^2+\sum(x_t-\hat\mu)^2=0\Rightarrow\hat\sigma^2=\dfrac{\sum(x_t-\bar x)^2}{n}\)`,String.raw`Segunda componente igual a cero, multiplicada por \(2\hat\sigma^4\), y con \(\hat\mu=\bar x\).`]])+
 h("b) Esperanza del score")+mp([
-[String.raw`\(E\left[\sum(X_i-\mu)\right]=\sum[E(X_i)-\mu]=\sum(\mu-\mu)=0\)`,"Linealidad de la esperanza."],
-[String.raw`\(E\left[\sum(X_i-\mu)^2\right]=\sum E(X_i-\mu)^2=n\sigma^2\)`,String.raw`Definición de varianza: \(E(X-\mu)^2=\sigma^2\).`],
-[String.raw`\(-\dfrac n{2\sigma^2}+\dfrac{n\sigma^2}{2\sigma^4}=-\dfrac n{2\sigma^2}+\dfrac n{2\sigma^2}=0\)`,"Se simplifica σ²."]])+
-h("c) y d) Hessiana, información y varianza")+mp([
-[String.raw`\(\dfrac{\partial^2l}{\partial\mu^2}=\dfrac{\sum(-1)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,String.raw`Se deriva \(\sum(x_i-\mu)\) respecto a μ: cada término da −1.`],
-[String.raw`\(\dfrac{\partial^2l}{\partial\mu\,\partial\sigma^2}=\sum(x_i-\mu)\cdot\dfrac{d}{dv}v^{-1}=-\dfrac{\sum(x_i-\mu)}{\sigma^4}\)`,"Derivada cruzada: se deriva el score de μ respecto a v = σ²."],
-[String.raw`\(\dfrac{\partial^2l}{\partial(\sigma^2)^2}=\dfrac{n}{2\sigma^4}-\dfrac{2\sum(x_i-\mu)^2}{2\sigma^6}=\dfrac{n}{2\sigma^4}-\dfrac{\sum(x_i-\mu)^2}{\sigma^6}\)`,String.raw`\(\frac{d}{dv}(-\frac{n}{2}v^{-1})=\frac n2v^{-2}\) y \(\frac{d}{dv}v^{-2}=-2v^{-3}\).`],
-[String.raw`\(E\left[-\dfrac{\sum(X_i-\mu)}{\sigma^4}\right]=0,\qquad E\left[\dfrac n{2\sigma^4}-\dfrac{\sum(X_i-\mu)^2}{\sigma^6}\right]=\dfrac n{2\sigma^4}-\dfrac{n\sigma^2}{\sigma^6}=-\dfrac n{2\sigma^4}\)`,"Mismas esperanzas del literal b)."],
-[String.raw`\(\mathbf I=\begin{bmatrix}n/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\Rightarrow\mathbf I^{-1}=\begin{bmatrix}\sigma^2/n&0\\0&2\sigma^4/n\end{bmatrix}\)`,"La inversa de una matriz diagonal invierte cada elemento de la diagonal."],
-[String.raw`\(E\left[\sum(X_i-\bar X)^2\right]=(n-1)\sigma^2\Rightarrow E(\hat\sigma^2)=\dfrac{n-1}{n}\sigma^2\)`,"Por qué el MLE de σ² es sesgado: se divide por n y no por n − 1."]]),
+[String.raw`\(E\left[\dfrac{\sum(X_t-\mu)}{\sigma^2}\right]=\dfrac{\sum[E(X_t)-\mu]}{\sigma^2}=\dfrac{\sum(\mu-\mu)}{\sigma^2}=0\)`,String.raw`Ayuda (a): \(E(X_t)=\mu\).`],
+[String.raw`\(E\left[-\dfrac{n}{2\sigma^2}+\dfrac{\sum(X_t-\mu)^2}{2\sigma^4}\right]=-\dfrac{n}{2\sigma^2}+\dfrac{n\sigma^2}{2\sigma^4}=0\)`,String.raw`Ayuda (b): \(E[(X_t-\mu)^2]=\sigma^2\), sumado n veces.`]])+
+h("c) Hessiana e información")+mp([
+[String.raw`\(\dfrac{\partial^2l}{\partial\mu^2}=\dfrac{\partial}{\partial\mu}\dfrac{\sum(x_t-\mu)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,String.raw`Cada término \((x_t-\mu)\) da −1 al derivar respecto a μ.`],
+[String.raw`\(\dfrac{\partial^2l}{\partial\mu\,\partial\sigma^2}=\sum(x_t-\mu)\dfrac{d}{dv}v^{-1}=-\dfrac{\sum(x_t-\mu)}{\sigma^4}\)`,String.raw`Derivada cruzada: el score de μ derivado respecto a \(v=\sigma^2\).`],
+[String.raw`\(\dfrac{\partial^2l}{\partial(\sigma^2)^2}=\dfrac{n}{2\sigma^4}-\dfrac{\sum(x_t-\mu)^2}{\sigma^6}\)`,String.raw`\(\frac{d}{dv}(-\frac n2v^{-1})=\frac n2v^{-2}\) y \(\frac{d}{dv}(\frac{S}{2}v^{-2})=-Sv^{-3}\).`],
+[String.raw`\(E\left[-\dfrac{\sum(X_t-\mu)}{\sigma^4}\right]=0,\qquad E\left[\dfrac{n}{2\sigma^4}-\dfrac{\sum(X_t-\mu)^2}{\sigma^6}\right]=\dfrac{n}{2\sigma^4}-\dfrac{n\sigma^2}{\sigma^6}=-\dfrac{n}{2\sigma^4}\)`,String.raw`Ayudas (a) y (b) otra vez.`],
+[String.raw`\(\mathbf I(\boldsymbol\theta)=-E(\mathbf H)=\begin{bmatrix}n/\sigma^2&0\\0&n/(2\sigma^4)\end{bmatrix}\)`,String.raw`Menos la esperanza de cada elemento de la Hessiana.`]])+
+h("d) Varianza del MLE")+mp([
+[String.raw`\(\operatorname{var}(\hat{\boldsymbol\theta})=\mathbf I^{-1}=\begin{bmatrix}\sigma^2/n&0\\0&2\sigma^4/n\end{bmatrix}\)`,String.raw`La inversa de una diagonal invierte cada elemento.`],
+[String.raw`\(E(\hat\sigma^2)=\dfrac{n-1}{n}\sigma^2\)`,String.raw`Nota: el MLE de σ² divide por n, por eso es sesgado en muestras pequeñas (aunque consistente).`]]),
 
-"ep4-4":h("a) Verosimilitud, score y MLE")+mp([
-[String.raw`\(L=\prod\theta(1-\theta)^{x_i-1}=\theta^n(1-\theta)^{\sum(x_i-1)}\)`,"θ multiplicado n veces es θⁿ; potencias de la misma base suman exponentes."],
-[String.raw`\(\sum(x_i-1)=\sum x_i-n\)`,"La suma de n unos es n."],
-[String.raw`\(l=n\ln\theta+\left(\sum x_i-n\right)\ln(1-\theta)\)`,"Logaritmo del producto y de las potencias."],
-[String.raw`\(\dfrac{d}{d\theta}\ln(1-\theta)=\dfrac{-1}{1-\theta}\)`,"Regla de la cadena: u = 1 − θ, u′ = −1."],
-[String.raw`\(s=\dfrac n\theta-\dfrac{\sum x_i-n}{1-\theta}=0\)`,"Score igualado a cero."],
-[String.raw`\(n(1-\theta)=\theta\left(\sum x_i-n\right)\)`,"Se multiplica por θ(1 − θ)."],
-[String.raw`\(n-n\theta=\theta\sum x_i-n\theta\Rightarrow n=\theta\sum x_i\)`,"Se distribuye; −nθ se cancela en los dos lados."],
-[String.raw`\(\hat\theta=\dfrac{n}{\sum x_i}=\dfrac1{\bar x}\)`,String.raw`Se despeja θ y se usa \(\sum x_i=n\bar x\).`]])+
+"ep4-4":h("Lo que da el enunciado (Ayuda) y dónde se usa")+mp([
+[String.raw`\(f(x,\theta)=\theta(1-\theta)^{x-1},\qquad x=1,2,3,\dots\)`,String.raw`Ayuda (d): la fdp de la geométrica. Se usa en a).`],
+[String.raw`\(E(X_t)=\dfrac1\theta\qquad\operatorname{var}(X_t)=E\left[\left(X_t-\dfrac1\theta\right)^2\right]=\dfrac{1-\theta}{\theta^2}\qquad\operatorname{cov}(X_i,X_j)=0\)`,String.raw`Ayudas (a), (b) y (c). (a) se usa en b) y c); (b) en d).`]])+
+h("a) Verosimilitud, score y MLE")+mp([
+[String.raw`\(f(x_i;\theta)=\theta(1-\theta)^{x_i-1}\)`,String.raw`La fdp de la Ayuda (d) con \(x_i\).`],
+[String.raw`\(L=\prod\theta(1-\theta)^{x_i-1}=\theta^n(1-\theta)^{\sum(x_i-1)}=\theta^n(1-\theta)^{\sum x_i-n}\)`,String.raw`θ n veces da θⁿ; potencias de la misma base suman exponentes; \(\sum(x_i-1)=\sum x_i-n\).`],
+[String.raw`\(l=n\ln\theta+\left(\sum x_i-n\right)\ln(1-\theta)\)`,String.raw`Logaritmo del producto y de las potencias.`],
+[String.raw`\(s=\dfrac n\theta+\left(\sum x_i-n\right)\dfrac{-1}{1-\theta}=\dfrac n\theta-\dfrac{\sum x_i-n}{1-\theta}\)`,String.raw`\(\frac{d}{d\theta}\ln(1-\theta)=\frac{-1}{1-\theta}\) (regla de la cadena con u = 1 − θ).`],
+[String.raw`\(n(1-\hat\theta)=\hat\theta\left(\sum x_i-n\right)\Rightarrow n-n\hat\theta=\hat\theta\sum x_i-n\hat\theta\Rightarrow n=\hat\theta\sum x_i\)`,String.raw`Score igual a cero, multiplicado por \(\hat\theta(1-\hat\theta)\); −nθ̂ se cancela en los dos lados.`],
+[String.raw`\(\hat\theta_{MLE}=\dfrac n{\sum x_i}=\dfrac1{\bar x}\)`,String.raw`Se despeja; \(\sum x_i=n\bar x\).`]])+
 h("b) Esperanza del score")+mp([
-[String.raw`\(E\left(\sum X_i-n\right)=\dfrac n\theta-n=\dfrac{n(1-\theta)}{\theta}\)`,"E(Xᵢ) = 1/θ y factor común n."],
-[String.raw`\(E[s]=\dfrac n\theta-\dfrac{n(1-\theta)/\theta}{1-\theta}=\dfrac n\theta-\dfrac n\theta=0\)`,"(1 − θ) se simplifica."]])+
-h("c) y d) Hessiana, información y H₁")+mp([
-[String.raw`\(\dfrac{d}{d\theta}\dfrac n\theta=-\dfrac n{\theta^2}\)`,"Regla de la potencia."],
-[String.raw`\(\dfrac{d}{d\theta}(1-\theta)^{-1}=(-1)(1-\theta)^{-2}(-1)=(1-\theta)^{-2}\)`,"Regla de la cadena: dos signos menos se cancelan."],
-[String.raw`\(\mathbf H=-\dfrac n{\theta^2}-\dfrac{\sum x_i-n}{(1-\theta)^2}\)`,"Se deriva cada término del score."],
-[String.raw`\(E(\mathbf H)=-\dfrac n{\theta^2}-\dfrac{n(1-\theta)/\theta}{(1-\theta)^2}=-\dfrac n{\theta^2}-\dfrac n{\theta(1-\theta)}\)`,"Se reemplaza la esperanza del literal b) y se simplifica un (1 − θ)."],
-[String.raw`\(=-\dfrac{n(1-\theta)+n\theta}{\theta^2(1-\theta)}=-\dfrac n{\theta^2(1-\theta)}\)`,"Denominador común θ²(1 − θ); −nθ + nθ se cancela."],
-[String.raw`\(s=\dfrac{n(1-\theta)-\theta(\sum x_i-n)}{\theta(1-\theta)}=\dfrac{n-\theta\sum x_i}{\theta(1-\theta)}\)`,"Score con denominador común."],
-[String.raw`\(E(\mathbf H_1)=\operatorname{var}(s)=\dfrac{\theta^2\operatorname{var}(\sum X_i)}{\theta^2(1-\theta)^2}\)`,"var(a + bY) = b²var(Y) con b = −θ/[θ(1 − θ)]."],
-[String.raw`\(=\dfrac{n(1-\theta)/\theta^2}{(1-\theta)^2}=\dfrac{n}{\theta^2(1-\theta)}\)`,"var(ΣXᵢ) = n(1 − θ)/θ²; se simplifica (1 − θ). Coincide con −E(H)."]]),
+[String.raw`\(E\left(\sum X_i-n\right)=\dfrac n\theta-n=\dfrac{n(1-\theta)}{\theta}\)`,String.raw`Ayuda (a): \(E(X_i)=1/\theta\).`],
+[String.raw`\(E[s]=\dfrac n\theta-\dfrac{n(1-\theta)/\theta}{1-\theta}=\dfrac n\theta-\dfrac n\theta=0\)`,String.raw`Se simplifica (1 − θ).`]])+
+h("c) Hessiana, información y varianza asintótica")+mp([
+[String.raw`\(\mathbf H=-\dfrac n{\theta^2}-\dfrac{\sum x_i-n}{(1-\theta)^2}\)`,String.raw`\(\frac{d}{d\theta}\frac n\theta=-\frac n{\theta^2}\); \(\frac{d}{d\theta}(1-\theta)^{-1}=(1-\theta)^{-2}\), con el signo menos de adelante.`],
+[String.raw`\(E(\mathbf H)=-\dfrac n{\theta^2}-\dfrac{n(1-\theta)/\theta}{(1-\theta)^2}=-\dfrac n{\theta^2}-\dfrac n{\theta(1-\theta)}=-\dfrac{n}{\theta^2(1-\theta)}\)`,String.raw`Se usa \(E(\sum X_i-n)\) de b); denominador común \(\theta^2(1-\theta)\).`],
+[String.raw`\(\mathbf I(\theta)=\dfrac{n}{\theta^2(1-\theta)},\qquad\operatorname{var}_a(\hat\theta)=\dfrac{\theta^2(1-\theta)}{n}\)`,String.raw`Información y su inversa.`]])+
+h("d) H₁ e igualdad de la información")+mp([
+[String.raw`\(s=\dfrac{n(1-\theta)-\theta(\sum x_i-n)}{\theta(1-\theta)}=\dfrac{n-\theta\sum x_i}{\theta(1-\theta)}\)`,String.raw`Score con denominador común.`],
+[String.raw`\(E(\mathbf H_1)=E(s^2)=\operatorname{var}(s)=\dfrac{\theta^2\operatorname{var}(\sum X_i)}{\theta^2(1-\theta)^2}\)`,String.raw`E(s) = 0; \(\operatorname{var}(a+bY)=b^2\operatorname{var}(Y)\) con \(b=-\theta/[\theta(1-\theta)]\).`],
+[String.raw`\(\operatorname{var}\left(\sum X_i\right)=\dfrac{n(1-\theta)}{\theta^2}\ \Rightarrow\ E(\mathbf H_1)=\dfrac{n(1-\theta)/\theta^2}{(1-\theta)^2}=\dfrac{n}{\theta^2(1-\theta)}=-E(\mathbf H)\ \checkmark\)`,String.raw`Ayuda (b) y (c): varianza de cada \(X_t\) sumada n veces.`]]),
 
-"ep4-7":mp([
-[String.raw`\(l(\mu)=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_i-\mu)^2}{2\sigma^2}\)`,"Igual que el punto 3, pero σ² es un número conocido: el primer término es constante."],
-[String.raw`\(\dfrac{dl}{d\mu}=\dfrac{\sum(x_i-\mu)}{\sigma^2}\)`,"Regla de la cadena sobre (xᵢ − μ)²; la constante tiene derivada cero."],
-[String.raw`\(\sum x_i-n\mu=0\Rightarrow\hat\mu=\bar x\)`,"Se iguala a cero y se despeja."],
-[String.raw`\(\mathbf H=\dfrac{d}{d\mu}\dfrac{\sum(x_i-\mu)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,"Cada término da −1/σ²."],
-[String.raw`\(\mathbf I=-E(\mathbf H)=\dfrac n{\sigma^2},\qquad\operatorname{var}(\hat\mu)=\dfrac{\sigma^2}{n}\)`,"La Hessiana no depende de los datos: su esperanza es ella misma."]]),
+"ep4-7":h("Lo que da el enunciado")+mp([
+[String.raw`\(f(x_t;\mu)=\dfrac{1}{\sqrt{2\pi\sigma^2}}\,e^{-\frac{(x_t-\mu)^2}{2\sigma^2}}\)`,String.raw`La misma densidad normal del punto 3, pero ahora <b>σ² es conocida</b>: es un número fijo, no un parámetro.`]])+
+h("Desarrollo")+mp([
+[String.raw`\(l(\mu)=-\dfrac n2\ln(2\pi\sigma^2)-\dfrac{\sum(x_t-\mu)^2}{2\sigma^2}\)`,String.raw`Producto de n densidades y logaritmo, como en el punto 3. El primer término es una constante.`],
+[String.raw`\(\dfrac{dl}{d\mu}=0-\dfrac{\sum2(x_t-\mu)(-1)}{2\sigma^2}=\dfrac{\sum(x_t-\mu)}{\sigma^2}\)`,String.raw`La constante deriva 0; regla de la cadena sobre \((x_t-\mu)^2\).`],
+[String.raw`\(\sum x_t-n\hat\mu=0\Rightarrow\hat\mu_{MLE}=\bar x\)`,String.raw`Score igual a cero.`],
+[String.raw`\(\mathbf H=\dfrac{d}{d\mu}\dfrac{\sum(x_t-\mu)}{\sigma^2}=-\dfrac n{\sigma^2}\)`,String.raw`Cada término da \(-1/\sigma^2\). No depende de los datos.`],
+[String.raw`\(\mathbf I(\mu)=-E(\mathbf H)=\dfrac n{\sigma^2},\qquad\operatorname{var}(\hat\mu)=\dfrac{\sigma^2}{n}\)`,String.raw`Como H no es aleatoria, su esperanza es ella misma.`]]),
 
-"ep4-5":h("Pendiente, intercepto y RSS de cada período")+mp([
-[String.raw`\(b_2=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}\)`,"Fórmula de la pendiente de MCO en regresión simple."],
-[String.raw`\(\text{Guerra: }b_2=\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{700-525}{1625-1225}=\dfrac{175}{400}=0{,}4375\)`,"Se reemplazan las sumas."],
-[String.raw`\(b_1=\bar y-b_2\bar x=\dfrac{15}5-0{,}4375\cdot\dfrac{35}5=3-3{,}0625=-0{,}0625\)`,"La recta pasa por el punto de medias."],
-[String.raw`\(RSS=S_{YY}-b_2^2S_{XX},\quad S_{YY}=\sum y^2-n\bar y^2,\quad S_{XX}=\sum x^2-n\bar x^2\)`,"La RSS es la variación total de Y menos la explicada (ESS = b₂²S_XX)."],
-[String.raw`\(RSS_1=(61-5\cdot9)-0{,}4375^2(325-5\cdot49)=16-0{,}19141(80)=16-15{,}3125=0{,}6875\)`,"Guerra."],
-[String.raw`\(\text{Paz: }b_2=\dfrac{10(828)-110(60)}{10(1540)-110^2}=\dfrac{1680}{3300}=0{,}50909,\quad b_1=6-0{,}50909(11)=0{,}4\)`,"Mismas fórmulas con n = 10."],
-[String.raw`\(RSS_2=(448-360)-0{,}50909^2(1540-1210)=88-85{,}527=2{,}4727\)`,"Paz."],
-[String.raw`\(RSS_{NR}=RSS_1+RSS_2=3{,}1602\)`,"El modelo con D y D·X equivale a dos rectas separadas, así que su RSS es la suma."]])+
-h("Modelo restringido y log-verosimilitudes")+mp([
-[String.raw`\(S_{XY}=968-\dfrac{145(75)}{15}=243,\quad S_{XX}=1865-\dfrac{145^2}{15}=463{,}333\)`,"Sumas en desviaciones con los 15 datos."],
-[String.raw`\(b_2=\dfrac{243}{463{,}333}=0{,}52446,\quad b_1=5-0{,}52446(9{,}6667)=-0{,}0698\)`,"Pendiente e intercepto de la recta común."],
-[String.raw`\(RSS_R=(509-15\cdot25)-0{,}52446(243)=134-127{,}444=6{,}5561\)`,"ESS = b₂·S_XY = b₂²·S_XX."],
-[String.raw`\(l=-\dfrac n2\left[1+\ln2\pi+\ln\dfrac{RSS}{n}\right]\)`,"Log-verosimilitud del modelo lineal en el máximo, con σ̂² = RSS/n."],
-[String.raw`\(l_{NR}=-7{,}5\,[1+1{,}83788+\ln(0{,}21068)]=-7{,}5\,(2{,}83788-1{,}55742)=-9{,}6035\)`,"n/2 = 7,5; ln 2π = 1,83788."],
-[String.raw`\(l_R=-7{,}5\,[2{,}83788+\ln(0{,}43707)]=-7{,}5\,(2{,}83788-0{,}82766)=-15{,}0767\)`,"Igual con el restringido."]])+
-h("Estadísticos")+mp([
-[String.raw`\(LR=2(l_{NR}-l_R)=2(-9{,}6035+15{,}0767)=2(5{,}4732)=10{,}946\)`,"Versión con log-verosimilitudes."],
-[String.raw`\(LR=15\ln\dfrac{6{,}5561}{3{,}1602}=15\ln(2{,}0746)=15(0{,}72975)=10{,}946\)`,"Versión con las RSS: es la misma porque las l dependen de ln(RSS/n)."],
-[String.raw`\(RSS_R-RSS_{NR}=6{,}5561-3{,}1602=3{,}3959\)`,"Pérdida de ajuste."],
-[String.raw`\(W=15\cdot\dfrac{3{,}3959}{3{,}1602}=15(1{,}07457)=16{,}119\)`,"Wald."],
-[String.raw`\(LM=15\cdot\dfrac{3{,}3959}{6{,}5561}=15(0{,}51797)=7{,}770\)`,"Multiplicadores de Lagrange."],
-[String.raw`\(R^2_{aux}=1-\dfrac{RSS_{NR}}{RSS_R}=\dfrac{RSS_R-RSS_{NR}}{RSS_R}=0{,}51797\Rightarrow nR^2=7{,}770\)`,"En la auxiliar, el RSS es el no restringido y el TSS es el restringido (los errores restringidos tienen media cero)."],
-[String.raw`\(\chi^2_{0{,}05}(2)=5{,}991\)`,"q = 2 restricciones (δ₁ = 0 y δ₂ = 0)."]]),
+"ep4-5":h("Lo que da el enunciado")+mp([
+[String.raw`\(Y_t=\beta_1+\beta_2X_t+\mu_t,\quad t=1,2,\dots,n\)`,String.raw`El modelo de regresión lineal clásico del enunciado: Y es el consumo y X la renta disponible.`],
+[String.raw`\(\text{Guerra }(t=1\text{ a }5):\ Y=1,2,2,4,6;\ X=2,4,6,10,13\)`,String.raw`Primeras \(n_1=5\) filas de la tabla.`],
+[String.raw`\(\text{Paz }(t=6\text{ a }15):\ Y=1,3,3,5,6,6,7,9,9,11;\ X=2,4,6,\dots,20\)`,String.raw`Últimas \(n_2=10\) filas; n = 15.`]])+
+h("Modelos e hipótesis")+mp([
+[String.raw`\(D_t=1\ (t\le5),\ D_t=0\ (t>5):\quad Y_t=\beta_1+\delta_1D_t+\beta_2X_t+\delta_2D_tX_t+\mu_t\)`,String.raw`No restringido: se le agrega al modelo del enunciado una dummy de guerra en el intercepto y en la pendiente. k = 4.`],
+[String.raw`\(H_0:\delta_1=\delta_2=0\ \text{(modelo del enunciado en los 15 años)}\quad H_1:\ \text{algún }\delta\neq0\)`,String.raw`Restringido: el modelo tal como lo escribe el enunciado, una sola recta. q = 2.`]])+
+h("Sumas de los datos")+mp([
+[String.raw`\(\text{Guerra: }\sum x=2+4+6+10+13=35,\ \sum y=1+2+2+4+6=15\)`,String.raw`Se suman las columnas de la tabla.`],
+[String.raw`\(\sum x^2=4+16+36+100+169=325,\ \sum xy=2+8+12+40+78=140,\ \sum y^2=1+4+4+16+36=61\)`,String.raw`Cuadrados y productos fila por fila.`],
+[String.raw`\(\text{Paz: }\sum x=110,\ \sum y=60,\ \sum x^2=1540,\ \sum xy=828,\ \sum y^2=448\)`,String.raw`Igual con las 10 filas de paz.`],
+[String.raw`\(\text{Total: }\sum x=145,\ \sum y=75,\ \sum x^2=1865,\ \sum xy=968,\ \sum y^2=509\)`,String.raw`Suma de los dos periodos.`]])+
+h("RSS de cada modelo")+mp([
+[String.raw`\(b_2=\dfrac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}:\quad\text{guerra }\dfrac{5(140)-35(15)}{5(325)-35^2}=\dfrac{175}{400}=0{,}4375\)`,String.raw`Fórmula de la pendiente de MCO.`],
+[String.raw`\(RSS=S_{YY}-b_2^2S_{XX}:\quad RSS_1=(61-5\cdot3^2)-0{,}4375^2(325-5\cdot7^2)=16-15{,}3125=0{,}6875\)`,String.raw`\(\bar y=15/5=3\), \(\bar x=35/5=7\).`],
+[String.raw`\(\text{Paz: }b_2=\dfrac{10(828)-110(60)}{10(1540)-110^2}=\dfrac{1680}{3300}=0{,}50909,\quad RSS_2=88-0{,}50909^2(330)=2{,}4727\)`,String.raw`\(S_{YY}=448-10(6^2)=88\) y \(S_{XX}=1540-10(11^2)=330\).`],
+[String.raw`\(RSS_{NR}=0{,}6875+2{,}4727=3{,}1602\)`,String.raw`El modelo con D y DX equivale a dos rectas separadas.`],
+[String.raw`\(\text{Total: }b_2=\dfrac{243}{463{,}333}=0{,}52446,\quad RSS_R=134-0{,}52446(243)=6{,}5561\)`,String.raw`\(S_{XY}=968-145(75)/15=243\), \(S_{XX}=1865-145^2/15=463{,}333\), \(S_{YY}=509-75^2/15=134\).`]])+
+h("Log-verosimilitudes y estadísticos")+mp([
+[String.raw`\(l=-\dfrac n2\left[1+\ln2\pi+\ln\dfrac{RSS}{n}\right]\)`,String.raw`Log-verosimilitud del modelo lineal en el máximo (el enunciado no la da: se calcula con las RSS).`],
+[String.raw`\(l_{NR}=-7{,}5\,[2{,}83788+\ln(3{,}1602/15)]=-9{,}6035,\qquad l_R=-7{,}5\,[2{,}83788+\ln(6{,}5561/15)]=-15{,}0767\)`,String.raw`n/2 = 7,5 y \(1+\ln2\pi=2{,}83788\).`],
+[String.raw`\(LR=2(l_{NR}-l_R)=2(5{,}4732)=10{,}946=15\ln\dfrac{6{,}5561}{3{,}1602}\)`,String.raw`Las dos versiones de LR.`],
+[String.raw`\(W=15\cdot\dfrac{3{,}3959}{3{,}1602}=16{,}119,\qquad LM=15\cdot\dfrac{3{,}3959}{6{,}5561}=7{,}770\)`,String.raw`\(RSS_R-RSS_{NR}=3{,}3959\).`],
+[String.raw`\(\chi^2_{0{,}05}(2)=5{,}991\)`,String.raw`Las tres superan el crítico: se rechaza \(H_0\).`]]),
 
-"ep4-6":mp([
-[String.raw`\(LR=2(l_{NR}-l_R)=2(-259{,}0488+260{,}3122)=2(1{,}2634)=2{,}5268\)`,"Restar un número negativo es sumar: −259,0488 + 260,3122."],
-[String.raw`\(LR=50\ln\dfrac{97.405{,}13}{92.605{,}07}=50\ln(1{,}051834)=50(0{,}050535)=2{,}5267\)`,"Versión con las RSS."],
-[String.raw`\(b_2+b_3-1=0{,}90783+0{,}18000-1=0{,}08783\)`,String.raw`Cuánto se aleja la estimación de la restricción: \(R\mathbf b-r\) con R = [0 1 1], r = 1.`],
-[String.raw`\(\operatorname{var}(b_2+b_3)=\operatorname{var}(b_2)+\operatorname{var}(b_3)+2\operatorname{cov}(b_2,b_3)\)`,"Varianza de una suma de variables correlacionadas."],
-[String.raw`\(=0{,}0129043+0{,}0069957+2(-0{,}0083668)=0{,}0199-0{,}0167336=0{,}0031664\)`,"La covarianza negativa reduce la varianza de la suma."],
-[String.raw`\(F=\dfrac{0{,}08783^2}{0{,}0031664}=\dfrac{0{,}0077141}{0{,}0031664}=2{,}4362\)`,"F (60): usa la varianza de vcov(), que tiene S² = RSS/(n − k)."],
-[String.raw`\(S^2=\dfrac{92.605{,}07}{47}=1.970{,}32,\qquad\hat\sigma^2_{MLE}=\dfrac{92.605{,}07}{50}=1.852{,}10\)`,"Las dos varianzas del error: dividen por n − k y por n."],
-[String.raw`\(W=F\cdot\dfrac{S^2}{\hat\sigma^2_{MLE}}=F\cdot\dfrac{n}{n-k}=2{,}4362\cdot\dfrac{50}{47}=2{,}5917\)`,"Wald asintótico: cambiar S² por σ̂²_MLE multiplica por n/(n − k)."],
-[String.raw`\(RSS_R-RSS_{NR}=97.405{,}13-92.605{,}07=4.800{,}06\)`,"Pérdida de ajuste."],
-[String.raw`\(W=50\cdot\dfrac{4.800{,}06}{92.605{,}07}=2{,}5917,\qquad LM=50\cdot\dfrac{4.800{,}06}{97.405{,}13}=2{,}4640\)`,"Versiones con las RSS."],
-[String.raw`\(RSS_R=S^2_R\,(n-k+q)=2.029{,}273\times48=97.405{,}1\)`,"Por qué el profesor multiplica por 48: restriktor divide la RSS restringida por n − k + q = 50 − 3 + 1."]]),
+"ep4-6":h("Lo que da el enunciado")+mp([
+[String.raw`\(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\mu_t\)`,String.raw`El modelo del enunciado: producto, capital y trabajo. n = 50 (1961-2010), k = 3.`],
+[String.raw`\(\mathbf b=(-61{,}95519;\ 0{,}90783;\ 0{,}18000)\)`,String.raw`Columna «Estimate» de la salida de <code>lm()</code>.`],
+[String.raw`\(RSS_{NR}=92.605{,}07,\qquad\hat\sigma^2_{MLE,NR}=RSS_{NR}/n=1.852{,}101,\qquad l_{NR}=-259{,}0488\)`,String.raw`Resultados adicionales: <code>deviance</code>, <code>RSSNR_E4/n</code> y <code>logLik</code>.`],
+[String.raw`\(\operatorname{var}(b_2)=0{,}012904310,\ \operatorname{var}(b_3)=0{,}006995666,\ \operatorname{cov}(b_2,b_3)=-0{,}008366772\)`,String.raw`De la matriz <code>vcov</code>: diagonal en X2t y X3t, y el elemento fuera de la diagonal entre ellas. Usa \(S^2=RSS/(n-k)\).`],
+[String.raw`\(S^2_R=2.029{,}273,\quad RSS_R=S^2_R\,(n-(k-1))=97.405{,}13,\quad l_R=-260{,}3122\)`,String.raw`Salida del modelo restringido con <code>restriktor</code>: el profesor multiplica por 48 porque restriktor divide por n − k + q.`]])+
+h("b) LR con las dos alternativas")+mp([
+[String.raw`\(H_0:\beta_2+\beta_3=1\quad H_1:\beta_2+\beta_3\neq1,\quad q=1\)`,String.raw`Restricción del enunciado.`],
+[String.raw`\(LR=2(l_{NR}-l_R)=2(-259{,}0488+260{,}3122)=2(1{,}2634)=2{,}527\)`,String.raw`Alternativa 1: con los dos <code>logLik</code>.`],
+[String.raw`\(LR=n\ln\dfrac{RSS_R}{RSS_{NR}}=50\ln\dfrac{97.405{,}13}{92.605{,}07}=50(0{,}050535)=2{,}527\)`,String.raw`Alternativa 2: con las dos RSS.`]])+
+h("c) Wald solo con el modelo sin restricción")+mp([
+[String.raw`\(b_2+b_3-1=0{,}90783+0{,}18000-1=0{,}08783\)`,String.raw`\(R\mathbf b-r\) con R = [0 1 1] y r = 1.`],
+[String.raw`\(\operatorname{var}(b_2+b_3)=0{,}0129043+0{,}0069957+2(-0{,}0083668)=0{,}0031664\)`,String.raw`Varianza de una suma: varianzas más dos veces la covarianza (de <code>vcov</code>).`],
+[String.raw`\(F=\dfrac{0{,}08783^2}{0{,}0031664}=2{,}4362\)`,String.raw`F (60) con la varianza de <code>vcov</code>.`],
+[String.raw`\(W=F\cdot\dfrac{n}{n-k}=2{,}4362\cdot\dfrac{50}{47}=2{,}5917\)`,String.raw`Wald asintótico: usa \(\hat\sigma^2_{MLE}=1.852{,}101\) en lugar de \(S^2=1.970{,}32\), y el cociente es n/(n − k).`]])+
+h("d) LM solo con el modelo restringido")+mp([
+[String.raw`\(LM=nR^2_{aux}\)`,String.raw`Requiere los errores del modelo restringido regresados contra X₂ y X₃. El enunciado no los da, así que <b>no se puede</b> hacer así.`],
+[String.raw`\(LM=n\,\dfrac{RSS_R-RSS_{NR}}{RSS_R}=50\cdot\dfrac{4.800{,}06}{97.405{,}13}=2{,}464\)`,String.raw`Sí se puede con las dos RSS (usa también el modelo no restringido).`],
+[String.raw`\(W=2{,}592\ \ge\ LR=2{,}527\ \ge\ LM=2{,}464\quad<\chi^2_{0{,}05}(1)=3{,}841\)`,String.raw`No se rechaza \(H_0\).`]]),
 
-"ep4-8":mp([
-[String.raw`\(\beta_5=1-\beta_3-\beta_4\)`,"Se despeja un coeficiente de la restricción."],
-[String.raw`\(\ln Y=\ln A+\beta_2\ln X+\beta_3\ln P_1+\beta_4\ln P_2+(1-\beta_3-\beta_4)\ln P_3\)`,"Se reemplaza en el modelo."],
-[String.raw`\(\ln Y-\ln P_3=\ln A+\beta_2\ln X+\beta_3(\ln P_1-\ln P_3)+\beta_4(\ln P_2-\ln P_3)\)`,String.raw`Se pasa \(\ln P_3\) a la izquierda y se agrupan los términos de β₃ y β₄.`],
-[String.raw`\(\ln\dfrac{Y}{P_3}=\ln A+\beta_2\ln X+\beta_3\ln\dfrac{P_1}{P_3}+\beta_4\ln\dfrac{P_2}{P_3}\)`,String.raw`\(\ln a-\ln b=\ln(a/b)\): de ahí sale el modelo 2.`],
-[String.raw`\(F=\dfrac{(0{,}364-0{,}336)/1}{0{,}336/(29-5)}=\dfrac{0{,}028}{0{,}014}=2{,}00\)`,"F (64) con q = 1 y n − k = 24."],
-[String.raw`\(W=29\cdot\dfrac{0{,}028}{0{,}336}=29(0{,}08333)=2{,}417\)`,"Wald con las RSS."],
-[String.raw`\(LR=29\ln\dfrac{0{,}364}{0{,}336}=29\ln(1{,}08333)=29(0{,}08004)=2{,}321\)`,"Razón de verosimilitud."],
-[String.raw`\(LM=29\cdot\dfrac{0{,}028}{0{,}364}=29(0{,}07692)=2{,}231\)`,"Multiplicadores de Lagrange."],
-[String.raw`\(\hat\beta_5=1-0{,}51-0{,}09=0{,}40\)`,"Elasticidad del combustible en el modelo restringido, por la restricción."]]),
+"ep4-8":h("Lo que da el enunciado")+mp([
+[String.raw`\(Y=AX^{\beta_2}P_1^{\beta_3}P_2^{\beta_4}P_3^{\beta_5}\mu\)`,String.raw`La función de costos de Nerlove: Y costo total, X producto, P₁ precio del trabajo, P₂ del capital, P₃ del combustible.`],
+[String.raw`\(\text{Modelo 1: }RSS=0{,}336;\qquad\text{Modelo 2: }RSS=0{,}364;\qquad n=29\)`,String.raw`Resultados de los dos modelos estimados del enunciado.`]])+
+h("Del modelo del enunciado a la forma lineal (modelo 1)")+mp([
+[String.raw`\(\ln Y=\ln\left(AX^{\beta_2}P_1^{\beta_3}P_2^{\beta_4}P_3^{\beta_5}\mu\right)\)`,String.raw`Se toma logaritmo a los dos lados de la función del enunciado.`],
+[String.raw`\(=\ln A+\ln X^{\beta_2}+\ln P_1^{\beta_3}+\ln P_2^{\beta_4}+\ln P_3^{\beta_5}+\ln\mu\)`,String.raw`Logaritmo de un producto: suma de logaritmos.`],
+[String.raw`\(=\ln A+\beta_2\ln X+\beta_3\ln P_1+\beta_4\ln P_2+\beta_5\ln P_3+\ln\mu\)`,String.raw`\(\ln a^k=k\ln a\). Queda lineal en los parámetros: se estima por MCO con k = 5.`]])+
+h("Del modelo con restricción al modelo 2")+mp([
+[String.raw`\(\beta_3+\beta_4+\beta_5=1\ \Rightarrow\ \beta_5=1-\beta_3-\beta_4\)`,String.raw`Se despeja un coeficiente de la restricción del enunciado.`],
+[String.raw`\(Y=AX^{\beta_2}P_1^{\beta_3}P_2^{\beta_4}P_3^{1-\beta_3-\beta_4}\mu=AX^{\beta_2}P_1^{\beta_3}P_2^{\beta_4}\dfrac{P_3}{P_3^{\beta_3}P_3^{\beta_4}}\mu\)`,String.raw`\(a^{1-m-n}=a\cdot a^{-m}a^{-n}\).`],
+[String.raw`\(\dfrac{Y}{P_3}=AX^{\beta_2}\left(\dfrac{P_1}{P_3}\right)^{\beta_3}\left(\dfrac{P_2}{P_3}\right)^{\beta_4}\mu\)`,String.raw`Se pasa \(P_3\) a dividir y se agrupan \(\frac{P_1^{\beta_3}}{P_3^{\beta_3}}=(P_1/P_3)^{\beta_3}\): es la forma que da el enunciado.`],
+[String.raw`\(\ln\dfrac{Y}{P_3}=\ln A+\beta_2\ln X+\beta_3\ln\dfrac{P_1}{P_3}+\beta_4\ln\dfrac{P_2}{P_3}+\ln\mu\)`,String.raw`Logaritmo, como en el modelo 1: es el modelo 2.`],
+[String.raw`\(\hat\beta_5=1-0{,}51-0{,}09=0{,}40\)`,String.raw`La elasticidad del combustible se recupera con la restricción.`]])+
+h("b) ¿Es válida la restricción?")+mp([
+[String.raw`\(F=\dfrac{(0{,}364-0{,}336)/1}{0{,}336/(29-5)}=\dfrac{0{,}028}{0{,}014}=2{,}00&lt;F_{0{,}05}(1,24)=4{,}26\)`,String.raw`F (64): RSS_R es la del modelo 2 y RSS_NR la del modelo 1.`],
+[String.raw`\(W=29\cdot\dfrac{0{,}028}{0{,}336}=2{,}417,\quad LR=29\ln\dfrac{0{,}364}{0{,}336}=2{,}321,\quad LM=29\cdot\dfrac{0{,}028}{0{,}364}=2{,}231\)`,String.raw`Las tres versiones con las RSS, contra \(\chi^2_{0{,}05}(1)=3{,}841\): no se rechaza.`]]),
 
-"ep4-9":h("b) Incluir TFT (H₀: β₄ = 0)")+mp([
-[String.raw`\(RSS_R-RSS_{NR}=106.315{,}6-91.875{,}38=14.440{,}22\)`,"El restringido es el modelo (1), sin TFT."],
-[String.raw`\(LR=2(-323{,}4298+328{,}1012)=2(4{,}6714)=9{,}343\)`,"Con las log-verosimilitudes."],
-[String.raw`\(LR=64\ln\dfrac{106.315{,}6}{91.875{,}38}=64\ln(1{,}15717)=64(0{,}14598)=9{,}343\)`,"Con las RSS."],
-[String.raw`\(W=64\cdot\dfrac{14.440{,}22}{91.875{,}38}=64(0{,}15717)=10{,}059\)`,"Wald con las RSS."],
-[String.raw`\(t=\dfrac{12{,}868636}{4{,}190533}=3{,}0709,\quad F=t^2=9{,}4303,\quad W=9{,}4303\cdot\dfrac{64}{60}=10{,}059\)`,"Wald solo con el modelo (2): para una restricción, F = t², y W = F·n/(n − k)."],
-[String.raw`\(LM=64\cdot\dfrac{14.440{,}22}{106.315{,}6}=64(0{,}135824)=8{,}693=64\,R^2_{aux}\)`,"La regresión auxiliar del enunciado (errores del modelo 1 contra PIBPC, TAF y TFT) da exactamente ese R²."]])+
+"ep4-9":h("Lo que da el enunciado")+mp([
+[String.raw`\((1)\ MI_i=\beta_1+\beta_2PIBPC_i+\beta_3TAF_i+\mu_i\qquad(2)\ MI_i=\beta_1+\beta_2PIBPC_i+\beta_3TAF_i+\beta_4TFT_i+\mu_i\)`,String.raw`Los dos modelos del enunciado, con i = 1, …, 64.`],
+[String.raw`\(RSS_1=106.315{,}6,\ l_1=-328{,}1012;\qquad RSS_2=91.875{,}38,\ l_2=-323{,}4298\)`,String.raw`<code>deviance</code> y <code>logLik</code> de cada modelo.`],
+[String.raw`\(b_3=-1{,}768029,\ b_4=12{,}868636,\ ee(b_4)=4{,}190533\)`,String.raw`Coeficientes de TAF y TFT del modelo (2).`],
+[String.raw`\(\operatorname{var}(b_3)=0{,}061512,\ \operatorname{var}(b_4)=17{,}56056,\ \operatorname{cov}(b_3,b_4)=0{,}632570\)`,String.raw`Elementos de la matriz var(b) del modelo (2): filas y columnas de TAF y TFT.`],
+[String.raw`\(R^2_{aux}=0{,}1358243;\qquad\text{modelo (3): }RSS_{R1}=(n-k+1)s^2_r=61(1.510{,}841)=92.161{,}3,\ l_{mr}=-323{,}5293,\ R^2_{aux1}=0{,}003102305\)`,String.raw`Regresión auxiliar del modelo (1) y salida del modelo restringido (3) con <code>restriktor</code>.`]])+
+h("b) ¿Se justifica incluir TFT? (H₀: β₄ = 0)")+mp([
+[String.raw`\(\text{Restringido = modelo (1)},\ \text{No restringido = modelo (2)},\ q=1\)`,String.raw`Quitar TFT es imponer β₄ = 0.`],
+[String.raw`\(LR=2(-323{,}4298+328{,}1012)=9{,}343=64\ln\dfrac{106.315{,}6}{91.875{,}38}\)`,String.raw`Dos versiones de LR.`],
+[String.raw`\(W=64\cdot\dfrac{14.440{,}22}{91.875{,}38}=10{,}059;\quad t=\dfrac{12{,}868636}{4{,}190533}=3{,}071,\ W=t^2\cdot\dfrac{64}{60}=10{,}059\)`,String.raw`Wald con las RSS y solo con el modelo (2): para una restricción F = t².`],
+[String.raw`\(LM=64\cdot\dfrac{14.440{,}22}{106.315{,}6}=8{,}693=64(0{,}1358243)=nR^2_{aux}\)`,String.raw`LM con las RSS y con la regresión auxiliar del enunciado.`]])+
 h("c) H₀: β₄ + 6β₃ = 0")+mp([
-[String.raw`\(R=[0\;\;0\;\;6\;\;1],\quad r=0\)`,"La restricción escrita como Rβ = r."],
-[String.raw`\(b_4+6b_3=12{,}868636+6(-1{,}768029)=12{,}868636-10{,}608174=2{,}260462\)`,"Se reemplazan los coeficientes del modelo (2)."],
-[String.raw`\(\operatorname{var}(6b_3+b_4)=6^2\operatorname{var}(b_3)+\operatorname{var}(b_4)+2(6)(1)\operatorname{cov}(b_3,b_4)\)`,String.raw`\(\operatorname{var}(aX+bY)=a^2\operatorname{var}X+b^2\operatorname{var}Y+2ab\operatorname{cov}(X,Y)\).`],
-[String.raw`\(=36(0{,}0615124)+17{,}56056+12(0{,}63257)=2{,}21445+17{,}56056+7{,}59084=27{,}36585\)`,"Se reemplazan los valores de var(b)."],
-[String.raw`\(F=\dfrac{2{,}260462^2}{27{,}36585}=\dfrac{5{,}10969}{27{,}36585}=0{,}18672,\quad W=0{,}18672\cdot\dfrac{64}{60}=0{,}19917\)`,"F (60) y su versión asintótica."],
-[String.raw`\(RSS_{R1}-RSS_{NR}=92.161{,}3-91.875{,}38=285{,}92\)`,"Pérdida de ajuste con la restricción."],
-[String.raw`\(W=64\cdot\dfrac{285{,}92}{91.875{,}38}=0{,}1992,\quad LM=64\cdot\dfrac{285{,}92}{92.161{,}3}=0{,}1986=64(0{,}003102305)\)`,"Versiones con las RSS y la auxiliar."],
-[String.raw`\(LR=2(-323{,}4298+323{,}5293)=2(0{,}0995)=0{,}199\)`,"Con las log-verosimilitudes."]]),
+[String.raw`\(R=[0\;\;0\;\;6\;\;1],\ r=0;\quad b_4+6b_3=12{,}868636-10{,}608174=2{,}260462\)`,String.raw`La restricción del enunciado en forma Rβ = r.`],
+[String.raw`\(\operatorname{var}(6b_3+b_4)=36(0{,}061512)+17{,}56056+12(0{,}632570)=27{,}3658\)`,String.raw`\(\operatorname{var}(aX+bY)=a^2\operatorname{var}X+b^2\operatorname{var}Y+2ab\operatorname{cov}\) con a = 6, b = 1.`],
+[String.raw`\(F=\dfrac{2{,}260462^2}{27{,}3658}=0{,}1867,\quad W=0{,}1867\cdot\dfrac{64}{60}=0{,}1992\)`,String.raw`F (60) y Wald asintótico.`],
+[String.raw`\(W=64\cdot\dfrac{285{,}92}{91.875{,}38}=0{,}1992,\quad LR=2(-323{,}4298+323{,}5293)=0{,}199,\quad LM=64\cdot\dfrac{285{,}92}{92.161{,}3}=0{,}1986=64(0{,}003102305)\)`,String.raw`Con \(RSS_{R1}-RSS_2=285{,}92\): todas menores que 3,841.`]]),
 
-"ep4-10":mp([
-[String.raw`\(b_2+3b_3=-5{,}8139+3(1{,}6672)=-5{,}8139+5{,}0016=-0{,}8123\)`,"Rb − r con R = [0 1 3 0] y r = 0."],
-[String.raw`\(\operatorname{var}(b_2+3b_3)=\operatorname{var}(b_2)+9\operatorname{var}(b_3)+2(1)(3)\operatorname{cov}(b_2,b_3)\)`,String.raw`\(\operatorname{var}(aX+bY)\) con a = 1, b = 3.`],
-[String.raw`\(=0{,}24705+9(0{,}51093)+6(0{,}09828)=0{,}24705+4{,}59838+0{,}58971=5{,}43514\)`,"Se reemplazan los valores."],
-[String.raw`\(F=\dfrac{(-0{,}8123)^2}{5{,}43514}=\dfrac{0{,}65983}{5{,}43514}=0{,}1214,\quad W=0{,}1214\cdot\dfrac{35}{31}=0{,}1371\)`,"F (60) y Wald asintótico, con n = 35 y n − k = 31."],
-[String.raw`\(RSS_R-RSS_{NR}=388{,}017-386{,}5032=1{,}5138\)`,"Pérdida de ajuste."],
-[String.raw`\(W=35\cdot\dfrac{1{,}5138}{386{,}5032}=0{,}1371,\quad LR=35\ln(1{,}003917)=35(0{,}003909)=0{,}1368\)`,"Versiones con las RSS."],
-[String.raw`\(LM=35\cdot\dfrac{1{,}5138}{388{,}017}=0{,}1365=35(0{,}003901352)=nR^2_{aux}\)`,"La regresión auxiliar del enunciado da el mismo LM."]])};
+"ep4-10":h("Lo que da el enunciado")+mp([
+[String.raw`\(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\beta_4X_{4t}+\mu_t,\quad t=1971,\dots,2005\)`,String.raw`Función de demanda del enunciado: n = 35, k = 4.`],
+[String.raw`\(b_2=-5{,}8139,\ b_3=1{,}6672;\quad RSS=\mathbf e'\mathbf e=386{,}5032\)`,String.raw`Salida de <code>lm()</code> y la RSS del enunciado.`],
+[String.raw`\(\operatorname{var}(b_2)=0{,}24705304,\ \operatorname{var}(b_3)=0{,}51093128,\ \operatorname{cov}(b_2,b_3)=0{,}09828469\)`,String.raw`De la matriz \(S^2(X'X)^{-1}\) del enunciado (filas 2 y 3).`],
+[String.raw`\(RSS_R=388{,}017,\qquad R^2_{aux}=0{,}003901352\)`,String.raw`Modelo restringido y regresión auxiliar de sus errores.`]])+
+h("Pruebas")+mp([
+[String.raw`\(H_0:\beta_2+3\beta_3=0;\quad b_2+3b_3=-5{,}8139+5{,}0016=-0{,}8123\)`,String.raw`\(R\mathbf b-r\) con R = [0 1 3 0].`],
+[String.raw`\(\operatorname{var}(b_2+3b_3)=0{,}24705+9(0{,}51093)+6(0{,}09828)=5{,}43514\)`,String.raw`a = 1, b = 3: 9 = 3² y 6 = 2·1·3.`],
+[String.raw`\(F=\dfrac{0{,}65983}{5{,}43514}=0{,}1214,\quad W=0{,}1214\cdot\dfrac{35}{31}=0{,}1371\)`,String.raw`F (60) y Wald asintótico.`],
+[String.raw`\(W=35\cdot\dfrac{1{,}5138}{386{,}5032}=0{,}1371,\quad LR=35\ln\dfrac{388{,}017}{386{,}5032}=0{,}1368,\quad LM=35\cdot\dfrac{1{,}5138}{388{,}017}=0{,}1365\)`,String.raw`Con las RSS: \(388{,}017-386{,}5032=1{,}5138\).`],
+[String.raw`\(LM=nR^2_{aux}=35(0{,}003901352)=0{,}1365\)`,String.raw`La regresión auxiliar da el mismo LM; como su R² es casi cero, no se rechaza \(H_0\).`]])};
 for(const tl of TALLERES)for(const p of (tl.puntos||[]))if(M[p.id])p.micro=M[p.id];
 })();
 
