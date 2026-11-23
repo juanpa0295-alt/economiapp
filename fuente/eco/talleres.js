@@ -945,40 +945,60 @@ h("Regresión auxiliar y decisión")+mp([
 
 // ---------- micropasos de Ejercicios propuestos 4
 const M={
-"ep4-1":h("a) Verosimilitud y log-verosimilitud")+mp([
-[String.raw`\(f(x_i;\theta)=\theta^{-1}e^{-x_i/\theta}\)`,"Se escribe 1/θ como θ⁻¹ (exponente negativo) para derivar más fácil."],
-[String.raw`\(L(\theta)=\prod_{i=1}^n\theta^{-1}e^{-x_i/\theta}=\left(\theta^{-1}\right)^n\prod e^{-x_i/\theta}\)`,"Muestra aleatoria: la conjunta es el producto. Una constante multiplicada n veces es una potencia."],
-[String.raw`\(=\theta^{-n}e^{-\sum x_i/\theta}\)`,String.raw`\((a^m)^n=a^{mn}\) y \(e^{a}e^{b}=e^{a+b}\): el producto de exponenciales suma los exponentes.`],
-[String.raw`\(l(\theta)=\ln\theta^{-n}+\ln e^{-\sum x_i/\theta}\)`,String.raw`\(\ln(ab)=\ln a+\ln b\).`],
-[String.raw`\(=-n\ln\theta-\dfrac{\sum x_i}{\theta}\)`,String.raw`\(\ln a^k=k\ln a\) y \(\ln e^c=c\).`]])+
+"ep4-1":h("Lo que da el enunciado y dónde se usa")+mp([
+[String.raw`\(X_1,\dots,X_n\ \text{m.a.}\)`,String.raw`«Muestra aleatoria» significa dos cosas: las \(X_i\) son <b>independientes</b> y tienen la <b>misma distribución</b> que X. La independencia permite multiplicar densidades en a) y sumar varianzas en e).`],
+[String.raw`\(f(x)=\dfrac1\theta e^{-x/\theta},\ x>0\)`,String.raw`Es la densidad de la observación del enunciado. Se usa en a), escribiéndola para cada \(x_i\). Como x &gt; 0 y θ &gt; 0, \(\sum x_i>0\), y se puede dividir o multiplicar por θ sin cambiar desigualdades.`],
+[String.raw`\(E(X)=\theta\)`,String.raw`Primera línea de la observación. Se usa en c) y en e) para reemplazar \(E(X_i)\).`],
+[String.raw`\(\operatorname{var}(X)=\theta^2\)`,String.raw`Segunda línea de la observación. Se usa en e) para \(\operatorname{var}(\sum X_i)\) y en g) para \(\sigma^2\).`],
+[String.raw`\(\tilde\mu=\text{mediana}(X)=\theta\ln2\)`,String.raw`Tercera línea de la observación. Se usa en g).`],
+[String.raw`\(x_i\ \text{(minúscula)}\ \text{vs.}\ X_i\ \text{(mayúscula)}\)`,String.raw`En a), b) y d) se trabaja con los datos observados \(x_i\) (números). En c) y e) se toma esperanza, y para eso se escriben como variables aleatorias \(X_i\).`]])+
+h("a) Verosimilitud y log-verosimilitud")+mp([
+[String.raw`\(f(x_i;\theta)=\dfrac1\theta e^{-x_i/\theta}=\theta^{-1}e^{-x_i/\theta}\)`,String.raw`Se toma la f(x) del enunciado y se reemplaza x por \(x_i\). Además \(\frac1\theta=\theta^{-1}\) (exponente negativo), que facilita derivar después.`],
+[String.raw`\(L(\theta)=f(x_1;\theta)\,f(x_2;\theta)\cdots f(x_n;\theta)=\prod_{i=1}^n\theta^{-1}e^{-x_i/\theta}\)`,String.raw`La verosimilitud es la densidad conjunta de la muestra vista como función de θ. Por independencia, la conjunta es el producto de las n densidades.`],
+[String.raw`\(=\underbrace{\theta^{-1}\cdots\theta^{-1}}_{n\text{ veces}}\cdot e^{-x_1/\theta}\cdots e^{-x_n/\theta}\)`,String.raw`Se reordena el producto: primero los n factores \(\theta^{-1}\), luego las n exponenciales (el orden de los factores no altera el producto).`],
+[String.raw`\(=\theta^{-n}\,e^{-x_1/\theta-x_2/\theta-\cdots-x_n/\theta}\)`,String.raw`\(a^ma^n=a^{m+n}\): n veces \(\theta^{-1}\) da \(\theta^{-n}\), y el producto de exponenciales suma los exponentes.`],
+[String.raw`\(=\theta^{-n}\,e^{-\frac1\theta\sum x_i}\)`,String.raw`Factor común \(-\frac1\theta\) en el exponente: \(-\frac{x_1}\theta-\cdots-\frac{x_n}\theta=-\frac1\theta(x_1+\cdots+x_n)\).`],
+[String.raw`\(l(\theta)=\ln L(\theta)=\ln\theta^{-n}+\ln e^{-\sum x_i/\theta}\)`,String.raw`Definición del enunciado: \(l(\theta)=\ln[L(\theta)]\). Logaritmo de un producto: \(\ln(ab)=\ln a+\ln b\).`],
+[String.raw`\(=-n\ln\theta-\dfrac{\sum x_i}{\theta}\)`,String.raw`\(\ln a^k=k\ln a\) (con k = −n) y \(\ln e^c=c\) (el logaritmo natural deshace la exponencial).`]])+
 h("b) Score y MLE")+mp([
-[String.raw`\(\dfrac{d}{d\theta}(-n\ln\theta)=-\dfrac n\theta\)`,String.raw`\(\frac{d}{d\theta}\ln\theta=\frac1\theta\).`],
-[String.raw`\(\dfrac{d}{d\theta}\left(-\sum x_i\,\theta^{-1}\right)=-\sum x_i\cdot(-1)\theta^{-2}=\dfrac{\sum x_i}{\theta^2}\)`,String.raw`Regla de la potencia \(\frac{d}{d\theta}\theta^k=k\theta^{k-1}\) con k = −1. Σxᵢ es constante respecto a θ.`],
-[String.raw`\(-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}=0\)`,"Condición de primer orden."],
-[String.raw`\(-n\theta+\sum x_i=0\)`,"Se multiplica todo por θ² > 0."],
-[String.raw`\(\hat\theta=\dfrac{\sum x_i}{n}=\bar x\)`,"Se despeja θ."],
-[String.raw`\(\mathbf H(\hat\theta)=\dfrac{n}{\bar x^2}-\dfrac{2n\bar x}{\bar x^3}=-\dfrac{n}{\bar x^2}<0\)`,"Segunda derivada en θ̂ (con Σxᵢ = n x̄): negativa, es un máximo."]])+
+[String.raw`\(s(\theta)=\dfrac{\partial l}{\partial\theta}=\dfrac{\partial}{\partial\theta}\left(-n\ln\theta\right)+\dfrac{\partial}{\partial\theta}\left(-\sum x_i\,\theta^{-1}\right)\)`,String.raw`Definición del enunciado: el score es la derivada de \(l(\theta)\). La derivada de una suma es la suma de derivadas; \(\frac{\sum x_i}{\theta}\) se escribe \(\sum x_i\,\theta^{-1}\).`],
+[String.raw`\(\dfrac{\partial}{\partial\theta}(-n\ln\theta)=-n\cdot\dfrac1\theta=-\dfrac n\theta\)`,String.raw`\(\frac{d}{d\theta}\ln\theta=\frac1\theta\); −n es una constante que multiplica.`],
+[String.raw`\(\dfrac{\partial}{\partial\theta}\left(-\sum x_i\,\theta^{-1}\right)=-\sum x_i\cdot(-1)\theta^{-2}=\dfrac{\sum x_i}{\theta^2}\)`,String.raw`Regla de la potencia \(\frac{d}{d\theta}\theta^k=k\theta^{k-1}\) con k = −1. \(\sum x_i\) son datos: no dependen de θ. Menos por menos da más.`],
+[String.raw`\(s(\theta)=-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}\)`,String.raw`Se juntan las dos derivadas.`],
+[String.raw`\(-\dfrac n{\hat\theta}+\dfrac{\sum x_i}{\hat\theta^2}=0\)`,String.raw`El MLE es el θ que anula el score (condición de primer orden); por eso se le pone sombrero.`],
+[String.raw`\(\hat\theta^2\left(-\dfrac n{\hat\theta}\right)+\hat\theta^2\left(\dfrac{\sum x_i}{\hat\theta^2}\right)=0\ \Rightarrow\ -n\hat\theta+\sum x_i=0\)`,String.raw`Se multiplican los dos lados por \(\hat\theta^2>0\) para quitar denominadores: \(\frac{\hat\theta^2}{\hat\theta}=\hat\theta\) y \(\frac{\hat\theta^2}{\hat\theta^2}=1\).`],
+[String.raw`\(\hat\theta_{MLE}=\dfrac{\sum x_i}{n}=\bar x\)`,String.raw`Se pasa \(n\hat\theta\) al otro lado y se divide por n. \(\frac{\sum x_i}{n}\) es la definición de la media muestral.`],
+[String.raw`\(\dfrac{\partial^2l}{\partial\theta^2}\Big|_{\hat\theta=\bar x}=\dfrac{n}{\bar x^2}-\dfrac{2(n\bar x)}{\bar x^3}=\dfrac{n}{\bar x^2}-\dfrac{2n}{\bar x^2}=-\dfrac{n}{\bar x^2}\)`,String.raw`Comprobación de que es un máximo (usa la Hessiana del literal d) evaluada en \(\bar x\), con \(\sum x_i=n\bar x\)). Como \(n/\bar x^2&gt;0\), la segunda derivada es negativa.`]])+
 h("c) La esperanza del score es cero")+mp([
-[String.raw`\(E[s(\theta)]=-\dfrac n\theta+\dfrac{E\left(\sum X_i\right)}{\theta^2}\)`,"Linealidad de la esperanza: los términos sin X salen tal cual."],
-[String.raw`\(E\left(\sum X_i\right)=\sum E(X_i)=n\theta\)`,"La esperanza de una suma es la suma de esperanzas, y cada E(Xᵢ) = θ."],
-[String.raw`\(=-\dfrac n\theta+\dfrac{n\theta}{\theta^2}=-\dfrac n\theta+\dfrac n\theta=0\)`,"Se simplifica θ."]])+
+[String.raw`\(s(\theta)=-\dfrac n\theta+\dfrac{\sum X_i}{\theta^2}\)`,String.raw`El mismo score de b), ahora con \(X_i\) mayúscula: para tomar esperanza se trata la muestra como aleatoria.`],
+[String.raw`\(E[s(\theta)]=E\left(-\dfrac n\theta\right)+E\left(\dfrac{\sum X_i}{\theta^2}\right)=-\dfrac n\theta+\dfrac{1}{\theta^2}E\left(\sum X_i\right)\)`,String.raw`Linealidad de la esperanza: \(E(a+bY)=a+bE(Y)\). \(-n/\theta\) y \(1/\theta^2\) son constantes (θ es un parámetro fijo, no aleatorio).`],
+[String.raw`\(E\left(\sum X_i\right)=E(X_1)+\cdots+E(X_n)=\theta+\cdots+\theta=n\theta\)`,String.raw`Esperanza de una suma = suma de esperanzas, y cada \(E(X_i)=\theta\) por la observación del enunciado (todas tienen la distribución de X).`],
+[String.raw`\(E[s(\theta)]=-\dfrac n\theta+\dfrac{n\theta}{\theta^2}=-\dfrac n\theta+\dfrac n\theta=0\)`,String.raw`Se reemplaza y se simplifica \(\frac{\theta}{\theta^2}=\frac1\theta\).`]])+
 h("d) Hessiana y H₁")+mp([
-[String.raw`\(\dfrac{d}{d\theta}\left(-n\theta^{-1}\right)=n\theta^{-2}\)`,String.raw`Regla de la potencia: \(-n\cdot(-1)\theta^{-2}\).`],
-[String.raw`\(\dfrac{d}{d\theta}\left(\sum x_i\,\theta^{-2}\right)=-2\sum x_i\,\theta^{-3}\)`,"Regla de la potencia con k = −2."],
-[String.raw`\(\mathbf H=\dfrac n{\theta^2}-\dfrac{2\sum x_i}{\theta^3},\qquad\mathbf H_1=s(\theta)^2\)`,"Con un solo parámetro, el producto exterior del score es su cuadrado."]])+
+[String.raw`\(\mathbf H=\dfrac{\partial^2l}{\partial\theta\,\partial\theta'}=\dfrac{\partial s}{\partial\theta}=\dfrac{\partial}{\partial\theta}\left(-n\theta^{-1}\right)+\dfrac{\partial}{\partial\theta}\left(\sum x_i\,\theta^{-2}\right)\)`,String.raw`Definición del enunciado. Con un solo parámetro, \(\partial\theta\,\partial\theta'\) es simplemente derivar dos veces respecto a θ: se deriva el score de b). Se reescribe \(\frac n\theta=n\theta^{-1}\) y \(\frac{\sum x_i}{\theta^2}=\sum x_i\,\theta^{-2}\).`],
+[String.raw`\(\dfrac{\partial}{\partial\theta}\left(-n\theta^{-1}\right)=-n(-1)\theta^{-2}=\dfrac{n}{\theta^2}\)`,String.raw`Regla de la potencia con k = −1.`],
+[String.raw`\(\dfrac{\partial}{\partial\theta}\left(\sum x_i\,\theta^{-2}\right)=\sum x_i(-2)\theta^{-3}=-\dfrac{2\sum x_i}{\theta^3}\)`,String.raw`Regla de la potencia con k = −2.`],
+[String.raw`\(\mathbf H=\dfrac n{\theta^2}-\dfrac{2\sum x_i}{\theta^3}\)`,String.raw`Se juntan las dos derivadas.`],
+[String.raw`\(\mathbf H_1=\left(\dfrac{\partial l}{\partial\theta}\right)\left(\dfrac{\partial l}{\partial\theta}\right)'=s(\theta)\cdot s(\theta)=\left(-\dfrac n\theta+\dfrac{\sum x_i}{\theta^2}\right)^2\)`,String.raw`Definición del enunciado. Con un parámetro, el score es un número (1 × 1) y su transpuesta es él mismo: el producto es el cuadrado del score.`],
+[String.raw`\(s(\theta)=\dfrac{-n\theta+\sum x_i}{\theta^2}=\dfrac{\sum x_i-n\theta}{\theta^2}\Rightarrow\mathbf H_1=\dfrac{\left(\sum x_i-n\theta\right)^2}{\theta^4}\)`,String.raw`Forma más cómoda: denominador común \(\theta^2\) (\(-\frac n\theta=-\frac{n\theta}{\theta^2}\)), y \((a/b)^2=a^2/b^2\). Se usa en e).`]])+
 h("e) Información e igualdad de la información")+mp([
-[String.raw`\(E(\mathbf H)=\dfrac n{\theta^2}-\dfrac{2n\theta}{\theta^3}=\dfrac n{\theta^2}-\dfrac{2n}{\theta^2}=-\dfrac n{\theta^2}\)`,"Linealidad y E(ΣXᵢ) = nθ; se simplifica θ."],
-[String.raw`\(\mathbf I(\theta)=-E(\mathbf H)=\dfrac n{\theta^2}\)`,"Definición de la información."],
-[String.raw`\(E(\mathbf H_1)=E(s^2)=\operatorname{var}(s)+[E(s)]^2=\operatorname{var}(s)\)`,String.raw`\(\operatorname{var}(Y)=E(Y^2)-[E(Y)]^2\), y E(s) = 0 por el literal c).`],
-[String.raw`\(\operatorname{var}(s)=\operatorname{var}\left(-\dfrac n\theta+\dfrac{\sum X_i}{\theta^2}\right)=\dfrac{1}{\theta^4}\operatorname{var}\left(\sum X_i\right)\)`,String.raw`\(\operatorname{var}(a+bY)=b^2\operatorname{var}(Y)\): la constante −n/θ no aporta varianza.`],
-[String.raw`\(\operatorname{var}\left(\sum X_i\right)=\sum\operatorname{var}(X_i)=n\theta^2\)`,"Por independencia, la varianza de la suma es la suma de las varianzas."],
-[String.raw`\(E(\mathbf H_1)=\dfrac{n\theta^2}{\theta^4}=\dfrac n{\theta^2}=-E(\mathbf H)\)`,"Se cumple la igualdad de la información."]])+
-h("f) y g) Varianza e invarianza")+mp([
-[String.raw`\(\operatorname{var}(\hat\theta)=\mathbf I(\theta)^{-1}=\dfrac{\theta^2}{n}\)`,"La varianza asintótica del MLE es la inversa de la información (cota de Cramér-Rao)."],
-[String.raw`\(\operatorname{var}(\bar x)=\dfrac{\operatorname{var}(\sum X_i)}{n^2}=\dfrac{n\theta^2}{n^2}=\dfrac{\theta^2}{n}\)`,"Comprobación exacta: coincide."],
-[String.raw`\(\sigma^2=\theta^2\Rightarrow\hat\sigma^2=\hat\theta^2=\bar x^2\)`,"Invarianza: el MLE de g(θ) es g(θ̂)."],
-[String.raw`\(F(m)=1-e^{-m/\theta}=\tfrac12\Rightarrow e^{-m/\theta}=\tfrac12\Rightarrow-\dfrac m\theta=\ln\tfrac12=-\ln2\Rightarrow m=\theta\ln2\)`,String.raw`De dónde sale la mediana: la acumulada vale 1/2. Se toma logaritmo y \(\ln(1/2)=-\ln2\).`],
-[String.raw`\(\tilde\mu=\hat\theta\ln2=\bar x\ln2\)`,"Invarianza otra vez."]]),
+[String.raw`\(E(\mathbf H)=\dfrac n{\theta^2}-\dfrac{2}{\theta^3}E\left(\sum X_i\right)=\dfrac n{\theta^2}-\dfrac{2n\theta}{\theta^3}\)`,String.raw`Linealidad de la esperanza y \(E(\sum X_i)=n\theta\) (de c)).`],
+[String.raw`\(=\dfrac n{\theta^2}-\dfrac{2n}{\theta^2}=-\dfrac n{\theta^2}\)`,String.raw`\(\frac{\theta}{\theta^3}=\frac1{\theta^2}\); y \(1-2=-1\).`],
+[String.raw`\(\mathbf I(\theta)=-E(\mathbf H)=\dfrac n{\theta^2}\)`,String.raw`Definición del enunciado: menos la esperanza de la Hessiana.`],
+[String.raw`\(E(\mathbf H_1)=\dfrac{E\left[\left(\sum X_i-n\theta\right)^2\right]}{\theta^4}\)`,String.raw`Se parte de la forma de \(\mathbf H_1\) del final de d); \(\theta^4\) es constante y sale de la esperanza.`],
+[String.raw`\(E\left[\left(\sum X_i-n\theta\right)^2\right]=E\left[\left(\sum X_i-E\sum X_i\right)^2\right]=\operatorname{var}\left(\sum X_i\right)\)`,String.raw`Como \(n\theta=E(\sum X_i)\), es la esperanza del cuadrado de la desviación respecto a la media: la definición de varianza.`],
+[String.raw`\(\operatorname{var}\left(\sum X_i\right)=\operatorname{var}(X_1)+\cdots+\operatorname{var}(X_n)=n\theta^2\)`,String.raw`Por independencia (muestra aleatoria), la varianza de la suma es la suma de las varianzas; cada una vale \(\theta^2\) por la observación del enunciado.`],
+[String.raw`\(E(\mathbf H_1)=\dfrac{n\theta^2}{\theta^4}=\dfrac n{\theta^2}=-E(\mathbf H)\ \checkmark\)`,String.raw`Se simplifica \(\frac{\theta^2}{\theta^4}=\frac1{\theta^2}\). Se cumple lo que pide verificar el enunciado.`]])+
+h("f) Varianza del MLE")+mp([
+[String.raw`\(\operatorname{var}(\hat\theta_{MLE})=\mathbf I(\theta)^{-1}=\left(\dfrac{n}{\theta^2}\right)^{-1}=\dfrac{\theta^2}{n}\)`,String.raw`La varianza (asintótica) del MLE es la inversa de la información: la cota de Cramér-Rao. Con un número, la inversa es el recíproco.`],
+[String.raw`\(\operatorname{var}(\bar X)=\operatorname{var}\left(\dfrac1n\sum X_i\right)=\dfrac1{n^2}\operatorname{var}\left(\sum X_i\right)=\dfrac{n\theta^2}{n^2}=\dfrac{\theta^2}{n}\)`,String.raw`Comprobación directa: \(\operatorname{var}(aY)=a^2\operatorname{var}(Y)\) con \(a=1/n\). Coincide, así que aquí la varianza es exacta, no solo asintótica.`]])+
+h("g) MLE de la varianza y de la mediana")+mp([
+[String.raw`\(\sigma^2=\operatorname{var}(X)=\theta^2\)`,String.raw`Segunda línea de la observación del enunciado: la varianza es una función de θ, \(g(\theta)=\theta^2\).`],
+[String.raw`\(\hat\sigma^2_{MLE}=g(\hat\theta)=\hat\theta^2=\bar x^2\)`,String.raw`Propiedad de invarianza: el MLE de \(g(\theta)\) es \(g(\hat\theta)\). Se reemplaza θ por \(\bar x\) (resultado de b)).`],
+[String.raw`\(\tilde\mu=\text{mediana}(X)=\theta\ln2\)`,String.raw`Tercera línea de la observación: otra función de θ, \(g(\theta)=\theta\ln2\).`],
+[String.raw`\(\hat{\tilde\mu}_{MLE}=\hat\theta\ln2=\bar x\ln2\approx0{,}6931\,\bar x\)`,String.raw`Invarianza otra vez; \(\ln2\approx0{,}6931\).`],
+[String.raw`\(F(m)=\int_0^m\dfrac1\theta e^{-x/\theta}dx=\left[-e^{-x/\theta}\right]_0^m=1-e^{-m/\theta}\)`,String.raw`Opcional, para ver de dónde sale \(\theta\ln2\) (el enunciado ya lo da): se integra la f(x) del enunciado para obtener la acumulada.`],
+[String.raw`\(1-e^{-m/\theta}=\tfrac12\Rightarrow e^{-m/\theta}=\tfrac12\Rightarrow-\dfrac m\theta=\ln\tfrac12=-\ln2\Rightarrow m=\theta\ln2\)`,String.raw`La mediana deja la mitad de la probabilidad a cada lado: \(F(m)=1/2\). Se toma logaritmo natural y \(\ln(1/2)=-\ln2\).`]]),
 
 "ep4-2":h("a) y b) Verosimilitud, score y MLE")+mp([
 [String.raw`\(L(\lambda)=\prod\dfrac{e^{-\lambda}\lambda^{x_i}}{x_i!}=\dfrac{e^{-n\lambda}\lambda^{\sum x_i}}{\prod x_i!}\)`,String.raw`Producto: \(e^{-\lambda}\) n veces da \(e^{-n\lambda}\) y \(\lambda^{x_1}\cdots\lambda^{x_n}=\lambda^{\sum x_i}\).`],
