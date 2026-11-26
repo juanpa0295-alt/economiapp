@@ -9,7 +9,7 @@ const PTS={};TLS.forEach(t=>t.puntos.forEach(p=>PTS[p.id]=Object.assign(p,{tl:t}
 const ALIASES=typeof ALIAS!=="undefined"?ALIAS:{};
 // Laboratorios (opcional por materia): casos de la vida real donde la herramienta del curso produce un beneficio
 const LABS=typeof LABORATORIOS!=="undefined"?LABORATORIOS:[];
-LABS.forEach(l=>ALL.push(Object.assign(l,{kind:"l"})));
+LABS.forEach(l=>{if(l.caso&&!l.html)l.html=LAB_CASO(l.caso);ALL.push(Object.assign(l,{kind:"l"}))});
 // Usos de la pestaña Práctica. Las ramas de repaso (fórmulas, visuales, preparar el parcial) se muestran allí; las demás son subestaciones opcionales de su estación
 const USO_RE={examen:/simulacro|parcial|supletorio|examen|pr[aá]ctica de la gu[ií]a|preparar/i,repaso:/f[oó]rmula|formulario|tarjeta|pregunta|l[ií]nea de tiempo|tabla|glosario|repaso|visuales/i};
 const usoDe=x=>x.uso||(x.kind==="w"&&x.grp==="ver"?"ver":USO_RE.examen.test(x.t)?"examen":USO_RE.repaso.test(x.t)?"repaso":x.kind==="b"?"":"resolver");

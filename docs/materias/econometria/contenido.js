@@ -3119,19 +3119,9 @@ for(let i=BRANCHES.length-1;i>=0;i--)if(BRANCHES[i].items&&!BRANCHES[i].items.le
 // ===================== LABORATORIOS: CASOS REALES =====================
 // Cada caso parte de una base del curso, estima con la herramienta de la estación y termina en una decisión con su beneficio medido.
 // Formato fijo: situación, pregunta, datos y modelo, de la estimación a la decisión, herramienta interactiva, decisión y beneficio, cuándo no funciona, código R.
-const CASO=(o)=>`<div class="caso">
-<div class="paso"><h4>La situación</h4>${o.sit}</div>
-<div class="paso"><h4>La pregunta que hay que responder</h4>${o.preg}</div>
-<div class="paso"><h4>Los datos y el modelo</h4>${o.datos}</div>
-<div class="paso"><h4>De la estimación a la decisión</h4>${o.paso}</div>
-<section><h3>Simulador de la decisión</h3><p class="hint" style="margin:0 0 8px">${o.simh}</p><div class="sim" id="sim"></div></section>
-<div class="paso benef"><h4>La decisión y el beneficio</h4>${o.benef}</div>
-<div class="paso limite"><h4>Cuándo no funciona</h4>${o.limite}</div>
-<div class="paso"><h4>Hazlo en R con la base del curso</h4><div><button class="cp" type="button" data-copy>Copiar</button><pre>${o.r}</pre></div></div>
-</div>`;
 const LABORATORIOS=[
 {id:"lab-precio",t:"Fijar el precio que más deja con la elasticidad",sector:"Comercio minorista · precios",links:["especificacion","inferencia"],sim:"labPrecio",
- html:CASO({
+ caso:{
  sit:String.raw`<p>Una cadena vende televisores. El gerente quiere saber si le conviene bajar o subir el precio. Tiene 48 meses de ventas, precio y publicidad: es la base del <b>Ejemplo 1 del profesor</b> (demanda de TV).</p>`,
  preg:String.raw`<p>¿Qué precio maximiza la utilidad, si cada televisor le cuesta \(c\) al almacén?</p>`,
  datos:String.raw`<p>El modelo log-log de la estación de especificación: \(\ln Y_t=\beta_1+\beta_2\ln X_{2t}+\beta_3\ln X_{3t}+u_t\), con \(Y\) la demanda, \(X_2\) el precio y \(X_3\) la publicidad. Estimado por MCO con \(n=48\):</p>
@@ -3159,9 +3149,9 @@ b2 = coef(m)[2]; se2 = sqrt(vcov(m)[2, 2])
 c0 = 700                               # costo unitario (supuesto)
 c0 * abs(b2) / (abs(b2) - 1)           # precio óptimo de Lerner
 ic = b2 + c(-1, 1) * qt(0.975, n - 3) * se2
-c0 * abs(ic) / (abs(ic) - 1)           # rango del precio óptimo`})},
+c0 * abs(ic) / (abs(ic) - 1)           # rango del precio óptimo`}},
 {id:"lab-inventario",t:"Cuánto inventario pedir con el intervalo de predicción",sector:"Logística · inventarios",links:["inferencia","mco-matricial"],sim:"labInventario",
- html:CASO({
+ caso:{
  sit:String.raw`<p>El mismo almacén debe hacer el pedido del mes 49 antes de conocer la demanda. Ya sabe el precio (1.425) y la publicidad (64,458) que va a usar. Si pide de más, liquida los sobrantes con pérdida; si pide de menos, pierde ventas.</p>`,
  preg:String.raw`<p>¿Cuántas unidades pedir para maximizar la utilidad esperada?</p>`,
  datos:String.raw`<p>El modelo lineal del Ejemplo 1: \(\hat Y_0=10{,}3017-0{,}005994\,X_{2,0}+0{,}005107\,X_{3,0}\). Con los valores del mes 49:</p>
@@ -3188,9 +3178,9 @@ ee_pred = sqrt(p$residual.scale^2 + p$se.fit^2)
 P = 1425; c0 = 700; s = 500
 RC = (P - c0) / ((P - c0) + (c0 - s))
 Q = p$fit + qnorm(RC) * ee_pred
-c(pronostico = p$fit, ee_pred = ee_pred, RC = RC, pedido = Q)`})},
+c(pronostico = p$fit, ee_pred = ee_pred, RC = RC, pedido = Q)`}},
 {id:"lab-escala",t:"¿Conviene crecer? Economías de escala con la función de costos",sector:"Energía e industria · expansión",links:["especificacion","inferencia"],sim:"labEscala",
- html:CASO({
+ caso:{
  sit:String.raw`<p>Una empresa generadora de electricidad evalúa duplicar su producción, por ejemplo comprando la planta de un competidor. La base es la de Nerlove (145 empresas de EE. UU.) del <b>Trabajo 1, punto 2</b>.</p>`,
  preg:String.raw`<p>Si la producción se multiplica por \(k\), ¿por cuánto se multiplica el costo total? ¿Y cuánto sube el presupuesto si se encarece el combustible?</p>`,
  datos:String.raw`<p>Función de costos Cobb-Douglas en logaritmos: \(\ln TC=\beta_1+\beta_2\ln Q+\beta_3\ln P_L+\beta_4\ln P_F+\beta_5\ln P_K+u\).</p>
@@ -3218,9 +3208,9 @@ k = 2
 k^b2                                   # multiplicador del costo
 1 - k^b2 / k                           # ahorro frente a k plantas
 ic = b2 + c(-1, 1) * qt(0.975, df.residual(m)) * se2
-1 - k^ic / k                           # rango del ahorro`})},
+1 - k^ic / k                           # rango del ahorro`}},
 {id:"lab-cambio",t:"Detectar a tiempo que el consumidor cambió (Chow)",sector:"Consumo masivo · pronóstico de ventas",links:["chow"],sim:"labCambio",
- html:CASO({
+ caso:{
  sit:String.raw`<p>Una empresa de consumo masivo pronostica sus ventas con la relación entre consumo e ingreso. Usa la base trimestral 2005-2010 del <b>Trabajo 1, punto 5</b>. En 2008 llega la crisis financiera y nadie ajusta el modelo.</p>`,
  preg:String.raw`<p>¿Cambió la relación consumo-ingreso? ¿Cuánto se equivoca el pronóstico si se sigue usando el modelo de antes?</p>`,
  datos:String.raw`<p>Modelo \(Y_t=\beta_1+\beta_2X_t+u_t\) (consumo e ingreso), estimado en tres muestras:</p>
@@ -3246,5 +3236,5 @@ k = 2; n = nrow(d)
 F = ((RSSr - RSSnr) / k) / (RSSnr / (n - 2 * k))
 c(F = F, critico = qf(0.95, k, n - 2 * k), p = 1 - pf(F, k, n - 2 * k))
 e = d$Y[13:24] - predict(a, d[13:24, ])  # error del modelo viejo
-mean(e); sqrt(mean(e^2))`})}
+mean(e); sqrt(mean(e^2))`}}
 ];
