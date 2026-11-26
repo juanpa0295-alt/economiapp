@@ -3100,6 +3100,17 @@ ins(B4.length?B4[B4.length-1].id:"mcg",[
 <p>En R: <code>gmm(y ~ x, ~ z1 + z2)</code> (paquete gmm) o <code>ivreg</code> con <code>summary(..., diagnostics = TRUE)</code>.</p></section>
 ${LABX("MC2E frente a GMM eficiente")}`,
 qs:[{q:"Con 3 instrumentos para 1 regresor endógeno (más la constante), ¿cuántos grados de libertad tiene la J de Hansen?",a:"Momentos m = 4 (constante y 3 instrumentos), parámetros k = 2: gl = m − k = 2."}]},...B6]);
+// Árbol de fórmulas del parcial 2: abre el laboratorio de pantalla completa (fuente/arbol/econometria-parcial2.js)
+{const it={id:"formulas-p2",t:"Árbol de fórmulas del parcial 2 (3D)",nuevo:true,html:String.raw`
+<section><h3>Para qué sirve</h3><p class="lead">Es la hoja «Fórmulas para el segundo parcial» convertida en un laboratorio: las 43 fórmulas en el orden en que se aplican, como carpetas que abres y cierras, cada una con su interpretación, cuándo se usa, sus micropasos algebraicos y una escena 3D que cambia con cada micropaso.</p>
+<p><a class="btn" href="econometria-parcial2.html">Abrir el árbol de fórmulas →</a></p></section>
+<section><h3>Qué trae</h3><ul>
+<li><b>Árbol del algoritmo:</b> MCO de base, pronósticos de Chow, cambio estructural (clásico, con dicótomas, solo intercepto, solo pendientes), máxima verosimilitud y las pruebas LR, Wald y LM.</li>
+<li><b>Hoja seleccionable:</b> selecciona cualquier término (RSS_NR, k*, score, Hessiana…) y se despliega su definición y dónde aparece.</li>
+<li><b>Escenas 3D:</b> planos de regresión que se separan, la envoltura de los errores de predicción, la colina de la verosimilitud y las tres medidas LR, W y LM.</li>
+<li><b>Distribuciones:</b> valor crítico, estadística y p-valor dibujados para cada prueba.</li></ul>
+<p>Los números de las escenas salen de datos simulados; los cálculos con datos del curso están en la <a href="#t-calc">calculadora de pruebas</a> y en las estaciones de cambio estructural.</p></section>`};
+const g=BRANCHES.find(b=>b.g==="Fórmulas del curso");if(g)g.items.push(it);else BRANCHES.unshift({g:"Fórmulas del curso",from:"inferencia",items:[it]})}
 const P={"r-cero":"Herramientas: R, datos y matrices","mco-simple":"Unidad 1 · El modelo de regresión lineal múltiple (repaso)",diagnostico:"Unidad 2 · Pruebas de diagnóstico",mcg:"Unidad 3 · El modelo lineal generalizado (MCG)",vi:"Unidad 4 · Variables instrumentales",gmm:"Unidad 5 · Método generalizado de los momentos",discreta:"Unidad 6 · Variable dependiente discreta"};
 let cur="";TRUNK.forEach(t=>{if(P[t.id])cur=P[t.id];t.parte=cur});
 for(let i=BRANCHES.length-1;i>=0;i--)if(BRANCHES[i].items&&!BRANCHES[i].items.length)BRANCHES.splice(i,1);

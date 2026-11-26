@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITULO__</title>
+<meta name="description" content="__DESC__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Economiapp · plantilla de los árboles de fórmulas (la genera fuente/sitio/build.py)
+   VOICE: tutor paciente; un explorador de carpetas para estudiar sin preguntar dos veces.
+   IDEA: el árbol de carpetas de un proyecto: cada fórmula es un archivo con su lugar en el algoritmo, y al abrirlo se ve en 3D.
+   PICTURE: visor 3D fijo en el panel de detalle, sincronizado con cada micropaso.
+   COLOUR and TYPE: cielo #4fb3e8, naranja #ff7a1a lo importante, tinta #10223a, morado y verde de apoyo; noche #0b1726. Outfit + Inter + JetBrains Mono para fórmulas.
+   LAYOUT: árbol | hoja de fórmulas seleccionable | detalle con 3D; en el celular todo apilado. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0b1726);--ink:light-dark(#10223a,#e6eef7);--soft:light-dark(#4f6279,#9fb3c8);--sky:#4fb3e8;--or:#ff7a1a;--pu:#7c3aed;--gn:#1a9e5a;--band:light-dark(#4fb3e8,#12304f);--card:light-dark(#f3f8fc,#112540);--line:light-dark(#d5e3ee,#21405f);--code:light-dark(#eaf3fa,#0f2238);--stage:light-dark(#e9f5fd,#0d2139);--hl:light-dark(#fff1e6,#3a2410)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Outfit,Inter,sans-serif;line-height:1.08;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px max(2vw,12px);background:var(--band);color:light-dark(#0b1726,#e6eef7)}
+.volver{color:inherit;text-decoration:none;font-weight:600;font-size:14px;min-height:42px;display:inline-flex;align-items:center;padding:0 12px;border-radius:12px;background:light-dark(rgba(255,255,255,.55),rgba(11,23,38,.45))}
+.top h1{font-size:clamp(20px,2.4vw,28px);font-weight:700;margin-right:auto}
+.top h1 small{display:block;font:500 13px Inter,sans-serif;opacity:.85;margin-top:2px}
+.tb{min-height:42px;padding:6px 14px;border-radius:12px;border:0;background:light-dark(rgba(255,255,255,.85),rgba(11,23,38,.7));font-weight:600}
+.tb[aria-pressed=true]{background:#10223a;color:#fff}
+.app{display:grid;grid-template-columns:270px minmax(0,.85fr) minmax(0,1.5fr);height:calc(100vh - 64px);height:calc(100dvh - 64px)}
+.app>section{overflow:auto;overscroll-behavior:contain}
+.app.notree{grid-template-columns:0 minmax(0,.85fr) minmax(0,1.5fr)}.app.notree .tree{display:none}
+.app.focus{grid-template-columns:270px 0 minmax(0,1fr)}.app.focus .doc{display:none}
+.app.notree.focus{grid-template-columns:0 0 minmax(0,1fr)}
+/* árbol */
+.tree{background:var(--card);border-right:1px solid var(--line);padding:12px 10px 40px}
+.tree h2,.doc h2.cap{font-size:15px;font-weight:600;color:var(--soft);margin:2px 6px 8px}
+.srch{width:100%;font:16px Inter,sans-serif;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.tact{display:flex;gap:6px;margin:8px 0 10px}.tact button{flex:1;min-height:38px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:14px;font-weight:500}
+.fh{display:flex;align-items:center;gap:6px;width:100%;text-align:left;border:0;background:none;padding:8px 6px;border-radius:10px;font:600 15px Outfit,sans-serif;min-height:40px}
+.fh:hover{background:light-dark(#e3eef7,#173253)}
+.fh .chev{width:0;height:0;border-left:6px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;transition:transform .15s;flex:none}
+.fh[aria-expanded=true] .chev{transform:rotate(90deg)}
+.fh .cnt{margin-left:auto;font:500 12px Inter,sans-serif;color:var(--soft)}
+.fo .fo .fh{font-size:14px}
+.fc{padding-left:14px;border-left:1px dashed var(--line);margin-left:9px}
+.tn{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:7px 8px;border-radius:10px;font-size:14px;min-height:38px;line-height:1.3}
+.tn:hover{background:light-dark(#e3eef7,#173253)}
+.tn .num{flex:none;min-width:26px;height:22px;border-radius:7px;background:var(--bg);border:1px solid var(--line);font:600 12px/20px Outfit,sans-serif;text-align:center}
+.tn.on{background:#10223a;color:#fff}.tn.on .num{background:var(--or);color:#0b1726;border-color:var(--or)}
+.tn mark{background:var(--hl);color:inherit;border-radius:3px}
+/* hoja */
+.doc{padding:14px clamp(14px,2vw,28px) 60px}
+.doc .lead{font-size:14px;color:var(--soft);margin:0 0 10px;max-width:62ch}
+.doc h3{font-size:22px;font-weight:600;margin:26px 0 8px;padding-top:12px;border-top:2px solid var(--line)}
+.doc h4{font:600 17px Outfit,sans-serif;margin:18px 0 6px}
+.doc p{margin:.5em 0;max-width:68ch}
+.fb{position:relative;font:13.5px/1.6 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--code);border-radius:12px;padding:22px 12px 10px;margin:8px 0 14px;white-space:pre;overflow-x:auto;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.fb:hover{border-color:var(--sky)}.fb.on{border-color:var(--or);background:var(--hl)}
+.fb .tag{position:absolute;top:4px;left:10px;font:600 11px Inter,sans-serif;color:var(--soft);white-space:nowrap}
+.fb .tag b{color:var(--ink)}
+::selection{background:#ffd2ad;color:#10223a}
+/* detalle */
+.det{border-left:1px solid var(--line);background:var(--bg)}
+.vw{position:sticky;top:0;z-index:3;background:var(--stage);border-bottom:1px solid var(--line)}
+.stage{position:relative;height:var(--sh,34vh);min-height:150px}.vw.min .stage{display:none}
+.split{height:14px;cursor:row-resize;display:flex;align-items:center;justify-content:center;touch-action:none;border-top:1px solid var(--line)}.split::before{content:"";width:56px;height:5px;border-radius:3px;background:var(--soft);opacity:.55}.split:hover::before{opacity:1;background:var(--or)}.vw.min .split{display:none}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.capt{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+.capt p{margin:0;background:light-dark(rgba(255,255,255,.93),rgba(11,23,38,.9));border-radius:12px;padding:7px 11px;font-size:14px;line-height:1.4;max-width:60ch;box-shadow:0 3px 14px rgba(11,23,38,.12)}
+.capt b{font-family:Outfit,sans-serif}
+.hud{position:absolute;left:10px;bottom:10px;right:150px;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chips span{background:light-dark(rgba(255,255,255,.92),rgba(11,23,38,.88));border-radius:9px;padding:2px 8px;font-size:13px;white-space:nowrap}
+.chips b{font:600 14px Outfit,sans-serif}.chips .x{background:var(--or);color:#0b1726}
+.bars{background:light-dark(rgba(255,255,255,.92),rgba(11,23,38,.88));border-radius:10px;padding:6px 8px;display:grid;gap:3px;font-size:12px;max-width:340px}
+.bars div{display:grid;grid-template-columns:6.4em minmax(0,1fr) 3.6em;gap:6px;align-items:center}
+.bars i{display:flex;height:11px;border-radius:6px;overflow:hidden;background:var(--line)}.bars i s{display:block;height:100%}
+.bars em{font-style:normal;font-weight:600;text-align:right}
+.vctl{position:absolute;right:8px;bottom:8px;display:flex;gap:5px}
+.vctl button{min-width:40px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:light-dark(rgba(255,255,255,.94),rgba(11,23,38,.92));font-weight:700}
+.sbar{display:flex;align-items:center;gap:6px;padding:5px 10px;flex-wrap:wrap}
+.sbar button{min-height:36px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:4px 12px;font-weight:600}
+.sbar .dots{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+.sbar .dots button{min-width:32px;padding:0;min-height:32px;font:600 13px Outfit,sans-serif}
+.sbar .dots button.on{background:var(--or);border-color:var(--or);color:#0b1726}
+.dc{padding:16px clamp(14px,2vw,26px) 60px}
+.crumb{font-size:13px;color:var(--soft);display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.crumb b{color:var(--ink);font-weight:600}
+.dc h2{font-size:clamp(24px,2.6vw,32px);font-weight:600;margin:6px 0 10px}
+.big{font:15px/1.65 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--code);border-radius:14px;padding:14px;white-space:pre;overflow-x:auto;border-left:5px solid var(--or);position:relative}
+.cp{position:absolute;top:6px;right:6px;min-height:34px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13px;padding:2px 10px}
+.sec{margin-top:18px}.sec h3{font-size:18px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.sec h3::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--sky)}
+.sec.u h3::before{background:var(--gn)}.sec.m h3::before{background:var(--or)}.sec.p h3::before{background:var(--pu)}
+.sec p{margin:.35em 0;max-width:70ch}
+.ctx{background:var(--card);border-radius:12px;padding:10px 14px;margin-top:8px;font-size:15px}
+.ms{list-style:none;margin:0;padding:0;counter-reset:m}
+.ms li{counter-increment:m;position:relative;padding:10px 12px 10px 46px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:background .15s,border-color .15s}
+.ms li::before{content:counter(m);position:absolute;left:10px;top:10px;width:26px;height:26px;border-radius:50%;background:var(--card);border:1px solid var(--line);font:600 13px/24px Outfit,sans-serif;text-align:center}
+.ms li:hover{border-color:var(--sky)}
+.ms li.on{border-color:var(--or);background:var(--hl)}.ms li.on::before{background:var(--or);border-color:var(--or);color:#0b1726}
+.ms .mf{display:block;font:13.5px/1.55 "JetBrains Mono",ui-monospace,monospace;background:var(--code);border-radius:9px;padding:6px 9px;margin:6px 0 2px;white-space:pre;overflow-x:auto}
+.ms .m3{display:flex;gap:7px;font-size:13.5px;color:var(--soft);margin-top:5px}
+.ms .m3::before{content:"3D";flex:none;font:700 10px/18px Outfit,sans-serif;background:var(--sky);color:#0b1726;border-radius:5px;padding:0 5px;height:18px;margin-top:1px}
+.path{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);gap:8px;align-items:stretch}
+.path button,.path div{border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:8px 10px;text-align:left;font-size:13.5px;min-height:56px}
+.path div{border:2px solid var(--or);background:var(--hl);font-weight:600}
+.path small{display:block;color:var(--soft);font-weight:500}
+.path button:disabled{opacity:.4;cursor:default}
+.mini{margin-top:10px;font-size:13.5px;color:var(--soft)}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.terms button{border-radius:99px;border:1px solid var(--line);background:var(--card);padding:5px 12px;min-height:36px;font-size:14px}
+.gcard{background:light-dark(#f2ecff,#21183d);border:2px solid var(--pu);border-radius:14px;padding:12px 14px;margin-bottom:14px;position:relative}
+.gcard h3{font-size:17px;margin-bottom:4px}.gcard p{margin:.3em 0}
+.gcard .x{position:absolute;top:6px;right:6px;min-width:36px;min-height:36px;border-radius:9px;border:1px solid var(--line);background:var(--bg)}
+.gcard .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.gcard .links button{border-radius:9px;border:1px solid var(--pu);background:var(--bg);padding:4px 10px;font-size:13.5px;min-height:34px}
+#chip{position:fixed;z-index:20;display:none;border:0;border-radius:12px;background:#10223a;color:#fff;padding:8px 14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);min-height:42px;max-width:min(90vw,380px);text-align:left}
+#chip small{display:block;font-weight:500;opacity:.8;font-size:12px}
+.note{font-size:13px;color:var(--soft)}
+@media(max-width:1100px){
+ .app,.app.notree{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+ .app.focus,.app.notree.focus{grid-template-columns:0 minmax(0,1fr)}
+ .tree{position:fixed;left:0;top:0;bottom:0;width:min(340px,88vw);z-index:30;box-shadow:8px 0 30px rgba(0,0,0,.25);transform:translateX(-105%);transition:transform .2s}
+ .app.drawer .tree{transform:none}.app.notree .tree{display:block}
+}
+@media(max-width:760px){
+ .app,.app.notree,.app.focus{display:block;height:auto}.app>section{overflow:visible}
+ .app.focus .doc{display:none}
+ .vw{position:relative}.det{border-left:0;border-top:2px solid var(--line)}
+ .stage{height:var(--sh,340px)}.hud{right:10px;bottom:56px}
+ .path{grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<!--HEAD-->
+</head>
+<body>
+<header class="top">
+ <a class="volver" href="__VOLVER__" aria-label="Volver a __MATERIA__">← __MATERIA__</a>
+ <h1>__H1__<small>Selecciona cualquier texto o toca una fórmula para desplegar su uso, micropasos y escena 3D</small></h1>
+ <button class="tb" id="bTree" aria-pressed="true">Árbol</button>
+ <button class="tb" id="bFocus" aria-pressed="false">Enfoque</button>
+</header>
+<main class="app" id="app">
+ <section class="tree" id="tree" aria-label="Árbol del proceso">
+  <h2>Orden del algoritmo</h2>
+  <input class="srch" id="q" type="search" placeholder="Buscar: RSS, score, k*…" aria-label="Buscar en el árbol">
+  <div class="tact"><button id="ex">Expandir todo</button><button id="co">Contraer todo</button></div>
+  <nav id="tw"></nav>
+ </section>
+ <section class="doc" id="doc" aria-label="Hoja de fórmulas">
+  <h2 class="cap">__HOJA__</h2>
+  <p class="lead">Texto de tu hoja, reescrito en texto plano. Selecciona una palabra o símbolo (RSS_NR, k*, score…) y aparece el botón «Desplegar».</p>
+  <div id="dw"></div>
+ </section>
+ <section class="det" id="det" aria-label="Detalle">
+  <div class="vw">
+   <div class="stage" id="stage">
+    <canvas id="cv" aria-label="Escena 3D del micropaso"></canvas>
+    <div class="capt"><p id="cap"></p></div>
+    <div class="hud" id="hud"></div>
+    <div class="vctl"><button id="zIn" aria-label="Acercar">+</button><button id="zOut" aria-label="Alejar">−</button><button id="rs" aria-label="Reiniciar vista">⟲</button></div>
+   </div>
+   <div class="sbar"><button id="sPrev" aria-label="Micropaso anterior">‹</button><div class="dots" id="dots"></div><button id="play">Reproducir</button><button id="sNext" aria-label="Micropaso siguiente">›</button><button id="vMin" aria-pressed="false" title="Ocultar o mostrar la escena 3D">Ocultar 3D</button></div>
+   <div class="split" id="split" role="separator" aria-orientation="horizontal" aria-label="Arrastra para cambiar el tamaño del 3D" tabindex="0"></div>
+  </div>
+  <div class="dc" id="dc"></div>
+ </section>
+</main>
+<button id="chip" type="button"></button>
+<script src="../comun/arbol.js"></script>
+<script src="__DATOS__"></script>
+</body>
+</html>

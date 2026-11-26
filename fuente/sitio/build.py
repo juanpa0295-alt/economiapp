@@ -612,6 +612,28 @@ shutil.copy(os.path.join(S, "LEEME.md"), os.path.join(OUT, "LEEME.md"))
 print({c["slug"]: (len(c["t"]), len(c["b"]), len(c["w"])) for c in cat})
 
 # ---------------------------------------------------------------------
+# Árboles de fórmulas: laboratorios de pantalla completa (árbol del algoritmo, hoja seleccionable,
+# micropasos y escenas 3D). Motor en fuente/arbol/motor.js; cada entrada usa fuente/arbol/<archivo>.js
+# y se publica en materias/<archivo>.html. Para agregar uno, ver fuente/arbol/LEEME.md.
+ARBOLES = [
+    dict(archivo="econometria-parcial2", materia="econometria", nombre="Econometría I",
+         h1="Econometría I · Árbol de fórmulas del parcial 2", hoja="Hoja de fórmulas del segundo parcial",
+         desc="Las fórmulas del segundo parcial de Econometría I (Chow, cambio estructural con dicótomas, máxima verosimilitud, LR, Wald y LM) en orden de algoritmo, con micropasos y escenas 3D."),
+]
+wr("comun/arbol.js", rd("arbol/motor.js"))
+_pl = rd("arbol/plantilla.html")
+for _a in ARBOLES:
+    wr(f"materias/{_a['materia']}/{_a['archivo']}.js", rd(f"arbol/{_a['archivo']}.js"))
+    _img = _a["materia"] if os.path.exists(os.path.join(S, "og", _a["materia"] + ".png")) else "portada"
+    _head = (analytics_tag() if ANALYTICS_ID else "") + pwa_tags("../") + og_tags(f"materias/{_a['archivo']}.html", _a["h1"] + " · Economiapp", _a["desc"], _img)
+    _e = lambda x: html_mod.escape(x, quote=True)
+    _t = (_pl.replace("<!--HEAD-->", _head).replace("__TITULO__", _e(_a["h1"]) + " · Economiapp").replace("__DESC__", _e(_a["desc"]))
+          .replace("__VOLVER__", _a["materia"] + ".html").replace("__MATERIA__", _e(_a["nombre"])).replace("__H1__", _e(_a["h1"]))
+          .replace("__HOJA__", _e(_a["hoja"])).replace("__DATOS__", f"{_a['materia']}/{_a['archivo']}.js"))
+    assert "__" not in _t.replace("__proto__", ""), _a["archivo"]
+    wr(f"materias/{_a['archivo']}.html", _t)
+
+# ---------------------------------------------------------------------
 # App instalable: íconos, manifiesto y service worker (con la lista de todo el sitio)
 import hashlib, re as _re
 wr("comun/app.js", open(os.path.join(S, "app.js"), encoding="utf-8").read())
