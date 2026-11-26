@@ -57,24 +57,19 @@ setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
     <a class="home" href="../index.html">← Todas las materias</a>
     <div class="lbl">Economiapp · Estadística II</div>
     <h1>Estadística II</h1>
-    <p>El tronco sigue las cinco unidades del programa (1504109, con Walpole y Wasserman): distribuciones de muestreo, convergencia estocástica, estimación puntual e intervalos, pruebas de hipótesis y regresión lineal múltiple. Los laboratorios simulan miles de muestras para que veas las distribuciones teóricas aparecer, resuelven cada intervalo y prueba paso a paso y muestran el código en R que lo reproduce. Viene de Estadística I y lleva a Econometría I.</p>
+    <p>El tronco sigue las cinco unidades del programa (1504109, con Walpole y Wasserman): distribuciones de muestreo, convergencia estocástica, estimación puntual e intervalos, pruebas de hipótesis y regresión lineal múltiple. Las herramientas interactivas simulan miles de muestras para que veas las distribuciones teóricas aparecer, resuelven cada intervalo y prueba paso a paso y muestran el código en R que lo reproduce. Viene de Estadística I y lleva a Econometría I.</p>
     <div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt"></span><span class="kh">· Navega con <span class="kbd">←</span> <span class="kbd">→</span></span></div>
   </header>
   <div class="grid">
     <nav class="map" aria-label="Mapa de temas">
       <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
-      <div>
+      <div class="ptabs" role="tablist" aria-label="Secciones de la materia"><button type="button" role="tab" data-pane-tab="ruta" aria-selected="true" class="on">Ruta</button><button type="button" role="tab" data-pane-tab="prac" aria-selected="false">Práctica</button><button type="button" role="tab" data-pane-tab="lab" aria-selected="false" hidden>Laboratorios</button></div>
+      <div data-pane-box="ruta">
         <div class="lbl" style="margin-bottom:8px">Tronco: las cinco unidades del programa</div>
         <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
       </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Ramas</div>
-        <div class="branches" id="branches"></div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Talleres</div>
-        <div id="talleres"></div>
-      </div>
+      <div data-pane-box="prac" hidden><div id="practica"></div></div>
+      <div data-pane-box="lab" hidden><div id="labs"></div></div>
     </nav>
     <article id="lesson" aria-live="polite"></article>
   </div>

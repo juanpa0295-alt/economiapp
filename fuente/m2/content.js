@@ -114,7 +114,7 @@ qs:[{q:"i = 9,25 %, i* = 4,5 %, Eₜ = 3.900. ¿Qué Eᵉ cumple la PNCI? Si el 
 <tr><td>Paridad de intereses</td><td>\(i^*\), \(F_t\)</td><td>\(i\)</td></tr>
 <tr><td>BdeP (CC + CF)</td><td>ICE (inversión colombiana afuera), Y (más importaciones)</td><td>Precio del petróleo, superávit en BC y BS, turismo, remesas, IEC, Y*, mejores términos de intercambio</td></tr>
 <tr><td>Competitividad</td><td>Caída del TCR (P*/P baja)</td><td>Alza del TCR (P*/P sube)</td></tr></table></div>
-<p class="hint">Las cadenas completas de cada determinante están en la rama «Diez cadenas del tipo de cambio».</p></section>
+<p class="hint">Las cadenas completas de cada determinante están en la subestación «Diez cadenas del tipo de cambio».</p></section>
 <section><h3>Visual de cambios: oferta y demanda de dólares</h3><div data-vis="divisas"></div></section>
 <section><h3>Intervención con tipo de cambio fijo</h3><div class="tbl"><table><tr><th>E fijo por encima del equilibrio</th><th>E fijo por debajo del equilibrio</th></tr>
 <tr><td>\(X_1>Q_1\): EOD → el BC compra el exceso de dólares → ∆+RI ⟺ ∆+M (política monetaria expansiva, con costo cuasifiscal) → ∆-i → ∆+I → ∆+A → ∆+DA → ∆+Y → ∆+P</td><td>\(Q_1>X_1\): EDD → el BC vende dólares → ∆-RI ⟺ ∆-M → ∆+i → ∆-I → ∆-A → ∆-DA → ∆-Y → ∆-P</td></tr></table></div>
@@ -430,7 +430,7 @@ const WORKSHOPS=[
 <li><b>Pregunta 2 (tipo fijo, caída de precios) → probablemente a.</b> La b es falsa (con tipo fijo siempre se interviene); la c describe solo el canal de bienes; la d dice que la deflación reduce la DA, lo que contradice el modelo. Confirma la clave con el profesor.</li>
 <li><b>Punto 2, PNCI con i = 24 %, i* = 10 %, Eᵉ = 4.612:</b> \(E_t=4.612\times1{,}10/1{,}24=4.091{,}29\); devaluación esperada de 12,73 % (no «moneda revaluada»). Con 24 % + 8 puntos = 32 %: \(E_t=3.843{,}33\) (con 8 % relativo, 25,92 %: 4.028,91).</li>
 <li><b>Punto 3, Big Mac en libras:</b> \(TCR=0{,}81\times5{,}81/7=0{,}672<1\): Inglaterra es menos competitiva. \(E_{PPC}=7/5{,}81=1{,}2048\) libras por dólar.</li>
-<li><b>Punto 4, alza de i* y estabilidad de precios:</b> hay que mostrar los dos regímenes con gráficas (rama «Política y choques en EMB–EMA», M17): el fijo protege los precios a costa de reservas y producción; el flexible amortigua la producción pero importa inflación.</li></ol>
+<li><b>Punto 4, alza de i* y estabilidad de precios:</b> hay que mostrar los dos regímenes con gráficas (subestación «Política y choques en EMB–EMA», M17): el fijo protege los precios a costa de reservas y producción; el flexible amortigua la producción pero importa inflación.</li></ol>
 <p class="hint">Otras claves del parcial: P1 utilidades recibidas en BS (crédito); P9 devaluación real = nominal + π* − π; P16 \(0{,}50\times1{,}10/1{,}20=0{,}458\) dólares por euro; P20 EMB relación directa y EMA inversa entre E e y.</p></section>
 <section><h3>Libro registro del supletorio</h3>${WSBOX}</section>`,
   d:"El supletorio 2025-2 resuelto (balanza de pagos, paridades y tres choques en el mercado de divisas) y la clave razonada de las preguntas del Parcial 1 que más se fallan."},

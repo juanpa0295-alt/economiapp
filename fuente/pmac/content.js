@@ -110,7 +110,7 @@ const TRUNK=[
 <ol><li><b>Preliminares:</b> medir la economía (PIB, precios, empleo) y medir los ciclos.</li>
 <li><b>Largo plazo:</b> hechos del crecimiento → modelo de producción → Solow → mercado laboral → inflación.</li>
 <li><b>Corto plazo:</b> brecha del producto, Okun y Phillips → Gran Recesión → IS → MP y Phillips → OA-DA.</li></ol>
-<p>Los temas del modelo keynesiano clásico (multiplicador, mercado de dinero e IS-LM) siguen disponibles como ramas, porque aparecen en otros cursos.</p></section>`,
+<p>Los temas del modelo keynesiano clásico (multiplicador, mercado de dinero e IS-LM) siguen disponibles como subestaciones, porque aparecen en otros cursos.</p></section>`,
 qs:[{q:"En el modelo de Solow, ¿la tasa de ahorro es endógena o exógena?",a:String.raw`Exógena: es un parámetro \(\bar s\). El modelo determina el capital, la producción y el consumo a partir de ella.`},
  {q:"¿Qué diferencia hay entre el largo y el corto plazo en este curso?",a:String.raw`El largo plazo estudia el producto potencial \(\bar Y_t\) y su crecimiento; el corto plazo estudia las desviaciones \(Y_t-\bar Y_t\) (recesiones y auges).`}]},
 
@@ -407,7 +407,7 @@ ${NOT}</section>
 <section><h3>El multiplicador en la IS</h3>
 <p>Si el consumo también depende de la brecha, \(\frac{C_t}{\bar Y_t}=\bar a_c+\bar x\,\tilde Y_t\), al despejar aparece un multiplicador como el keynesiano:</p>
 <div class="mj">\[\tilde Y_t=\frac{1}{1-\bar x}\big[\bar a-\bar b\,(R_t-\bar r)\big]\]</div>
-<p>Jones considera que \(\bar x\) es pequeño (el consumo responde poco a ingresos transitorios, por la teoría del ingreso permanente), y por eso trabaja con el multiplicador igual a 1. La rama «Modelo keynesiano y multiplicador» desarrolla el caso clásico.</p></section>
+<p>Jones considera que \(\bar x\) es pequeño (el consumo responde poco a ingresos transitorios, por la teoría del ingreso permanente), y por eso trabaja con el multiplicador igual a 1. La subestación «Modelo keynesiano y multiplicador» desarrolla el caso clásico.</p></section>
 <section><h3>Visual de cambios</h3><div data-vis="ismp"></div></section>
 ${LAB}`,
 deep:[{k:"Consumo",t:"Ingreso permanente y ciclo de vida",html:"<p>Friedman (ingreso permanente) y Modigliani (ciclo de vida) argumentaron que el consumo depende del ingreso de toda la vida, no del de este año. Un aumento transitorio del ingreso se reparte en muchos años de consumo, así que la propensión a consumir de un ingreso transitorio es baja. Por eso en la IS de Jones el consumo es una fracción fija del potencial y el multiplicador es cercano a 1.</p>"}],
@@ -441,7 +441,7 @@ ${NOT}</section>
 <p>Los choques de demanda no crean dilema; los de oferta sí: el banco central debe elegir entre estabilizar la producción o la inflación.</p></section>
 <section><h3>Visual de cambios</h3><div data-vis="ismp"></div></section>
 ${LAB}`,
-deep:[{k:"Detalle",t:"Cómo fija el banco central la tasa nominal",html:String.raw`<p>El banco central es el único que puede crear dinero base. Si quiere bajar la tasa, compra bonos (inyecta dinero) hasta que la tasa de mercado baje al nivel deseado; si quiere subirla, vende bonos. En la práctica fija una tasa de referencia para los préstamos de muy corto plazo a los bancos, y las demás tasas se mueven con ella. La rama «Mercado de dinero» muestra este mecanismo con la oferta y la demanda de dinero.</p>`},
+deep:[{k:"Detalle",t:"Cómo fija el banco central la tasa nominal",html:String.raw`<p>El banco central es el único que puede crear dinero base. Si quiere bajar la tasa, compra bonos (inyecta dinero) hasta que la tasa de mercado baje al nivel deseado; si quiere subirla, vende bonos. En la práctica fija una tasa de referencia para los préstamos de muy corto plazo a los bancos, y las demás tasas se mueven con ella. La subestación «Mercado de dinero» muestra este mecanismo con la oferta y la demanda de dinero.</p>`},
  {k:"Colombia",t:"El esquema de inflación objetivo",html:"<p>El Banco de la República tiene una meta de inflación de 3 % con un rango de ±1 punto. Su Junta Directiva sube la tasa de política cuando espera que la inflación supere la meta, y la baja cuando espera que quede por debajo y la economía tiene holgura (brecha negativa). Es exactamente el razonamiento del modelo IS-MP-Phillips.</p>"}],
 qs:[{q:"Con b̄ = 0,5, si ā sube 1 punto, ¿cuánto debe subir R el banco central para mantener la brecha en cero?",a:String.raw`\(\Delta R=\bar a/\bar b=1/0{,}5=2\) puntos.`},
  {q:"¿Por qué un choque petrolero crea un dilema y un choque de demanda no?",a:"El de demanda mueve la producción y la inflación en la misma dirección, así que una sola herramienta los corrige a la vez. El petrolero sube la inflación sin subir la brecha: para bajar la inflación hay que crear una recesión."}]},

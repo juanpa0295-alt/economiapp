@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <!--INICIO-PAGINA-->
 <title>Economiapp</title>
-<meta name="description" content="Rutas de estudio interactivas para las materias de Economía: lecciones, laboratorios y ejercicios resueltos paso a paso.">
+<meta name="description" content="Rutas de estudio interactivas para las materias de Economía: lecciones, herramientas interactivas y ejercicios resueltos paso a paso.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -126,7 +126,7 @@ footer{border-top:1px solid var(--rule);padding-top:16px;color:var(--muted);font
   <header>
     <div class="lbl">Rutas de estudio para Economía</div>
     <h1>Economiapp</h1>
-    <p>Las materias del pregrado en Economía (plan 2015-I, Universidad de Antioquia) organizadas por semestre. Cada materia es una línea de metro: las estaciones van de lo básico a lo avanzado, con lecciones, laboratorios interactivos y ejercicios resueltos paso a paso para que puedas hacerlos a mano en el examen.</p>
+    <p>Las materias del pregrado en Economía (plan 2015-I, Universidad de Antioquia) organizadas por semestre. Cada materia es una línea de metro: las estaciones van de lo básico a lo avanzado, con lecciones, herramientas interactivas, laboratorios con casos reales (en algunas materias) y ejercicios resueltos paso a paso para que puedas hacerlos a mano en el examen.</p>
     <div class="legendline" id="legend" aria-hidden="true"></div>
   </header>
 
@@ -177,7 +177,7 @@ const idOf=p=>p.cod||p.nombre;
 const STL={"":"Marcar",cursando:"Cursando",aprobada:"Aprobada"},NEXT={"":"cursando",cursando:"aprobada",aprobada:""};
 const stBtn=(p,est)=>`<button type="button" class="st" data-id="${esc(idOf(p))}" data-s="${est}" aria-label="Estado de ${esc(p.nombre)}: ${STL[est]==="Marcar"?"sin marcar":STL[est]}. Cambiar">${STL[est]}</button>`;
 function card(m,p,est){
-  const done=read(m.key),lessons=[...m.t,...m.b],n=lessons.filter(([id])=>done[id]).length,pct=Math.round(n/lessons.length*100);
+  const done=read(m.key),lessons=m.t,n=lessons.filter(([id])=>done[id]).length,pct=Math.round(n/lessons.length*100);
   const l=last(m.key),lt=[...m.t,...m.b,...m.w].find(([id])=>id===l);
   return `<div class="course">${stBtn(p,est)}<a class="line" href="${href(m,lt?l:"")}" style="--c:${m.color[0]};--cd:${m.color[1]}">
       <div><h2>${esc(p.slug==="matematicas"?m.nombre:p.nombre)}</h2><p class="sum">${p.cod?`<span style="font-family:var(--f-mono);font-size:12.5px">${p.cod}</span> · `:""}${esc(m.resumen)}${p.nota?` <i>${esc(p.nota)}</i>`:""}</p></div>
@@ -197,7 +197,7 @@ function render(){
     const con=items.filter(p=>p.slug&&BYSLUG[p.slug]),sin=items.filter(p=>!(p.slug&&BYSLUG[p.slug])),tot=PLAN.filter(p=>p.sem===s);
     html+=`<section class="sem" aria-label="Semestre ${ROM[s]}"><div class="semh"><h2>Semestre ${ROM[s]}</h2><small>${tot.filter(p=>p.slug).length} de ${tot.length} materias en la app</small></div>`
       +(con.length?`<div class="net">${con.map(p=>card(BYSLUG[p.slug],p,S[idOf(p)]||"")).join("")}</div>`:"")
-      +(sin.length?`<div class="pend">${sin.map(p=>`<div><div class="row"><span class="tag">${p.tipo==="guia"?"Resumen y guía":"Módulo con laboratorios"} · próximamente</span>${stBtn(p,S[idOf(p)]||"")}</div><b>${esc(p.nombre)}</b>${p.cod?`<small style="font-family:var(--f-mono)">${p.cod}</small>`:""}${p.nota?`<small>${esc(p.nota)}</small>`:""}</div>`).join("")}</div>`:"")+`</section>`}
+      +(sin.length?`<div class="pend">${sin.map(p=>`<div><div class="row"><span class="tag">${p.tipo==="guia"?"Resumen y guía":"Módulo interactivo"} · próximamente</span>${stBtn(p,S[idOf(p)]||"")}</div><b>${esc(p.nombre)}</b>${p.cod?`<small style="font-family:var(--f-mono)">${p.cod}</small>`:""}${p.nota?`<small>${esc(p.nota)}</small>`:""}</div>`).join("")}</div>`:"")+`</section>`}
   $("sems").innerHTML=html||`<p style="color:var(--muted);margin:0">No hay materias con ese filtro. ${filtro==="cursando"?"Marca las que estás viendo con el botón «Marcar» de cada materia.":""}</p>`;
 }
 $("semnav").addEventListener("click",e=>{const b=e.target.closest("button[data-f]");if(!b)return;filtro=b.dataset.f;try{localStorage.setItem(KF,filtro)}catch(x){}render()});

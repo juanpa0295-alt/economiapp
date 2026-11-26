@@ -30,7 +30,7 @@ function miniPlot({xs,series,band,xl,yl,H=240,zero}){const W=600,all=[...series.
   return`<div class="plot"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${yl}">${f.g}${g}</svg></div>`}
 
 SIMS.calc=function(){
-  $("sim").innerHTML=`<p class="hint" style="margin:0 0 8px">¿El ejercicio trae la tabla de datos? Entonces usa el <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button>. Aquí van los que traen resultados ya calculados.</p>
+  $("sim").innerHTML=`<p class="hint" style="margin:0 0 8px">¿El ejercicio trae la tabla de datos? Entonces usa el <button class="btn" type="button" data-go="t-datos">Analizador de datos</button>. Aquí van los que traen resultados ya calculados.</p>
   ${seg("ce-m","Qué te da el enunciado",[["mat","X′X, X′y, y′y"],["rss","RSS, s o R²"],["coef","Modelo con dummies estimado"],["wlm","Wald, LR y LM"],["otras","Otras pruebas"]],"mat")}
   <div class="calcf" style="margin-top:8px"><label>Nivel de significancia α<select id="ce-al"><option value="0.01">1 %</option><option value="0.05" selected>5 %</option><option value="0.1">10 %</option></select></label></div>
   <div id="ce-mat"></div><div id="ce-rss" hidden></div><div id="ce-coef" hidden></div><div id="ce-wlm" hidden></div><div id="ce-otras" hidden><p class="hint">F general con RSS, igualdad de varianzas (Goldfeld-Quandt), Breusch-Pagan con el R² de la regresión auxiliar y Durbin-Watson con d<sub>L</sub> y d<sub>U</sub> de la tabla.</p><div id="ws"></div></div>`;

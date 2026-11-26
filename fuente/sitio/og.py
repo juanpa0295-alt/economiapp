@@ -46,10 +46,10 @@ def tarjeta(nombre, titulo, sub, c1, c2, kicker):
     d.text((170, H - 104), "economiapp.app", font=fb(34), fill=CARD)
     im.save(os.path.join(D, nombre + ".png"), optimize=True)
 
-tarjeta("portada", "Las materias de Economía como líneas de metro", "Lecciones, laboratorios y simulacros. Gratis y sin internet.",
+tarjeta("portada", "Las materias de Economía como líneas de metro", "Lecciones, herramientas interactivas y simulacros. Gratis y sin internet.",
         (64, 196, 170), (239, 108, 84), "Economiapp")
 for m in json.load(open(os.path.join(D, "materias.json"), encoding="utf-8")):
     c = [hexc(x) for x in m["c"]]
     claro = tuple(min(255, int(v * 0.45 + 255 * 0.55)) for v in c[0])
-    tarjeta(m["slug"], re.sub(r" (I{1,3}|IV|[0-9])$", "\u00a0\\1", m["h1"]), "Lecciones, laboratorios y simulacros paso a paso.", c[2], claro, "Economiapp · Ruta de estudio")
+    tarjeta(m["slug"], re.sub(r" (I{1,3}|IV|[0-9])$", "\u00a0\\1", m["h1"]), "Lecciones, herramientas interactivas y simulacros paso a paso.", c[2], claro, "Economiapp · Ruta de estudio")
 print("listo")

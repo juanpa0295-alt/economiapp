@@ -347,7 +347,7 @@ pre .pc-cd:empty{display:none}
 .tbl th.num{text-align:right}
 details.dl-guia{margin:10px 0}
 details.dl-guia ol{margin-top:8px}
-/* --- Laboratorio de datos: tarjetas de variables y significado de los resultados --- */
+/* --- Analizador de datos: tarjetas de variables y significado de los resultados --- */
 .vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
 .vcard{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:9px 11px;background:var(--card);cursor:pointer}
 .vcard:has(input:checked){border-color:var(--line);background:var(--line-soft)}
@@ -511,3 +511,40 @@ ol.mp{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
 ol.mp>li{padding-left:2px}
 .mp-e{overflow-x:auto;max-width:100%}
 .mp .por{font-size:13px;color:var(--muted);margin-top:2px;padding-left:8px;border-left:2px solid var(--line)}
+/* --- pestañas del mapa: Ruta · Práctica · Laboratorios --- */
+.ptabs{display:flex;gap:4px;padding:3px;border:1px solid var(--rule);border-radius:10px;background:var(--card)}
+.ptabs button{flex:1;font:inherit;font-size:13px;font-weight:600;padding:6px 8px;border:0;border-radius:7px;background:none;color:var(--muted);cursor:pointer}
+.ptabs button.on{background:var(--line);color:var(--card)}
+.ptabs button:focus-visible{outline:2px solid var(--line);outline-offset:2px}
+.ptabs button[hidden]{display:none}
+/* subestaciones: opcionales, colgando de su estación */
+ol.trunk details.subs{margin:0 0 4px 34px;font-size:12.5px}
+ol.trunk details.subs>summary{cursor:pointer;color:var(--muted);list-style:none;padding:1px 0}
+ol.trunk details.subs>summary::-webkit-details-marker{display:none}
+ol.trunk details.subs>summary::before{content:"↳ ";color:var(--branch)}
+ol.trunk details.subs>summary i{font-style:normal;font-size:11px;border:1px dashed var(--branch);border-radius:99px;padding:0 6px;margin-left:4px}
+ol.trunk details.subs>div{display:flex;flex-direction:column;gap:3px;margin:4px 0 2px;border-left:2px dashed var(--branch);padding-left:8px}
+.sub{font:inherit;font-size:12.5px;text-align:left;background:none;border:0;padding:2px 4px;border-radius:6px;color:var(--ink);cursor:pointer}
+.sub:hover{background:var(--branch-soft)}.sub.on{background:var(--branch-soft);font-weight:600}.sub.done::before{content:"✓ ";color:var(--good)}
+/* práctica agrupada por uso */
+.uso{border-left:4px solid var(--line-soft);padding:2px 0 2px 12px;margin-bottom:14px}
+.uso.cur{border-left-color:var(--line)}
+.uso h4{margin:0;font-size:13.5px}.uso small{display:block;color:var(--muted);font-size:12px;margin:1px 0 6px}
+.uso .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+/* laboratorios: casos reales */
+.labintro{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.labc{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;font:inherit;border:1px solid var(--rule);border-left:4px solid var(--exam);background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:8px;cursor:pointer;color:var(--ink)}
+.labc b{font-size:13.5px}.labc span{font-size:12px;color:var(--muted)}.labc.on{background:var(--exam-soft)}
+.tag.lab{margin-left:0;background:var(--exam-soft);color:var(--ink);border:1px solid var(--exam)}
+.subsec h3 small{font-size:12.5px;font-weight:400;color:var(--muted)}
+.subl{display:flex;flex-direction:column;gap:6px}
+.subl .tl-ref small{display:block;font-size:12px;color:var(--muted)}
+/* caso de laboratorio */
+.caso{display:grid;gap:12px}
+.caso .paso{border:1px solid var(--rule);border-radius:10px;padding:10px 14px;background:var(--card)}
+.caso .paso h4{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.caso .benef{border-left:4px solid var(--good);}
+.caso .limite{border-left:4px solid var(--bad);}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.kpi{flex:1 1 130px;border:1px solid var(--rule);border-radius:8px;padding:8px 10px}
+.kpi b{display:block;font-size:20px;font-family:var(--f-mono)}.kpi span{font-size:12px;color:var(--muted)}
