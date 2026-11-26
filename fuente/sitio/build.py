@@ -111,7 +111,7 @@ css += """
 wr("comun/ruta.css", css)
 
 # ---------- comun/ruta.js: motor de la ruta (mapa, lecciones, progreso, utilidades y gráficos)
-core = rd("tj/engine.js")
+core = rd("tj/casos_comun.js") + "\n" + rd("tj/engine.js")
 core = core.replace('const KEY="ruta-tj-done";', 'const KEY=window.RUTA_KEY||"ruta-done";')
 core = core.replace("let cur=null;", "let cur=null;\nfunction remember(id){try{localStorage.setItem(KEY+\"-last\",id)}catch(e){}}")
 core = core.replace("const s=byId(id)||TRUNK[0]; const prevIdx=ALL.findIndex(x=>x.id===cur); cur=s.id;",
@@ -167,16 +167,16 @@ assert "parcial de mañana" not in tjc
 tjs = rd("tj/tjsims.js")
 assert tjs.startswith("const GT=")
 tjs = tjs.split("\n", 1)[1]
-wr("materias/teoria-juegos/contenido.js", "// Teoría de Juegos · contenido de la ruta (notación del curso, ejercicios de los talleres 1 a 3)\n" + tjc + "\n" + rd("tj/extra.js"))
-wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js") + "\n" + rd("tj/guiada.js"))
+wr("materias/teoria-juegos/contenido.js", "// Teoría de Juegos · contenido de la ruta (notación del curso, ejercicios de los talleres 1 a 3)\n" + tjc + "\n" + rd("tj/extra.js") + "\n" + rd("tj/casos.js"))
+wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js") + "\n" + rd("tj/guiada.js") + "\n" + rd("tj/casos_labs.js"))
 
 wr("comun/macro.js", "// Economiapp · cálculos de Macroeconomía 1 como funciones puras.\n" + rd("macro1/macro.js").replace('if(typeof module!=="undefined")module.exports=MAC;', "").rstrip() + "\n")
 wr("materias/macroeconomia-1/contenido.js", "// Macroeconomía I · contenido de la ruta (programa 1503711)\n" + rd("macro1/content.js"))
 wr("materias/macroeconomia-1/laboratorios.js", "// Macroeconomía I · laboratorios interactivos\n" + rd("macro1/labs.js") + "\n" + rd("macro1/vis_scenes.js") + "\n" + rd("macro1/labs2.js"))
 wr("comun/visual.js", "// Economiapp · visuales de cambios: curvas que se arrastran con una lectura en texto del cambio.\n" + rd("vis/engine.js"))
 wr("comun/macro2.js", "// Economiapp · cálculos de Macroeconomía 2 (economía abierta) como funciones puras.\n" + rd("m2/macro2.js").replace('if(typeof module!=="undefined")module.exports=M2;', "").rstrip() + "\n")
-wr("materias/macroeconomia-2/contenido.js", "// Macroeconomía 2 · contenido de la ruta (notación del curso, prof. Ramón Javier Mesa)\n" + rd("m2/content.js") + "\n" + rd("m2/extra.js"))
-wr("materias/macroeconomia-2/laboratorios.js", "// Macroeconomía 2 · laboratorios interactivos\n" + rd("m2/labs.js") + "\n" + rd("m2/vis_scenes.js") + "\n" + rd("m2/labs_extra.js"))
+wr("materias/macroeconomia-2/contenido.js", "// Macroeconomía 2 · contenido de la ruta (notación del curso, prof. Ramón Javier Mesa)\n" + rd("m2/content.js") + "\n" + rd("m2/extra.js") + "\n" + rd("m2/casos.js"))
+wr("materias/macroeconomia-2/laboratorios.js", "// Macroeconomía 2 · laboratorios interactivos\n" + rd("m2/labs.js") + "\n" + rd("m2/vis_scenes.js") + "\n" + rd("m2/labs_extra.js") + "\n" + rd("m2/casos_labs.js"))
 
 wr("comun/laboral.js", "// Economiapp · cálculos de Derecho Laboral (CST). Actualiza la tabla LEY cada año.\n" + rd("lab/laboral.js").replace('if(typeof module!=="undefined")module.exports={LEY,LAB};', "").rstrip() + "\n")
 wr("materias/derecho-laboral/contenido.js", "// Derecho Laboral y Comercial · contenido de la ruta\n" + rd("lab/content.js") + "\n" + rd("lab/talleres.js") + "\n" + rd("lab/extra.js"))
@@ -239,8 +239,8 @@ wr("comun/historia.js", "// Economiapp · cálculos de Historia del Pensamiento 
 wr("materias/historia-pensamiento/contenido.js", "// Historia del Pensamiento Económico · contenido de la ruta (libro de Tobón, 2023, y programa del curso)\n" + rd("hpe/content.js") + "\n" + rd("hpe/extra.js"))
 wr("materias/historia-pensamiento/laboratorios.js", "// Historia del Pensamiento Económico · laboratorios interactivos\n" + rd("hpe/labs.js") + "\n" + rd("hpe/vis_scenes.js") + "\n" + rd("hpe/labs_extra.js"))
 wr("comun/finanzas.js", "// Economiapp · matemáticas financieras de Gerencia Financiera I como funciones puras.\n" + rd("gf/gf.js").replace('if(typeof module!=="undefined")module.exports=GF;', "").rstrip() + "\n")
-wr("materias/gerencia-financiera/contenido.js", "// Gerencia Financiera I · contenido de la ruta (notación y casos del prof. Luis Fernando Vásquez Villa)\n" + rd("gf/content.js") + "\n" + rd("gf/extra.js"))
-wr("materias/gerencia-financiera/laboratorios.js", "// Gerencia Financiera I · laboratorios con fórmulas de Excel\n" + rd("gf/labs.js") + "\n" + rd("gf/labs_extra.js"))
+wr("materias/gerencia-financiera/contenido.js", "// Gerencia Financiera I · contenido de la ruta (notación y casos del prof. Luis Fernando Vásquez Villa)\n" + rd("gf/content.js") + "\n" + rd("gf/extra.js") + "\n" + rd("gf/casos.js"))
+wr("materias/gerencia-financiera/laboratorios.js", "// Gerencia Financiera I · laboratorios con fórmulas de Excel\n" + rd("gf/labs.js") + "\n" + rd("gf/labs_extra.js") + "\n" + rd("gf/casos_labs.js"))
 wr("materias/principios-macro/laboratorios.js", "// Principios de Macroeconomía · laboratorios interactivos\n" + rd("pmac/labs.js") + "\n" + rd("pmac/vis_scenes.js"))
 
 # Econometría: el contenido, los laboratorios y los estilos propios se separan de la página original
