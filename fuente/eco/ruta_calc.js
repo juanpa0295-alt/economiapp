@@ -87,7 +87,7 @@ RC.chowMat=function(el,A1,B1,c1,n1,A2,B2,c2,n2,names){const k=A1.length,mk=(A,B,
     {id:"F",t:"Estadístico F de Chow",short:"F",why:"Compara el restringido con el no restringido.",deps:["mt-scr","nr"],f:`F = [(RSS<sub>R</sub> − RSS<sub>NR</sub>)/${k}] / [RSS<sub>NR</sub>/${n-2*k}]`,shape:"n",val:F,dec:4,hint:()=>`[(${fmt(rT.R.scr,6)} − ${fmt(nr,6)})/${k}] / [${fmt(nr,6)}/${n-2*k}].`},
     RC.critStep("cr",[],k,n-2*k,""),RC.decStep("dec",["F","cr"],F,cr,"La relación es distinta en las dos muestras.","La misma relación sirve para las dos muestras.")])};
 
-// ---------- ruta de la estimación por MCO (laboratorio de datos)
+// ---------- ruta de la estimación por MCO (analizador de datos)
 RC.mco=function(el,M){const n=M.n,k=M.k,names=M.names,R=RC.regSteps("","",M.X,M.y,names);if(!R){el.innerHTML=err("X′X no es invertible.");return}
   const s2=R.scr/(n-k),se=R.I.map((r,i)=>Math.sqrt(s2*r[i])),t=R.b.map((v,i)=>v/se[i]),ym=M.y.reduce((a,v)=>a+v,0)/n,stc=R.S.yty-n*ym*ym,r2=1-R.scr/stc,F=M.opt.cte&&k>1?(r2/(k-1))/((1-r2)/(n-k)):NaN;
   const steps=[{id:"cnt",t:"Tamaños: n y k",short:"n, k",why:"n es el número de observaciones usadas y k el de parámetros (con el intercepto).",deps:[],f:"k = columnas de X",shape:"v",labels:["n","k"],val:[n,k],dec:0},

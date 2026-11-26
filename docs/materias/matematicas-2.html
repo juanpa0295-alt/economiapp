@@ -63,18 +63,13 @@ setTimeout(v,400);addEventListener("hashchange",()=>setTimeout(v,60))})();
   <div class="grid">
     <nav class="map" aria-label="Mapa de temas">
       <button type="button" class="maptg" id="maptg" aria-expanded="true" aria-label="Mostrar u ocultar el mapa de temas"><span class="ic" aria-hidden="true">☰</span><span class="t">Ocultar temas</span></button>
-      <div>
+      <div class="ptabs" role="tablist" aria-label="Secciones de la materia"><button type="button" role="tab" data-pane-tab="ruta" aria-selected="true" class="on">Ruta</button><button type="button" role="tab" data-pane-tab="prac" aria-selected="false">Práctica</button><button type="button" role="tab" data-pane-tab="lab" aria-selected="false" hidden>Laboratorios</button></div>
+      <div data-pane-box="ruta">
         <div class="lbl" style="margin-bottom:8px">Tronco: las cuatro unidades del programa</div>
         <div class="trunkbox"><span class="track"></span><span class="fill" id="fill"></span><span class="train" id="train"></span><ol class="trunk" id="trunk"></ol></div>
       </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Ramas</div>
-        <div class="branches" id="branches"></div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Talleres</div>
-        <div id="talleres"></div>
-      </div>
+      <div data-pane-box="prac" hidden><div id="practica"></div></div>
+      <div data-pane-box="lab" hidden><div id="labs"></div></div>
     </nav>
     <article id="lesson" aria-live="polite"></article>
   </div>

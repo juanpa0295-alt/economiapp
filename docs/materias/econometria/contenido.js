@@ -1262,7 +1262,7 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <section><h3>Primero: ¿qué te da el enunciado?</h3>
 <p class="lead">Todos los ejercicios de cambio estructural se resuelven con la misma prueba F; lo que cambia es cómo se obtienen las RSS. Mira qué trae el enunciado y usa la herramienta que corresponde.</p>
 <div class="tbl"><table><tr><th>El ejercicio da…</th><th>Qué haces</th><th>Herramienta</th></tr>
-<tr><td>La tabla de datos o un archivo</td><td>Estimas el restringido, cada submuestra y el modelo con dummies</td><td><button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button></td></tr>
+<tr><td>La tabla de datos o un archivo</td><td>Estimas el restringido, cada submuestra y el modelo con dummies</td><td><button class="btn" type="button" data-go="t-datos">Analizador de datos</button></td></tr>
 <tr><td>X′X, X′y y y′y</td><td>b = (X′X)⁻¹X′y y RSS = y′y − b′X′y en cada muestra; para el restringido se suman las matrices</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · X′X, X′y, y′y</td></tr>
 <tr><td>Las RSS, o s, o R² con la STC</td><td>RSS = s²(n − k) o (1 − R²)·STC, y la F con m submuestras</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · RSS, s o R²</td></tr>
 <tr><td>Un modelo con dummies ya estimado</td><td>Escribes una ecuación por grupo, interpretas los δ y haces las pruebas t</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · Modelo estimado</td></tr>
@@ -1294,7 +1294,7 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <ol class="steps"><li><b>Coeficientes recursivos:</b> \(\mathbf b_t=(X_t'X_t)^{-1}X_t'\mathbf y_t\) con las primeras t observaciones, con bandas de ±2 errores estándar. Un salto fuera de la banda indica cambio.</li>
 <li><b>Errores de predicción un paso adelante:</b> \(e_{t+1}=y_{t+1}-\mathbf x_{t+1}'\mathbf b_t\), con varianza \(\sigma^2[1+\mathbf x_{t+1}'(X_t'X_t)^{-1}\mathbf x_{t+1}]\). Si un error queda fuera de ±2 desviaciones, el modelo no anticipó esa observación.</li>
 <li><b>Residuos recursivos y CUSUM:</b> \(w_t=e_t/\sqrt{1+\mathbf x_t'(X_{t-1}'X_{t-1})^{-1}\mathbf x_t}\). La suma acumulada \(W_t=\sum w_j/\hat\sigma\) debe quedar dentro de las bandas \(\pm0{,}948\sqrt{T}\,(1+2t/T)\) al 5 %.</li></ol>
-<p>El <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos).</p></section>
+<p>El <button class="btn" type="button" data-go="t-datos">Analizador de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos).</p></section>
 <section><h3>En R</h3>
 <pre class="ce-code">library(readxl); library(strucchange)
 datos &lt;- read_excel("mis_datos.xlsx")   # o read.csv("mis_datos.csv")
@@ -1318,7 +1318,7 @@ sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre></section>`},
 <p>En matrices: \(X'X=\begin{bmatrix}X_1'X_1+X_2'X_2&X_2'X_2\\X_2'X_2&X_2'X_2\end{bmatrix}\). Al resolver las ecuaciones normales se obtiene \(\mathbf b_\beta=(X_1'X_1)^{-1}X_1'\mathbf y_1\) y \(\mathbf b_\beta+\mathbf b_\delta=(X_2'X_2)^{-1}X_2'\mathbf y_2\).</p></section>`}]});
 
 // ---------- Herramientas: dos para resolver y tres para entender
-WORKSHOPS.push({id:"t-datos",t:"Laboratorio de datos",anchor:"mco-matricial",links:["datos","mco-matricial","inferencia","chow","hetero","autocorr"],sim:"datos",html:`<div class="sim" id="sim"></div>`,d:""});
+WORKSHOPS.push({id:"t-datos",t:"Analizador de datos",anchor:"mco-matricial",links:["datos","mco-matricial","inferencia","chow","hetero","autocorr"],sim:"datos",html:`<div class="sim" id="sim"></div>`,d:""});
 WORKSHOPS.splice(0,WORKSHOPS.length,...(function(){
   const by=id=>WORKSHOPS.find(w=>w.id===id), out=[];
   const calc=Object.assign(by("t-calc"),{t:"Calculadora de ejercicios",anchor:"chow",sim:"calc",html:`<div class="sim" id="sim"></div>`,
@@ -1327,7 +1327,7 @@ WORKSHOPS.splice(0,WORKSHOPS.length,...(function(){
   out.push(by("t-datos"),calc);
   ["t-matrices","t-geometria","t-plano"].forEach(id=>{const w=by(id);if(w){w.grp="ver";out.push(w)}});
   return out})());
-Object.assign(WORKSHOPS.find(w=>w.id==="t-datos"),{t:"Laboratorio de datos",
+Object.assign(WORKSHOPS.find(w=>w.id==="t-datos"),{t:"Analizador de datos",
   d:"Para los ejercicios que traen una tabla de datos o un archivo (CSV o Excel). Estadísticas y correlaciones, variables nuevas (logaritmos, rezagos, dummies de quiebre, interacciones), MCO con errores robustos y pronóstico con intervalos, y pruebas: F, Chow por fila o por grupo con todas sus alternativas y los pronósticos de Chow, coeficientes recursivos y CUSUM, heterocedasticidad, autocorrelación, normalidad, RESET y VIF. También las demostraciones con tus números y el código R. Trae cargadas las bases de los talleres, y los datos no salen de tu navegador."});
 // Enlaces viejos que apuntaban a lo que se reorganizó
 const ALIAS={"t-cambio":"t-calc","ce-resueltos":"tl-ep3","ce-interpretar":"tl-ep3","tl-t1":"tl-ep3"};
@@ -1903,7 +1903,7 @@ RSSR_M2=0.23; RSSR_M3=0.24; RSSR_M4=0.24096
 (Fc_f=((RSSR_M4-RSSNR)/2)/S2); pf(Fc_f, df1=2, df2=n-k, lower.tail=F)</code></pre>`,
 res:String.raw`<p>La elasticidad precio no es −1,6 (p = 0,015). No se rechazan β₂ + 4β₄ = 0 (F ≈ 0,47), ni que las elasticidades sumen cero (F ≈ 2,5; p ≈ 0,12), ni β₃ = β₄ = 0 (F = 1,37; p = 0,26): los precios de otros licores y de otros bienes no son conjuntamente significativos.</p>`},
 
-{id:"p1-t24", n:"T2-4", t:"Demanda de televisores: intervalos y β₂ + β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia","mco-matricial"], tool:{id:"t-datos",pre:"tv",lbl:"Abrir la base de TV en el Laboratorio de datos"},
+{id:"p1-t24", n:"T2-4", t:"Demanda de televisores: intervalos y β₂ + β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia","mco-matricial"], tool:{id:"t-datos",pre:"tv",lbl:"Abrir la base de TV en el Analizador de datos"},
 enun:String.raw`<p>Con los 48 meses de demanda de televisores Yt, precio X2t y publicidad X3t (la base del Ejemplo 1) se estiman el modelo (1) \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\mu_t\) y el modelo (2), con la restricción β₃ = −β₂. Se tiene b = (10,3017274; −0,0059941; 0,0051071), con errores estándar 0,2440101, 0,0001610 y 0,0008146, cov(b₂, b₃) = 5,399229·10⁻⁸, RSS<sub>NR</sub> = 1,21268 y RSS<sub>R</sub> = 1,239267.</p>
 <p><b>b)</b> Intervalos de confianza del 95 %. <b>c)</b> Pruebe β₂ + β₃ = 0 por todas las formas posibles.</p>`,
 saber:[String.raw`<b>Intervalo:</b> \(b_j\pm t_{\alpha/2}(n-k)\,S_{b_j}\), con \(t_{0{,}025}(45)=2{,}0141\).`,
@@ -2076,7 +2076,7 @@ sol:String.raw`<ol class="steps">
 <li>También se puede con la t de \(b_3+b_4+b_5-1\), pero para eso hace falta la covarianza de los coeficientes, que no viene en el enunciado.</li></ol>`,
 res:String.raw`<p>F = 2,00; W = 2,42; LR = 2,32 y LM = 2,23: no se rechaza que las elasticidades precio sumen 1 (homogeneidad de grado uno en precios).</p>`},
 
-{id:"ep4-9", n:"9", t:"Mortalidad infantil: incluir TFT y probar β₄ + 6β₃ = 0", tipo:"Pruebas LR, W y LM en todas sus versiones", temas:["mv-pruebas","inferencia"], tool:{id:"t-datos",pre:"mi",lbl:"Abrir la base de mortalidad infantil en el Laboratorio de datos"},
+{id:"ep4-9", n:"9", t:"Mortalidad infantil: incluir TFT y probar β₄ + 6β₃ = 0", tipo:"Pruebas LR, W y LM en todas sus versiones", temas:["mv-pruebas","inferencia"], tool:{id:"t-datos",pre:"mi",lbl:"Abrir la base de mortalidad infantil en el Analizador de datos"},
 enun:String.raw`<p>Con 64 países se estiman (1) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\mu\) y (2) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\beta_4TFT+\mu\).</p>
 <p><b>Modelo (1):</b> b = (263,641586; −0,005647; −2,231586), R² = 0,7077, \(RSS_1=106.315{,}6\), \(l_1=-328{,}1012\), Jarque-Bera = 0,5594 (p = 0,736). <b>Modelo (2):</b> b = (168,306690; −0,005511; −1,768029; 12,868636), errores estándar 32,89, 0,001878, 0,248017 y 4,190533, R² = 0,7474, \(RSS_2=91.875{,}38\), \(l_2=-323{,}4298\); var(b₃) = 0,0615124, var(b₄) = 17,56056, cov(b₃, b₄) = 0,63257. Regresión auxiliar de los errores del modelo (1) contra PIBPC, TAF y TFT: \(R^2_{aux}=0{,}1358243\).</p>
 <p>Con la restricción \(\beta_4+6\beta_3=0\): \(RSS_{R1}=92.161{,}3\), \(l_R=-323{,}5293\), y la regresión auxiliar de sus errores da \(R^2_{aux1}=0{,}003102305\).</p>
@@ -3115,3 +3115,136 @@ const P={"r-cero":"Herramientas: R, datos y matrices","mco-simple":"Unidad 1 · 
 let cur="";TRUNK.forEach(t=>{if(P[t.id])cur=P[t.id];t.parte=cur});
 for(let i=BRANCHES.length-1;i>=0;i--)if(BRANCHES[i].items&&!BRANCHES[i].items.length)BRANCHES.splice(i,1);
 })();
+
+// ===================== LABORATORIOS: CASOS REALES =====================
+// Cada caso parte de una base del curso, estima con la herramienta de la estación y termina en una decisión con su beneficio medido.
+// Formato fijo: situación, pregunta, datos y modelo, de la estimación a la decisión, herramienta interactiva, decisión y beneficio, cuándo no funciona, código R.
+const CASO=(o)=>`<div class="caso">
+<div class="paso"><h4>La situación</h4>${o.sit}</div>
+<div class="paso"><h4>La pregunta que hay que responder</h4>${o.preg}</div>
+<div class="paso"><h4>Los datos y el modelo</h4>${o.datos}</div>
+<div class="paso"><h4>De la estimación a la decisión</h4>${o.paso}</div>
+<section><h3>Simulador de la decisión</h3><p class="hint" style="margin:0 0 8px">${o.simh}</p><div class="sim" id="sim"></div></section>
+<div class="paso benef"><h4>La decisión y el beneficio</h4>${o.benef}</div>
+<div class="paso limite"><h4>Cuándo no funciona</h4>${o.limite}</div>
+<div class="paso"><h4>Hazlo en R con la base del curso</h4><div><button class="cp" type="button" data-copy>Copiar</button><pre>${o.r}</pre></div></div>
+</div>`;
+const LABORATORIOS=[
+{id:"lab-precio",t:"Fijar el precio que más deja con la elasticidad",sector:"Comercio minorista · precios",links:["especificacion","inferencia"],sim:"labPrecio",
+ html:CASO({
+ sit:String.raw`<p>Una cadena vende televisores. El gerente quiere saber si le conviene bajar o subir el precio. Tiene 48 meses de ventas, precio y publicidad: es la base del <b>Ejemplo 1 del profesor</b> (demanda de TV).</p>`,
+ preg:String.raw`<p>¿Qué precio maximiza la utilidad, si cada televisor le cuesta \(c\) al almacén?</p>`,
+ datos:String.raw`<p>El modelo log-log de la estación de especificación: \(\ln Y_t=\beta_1+\beta_2\ln X_{2t}+\beta_3\ln X_{3t}+u_t\), con \(Y\) la demanda, \(X_2\) el precio y \(X_3\) la publicidad. Estimado por MCO con \(n=48\):</p>
+<table class="tbl"><tr><th></th><th>Coeficiente</th><th>Error estándar</th><th>t</th></tr>
+<tr><td>Intercepto</td><td>16,5223</td><td>0,7616</td><td>21,69</td></tr>
+<tr><td>ln(precio)</td><td>−2,2467</td><td>0,0968</td><td>−23,20</td></tr>
+<tr><td>ln(publicidad)</td><td>0,1345</td><td>0,0364</td><td>3,70</td></tr></table>
+<p>\(R^2=0{,}939\) y \(S=0{,}0846\). En un modelo log-log cada pendiente es una <b>elasticidad</b>: si el precio sube 1 %, la demanda cae 2,25 %.</p>`,
+ paso:String.raw`<ol><li><b>¿La demanda es elástica?</b> Se prueba \(H_0:\beta_2=-1\). \(t=(-2{,}2467+1)/0{,}0968=-12{,}88\), mucho más allá de \(-2{,}01\). La elasticidad es mayor que 1 en valor absoluto: un precio más bajo <i>sube</i> el ingreso.</li>
+<li><b>Regla del precio óptimo.</b> La utilidad es \((P-c)\,Q(P)\). Al derivar e igualar a cero sale la regla de Lerner: \(\dfrac{P-c}{P}=\dfrac{1}{|\varepsilon|}\), o sea \(P^*=c\cdot\dfrac{|\varepsilon|}{|\varepsilon|-1}\).</li>
+<li><b>Con la estimación:</b> \(P^*=c\cdot 2{,}2467/1{,}2467=1{,}80\,c\). El precio óptimo es 80 % sobre el costo.</li>
+<li><b>La incertidumbre también se traslada.</b> El intervalo del 95 % de \(\beta_2\) es \(-2{,}2467\pm2{,}014(0{,}0968)=[-2{,}44;\,-2{,}05]\). Con esos extremos el margen óptimo va de \(1{,}69\,c\) a \(1{,}95\,c\).</li></ol>`,
+ simh:"Mueve el costo unitario y el precio. La curva es la utilidad que predice el modelo; el punto azul es tu precio y la franja, el rango del precio óptimo con el intervalo de la elasticidad.",
+ benef:String.raw`<p>Con un costo de 700 por televisor, el último precio de la base (1.436 en el mes 50) está por encima del óptimo (≈ 1.261). Bajarlo aumenta las unidades vendidas en cerca de 34 % y la utilidad mensual en alrededor de 2 %. El simulador recalcula esas cifras con tu costo.</p>
+<p>La lección práctica es que la utilidad es plana cerca del óptimo. Equivocarse 5 % en el precio cuesta poco; equivocarse en el <i>signo</i> de la decisión (subir cuando había que bajar) cuesta mucho. Por eso la prueba de \(H_0:\beta_2=-1\) es la que manda.</p>`,
+ limite:String.raw`<ul><li>La elasticidad es la del rango de precios observado (904 a 1.471). Fuera de ese rango el modelo extrapola.</li>
+<li>Supone que la competencia no reacciona. Si los rivales igualan la rebaja, la elasticidad efectiva es menor.</li>
+<li>Si hay autocorrelación (es una serie mensual), los errores estándar de MCO están subestimados y el intervalo real es más ancho. Revísalo en la estación de autocorrelación antes de decidir.</li>
+<li>Al volver de logaritmos a unidades, \(e^{\widehat{\ln Y}}\) subestima un poco la media. La corrección es multiplicar por \(e^{S^2/2}=1{,}0036\): aquí es despreciable.</li></ul>`,
+ r:String.raw`n = 48
+m = lm(log(Yt) ~ log(X2t) + log(X3t), data = Datos[1:n, ])
+summary(m)
+b2 = coef(m)[2]; se2 = sqrt(vcov(m)[2, 2])
+(b2 + 1) / se2                         # t de H0: elasticidad = -1
+c0 = 700                               # costo unitario (supuesto)
+c0 * abs(b2) / (abs(b2) - 1)           # precio óptimo de Lerner
+ic = b2 + c(-1, 1) * qt(0.975, n - 3) * se2
+c0 * abs(ic) / (abs(ic) - 1)           # rango del precio óptimo`})},
+{id:"lab-inventario",t:"Cuánto inventario pedir con el intervalo de predicción",sector:"Logística · inventarios",links:["inferencia","mco-matricial"],sim:"labInventario",
+ html:CASO({
+ sit:String.raw`<p>El mismo almacén debe hacer el pedido del mes 49 antes de conocer la demanda. Ya sabe el precio (1.425) y la publicidad (64,458) que va a usar. Si pide de más, liquida los sobrantes con pérdida; si pide de menos, pierde ventas.</p>`,
+ preg:String.raw`<p>¿Cuántas unidades pedir para maximizar la utilidad esperada?</p>`,
+ datos:String.raw`<p>El modelo lineal del Ejemplo 1: \(\hat Y_0=10{,}3017-0{,}005994\,X_{2,0}+0{,}005107\,X_{3,0}\). Con los valores del mes 49:</p>
+<ul><li>Pronóstico puntual: \(\hat Y_0=2{,}0893\).</li>
+<li>Error estándar de la media: \(\sqrt{S^2\,x_0'(X'X)^{-1}x_0}=0{,}0303\).</li>
+<li>Error estándar de la <b>predicción individual</b>: \(\sqrt{S^2\,(1+x_0'(X'X)^{-1}x_0)}=\sqrt{0{,}1642^2+0{,}0303^2}=0{,}1669\).</li></ul>
+<p>Para un pedido se usa la segunda: lo que se vende un mes concreto varía alrededor de la media.</p>`,
+ paso:String.raw`<ol><li><b>Costo de quedarse corto</b> por unidad: \(c_u=P-c\) (el margen que se pierde).</li>
+<li><b>Costo de pasarse</b> por unidad: \(c_o=c-s\), donde \(s\) es lo que se recupera al liquidar.</li>
+<li><b>Razón crítica:</b> \(RC=\dfrac{c_u}{c_u+c_o}\). Es la probabilidad de no quedarse corto que conviene comprar.</li>
+<li><b>Pedido óptimo:</b> \(Q^*=\hat Y_0+z_{RC}\cdot ee(\text{pred})\), con \(z_{RC}\) el cuantil de la normal estándar.</li>
+<li>Con \(c=700\) y \(s=500\): \(RC=725/925=0{,}784\), \(z=0{,}785\) y \(Q^*=2{,}0893+0{,}785(0{,}1669)=2{,}220\).</li></ol>`,
+ simh:"Cambia el costo y el valor de liquidación. Verás cómo se mueve la razón crítica, el pedido óptimo y cuánto se ahorra frente a pedir solo el pronóstico puntual.",
+ benef:String.raw`<p>Pedir exactamente el pronóstico puntual (2,089) parece lo natural, pero ignora que perder una venta cuesta más que liquidar un sobrante. Con los valores de ejemplo, pedir \(Q^*\) baja el costo esperado de equivocarse en cerca de una cuarta parte (de 61,6 a 45,3 por mes). El simulador lo calcula con la fórmula de la pérdida normal.</p>
+<p>Lo que aporta la econometría es el <b>ancho</b> del intervalo: sin \(ee(\text{pred})\) no hay forma de saber cuánto colchón poner.</p>`,
+ limite:String.raw`<ul><li>Supone errores normales. Revisa Jarque-Bera en la estación de diagnóstico; con colas pesadas el colchón se queda corto.</li>
+<li>Con \(n-k=45\) grados de libertad, la t y la normal casi coinciden. Con muestras pequeñas usa el cuantil de la t.</li>
+<li>Si la demanda tiene tendencia o estacionalidad que el modelo no recoge, el pronóstico puntual está sesgado y ningún colchón lo arregla.</li></ul>`,
+ r:String.raw`n = 48
+m = lm(Yt ~ X2t + X3t, data = Datos[1:n, ])
+nuevo = data.frame(X2t = 1425, X3t = 64.458)
+p = predict(m, nuevo, se.fit = TRUE)
+ee_pred = sqrt(p$residual.scale^2 + p$se.fit^2)
+P = 1425; c0 = 700; s = 500
+RC = (P - c0) / ((P - c0) + (c0 - s))
+Q = p$fit + qnorm(RC) * ee_pred
+c(pronostico = p$fit, ee_pred = ee_pred, RC = RC, pedido = Q)`})},
+{id:"lab-escala",t:"¿Conviene crecer? Economías de escala con la función de costos",sector:"Energía e industria · expansión",links:["especificacion","inferencia"],sim:"labEscala",
+ html:CASO({
+ sit:String.raw`<p>Una empresa generadora de electricidad evalúa duplicar su producción, por ejemplo comprando la planta de un competidor. La base es la de Nerlove (145 empresas de EE. UU.) del <b>Trabajo 1, punto 2</b>.</p>`,
+ preg:String.raw`<p>Si la producción se multiplica por \(k\), ¿por cuánto se multiplica el costo total? ¿Y cuánto sube el presupuesto si se encarece el combustible?</p>`,
+ datos:String.raw`<p>Función de costos Cobb-Douglas en logaritmos: \(\ln TC=\beta_1+\beta_2\ln Q+\beta_3\ln P_L+\beta_4\ln P_F+\beta_5\ln P_K+u\).</p>
+<table class="tbl"><tr><th></th><th>Coeficiente</th><th>Error estándar</th></tr>
+<tr><td>ln Q (producción)</td><td>0,8015</td><td>0,0111</td></tr>
+<tr><td>ln P<sub>L</sub> (salario)</td><td>0,1294</td><td>0,1811</td></tr>
+<tr><td>ln P<sub>F</sub> (combustible)</td><td>0,4585</td><td>0,0639</td></tr>
+<tr><td>ln P<sub>K</sub> (capital)</td><td>−0,4173</td><td>0,2154</td></tr></table>
+<p>\(R^2=0{,}975\), \(n=145\).</p>`,
+ paso:String.raw`<ol><li><b>Elasticidad costo-producción:</b> \(\beta_2=0{,}8015\). Si \(Q\) sube 1 %, el costo sube 0,80 %.</li>
+<li><b>¿Hay economías de escala?</b> Se prueba \(H_0:\beta_2=1\) (rendimientos constantes). \(t=(0{,}8015-1)/0{,}0111=-17{,}9\): se rechaza.</li>
+<li><b>Rendimientos a escala:</b> \(r=1/\beta_2=1{,}248\). Si todos los insumos se duplican, la producción se multiplica por \(2^{1{,}248}=2{,}37\), en el promedio de la muestra.</li>
+<li><b>Multiplicar la producción por \(k\):</b> \(TC_1/TC_0=k^{\beta_2}\). Con \(k=2\): \(2^{0{,}8015}=1{,}743\). Dos plantas separadas costarían 2; una sola que produce lo mismo cuesta 1,743. El ahorro es \(1-1{,}743/2=12{,}9\,\%\).</li>
+<li><b>Choque de combustible:</b> si \(P_F\) sube \(g\,\%\), el costo sube \(\beta_4\cdot g\approx0{,}46\,g\,\%\).</li></ol>`,
+ simh:"Elige cuánto crece la producción y cuánto cambia el precio del combustible. La franja usa el intervalo del 95 % de β₂.",
+ benef:String.raw`<p>Para una empresa que hoy gasta 10 millones de dólares al año, duplicar la producción en una sola operación costaría unos 17,4 millones en lugar de 20: un ahorro anual cercano a 2,6 millones. Con el intervalo de \(\beta_2\), el ahorro va de 11,5 % a 14 %. Esa cifra es la que se compara con el precio de compra de la planta.</p>`,
+ limite:String.raw`<ul><li>Nerlove mostró que las economías de escala <b>se agotan</b> en las empresas grandes. Un \(\beta_2\) único promedia empresas pequeñas (con mucho ahorro) y grandes (con poco). Agrega \((\ln Q)^2\) y verás que la elasticidad crece con \(Q\).</li>
+<li>La teoría exige \(\beta_3+\beta_4+\beta_5=1\) (homogeneidad en precios). Aquí suman 0,17, y \(\beta_5\) tiene signo negativo. El modelo sin restringir no es del todo coherente: estima el restringido con la prueba F de la estación de inferencia.</li>
+<li>Con corte transversal de empresas de tamaños muy distintos, sospecha heterocedasticidad: usa errores robustos (estación de heterocedasticidad).</li></ul>`,
+ r:String.raw`m = lm(log(TC) ~ log(Q) + log(PL) + log(PF) + log(PK), data = nerlove)
+b2 = coef(m)[2]; se2 = sqrt(vcov(m)[2, 2])
+(b2 - 1) / se2                         # t de H0: rendimientos constantes
+1 / b2                                 # rendimientos a escala
+k = 2
+k^b2                                   # multiplicador del costo
+1 - k^b2 / k                           # ahorro frente a k plantas
+ic = b2 + c(-1, 1) * qt(0.975, df.residual(m)) * se2
+1 - k^ic / k                           # rango del ahorro`})},
+{id:"lab-cambio",t:"Detectar a tiempo que el consumidor cambió (Chow)",sector:"Consumo masivo · pronóstico de ventas",links:["chow"],sim:"labCambio",
+ html:CASO({
+ sit:String.raw`<p>Una empresa de consumo masivo pronostica sus ventas con la relación entre consumo e ingreso. Usa la base trimestral 2005-2010 del <b>Trabajo 1, punto 5</b>. En 2008 llega la crisis financiera y nadie ajusta el modelo.</p>`,
+ preg:String.raw`<p>¿Cambió la relación consumo-ingreso? ¿Cuánto se equivoca el pronóstico si se sigue usando el modelo de antes?</p>`,
+ datos:String.raw`<p>Modelo \(Y_t=\beta_1+\beta_2X_t+u_t\) (consumo e ingreso), estimado en tres muestras:</p>
+<table class="tbl"><tr><th>Muestra</th><th>\(\hat\beta_1\)</th><th>\(\hat\beta_2\)</th><th>RSS</th></tr>
+<tr><td>Completa (T = 1 a 24)</td><td>1,2106</td><td>0,7188</td><td>0,15577</td></tr>
+<tr><td>Antes (T = 1 a 12)</td><td>0,2256</td><td>0,8157</td><td rowspan="2">0,03228 (suma)</td></tr>
+<tr><td>Después (T = 13 a 24)</td><td>−0,4814</td><td>0,8632</td></tr></table>`,
+ paso:String.raw`<ol><li><b>Estadístico de Chow:</b> \(F=\dfrac{(RSS_R-RSS_{NR})/k}{RSS_{NR}/(n-2k)}=\dfrac{(0{,}15577-0{,}03228)/2}{0{,}03228/20}=38{,}25\).</li>
+<li><b>Valor crítico:</b> \(F_{0{,}05}(2,20)=3{,}49\). Se rechaza la estabilidad: el valor p es \(1{,}5\times10^{-7}\).</li>
+<li><b>Lo que cambió:</b> a igual ingreso, el nivel de consumo bajó (el intercepto pasa de 0,23 a −0,48), aunque la pendiente casi no se movió.</li>
+<li><b>El costo de no darse cuenta:</b> con el modelo de antes, el pronóstico de 2008-2010 sobrestima el consumo en 0,169 por trimestre en promedio. Eso es 1,8 % de las ventas. El error cuadrático medio pasa de 0,051 (modelo nuevo) a 0,177 (modelo viejo).</li></ol>`,
+ simh:"Mueve el trimestre de corte: la prueba de Chow se calcula en vivo con los datos del trabajo. El pico de F señala el quiebre más probable. Abajo, traduce el sesgo del pronóstico a plata con tus compras anuales.",
+ benef:String.raw`<p>Si la empresa compra inventario por 50.000 millones de pesos al año guiada por ese pronóstico, un sesgo de 1,8 % son cerca de 900 millones en mercancía de más por año. Correr la prueba de Chow cada trimestre (o la de pronósticos de Chow, que sirve con pocos datos nuevos) avisa del cambio y permite reestimar.</p>`,
+ limite:String.raw`<ul><li>Chow exige saber dónde está el corte. Si lo eliges mirando los datos (el pico del simulador), el valor crítico de la F se queda corto: hay que usar la prueba sup-F de Andrews (estación de cambio estructural a fondo).</li>
+<li>Con pocos trimestres después del corte, usa la prueba de pronósticos de Chow en vez de la de dos regresiones.</li>
+<li>Supone varianzas iguales en ambos periodos. Si la crisis también hizo más volátil el consumo, compara primero las varianzas (Goldfeld-Quandt).</li></ul>`,
+ r:String.raw`d = consumoq                              # columnas T, Y, X
+r  = lm(Y ~ X, data = d)
+a  = lm(Y ~ X, data = d[1:12, ])
+b  = lm(Y ~ X, data = d[13:24, ])
+RSSr = sum(resid(r)^2); RSSnr = sum(resid(a)^2) + sum(resid(b)^2)
+k = 2; n = nrow(d)
+F = ((RSSr - RSSnr) / k) / (RSSnr / (n - 2 * k))
+c(F = F, critico = qf(0.95, k, n - 2 * k), p = 1 - pf(F, k, n - 2 * k))
+e = d$Y[13:24] - predict(a, d[13:24, ])  # error del modelo viejo
+mean(e); sqrt(mean(e^2))`})}
+];

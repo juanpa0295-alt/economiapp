@@ -9,9 +9,31 @@ const TLS=typeof TALLERES!=="undefined"?TALLERES:[];
 TLS.forEach(t=>ALL.push(Object.assign(t,{kind:"k"})));
 const PTS={};TLS.forEach(t=>t.puntos.forEach(p=>PTS[p.id]=Object.assign(p,{tl:t})));
 const ALIASES=typeof ALIAS!=="undefined"?ALIAS:{};
+// Laboratorios (opcional por materia): casos de la vida real donde la herramienta del curso produce un beneficio
+const LABS=typeof LABORATORIOS!=="undefined"?LABORATORIOS:[];
+LABS.forEach(l=>ALL.push(Object.assign(l,{kind:"l"})));
+// Usos de la pestaña Práctica. Las ramas de repaso (fórmulas, visuales, preparar el parcial) se muestran allí; las demás son subestaciones opcionales de su estación
+const USO_RE={examen:/simulacro|parcial|supletorio|examen|pr[aá]ctica de la gu[ií]a|preparar/i,repaso:/f[oó]rmula|formulario|tarjeta|pregunta|l[ií]nea de tiempo|tabla|glosario|repaso|visuales/i};
+const usoDe=x=>x.uso||(x.kind==="w"&&x.grp==="ver"?"ver":USO_RE.examen.test(x.t)?"examen":USO_RE.repaso.test(x.t)?"repaso":x.kind==="b"?"":"resolver");
+BRANCHES.forEach(g=>{const u=g.uso||(USO_RE.examen.test(g.g)?"examen":USO_RE.repaso.test(g.g)?"repaso":"");g.items.forEach(it=>{if(u){it.prac=true;it.uso=it.uso||u}})});
+const SUBS={};TRUNK.forEach(t=>SUBS[t.id]=[]);BRANCHES.forEach(g=>g.items.forEach(it=>{if(!it.prac&&SUBS[g.from])SUBS[g.from].push(it)}));
+const PRAC_ITEMS=ALL.filter(x=>x.kind==="w"||x.kind==="k"||(x.kind==="b"&&x.prac));
+const USOS=[["talleres","Hacer los talleres","Los talleres resueltos, con las fórmulas y fichas para estudiarlos"],["resolver","Herramientas para resolver","Meten tus datos y hacen el cálculo paso a paso"],["examen","Preparar el examen","Simulacros, parciales y preguntas como las del examen"],["ver","Herramientas visuales","Para entender: gráficos y escenas que se mueven"]];
+const usoGrupo=x=>x.kind==="k"||usoDe(x)==="repaso"?"talleres":usoDe(x)||"resolver";
+const PRAC=USOS.flatMap(([u])=>u==="talleres"?[...TLS,...PRAC_ITEMS.filter(x=>x.kind!=="k"&&usoGrupo(x)==="talleres")]:PRAC_ITEMS.filter(x=>x.kind!=="k"&&usoGrupo(x)===u));
+// Solo las estaciones del tronco cuentan como progreso: las subestaciones son opcionales
 ALL.forEach(s=>{if(s.q&&!s.qs)s.qs=[{q:s.q,a:s.a}]});
-const LESSONS=ALL.filter(s=>s.kind==="t"||s.kind==="b");
+const LESSONS=TRUNK;
 const EXAM=window.RUTA_EXAM||"",TNOTE=window.RUTA_TRUNK_NOTE===undefined?"<span>· módulo de Economiapp</span>":window.RUTA_TRUNK_NOTE;
+const paneDe=x=>!x?"ruta":x.kind==="l"?"lab":x.kind==="t"||(x.kind==="b"&&!x.prac)?"ruta":"prac";
+function vecinos(s){
+  if(s.kind==="t"){const i=TRUNK.indexOf(s);return [TRUNK[i-1],TRUNK[i+1]]}
+  if(s.kind==="b"&&!s.prac){const p=byId(s.grp.from),sib=SUBS[p.id],i=sib.indexOf(s);return [sib[i-1]||p,sib[i+1]||TRUNK[TRUNK.indexOf(p)+1]]}
+  const L=s.kind==="l"?LABS:PRAC,i=L.indexOf(s);return [L[i-1],L[i+1]]}
+let PANE=null;
+function setPane(p,user){PANE=p;document.querySelectorAll("[data-pane-tab]").forEach(b=>{const on=b.dataset.paneTab===p;b.setAttribute("aria-selected",on);b.classList.toggle("on",on)});
+  document.querySelectorAll("[data-pane-box]").forEach(d=>d.hidden=d.dataset.paneBox!==p);if(user)try{localStorage.setItem("ruta-pane",p)}catch(e){}requestAnimationFrame(moveTrain)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pane-tab]");if(b)setPane(b.dataset.paneTab,true)});
 const byId=id=>ALL.find(s=>s.id===(ALIASES[id]||id));
 const KEY=window.RUTA_KEY||"ruta-done";
 let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){done={}}
@@ -19,25 +41,27 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $=id=>document.getElementById(id);
-const trunkEl=$("trunk"), brEl=$("branches"), les=$("lesson");
+const trunkEl=$("trunk"), les=$("lesson");
 let cur=null;
 function remember(id){try{localStorage.setItem(KEY+"-last",id)}catch(e){}}
 const NW='<span class="tag nw">Nuevo</span>';
 
 function typeset(el){if(window.MathJax&&MathJax.typesetPromise){try{MathJax.typesetClear&&MathJax.typesetClear([el])}catch(e){}MathJax.typesetPromise([el]).catch(()=>{})}}
 
+function subsHTML(t){const l=SUBS[t.id];if(!l||!l.length)return"";const has=l.some(x=>x.id===cur)||cur===t.id;
+  return `<details class="subs${has?" cur":""}" data-g="s:${t.id}" ${has||OPENG.has("s:"+t.id)?"open":""}><summary>${l.length} ${l.length>1?"subestaciones":"subestación"} <i>opcional</i></summary><div>${l.map(x=>`<button class="sub ${cur===x.id?"on":""} ${done[x.id]?"done":""}" type="button" data-go="${x.id}">${x.t}${x.nuevo?'<span class="nwdot">nuevo</span>':""}</button>`).join("")}</div></details>`}
 function renderMap(){
   trunkEl.innerHTML=TRUNK.map((s,i)=>`${s.parte&&(!i||TRUNK[i-1].parte!==s.parte)?`<li class="tparte">${s.parte}</li>`:""}<li><button class="st ${done[s.id]?"done":""} ${cur===s.id?"on":""}" type="button" data-go="${s.id}">
     <span class="dot">${done[s.id]?"✓":i+1}</span><span class="nm">${s.t}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}</button></li>`).join("");
-  brEl.innerHTML=BRANCHES.map((b,gi)=>{const has=b.items.some(it=>it.id===cur),op=has||OPENG.has(gi),nd=b.items.filter(it=>done[it.id]).length;
-    return `<details class="bgrp${has?" cur":""}" data-g="${gi}" ${op?"open":""}><summary><span class="bgt">${b.g}</span><span class="bgn">${nd?nd+"/":""}${b.items.length}</span></summary><small>Sale de: ${byId(b.from).t}</small><div class="chips">${
-    b.items.map(it=>`<button class="chip ${cur===it.id?"on":""} ${done[it.id]?"done":""}" type="button" data-go="${it.id}">${it.t}${it.nuevo?'<span class="nwdot">nuevo</span>':""}</button>`).join("")}</div></details>`}).join("");
-  const wgrp=(g,title,list,cls)=>{if(!list.length)return"";const has=list.some(w=>w.id===cur);return `<details class="wsgrp${has?" cur":""}" ${has||OPENG.has(g)?"open":""} data-g="${g}"><summary><span class="bgt">${title}</span><span class="bgn">${list.length}</span></summary><div class="chips">${list.map(w=>`<button class="chip ${cls} ${cur===w.id?"on":""}" type="button" data-go="${w.id}">${w.t}</button>`).join("")}</div></details>`};
-  const W2=WORKSHOPS.filter(w=>w.grp==="ver"),W1=WORKSHOPS.filter(w=>w.grp!=="ver");
-  let tlh="";if(TLS.length){const has=TLS.some(t=>t.id===cur),all=Object.values(PTS),nd=all.filter(p=>done["p:"+p.id]).length;
-    tlh=`<details class="wsgrp tlgrp${has?" cur":""}" ${has||OPENG.has("k")?"open":""} data-g="k"><summary><span class="bgt">Talleres resueltos</span><span class="bgn">${nd?nd+"/":""}${all.length}</span></summary><small>Cada punto paso a paso, con las propiedades que usa</small><div class="chips">${TLS.map(t=>{const d=t.puntos.filter(p=>done["p:"+p.id]).length;return `<button class="chip tl-chip ${cur===t.id?"on":""}" type="button" data-go="${t.id}">${t.t}<span class="nwdot">${d}/${t.puntos.length}</span></button>`}).join("")}</div></details>`}
-  $("talleres").innerHTML=tlh+wgrp("w",W2.length?"Herramientas para resolver":"Herramientas para practicar",W1,"ws-chip")+wgrp("v","Para entender (visualizaciones)",W2,"ws-chip");
-  const mt=$("maptg");if(mt){const s0=byId(cur),pos=s0?(s0.kind==="t"?`Estación ${TRUNK.indexOf(s0)+1} de ${TRUNK.length}`:s0.kind==="w"?"Herramienta":s0.kind==="k"?"Taller":"Rama"):"";mt.querySelector(".t").textContent=MOBILE()?`Temas del curso · ${pos}`:(document.body.classList.contains("nomap")?"Mostrar temas":"Ocultar temas")}
+  trunkEl.querySelectorAll(":scope>li>.st").forEach(b=>{const h=subsHTML(byId(b.dataset.go));if(h)b.insertAdjacentHTML("afterend",h)});
+  const chip=(x,cls)=>`<button class="chip ${cls||""} ${cur===x.id?"on":""}" type="button" data-go="${x.id}">${x.t}${x.kind==="k"?`<span class="nwdot">${x.puntos.filter(p=>done["p:"+p.id]).length}/${x.puntos.length}</span>`:""}</button>`;
+  const pr=$("practica");if(pr)pr.innerHTML=USOS.map(([u,tt,dd])=>{const l=PRAC.filter(x=>usoGrupo(x)===u);if(!l.length)return"";
+    const k=l.filter(x=>x.kind==="k"),r=l.filter(x=>x.kind!=="k");
+    const t2=u==="talleres"&&!k.length?"Fórmulas y fichas para estudiar":tt,d2=u==="talleres"&&!k.length?"Lo que necesitas a mano para repasar y resolver":dd;
+    return `<section class="uso${l.some(x=>x.id===cur)?" cur":""}"><h4>${t2}</h4><small>${d2}</small>${k.length?`<div class="chips">${k.map(x=>chip(x,"tl-chip")).join("")}</div>`:""}${r.length?`<div class="chips">${r.map(x=>chip(x,"ws-chip")).join("")}</div>`:""}</section>`}).join("");
+  const lb=$("labs");if(lb)lb.innerHTML=LABS.length?`<p class="labintro">Casos reales: cómo se usa lo del curso para tomar una decisión que deja un beneficio medible.</p>${LABS.map(x=>`<button class="labc ${cur===x.id?"on":""}" type="button" data-go="${x.id}"><b>${x.t}</b><span>${x.sector||""}</span></button>`).join("")}`:"";
+  const lt=document.querySelector('[data-pane-tab="lab"]');if(lt)lt.hidden=!LABS.length;
+  const mt=$("maptg");if(mt){const s0=byId(cur),pos=s0?(s0.kind==="t"?`Estación ${TRUNK.indexOf(s0)+1} de ${TRUNK.length}`:s0.kind==="w"?"Práctica":s0.kind==="k"?"Taller":s0.kind==="l"?"Laboratorio":s0.prac?"Práctica":"Subestación"):"";mt.querySelector(".t").textContent=MOBILE()?`Temas del curso · ${pos}`:(document.body.classList.contains("nomap")?"Mostrar temas":"Ocultar temas")}
   const n=LESSONS.filter(s=>done[s.id]).length;
   $("pbar").style.width=(n/LESSONS.length*100)+"%";
   $("ptxt").textContent=`${n} de ${LESSONS.length} temas dominados`;
@@ -60,7 +84,7 @@ function prettyCode(root){(root||document).querySelectorAll("pre:not([data-pc])"
     return `<span class="pc-ln"><span class="pc-cd">${esc(body)}</span><span class="pc-sp">${esc(sp)}</span><span class="pc-cm">${esc(cm)}</span>${nl}</span>`}).join("")})}
 function moveTrain(){
   const s=byId(cur); if(!s) return;
-  const anchor=s.kind==="t"?s.id:s.kind==="b"?s.grp.from:s.anchor;
+  const anchor=s.kind==="t"?s.id:s.kind==="b"?s.grp.from:s.kind==="l"?(s.links||[])[0]:s.anchor;
   const btn=trunkEl.querySelector(`[data-go="${anchor}"]`); if(!btn) return;
   const y=btn.offsetTop+btn.offsetHeight/2;
   $("fill").style.height=Math.max(0,y-14)+"px";
@@ -73,7 +97,7 @@ function deepBlock(s){
     ${["r","stata","py"].map((l,j)=>`<div data-pane="${l}" ${j?"hidden":""}><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(s.code[l])}</pre></div>`).join("")}
   </div></div></div></div>`;
   if(s.py) h+=`<div class="dp"><button type="button" aria-expanded="false" data-dp><span class="k">Python</span><span>El cálculo de Economiapp como función</span><span class="chev">›</span></button><div class="dpb"><div><div>
-    <p class="hint" style="margin:0 0 8px">Es la misma lógica de tu página de Streamlit, separada de la interfaz. El laboratorio de arriba hace estas operaciones y da los mismos resultados.</p>
+    <p class="hint" style="margin:0 0 8px">Es la misma lógica de tu página de Streamlit, separada de la interfaz. La herramienta interactiva de arriba hace estas operaciones y da los mismos resultados.</p>
     <div><button class="cp" type="button" data-copy>Copiar</button><pre>${esc(s.py)}</pre></div></div></div></div></div>`;
   return h?`<section><h3>Para profundizar</h3><div class="deep">${h}</div></section>`:"";
 }
@@ -103,28 +127,37 @@ function enTalleres(s){const ps=Object.values(PTS).filter(p=>(p.temas||[]).inclu
   return `<section class="tl-en"><h3>En los talleres</h3><p class="hint" style="margin:0 0 8px">Estos puntos se resuelven con lo de esta lección${ej?"; abajo está resuelto uno como ejemplo":""}.</p>
   ${grupos.map(([t,l])=>`<div class="tl-g"><span class="lbl">${t.t}</span><div class="tl-enl">${l.map(p=>`<button class="tl-ref${p===ej?" ej":""}" type="button" data-go="${t.id}~${p.id}"><b>${p.n}</b><span>${p.t}</span></button>`).join("")}</div></div>`).join("")}
   ${ej?`<details class="pto tl-ej" open><summary><span class="pn">${ej.n}</span><span class="pt"><small>Ejemplo resuelto · ${ej.tl.t}, ${ej.tl.nl||"punto"} ${ej.n}</small>${ej.t}</span></summary><div class="pto-b">${ptoBody(ej,true)}</div></details>`:""}</section>`}
+function subsLesson(t){const l=SUBS[t.id]||[],lb=LABS.filter(x=>(x.links||[]).includes(t.id));if(!l.length&&!lb.length)return"";
+  return `${l.length?`<section class="subsec"><h3>Subestaciones <small>opcionales · para profundizar</small></h3><div class="subl">${l.map(x=>`<button class="tl-ref" type="button" data-go="${x.id}"><b>${done[x.id]?"✓":"↳"}</b><span>${x.t}<small>${x.grp.g}</small></span></button>`).join("")}</div></section>`:""}
+  ${lb.length?`<section class="subsec labsec"><h3>Aplícalo en un caso real</h3><div class="subl">${lb.map(x=>`<button class="tl-ref" type="button" data-go="${x.id}"><b>◆</b><span>${x.t}<small>${x.sector||"Laboratorio"}</small></span></button>`).join("")}</div></section>`:""}`}
+// Lo que antes se llamaba «laboratorio» dentro de una lección es una herramienta interactiva; «Laboratorios» ahora son los casos reales
+const LABTXT=[[/\b([Dd])el laboratorio\b/g,"$1e la herramienta interactiva"],[/\b([Aa])l laboratorio\b/g,"$1 la herramienta interactiva"],[/\bEl laboratorio\b/g,"La herramienta interactiva"],[/\bel laboratorio\b/g,"la herramienta interactiva"],[/\bEl Laboratorio\b/g,"La herramienta interactiva"],[/\bel Laboratorio\b/g,"la herramienta interactiva"],[/\b([Uu])n laboratorio\b/g,"$1na herramienta interactiva"],[/\bLos laboratorios\b/g,"Las herramientas interactivas"],[/\blos laboratorios\b/g,"las herramientas interactivas"],[/\bLaboratorios\b/g,"Herramientas interactivas"],[/\blaboratorios\b/g,"herramientas interactivas"],[/\bLaboratorio\b/g,"Herramienta interactiva"],[/\blaboratorio\b/g,"herramienta interactiva"]];
+function renombrarLab(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){if(!/aboratorio/.test(n.nodeValue)||n.parentNode.closest("pre,code"))continue;let v=n.nodeValue;LABTXT.forEach(([r,t])=>v=v.replace(r,t));n.nodeValue=v}}
 function openPto(pid,smooth){const d=$("pto-"+pid);if(!d)return;d.open=true;requestAnimationFrame(()=>d.scrollIntoView({behavior:smooth&&!reduce?"smooth":"auto",block:"start"}))}
 function show(id,scroll){
   let sub=null;id=id||"";if(id.includes("~")){[id,sub]=id.split("~")}else if(PTS[id]){sub=id;id=PTS[id].tl.id}
   const s=byId(id)||TRUNK[0]; const prevIdx=ALL.findIndex(x=>x.id===cur); cur=s.id; remember(s.id);
-  const i=ALL.indexOf(s), prev=ALL[i-1], next=ALL[i+1];
+  const i=ALL.indexOf(s), [prev,next]=vecinos(s);
   const eyebrow=s.kind==="t"
     ? `<span>Estación ${i+1} de ${TRUNK.length}</span>${s.exam&&EXAM?`<span class="tag">${EXAM}</span>`:""}${s.parte?`<span>· ${s.parte}</span>`:""}${s.nuevo?NW:s.parte?"":TNOTE}`
-    : s.kind==="b" ? `<span class="tag br">Rama</span>${s.nuevo?NW:""}<span>${s.grp.g} · sale de ${byId(s.grp.from).t}</span>`
+    : s.kind==="b"&&s.prac ? `<span class="tag ws">Para estudiar</span>${s.nuevo?NW:""}<span>${s.grp.g}</span>`
+    : s.kind==="b" ? `<span class="tag br">Subestación · opcional</span>${s.nuevo?NW:""}<span>De la estación ${TRUNK.indexOf(byId(s.grp.from))+1}: ${byId(s.grp.from).t}</span>`
+    : s.kind==="l" ? `<span class="tag lab">Laboratorio · caso real</span><span>${s.sector||""}</span>`
     : s.kind==="k" ? `<span class="tag ws">Taller resuelto</span><span>${s.sub||""} · ${s.puntos.length} puntos</span>`
-    : `<span class="tag ws">Herramienta</span><span>${s.grp==="ver"?"Para entender":"Para resolver ejercicios"}</span>`;
+    : `<span class="tag ws">Práctica</span><span>${(USOS.find(u=>u[0]===usoGrupo(s))||[])[1]||""}</span>`;
   const rel=WORKSHOPS.filter(w=>w.links.includes(s.id));
-  const relHtml=s.kind==="k"?"":s.kind==="w"
-    ? `<div class="relws"><span class="lbl">Lecciones relacionadas</span>${s.links.map(l=>`<button class="btn" type="button" data-go="${l}">${byId(l).t}</button>`).join("")}</div>`
+  const relHtml=s.kind==="k"?"":s.kind==="w"||s.kind==="l"
+    ? `<div class="relws"><span class="lbl">Lecciones relacionadas</span>${(s.links||[]).map(byId).filter(Boolean).map(l=>`<button class="btn" type="button" data-go="${l.id}">${l.t}</button>`).join("")}</div>`
     : rel.length?`<div class="relws"><span class="lbl">Practica en</span>${rel.map(w=>`<button class="btn" type="button" data-go="${w.id}">${w.t} →</button>`).join("")}</div>`:"";
   les.innerHTML=`<div><div class="eyebrow">${eyebrow}</div><h2>${s.t}</h2></div>
     ${s.kind==="w"?`<p class="lead" style="margin:0">${s.d}</p>`:""}
     ${s.kind==="k"?tallerHTML(s):s.html}
     ${s.kind==="t"||s.kind==="b"?enTalleres(s):""}
+    ${s.kind==="t"?subsLesson(s):""}
     ${relHtml}
     ${deepBlock(s)}
     ${quizBlock(s)}
-    <div class="foot">${s.kind==="t"||s.kind==="b"?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya lo domino</label>`:"<span></span>"}
+    <div class="foot">${s.kind==="t"?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya lo domino</label>`:s.kind==="b"&&!s.prac?`<label for="chk"><input type="checkbox" id="chk" ${done[s.id]?"checked":""}> Ya la vi <small class="hint">(opcional, no cuenta en el progreso)</small></label>`:"<span></span>"}
       <div class="row">${prev?`<button class="btn" type="button" data-go="${prev.id}">← ${prev.t}</button>`:""}${next?`<button class="btn solid" type="button" data-go="${next.id}">${next.t} →</button>`:""}</div></div>`;
   [...les.children].forEach((c,k)=>c.style.setProperty("--i",k));
   if(!reduce && prevIdx>=0 && les.animate){
@@ -133,9 +166,11 @@ function show(id,scroll){
   }
   const ck=$("chk");
   if(ck) ck.onchange=e=>{done[s.id]=e.target.checked;save();renderMap()};
-  if(s.sim) try{SIMS[s.sim]()}catch(err){const b=$("sim");if(b)b.innerHTML=`<p class="err">El laboratorio no pudo cargarse: ${esc(String(err.message||err))}</p>`}
+  if(s.kind!=="l") renombrarLab(les);
+  if(s.sim) try{SIMS[s.sim]()}catch(err){const b=$("sim");if(b)b.innerHTML=`<p class="err">La herramienta interactiva no pudo cargarse: ${esc(String(err.message||err))}</p>`}
   if(typeof VISUAL==="function") les.querySelectorAll("[data-vis]").forEach(el=>{try{VISUAL(el,el.dataset.vis)}catch(err){el.innerHTML=`<p class="err">El visual no pudo cargarse: ${esc(String(err.message||err))}</p>`}});
   les.classList.toggle("tl-page",s.kind==="k");
+  {const want=paneDe(s);if(PANE!==want)setPane(want)}
   renderMap();
   prettyCode(les);
   typeset(les);
@@ -166,9 +201,9 @@ document.addEventListener("click",e=>{
 function sel(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}
 document.addEventListener("keydown",e=>{
   if(e.target.closest("input,textarea,select")) return;
-  const i=ALL.findIndex(x=>x.id===cur);
-  if(e.key==="ArrowRight"&&ALL[i+1]) location.hash=ALL[i+1].id;
-  if(e.key==="ArrowLeft"&&ALL[i-1]) location.hash=ALL[i-1].id;
+  const s=byId(cur);if(!s)return;const [p,n]=vecinos(s);
+  if(e.key==="ArrowRight"&&n) location.hash=n.id;
+  if(e.key==="ArrowLeft"&&p) location.hash=p.id;
 });
 document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="tl-hide"){TLHIDE=t.checked;document.body.classList.toggle("tl-hide",TLHIDE);try{localStorage.setItem("ruta-tl-hide",TLHIDE?"1":"0")}catch(er){}return}

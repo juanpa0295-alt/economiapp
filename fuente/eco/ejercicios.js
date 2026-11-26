@@ -8,7 +8,7 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <section><h3>Primero: ¿qué te da el enunciado?</h3>
 <p class="lead">Todos los ejercicios de cambio estructural se resuelven con la misma prueba F; lo que cambia es cómo se obtienen las RSS. Mira qué trae el enunciado y usa la herramienta que corresponde.</p>
 <div class="tbl"><table><tr><th>El ejercicio da…</th><th>Qué haces</th><th>Herramienta</th></tr>
-<tr><td>La tabla de datos o un archivo</td><td>Estimas el restringido, cada submuestra y el modelo con dummies</td><td><button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button></td></tr>
+<tr><td>La tabla de datos o un archivo</td><td>Estimas el restringido, cada submuestra y el modelo con dummies</td><td><button class="btn" type="button" data-go="t-datos">Analizador de datos</button></td></tr>
 <tr><td>X′X, X′y y y′y</td><td>b = (X′X)⁻¹X′y y RSS = y′y − b′X′y en cada muestra; para el restringido se suman las matrices</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · X′X, X′y, y′y</td></tr>
 <tr><td>Las RSS, o s, o R² con la STC</td><td>RSS = s²(n − k) o (1 − R²)·STC, y la F con m submuestras</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · RSS, s o R²</td></tr>
 <tr><td>Un modelo con dummies ya estimado</td><td>Escribes una ecuación por grupo, interpretas los δ y haces las pruebas t</td><td><button class="btn" type="button" data-go="t-calc">Calculadora</button> · Modelo estimado</td></tr>
@@ -40,7 +40,7 @@ BRANCHES.push({g:"Cambio estructural a fondo", from:"chow", items:[
 <ol class="steps"><li><b>Coeficientes recursivos:</b> \(\mathbf b_t=(X_t'X_t)^{-1}X_t'\mathbf y_t\) con las primeras t observaciones, con bandas de ±2 errores estándar. Un salto fuera de la banda indica cambio.</li>
 <li><b>Errores de predicción un paso adelante:</b> \(e_{t+1}=y_{t+1}-\mathbf x_{t+1}'\mathbf b_t\), con varianza \(\sigma^2[1+\mathbf x_{t+1}'(X_t'X_t)^{-1}\mathbf x_{t+1}]\). Si un error queda fuera de ±2 desviaciones, el modelo no anticipó esa observación.</li>
 <li><b>Residuos recursivos y CUSUM:</b> \(w_t=e_t/\sqrt{1+\mathbf x_t'(X_{t-1}'X_{t-1})^{-1}\mathbf x_t}\). La suma acumulada \(W_t=\sum w_j/\hat\sigma\) debe quedar dentro de las bandas \(\pm0{,}948\sqrt{T}\,(1+2t/T)\) al 5 %.</li></ol>
-<p>El <button class="btn" type="button" data-go="t-datos">Laboratorio de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos).</p></section>
+<p>El <button class="btn" type="button" data-go="t-datos">Analizador de datos</button> dibuja los tres gráficos con tu base (sección 4, Recursivos).</p></section>
 <section><h3>En R</h3>
 <pre class="ce-code">library(readxl); library(strucchange)
 datos &lt;- read_excel("mis_datos.xlsx")   # o read.csv("mis_datos.csv")
@@ -64,7 +64,7 @@ sctest(efp(Y ~ X, data = datos, type = "Rec-CUSUM"))</pre></section>`},
 <p>En matrices: \(X'X=\begin{bmatrix}X_1'X_1+X_2'X_2&X_2'X_2\\X_2'X_2&X_2'X_2\end{bmatrix}\). Al resolver las ecuaciones normales se obtiene \(\mathbf b_\beta=(X_1'X_1)^{-1}X_1'\mathbf y_1\) y \(\mathbf b_\beta+\mathbf b_\delta=(X_2'X_2)^{-1}X_2'\mathbf y_2\).</p></section>`}]});
 
 // ---------- Herramientas: dos para resolver y tres para entender
-WORKSHOPS.push({id:"t-datos",t:"Laboratorio de datos",anchor:"mco-matricial",links:["datos","mco-matricial","inferencia","chow","hetero","autocorr"],sim:"datos",html:`<div class="sim" id="sim"></div>`,d:""});
+WORKSHOPS.push({id:"t-datos",t:"Analizador de datos",anchor:"mco-matricial",links:["datos","mco-matricial","inferencia","chow","hetero","autocorr"],sim:"datos",html:`<div class="sim" id="sim"></div>`,d:""});
 WORKSHOPS.splice(0,WORKSHOPS.length,...(function(){
   const by=id=>WORKSHOPS.find(w=>w.id===id), out=[];
   const calc=Object.assign(by("t-calc"),{t:"Calculadora de ejercicios",anchor:"chow",sim:"calc",html:`<div class="sim" id="sim"></div>`,
@@ -73,7 +73,7 @@ WORKSHOPS.splice(0,WORKSHOPS.length,...(function(){
   out.push(by("t-datos"),calc);
   ["t-matrices","t-geometria","t-plano"].forEach(id=>{const w=by(id);if(w){w.grp="ver";out.push(w)}});
   return out})());
-Object.assign(WORKSHOPS.find(w=>w.id==="t-datos"),{t:"Laboratorio de datos",
+Object.assign(WORKSHOPS.find(w=>w.id==="t-datos"),{t:"Analizador de datos",
   d:"Para los ejercicios que traen una tabla de datos o un archivo (CSV o Excel). Estadísticas y correlaciones, variables nuevas (logaritmos, rezagos, dummies de quiebre, interacciones), MCO con errores robustos y pronóstico con intervalos, y pruebas: F, Chow por fila o por grupo con todas sus alternativas y los pronósticos de Chow, coeficientes recursivos y CUSUM, heterocedasticidad, autocorrelación, normalidad, RESET y VIF. También las demostraciones con tus números y el código R. Trae cargadas las bases de los talleres, y los datos no salen de tu navegador."});
 // Enlaces viejos que apuntaban a lo que se reorganizó
 const ALIAS={"t-cambio":"t-calc","ce-resueltos":"tl-ep3","ce-interpretar":"tl-ep3","tl-t1":"tl-ep3"};

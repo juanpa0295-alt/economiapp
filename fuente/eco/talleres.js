@@ -569,7 +569,7 @@ RSSR_M2=0.23; RSSR_M3=0.24; RSSR_M4=0.24096
 (Fc_f=((RSSR_M4-RSSNR)/2)/S2); pf(Fc_f, df1=2, df2=n-k, lower.tail=F)</code></pre>`,
 res:String.raw`<p>La elasticidad precio no es −1,6 (p = 0,015). No se rechazan β₂ + 4β₄ = 0 (F ≈ 0,47), ni que las elasticidades sumen cero (F ≈ 2,5; p ≈ 0,12), ni β₃ = β₄ = 0 (F = 1,37; p = 0,26): los precios de otros licores y de otros bienes no son conjuntamente significativos.</p>`},
 
-{id:"p1-t24", n:"T2-4", t:"Demanda de televisores: intervalos y β₂ + β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia","mco-matricial"], tool:{id:"t-datos",pre:"tv",lbl:"Abrir la base de TV en el Laboratorio de datos"},
+{id:"p1-t24", n:"T2-4", t:"Demanda de televisores: intervalos y β₂ + β₃ = 0", tipo:"Intervalos, F (60) y F (64)", temas:["inferencia","mco-matricial"], tool:{id:"t-datos",pre:"tv",lbl:"Abrir la base de TV en el Analizador de datos"},
 enun:String.raw`<p>Con los 48 meses de demanda de televisores Yt, precio X2t y publicidad X3t (la base del Ejemplo 1) se estiman el modelo (1) \(Y_t=\beta_1+\beta_2X_{2t}+\beta_3X_{3t}+\mu_t\) y el modelo (2), con la restricción β₃ = −β₂. Se tiene b = (10,3017274; −0,0059941; 0,0051071), con errores estándar 0,2440101, 0,0001610 y 0,0008146, cov(b₂, b₃) = 5,399229·10⁻⁸, RSS<sub>NR</sub> = 1,21268 y RSS<sub>R</sub> = 1,239267.</p>
 <p><b>b)</b> Intervalos de confianza del 95 %. <b>c)</b> Pruebe β₂ + β₃ = 0 por todas las formas posibles.</p>`,
 saber:[String.raw`<b>Intervalo:</b> \(b_j\pm t_{\alpha/2}(n-k)\,S_{b_j}\), con \(t_{0{,}025}(45)=2{,}0141\).`,
@@ -742,7 +742,7 @@ sol:String.raw`<ol class="steps">
 <li>También se puede con la t de \(b_3+b_4+b_5-1\), pero para eso hace falta la covarianza de los coeficientes, que no viene en el enunciado.</li></ol>`,
 res:String.raw`<p>F = 2,00; W = 2,42; LR = 2,32 y LM = 2,23: no se rechaza que las elasticidades precio sumen 1 (homogeneidad de grado uno en precios).</p>`},
 
-{id:"ep4-9", n:"9", t:"Mortalidad infantil: incluir TFT y probar β₄ + 6β₃ = 0", tipo:"Pruebas LR, W y LM en todas sus versiones", temas:["mv-pruebas","inferencia"], tool:{id:"t-datos",pre:"mi",lbl:"Abrir la base de mortalidad infantil en el Laboratorio de datos"},
+{id:"ep4-9", n:"9", t:"Mortalidad infantil: incluir TFT y probar β₄ + 6β₃ = 0", tipo:"Pruebas LR, W y LM en todas sus versiones", temas:["mv-pruebas","inferencia"], tool:{id:"t-datos",pre:"mi",lbl:"Abrir la base de mortalidad infantil en el Analizador de datos"},
 enun:String.raw`<p>Con 64 países se estiman (1) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\mu\) y (2) \(MI=\beta_1+\beta_2PIBPC+\beta_3TAF+\beta_4TFT+\mu\).</p>
 <p><b>Modelo (1):</b> b = (263,641586; −0,005647; −2,231586), R² = 0,7077, \(RSS_1=106.315{,}6\), \(l_1=-328{,}1012\), Jarque-Bera = 0,5594 (p = 0,736). <b>Modelo (2):</b> b = (168,306690; −0,005511; −1,768029; 12,868636), errores estándar 32,89, 0,001878, 0,248017 y 4,190533, R² = 0,7474, \(RSS_2=91.875{,}38\), \(l_2=-323{,}4298\); var(b₃) = 0,0615124, var(b₄) = 17,56056, cov(b₃, b₄) = 0,63257. Regresión auxiliar de los errores del modelo (1) contra PIBPC, TAF y TFT: \(R^2_{aux}=0{,}1358243\).</p>
 <p>Con la restricción \(\beta_4+6\beta_3=0\): \(RSS_{R1}=92.161{,}3\), \(l_R=-323{,}5293\), y la regresión auxiliar de sus errores da \(R^2_{aux1}=0{,}003102305\).</p>
