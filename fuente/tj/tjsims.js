@@ -687,11 +687,16 @@ const BNP={
   bos:{t:"Batalla de los sexos: el 2 quiere encontrarse o evitar (½, ½)",x:"acciones 1: B S\nacciones 2: B S\ntipos 1: -\ntipos 2: encontrarse 1/2, evitar 1/2\ntabla -, encontrarse:\n2,1  0,0\n0,0  1,2\ntabla -, evitar:\n2,0  0,2\n0,1  1,0"},
   ent:{t:"Entrada con costo privado del incumbente (Fudenberg y Tirole)",x:"acciones 1: Construir No\nacciones 2: Entrar Quedarse\ntipos 1: alto 1/2, bajo 1/2\ntipos 2: -\ntabla alto, -:\n0,-1  2,0\n2,1  3,0\ntabla bajo, -:\n1.5,-1  3.5,0\n2,1  3,0"},
   bp:{t:"Bien público con costos privados (los dos tienen tipo)",x:"acciones 1: Aportar No\nacciones 2: Aportar No\ntipos 1: bajo 1/2, alto 1/2\ntipos 2: bajo 1/2, alto 1/2\ntabla bajo, bajo:\n3/4,3/4  3/4,1\n1,3/4  0,0\ntabla bajo, alto:\n3/4,1/4  3/4,1\n1,1/4  0,0\ntabla alto, bajo:\n1/4,3/4  1/4,1\n1,3/4  0,0\ntabla alto, alto:\n1/4,1/4  1/4,1\n1,1/4  0,0"},
+  t4p2:{t:"Taller 4 · Punto 2 · Dilema del prisionero (p = 1/3 de que el 2 sea normal)",x:"acciones 1: C N\nacciones 2: C N\ntipos 1: -\ntipos 2: normal 1/3, cooperativo 2/3\ntabla -, normal:\n4,2  0,3\n3,0  1,1\ntabla -, cooperativo:\n4,4  0,3\n3,2  1,1"},
+  t4p2b:{t:"Taller 4 · Punto 2 · Dilema del prisionero (p = 2/3 de que el 2 sea normal)",x:"acciones 1: C N\nacciones 2: C N\ntipos 1: -\ntipos 2: normal 2/3, cooperativo 1/3\ntabla -, normal:\n4,2  0,3\n3,0  1,1\ntabla -, cooperativo:\n4,4  0,3\n3,2  1,1"},
+  t4p3:{t:"Taller 4 · Punto 3 · Tablas 1 y 2 (p = 1/4)",x:"acciones 1: R NR\nacciones 2: NE E\ntipos 1: tabla1 1/4, tabla2 3/4\ntipos 2: -\ntabla tabla1, -:\n0,-1  2,0\n3,2  5,0\ntabla tabla2, -:\n2,-1  4,0\n3,2  2,0"},
+  t4p3b:{t:"Taller 4 · Punto 3 · Tablas 1 y 2 (p = 1/2)",x:"acciones 1: R NR\nacciones 2: NE E\ntipos 1: tabla1 1/2, tabla2 1/2\ntipos 2: -\ntabla tabla1, -:\n0,-1  2,0\n3,2  5,0\ntabla tabla2, -:\n2,-1  4,0\n3,2  2,0"},
+  t4p5:{t:"Taller 4 · Punto 5 · Batalla de los sexos simultánea (p = 1/2)",x:"acciones 1: F C\nacciones 2: F C\ntipos 1: tabla1 1/2, tabla2 1/2\ntipos 2: -\ntabla tabla1, -:\n3,2  2,1\n0,0  1,3\ntabla tabla2, -:\n1,2  0,1\n2,0  3,3"},
   bos2:{t:"Batalla de los sexos con p = 1/4 de querer encontrarse",x:"acciones 1: B S\nacciones 2: B S\ntipos 1: -\ntipos 2: encontrarse 1/4, evitar 3/4\ntabla -, encontrarse:\n2,1  0,0\n0,0  1,2\ntabla -, evitar:\n2,0  0,2\n0,1  1,0"}};
 SIMS.bayes=function(){
   $("sim").innerHTML=`<div class="row slv-top"><label class="selw" for="bn-pre">Ejemplo<select id="bn-pre">${Object.keys(BNP).map(k=>`<option value="${k}">${BNP[k].t}</option>`).join("")}</select></label></div>
   <details class="exted"><summary>Editar o escribir otro juego</summary><p class="hint">Escribe las acciones de cada jugador, sus tipos con la probabilidad de cada uno (usa <code>-</code> si un jugador tiene un solo tipo) y una tabla de pagos por cada par de tipos. Cada fila de la tabla es una acción del jugador 1 y cada celda es «π₁,π₂».</p><textarea id="bn-tx" rows="12" spellcheck="false" aria-label="Juego bayesiano"></textarea></details><div id="bn-out" class="slv-out"></div>`;
-  const tx=$("bn-tx");tx.value=BNP.bos.x;
+  const tp=takePre(BNP)||"bos";if(tp!=="bos")$("bn-pre").value=tp;const tx=$("bn-tx");tx.value=BNP[tp].x;
   const run=()=>{let g,r;try{g=BN.parse(tx.value);r=BN.solve(g)}catch(e){$("bn-out").innerHTML=`<p class="err">Revisa el juego: ${e.message}</p>`;return}
     const T=g.T,A=g.A,multi=i=>T[i].length>1,sol=([x,y])=>`(${r.G.R[x]}, ${r.G.C[y]})`;let n=0,h=[];
     // 1. transformación de Harsanyi
