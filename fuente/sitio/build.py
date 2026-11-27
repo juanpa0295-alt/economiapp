@@ -168,7 +168,7 @@ tjs = rd("tj/tjsims.js")
 assert tjs.startswith("const GT=")
 tjs = tjs.split("\n", 1)[1]
 wr("materias/teoria-juegos/contenido.js", "// Teoría de Juegos · contenido de la ruta (notación del curso, ejercicios de los talleres 1 a 3)\n" + tjc + "\n" + rd("tj/extra.js") + "\n" + rd("tj/casos.js"))
-wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js") + "\n" + rd("tj/guiada.js") + "\n" + rd("tj/casos_labs.js"))
+wr("materias/teoria-juegos/laboratorios.js", "// Teoría de Juegos · resolvedor y laboratorios\n" + tjs.rstrip() + "\n" + rd("tj/labs_extra.js") + "\n" + rd("tj/guiada.js") + "\n" + rd("tj/senal.js") + "\n" + rd("tj/casos_labs.js"))
 
 wr("comun/macro.js", "// Economiapp · cálculos de Macroeconomía 1 como funciones puras.\n" + rd("macro1/macro.js").replace('if(typeof module!=="undefined")module.exports=MAC;', "").rstrip() + "\n")
 wr("materias/macroeconomia-1/contenido.js", "// Macroeconomía I · contenido de la ruta (programa 1503711)\n" + rd("macro1/content.js"))
@@ -406,7 +406,7 @@ MATERIAS = [
        desc="Programa 1503704: forma estratégica y extensiva, dominancia, equilibrio de Nash en puras y mixtas, suma cero, Cournot y Bertrand, bienes públicos y suscripción, equilibrio perfecto en subjuegos, juegos repetidos y teorema de Folk, Bayes-Nash, bayesiano perfecto y señalización, con resolvedores paso a paso.",
        colors=("#6b3fa0", "#ebe1f6", "#c3a6f0", "#2e2244"),
        lbl="Economiapp · Teoría de Juegos", h1="Teoría de Juegos", trunk="Tronco: las cuatro unidades del programa",
-       intro='Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, las aplicaciones con estrategias continuas, los juegos dinámicos (EPS) y los de información incompleta (Bayes-Nash y EBP), con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub>, σ y μ. El primer y el segundo taller están resueltos punto por punto en «Talleres resueltos», y cada lección muestra qué puntos le corresponden. Los resolvedores traen todos los puntos con tabla o árbol, agrupados por taller y en orden, y muestran cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> se agregó hace poco.'),
+       intro='Del planteamiento del juego a los equilibrios en estrategias puras y mixtas, las aplicaciones con estrategias continuas, los juegos dinámicos (EPS) y los de información incompleta (Bayes-Nash y EBP), con la notación del curso: G(Γ), r<sub>i</sub>, ρ<sub>i</sub>, σ y μ. Los cuatro talleres están resueltos punto por punto, con micropasos en el tercero y el cuarto, en la pestaña Práctica, y cada lección muestra qué puntos le corresponden. Los resolvedores traen todos los puntos con tabla o árbol, agrupados por taller y en orden, y muestran cada paso como se hace a mano. Lo marcado como <span class="tag nw">Nuevo</span> se agregó hace poco.'),
 ]
 MATERIAS += [
   dict(slug="derecho-laboral", key="ruta-lab-done", title="Derecho Laboral y Comercial · Economiapp", lib="laboral.js", mathjax=True,
