@@ -187,6 +187,7 @@ function show(id,scroll){
   const ck=$("chk");
   if(ck) ck.onchange=e=>{done[s.id]=e.target.checked;save();renderMap()};
   if(s.kind!=="l") renombrarLab(les);
+  if(typeof window.FIGS==="function")try{window.FIGS(les)}catch(err){}
   if(s.sim) try{SIMS[s.sim]()}catch(err){const b=$("sim");if(b)b.innerHTML=`<p class="err">La herramienta interactiva no pudo cargarse: ${esc(String(err.message||err))}</p>`}
   if(typeof VISUAL==="function") les.querySelectorAll("[data-vis]").forEach(el=>{try{VISUAL(el,el.dataset.vis)}catch(err){el.innerHTML=`<p class="err">El visual no pudo cargarse: ${esc(String(err.message||err))}</p>`}});
   les.classList.toggle("tl-page",s.kind==="k");
