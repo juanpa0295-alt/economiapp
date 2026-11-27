@@ -179,8 +179,8 @@ wr("materias/macroeconomia-2/contenido.js", "// Macroeconomía 2 · contenido de
 wr("materias/macroeconomia-2/laboratorios.js", "// Macroeconomía 2 · laboratorios interactivos\n" + rd("m2/labs.js") + "\n" + rd("m2/vis_scenes.js") + "\n" + rd("m2/labs_extra.js") + "\n" + rd("m2/casos_labs.js"))
 
 wr("comun/laboral.js", "// Economiapp · cálculos de Derecho Laboral (CST). Actualiza la tabla LEY cada año.\n" + rd("lab/laboral.js").replace('if(typeof module!=="undefined")module.exports={LEY,LAB};', "").rstrip() + "\n")
-wr("materias/derecho-laboral/contenido.js", "// Derecho Laboral y Comercial · contenido de la ruta\n" + rd("lab/content.js") + "\n" + rd("lab/talleres.js") + "\n" + rd("lab/extra.js"))
-wr("materias/derecho-laboral/laboratorios.js", "// Derecho Laboral y Comercial · calculadoras\n" + rd("lab/labs.js") + "\n" + rd("lab/caso.js") + "\n" + rd("lab/labs_extra.js"))
+wr("materias/derecho-laboral/contenido.js", "// Derecho Laboral y Comercial · contenido de la ruta\n" + rd("lab/content.js") + "\n" + rd("lab/talleres.js") + "\n" + rd("lab/extra.js") + "\n" + rd("lab/comercial.js"))
+wr("materias/derecho-laboral/laboratorios.js", "// Derecho Laboral y Comercial · calculadoras\n" + rd("lab/labs.js") + "\n" + rd("lab/caso.js") + "\n" + rd("lab/labs_extra.js") + "\n" + rd("lab/ciiu_datos.js") + "\n" + rd("lab/ciiu.js"))
 simb = rd("mat/simbolico.js").replace('if (typeof module !== "undefined") module.exports = { NUM };', "").rstrip()
 assert "/*PY*/" in simb
 wr("comun/simbolico.js", simb.replace("/*PY*/", json.dumps(rd("mat/cas.py") + rd("mat/cas2.py"), ensure_ascii=False)) + "\n")
@@ -414,7 +414,7 @@ MATERIAS += [
        desc="Programa 1501875: contrato de trabajo, período de prueba, suspensión y prescripción, prórrogas e indemnizaciones, empleador y trabajador, salario y embargos, nómina, prestaciones, riesgos laborales, sanciones, y derecho comercial (comerciante, títulos valores, sociedades), con calculadoras.",
        colors=("#7a5a2e", "#efe4d3", "#d9b07a", "#352a1c"),
        lbl="Economiapp · Derecho Laboral y Comercial", h1="Derecho Laboral y Comercial", trunk="Tronco: las unidades del programa",
-       intro="El tronco sigue el programa 1501875: las siete unidades de derecho laboral con el Código Sustantivo del Trabajo vigente (reformado por la Ley 2466 de 2025) y la parte de derecho comercial con el Código de Comercio: el comerciante y los actos de comercio, los bienes mercantiles y títulos valores, y las sociedades. Con el expediente puedes seguir un mismo caso por todas las herramientas. Cada estación tiene una calculadora que muestra el cálculo paso a paso. Es una herramienta de estudio, no asesoría legal."),
+       intro="El tronco sigue el programa 1501875: las siete unidades de derecho laboral con el Código Sustantivo del Trabajo vigente (reformado por la Ley 2466 de 2025) y trece estaciones de derecho comercial: fuentes, comerciante, registro y formalización; sociedades, establecimiento, contratos, títulos valores y propiedad intelectual; contabilidad, competencia, consumidor e insolvencia. En Práctica están el buscador de códigos CIIU y el glosario de normas comerciales. Con el expediente puedes seguir un mismo caso por todas las herramientas. Es una herramienta de estudio, no asesoría legal."),
   dict(slug="matematicas", key="ruta-mat-done", title="Matemáticas · Economiapp", lib=["simbolico.js"], ext=["https://cdn.jsdelivr.net/npm/mathjs@12.4.3/lib/browser/math.js"],
        desc="Álgebra, límites, derivadas, integrales y optimización con restricciones, con calculadoras paso a paso.",
        colors=("#b5501c", "#f6e2d6", "#f0a070", "#3d2618"),
